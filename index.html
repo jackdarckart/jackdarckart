@@ -564,9 +564,9 @@
     const SONGS_KEY = 'cloudbeats_songs';
     const PLAYLISTS_KEY = 'cloudbeats_playlists';
     
-    // Cloudinary Config - DEINE ECHTEN DATEN
+    // Cloudinary Config - UNSIGNED_MATRIX PRESET
     const CLOUDINARY_CLOUD_NAME = 'sda9jage';
-    const CLOUDINARY_UPLOAD_PRESET = 'cloudbeats_unsigned';
+    const CLOUDINARY_UPLOAD_PRESET = 'unsigned_matrix';
 
     let currentUser = null;
     let currentEditingSongId = null;
@@ -682,14 +682,7 @@
                 multiple: false,
                 cropping: type === 'image',
                 showAdvancedOptions: true,
-                sources: ['local', 'url', 'camera'],
-                text: {
-                    en: {
-                        'menu': {
-                            'unsignedUploads': 'My unsigned uploads'
-                        }
-                    }
-                }
+                sources: ['local', 'url', 'camera']
             },
             (error, result) => {
                 if (!error && result && result.event === 'success') {
