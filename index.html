@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudBeats Hub</title>
     
-    <!-- Cloudinary SDK -->
-    <script src="https://upload-widget.cloudinary.com/latest/sources/index.js"></script>
-    
-    <!-- Audio Processing Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.3.0/wavesurfer.min.js"></script>
+    <!-- Cloudinary SDK - NEUE VERSION MIT CJS -->
+    <script src="https://upload-widget.cloudinary.com/latest/index.js"></script>
 
     <script>
         if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
@@ -597,8 +594,6 @@
     // Cloudinary Config
     const CLOUDINARY_CLOUD_NAME = 'sda9jage';
     const CLOUDINARY_UPLOAD_PRESET = 'unsigned_matrix';
-    const CLOUDINARY_API_KEY = 'YOUR_API_KEY'; // ERSETZE MIT DEINEM API KEY
-    const CLOUDINARY_API_SECRET = 'YOUR_API_SECRET'; // ERSETZE MIT DEINEM API SECRET
 
     let currentUser = null;
     let currentEditingSongId = null;
@@ -656,131 +651,6 @@
         modals.forEach(modal => modal.classList.remove('active'));
     }
 
-    // ====== CLOUDINARY DELETE FUNKTION ======
-    async function deleteFromCloudinary(url) {
-        try {
-            if (!url) return true;
-
-            // Extrahiere Public ID aus URL
-            const publicId = extractPublicIdFromUrl(url);
-            if (!publicId) return true;
-
-            // Nutze einen Backend-Service oder Cloudinary-API
-            // HINWEIS: Direkte API-Aufrufe sind aus dem Browser aus nicht sicher!
-            // Besser: Nutze einen Backend-Service
-            
-            console.log('🗑️ Lösche aus Cloudinary:', publicId);
-            
-            // Für lokale Tests - real sollte ein Backend dafür zuständig sein
-            // Beispiel Backend-Endpoint: POST /api/cloudinary/delete
-            
-            return true;
-        } catch (error) {
-            console.error('❌ Fehler beim Löschen aus Cloudinary:', error);
-            return true; // Trotzdem lokal löschen
-        }
-    }
-
-    // ====== PUBLIC ID EXTRAHIEREN ======
-    function extractPublicIdFromUrl(url) {
-        try {
-            // Format: https://res.cloudinary.com/cloud_name/image/upload/v123456/cloudbeats/username/filename.ext
-            // Public ID: cloudbeats/username/filename (ohne ext)
-            const match = url.match(/\/upload\/(?:v\d+\/)?(.+?)\.[a-z]+$/i);
-            return match ? match[1] : null;
-        } catch {
-            return null;
-        }
-    }
-
-    // ====== LOGIN ======
-    function processSecureLogin() {
-        const username = document.getElementById('login-username').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-        const errorBanner = document.getElementById('login-error-banner');
-
-        if (!username || !password) {
-            showError(errorBanner, '❌ Bitte fülle alle Felder aus!');
-            return;
-        }
-
-        if (username && password.length >= 3) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ username }));
-            showSuccess('✅ Login erfolgreich!');
-            updateUIAfterLogin(username);
-        } else {
-            showError(errorBanner, '❌ Nutzername oder Passwort ungültig!');
-        }
-    }
-
-    // ====== REGISTER ======
-    function processSecureRegister() {
-        const email = document.getElementById('reg-email').value.trim();
-        const username = document.getElementById('reg-username').value.trim();
-        const password = document.getElementById('reg-password').value;
-        const passwordConfirm = document.getElementById('reg-password-confirm').value;
-        const errorBanner = document.getElementById('register-error-banner');
-
-        if (!email || !username || !password || !passwordConfirm) {
-            showError(errorBanner, '❌ Bitte fülle alle Felder aus!');
-            return;
-        }
-
-        if (password !== passwordConfirm) {
-            showError(errorBanner, '❌ Passwörter stimmen nicht überein!');
-            return;
-        }
-
-        if (password.length < 6) {
-            showError(errorBanner, '❌ Passwort muss mindestens 6 Zeichen lang sein!');
-            return;
-        }
-
-        const newUser = { username, email };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
-        localStorage.setItem(SONGS_KEY + '_' + username, JSON.stringify([]));
-        localStorage.setItem(PLAYLISTS_KEY + '_' + username, JSON.stringify([]));
-        
-        showSuccess('✅ Registrierung erfolgreich!');
-        updateUIAfterLogin(username);
-    }
-
-    // ====== LOGOUT ======
-    function executeSecureLogout() {
-        localStorage.removeItem(STORAGE_KEY);
-        currentUser = null;
-        showSuccess('✅ Du wurdest abgemeldet!');
-        location.reload();
-    }
-
-    // ====== UI NACH LOGIN ======
-    function updateUIAfterLogin(username) {
-        currentUser = username;
-        document.getElementById('login-panel-card').style.display = 'none';
-        document.getElementById('register-panel-card').style.display = 'none';
-        document.getElementById('studio-vault-lock-card').style.display = 'none';
-        document.getElementById('creator-studio-card').style.display = 'block';
-        document.getElementById('user-profile-bar').style.display = 'flex';
-        document.getElementById('logged-in-user').textContent = username;
-        
-        loadUserSongs();
-        loadUserPlaylists();
-    }
-
-    // ====== TOGGLE REGISTER PANEL ======
-    function toggleRegisterPanel() {
-        const loginCard = document.getElementById('login-panel-card');
-        const registerCard = document.getElementById('register-panel-card');
-        
-        if (registerCard.style.display === 'none') {
-            loginCard.style.display = 'none';
-            registerCard.style.display = 'block';
-        } else {
-            loginCard.style.display = 'block';
-            registerCard.style.display = 'none';
-        }
-    }
-
     // ====== CLOUDINARY WIDGET ======
     function openCloudinaryWidget(type, isEdit = false) {
         if (!currentUser) {
@@ -790,18 +660,19 @@
 
         const resourceType = type === 'audio' ? 'video' : 'image';
         
-        cloudinary.openUploadWidget(
+        const widget = cloudinary.createUploadWidget(
             {
                 cloudName: CLOUDINARY_CLOUD_NAME,
                 uploadPreset: CLOUDINARY_UPLOAD_PRESET,
                 resourceType: resourceType,
                 folder: `cloudbeats/${currentUser}`,
                 maxFileSize: 5242880,
-                clientAllowedFormats: type === 'audio' ? ['mp3'] : ['jpg', 'jpeg', 'png', 'webp'],
+                clientAllowedFormats: type === 'audio' ? ['mp3', 'wav', 'ogg'] : ['jpg', 'jpeg', 'png', 'webp', 'gif'],
                 multiple: false,
                 cropping: type === 'image',
-                showAdvancedOptions: true,
-                sources: ['local', 'url', 'camera']
+                showAdvancedOptions: false,
+                sources: ['local', 'url'],
+                defaultSource: 'local'
             },
             (error, result) => {
                 if (!error && result && result.event === 'success') {
@@ -810,23 +681,31 @@
                     if (isEdit) {
                         if (type === 'audio') {
                             document.getElementById('edit-song-audio').value = url;
+                            showSuccess('✅ Audio-Datei aktualisiert!');
                         } else {
                             document.getElementById('edit-song-cover').value = url;
+                            showSuccess('✅ Cover aktualisiert!');
                         }
                     } else {
                         if (type === 'audio') {
-                            const title = prompt('Song Titel eingeben:');
-                            if (title) {
-                                addNewSong(title, url, '');
+                            const title = prompt('🎵 Song Titel eingeben:');
+                            if (title && title.trim()) {
+                                addNewSong(title.trim(), url, '');
+                            } else {
+                                addNewSong('Neuer Song', url, '');
                             }
                         } else {
                             sessionStorage.setItem('pending_cover_url', url);
-                            alert('✅ Cover gespeichert! Lade jetzt die MP3 hoch.');
+                            showSuccess('✅ Cover gespeichert!');
                         }
                     }
+                } else if (error) {
+                    console.error('Upload Fehler:', error);
                 }
             }
         );
+        
+        widget.open();
     }
 
     // ====== SONG HINZUFÜGEN ======
@@ -835,7 +714,7 @@
 
         const song = {
             id: Date.now(),
-            title: title || 'Untitled Song',
+            title: title || 'Neuer Song',
             audioUrl: audioUrl,
             coverUrl: coverUrl || 'https://via.placeholder.com/180?text=🎵',
             createdAt: new Date().toLocaleString('de-DE'),
@@ -886,7 +765,7 @@
                 </div>
                 <div class="song-title">${escapeHtml(song.title)}</div>
                 <div class="song-meta">${escapeHtml(song.createdAt)}</div>
-                <div class="song-player" onclick="playSong('${escapeHtml(song.audioUrl)}')">
+                <div class="song-player" onclick="playSong('${song.audioUrl}')">
                     ▶️ PLAY
                 </div>
                 <div class="song-actions">
@@ -902,7 +781,9 @@
     // ====== SONG ABSPIELEN ======
     function playSong(audioUrl) {
         const audio = new Audio(audioUrl);
-        audio.play().catch(e => alert('❌ Fehler beim Abspielen: ' + e.message));
+        audio.play().catch(e => {
+            showSuccess('❌ Fehler beim Abspielen: ' + e.message);
+        });
     }
 
     // ====== SONG BEARBEITEN ======
@@ -918,53 +799,27 @@
         openModal('edit-song-modal');
     }
 
-    async function saveSongEdit() {
+    function saveSongEdit() {
         const song = allSongs.find(s => s.id === currentEditingSongId);
         if (!song) return;
 
-        const oldCoverUrl = song.coverUrl;
-        const oldAudioUrl = song.audioUrl;
-
-        const newCoverUrl = document.getElementById('edit-song-cover').value;
-        const newAudioUrl = document.getElementById('edit-song-audio').value;
-
-        song.title = document.getElementById('edit-song-title').value || 'Untitled';
-        song.coverUrl = newCoverUrl;
-        song.audioUrl = newAudioUrl;
-
-        // Lösche alte Dateien aus Cloudinary wenn sie geändert wurden
-        if (newCoverUrl !== oldCoverUrl && oldCoverUrl) {
-            await deleteFromCloudinary(oldCoverUrl);
-        }
-        if (newAudioUrl !== oldAudioUrl && oldAudioUrl) {
-            await deleteFromCloudinary(oldAudioUrl);
-        }
+        song.title = document.getElementById('edit-song-title').value || 'Neuer Song';
+        song.coverUrl = document.getElementById('edit-song-cover').value;
+        song.audioUrl = document.getElementById('edit-song-audio').value;
 
         saveSongsToStorage();
         renderSongs();
         closeModal();
-        showSuccess('✅ Song aktualisiert! Alte Dateien wurden aus Cloudinary gelöscht.');
+        showSuccess('✅ Song aktualisiert!');
     }
 
-    // ====== SONG LÖSCHEN MIT CLOUDINARY DELETE ======
-    async function deleteSongWithCloudinary(songId) {
-        if (confirm('🗑️ Wirklich diesen Song löschen? Dateien werden aus Cloudinary gelöscht!')) {
-            const song = allSongs.find(s => s.id === songId);
-            
-            if (song) {
-                // Lösche Audio und Cover aus Cloudinary
-                if (song.audioUrl) {
-                    await deleteFromCloudinary(song.audioUrl);
-                }
-                if (song.coverUrl && !song.coverUrl.includes('placeholder')) {
-                    await deleteFromCloudinary(song.coverUrl);
-                }
-            }
-
+    // ====== SONG LÖSCHEN ======
+    function deleteSongWithCloudinary(songId) {
+        if (confirm('🗑️ Wirklich diesen Song löschen?')) {
             allSongs = allSongs.filter(s => s.id !== songId);
             saveSongsToStorage();
             renderSongs();
-            showSuccess('✅ Song gelöscht! Cloudinary-Dateien wurden entfernt.');
+            showSuccess('✅ Song gelöscht!');
         }
     }
 
@@ -1084,7 +939,7 @@
                             ${!song.coverUrl || song.coverUrl.includes('placeholder') ? '🎵' : ''}
                         </div>
                         <div class="song-title">${escapeHtml(song.title)}</div>
-                        <div class="song-player" onclick="playSong('${escapeHtml(song.audioUrl)}')">
+                        <div class="song-player" onclick="playSong('${song.audioUrl}')">
                             ▶️ PLAY
                         </div>
                     `;
@@ -1094,6 +949,94 @@
         }
 
         openModal('view-playlist-modal');
+    }
+
+    // ====== LOGIN ======
+    function processSecureLogin() {
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+        const errorBanner = document.getElementById('login-error-banner');
+
+        if (!username || !password) {
+            showError(errorBanner, '❌ Bitte fülle alle Felder aus!');
+            return;
+        }
+
+        if (username && password.length >= 3) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ username }));
+            showSuccess('✅ Login erfolgreich!');
+            updateUIAfterLogin(username);
+        } else {
+            showError(errorBanner, '❌ Nutzername oder Passwort ungültig!');
+        }
+    }
+
+    // ====== REGISTER ======
+    function processSecureRegister() {
+        const email = document.getElementById('reg-email').value.trim();
+        const username = document.getElementById('reg-username').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const passwordConfirm = document.getElementById('reg-password-confirm').value;
+        const errorBanner = document.getElementById('register-error-banner');
+
+        if (!email || !username || !password || !passwordConfirm) {
+            showError(errorBanner, '❌ Bitte fülle alle Felder aus!');
+            return;
+        }
+
+        if (password !== passwordConfirm) {
+            showError(errorBanner, '❌ Passwörter stimmen nicht überein!');
+            return;
+        }
+
+        if (password.length < 6) {
+            showError(errorBanner, '❌ Passwort muss mindestens 6 Zeichen lang sein!');
+            return;
+        }
+
+        const newUser = { username, email };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
+        localStorage.setItem(SONGS_KEY + '_' + username, JSON.stringify([]));
+        localStorage.setItem(PLAYLISTS_KEY + '_' + username, JSON.stringify([]));
+        
+        showSuccess('✅ Registrierung erfolgreich!');
+        updateUIAfterLogin(username);
+    }
+
+    // ====== LOGOUT ======
+    function executeSecureLogout() {
+        localStorage.removeItem(STORAGE_KEY);
+        currentUser = null;
+        showSuccess('✅ Du wurdest abgemeldet!');
+        location.reload();
+    }
+
+    // ====== UI NACH LOGIN ======
+    function updateUIAfterLogin(username) {
+        currentUser = username;
+        document.getElementById('login-panel-card').style.display = 'none';
+        document.getElementById('register-panel-card').style.display = 'none';
+        document.getElementById('studio-vault-lock-card').style.display = 'none';
+        document.getElementById('creator-studio-card').style.display = 'block';
+        document.getElementById('user-profile-bar').style.display = 'flex';
+        document.getElementById('logged-in-user').textContent = username;
+        
+        loadUserSongs();
+        loadUserPlaylists();
+    }
+
+    // ====== TOGGLE REGISTER PANEL ======
+    function toggleRegisterPanel() {
+        const loginCard = document.getElementById('login-panel-card');
+        const registerCard = document.getElementById('register-panel-card');
+        
+        if (registerCard.style.display === 'none') {
+            loginCard.style.display = 'none';
+            registerCard.style.display = 'block';
+        } else {
+            loginCard.style.display = 'block';
+            registerCard.style.display = 'none';
+        }
     }
 
     // ====== INITIALISIERUNG ======
