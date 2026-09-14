@@ -49,6 +49,10 @@
         .btn { padding: 16px 28px; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; width: 100%; text-align: center; font-size: 0.85rem; letter-spacing: 0.5px; }
         .btn-primary { background: var(--primary); color: #030608; }
         .btn-secondary { background: #060a0d; border: 1px solid var(--border); color: #fff; margin-top: 12px; }
+        
+        /* 🚨 OPTIMIERTES WARNFENSTER-DESIGN */
+        .error-alert-banner { display: none; background: rgba(255, 51, 102, 0.08); border: 1px solid var(--lock); color: var(--lock); padding: 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; text-align: center; margin-bottom: 15px; }
+        
         .lock-badge { background: rgba(255, 51, 102, 0.08); border: 1px solid var(--lock); color: var(--lock); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; }
         .unlock-badge { background: rgba(0, 230, 118, 0.08); border: 1px solid var(--unlock); color: var(--unlock); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; }
     </style>
@@ -104,6 +108,7 @@
 
     <div class="card" id="login-panel-card">
         <h3>🔒 Studio Login</h3>
+        <div id="login-error-banner" class="error-alert-banner"></div>
         <div class="form-group"><label>Nutzername</label><input type="text" id="login-username" placeholder="z. B. test"></div>
         <div class="form-group"><label>Passwort</label><input type="password" id="login-password" placeholder="z. B. 123"></div>
         <button class="btn btn-primary" onclick="processSecureLogin()">Einloggen</button>
@@ -111,6 +116,7 @@
 
     <div class="card" id="register-panel-card">
         <h3>📝 Neues Creator Studio registrieren</h3>
+        <div id="register-error-banner" class="error-alert-banner"></div>
         <div class="form-group"><label>E-Mail-Adresse</label><input type="email" id="reg-email" placeholder="name@stream-musik.space"></div>
         <div class="form-group"><label>Nutzername (Eindeutig geschützt)</label><input type="text" id="reg-username" placeholder="Dein Studio-Name"></div>
         <div class="form-group"><label>Passwort</label><input type="password" id="reg-password" placeholder="••••••••"></div>
@@ -127,8 +133,3 @@
 <div class="player-bar">
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
-            <strong id="p-title" style="color:#fff; font-size:0.95rem; display:block; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Kein Beat geladen</strong>
-            <span id="p-status" style="color:#64748b; font-size:0.75rem;">System Bereit</span>
-        </div>
-        <button id="play-trigger" onclick="togglePlayback()" style="background:var(--primary); border:none; padding:10px 18px; border-radius:8px; color:#030608; font-weight:700; cursor:pointer; display:none;">▶ PLAY</button>
-    </div>
