@@ -28,7 +28,7 @@
             --unlock: #00e676;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         
         body { 
             background: var(--bg); 
@@ -45,7 +45,7 @@
 
         .container { max-width: 680px; width: 100%; margin: 0 auto; padding: 25px 20px; display: flex; flex-direction: column; gap: 24px; }
         
-        .header { text-align: center; padding: 40px 0 20px 0; }
+        .header { text-align: center; padding: 40px 0 20px 0; position: relative; }
         .logo-glow {
             font-size: 3.5rem;
             display: inline-block;
@@ -80,6 +80,7 @@
         .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--accent-quantum)); }
         
         h3 { margin-bottom: 20px; font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        h3 span.icon { color: var(--primary); margin-right: 10px; }
 
         .compliance-box { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
         .compliance-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 191, 165, 0.05); border: 1px solid rgba(0, 191, 165, 0.15); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.8px; }
@@ -97,7 +98,9 @@
             border-radius: 12px; 
             color: #fff; 
             font-size: 0.95rem; 
+            transition: all 0.2s ease; 
         }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 191, 165, 0.1); outline: none; }
 
         .upload-area { 
             background: #05080b; 
@@ -107,8 +110,10 @@
             text-align: center; 
             cursor: pointer; 
         }
-        .upload-area:hover { border-color: var(--primary); }
+        .upload-area:hover { border-color: var(--primary); background: rgba(0, 191, 165, 0.02); }
         .upload-area .up-icon { font-size: 2.2rem; display: block; margin-bottom: 12px; }
+        .upload-area h4 { font-size: 1.05rem; margin-bottom: 4px; color: #fff; }
+        .upload-area p { color: var(--text-muted); font-size: 0.8rem; }
         .upload-progress { margin-top: 20px; font-size: 0.9rem; color: var(--primary); display: none; font-weight: 600; text-align: center; }
 
         .track-item { 
@@ -121,8 +126,9 @@
             align-items: center; 
             margin-bottom: 12px; 
             cursor: pointer; 
+            transition: all 0.2s ease; 
         }
-        .track-item:hover { border-color: var(--primary); background: #16222b; }
+        .track-item:hover { border-color: var(--primary); background: #16222b; transform: translateX(2px); }
         .track-meta-box { display: flex; align-items: center; gap: 14px; }
         .track-disc { width: 36px; height: 36px; background: #05080b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; border: 1px solid var(--border); }
         .track-title { font-weight: 600; font-size: 0.95rem; color: #fff; }
@@ -133,7 +139,7 @@
             bottom: 0; 
             left: 0; 
             width: 100%; 
-            background: rgba(10, 15, 18, 0.9);
+            background: rgba(10, 15, 18, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid var(--border); 
@@ -141,6 +147,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 12px; 
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.7); 
             z-index: 1000; 
             height: 130px; 
         }
@@ -148,14 +155,15 @@
         .p-meta-title { color: #fff; font-size: 1rem; font-weight: 700; display: block; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .p-meta-status { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
         .progress-container { width: 100%; height: 6px; background: #05070a; border-radius: 10px; cursor: pointer; position: relative; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent-quantum)); border-radius: 10px; }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent-quantum)); border-radius: 10px; box-shadow: 0 0 10px var(--primary); }
 
-        .btn { padding: 16px 28px; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.8px; width: 100%; text-align: center; }
+        .btn { padding: 16px 28px; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.8px; transition: all 0.22s ease; width: 100%; text-align: center; }
         .btn-primary { background: var(--primary); color: #030608; }
         .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 0 16px var(--primary-glow); }
         .btn-secondary { background: #060a0d; border: 1px solid var(--border); color: var(--text-main); margin-top: 12px; }
         
         .btn-logout { background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px; font-size: 0.75rem; border-radius: 20px; font-weight: 700; cursor: pointer; }
+        .btn-logout:hover { border-color: var(--lock); color: var(--lock); }
         .btn-delete { background: transparent; border: 1px solid rgba(255, 51, 102, 0.15); color: var(--lock); padding: 8px 16px; font-size: 0.75rem; border-radius: 20px; font-weight: 700; cursor: pointer; margin-left: 8px; }
         .alert-box { color: var(--lock); background: rgba(255,51,102,0.05); border: 1px solid rgba(255,51,102,0.15); padding: 12px; border-radius: 10px; font-size: 0.85rem; margin-top: 14px; text-align: center; font-weight: 600; display: none; }
         .badge-studio { border: 1px solid rgba(157, 78, 221, 0.3); background: rgba(157, 78, 221, 0.08); color: var(--accent-quantum); }
@@ -173,13 +181,3 @@
             <div id="user-profile-bar-text">👑 Studio-Sitzung: <strong id="logged-in-user" style="color:#fff;">-</strong></div>
             <div>
                 <button class="btn-logout" onclick="executeSecureLogout()">Abmelden</button>
-                <button class="btn-delete" onclick="executeAccountDeletion()">Konto löschen</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="compliance-badge">⚖️ LEX-SINGULARITY MATRIX 25.0 ACTIVE</div>
-        <div class="compliance-box">
-            <p style="margin-bottom: 6px;">⚖️ <strong>MiCA &amp; Utility Shield:</strong> SBT-Transienten besitzen keinen Geldwert. Vollständiger Schutz vor Glücksspiel-Regulierungen.</p>
-            <p style="margin-bottom: 6px;">🤖 <strong>EU AI Act Compliance:</strong> Manipulationssichere Kennzeichnung aller generierten Spuren.</p>
