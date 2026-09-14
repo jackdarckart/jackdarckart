@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudBeats Hub</title>
     
-    <!-- 🔒 AUTOMATISCHE HTTPS-ERZWUNGUNG -->
+    <!-- Cloudinary SDK -->
+    <script src="https://upload-widget.cloudinary.com/latest/sources/index.js"></script>
+    
+    <!-- Audio Processing Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.3.0/wavesurfer.min.js"></script>
+
     <script>
         if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
             window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search);
@@ -35,11 +40,11 @@
             min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
-            padding-bottom: 140px; 
+            padding-bottom: 20px; 
             overflow-x: hidden; 
         }
         .container { 
-            max-width: 680px; 
+            max-width: 900px; 
             width: 100%; 
             margin: 0 auto; 
             padding: 25px 20px; 
@@ -93,7 +98,7 @@
             text-transform: uppercase; 
             font-weight: 700; 
         }
-        input { 
+        input, textarea { 
             width: 100%; 
             padding: 16px; 
             background: #060a0d; 
@@ -102,7 +107,7 @@
             color: #fff; 
             font-size: 0.95rem; 
         }
-        input:focus { 
+        input:focus, textarea:focus { 
             border-color: var(--primary); 
             outline: none; 
         }
@@ -154,34 +159,140 @@
             border-radius: 10px; 
             transition: width 0.1s ease; 
         }
-        
-        .track-item { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            padding: 16px 20px; 
-            border-radius: 14px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+
+        .songs-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .song-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+
+        .song-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(0,191,165,0.1);
+        }
+
+        .song-cover {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, var(--primary), #9d4edd);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin-bottom: 12px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .song-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .song-meta {
+            font-size: 0.75rem;
+            color: #64748b;
             margin-bottom: 12px;
         }
-        .track-item:hover { 
-            border-color: var(--primary); 
-        }
-        .player-bar { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            background: rgba(10, 15, 18, 0.95); 
-            border-top: 1px solid var(--border); 
-            padding: 20px 40px; 
-            display: flex; 
-            flex-direction: row; 
-            gap: 20px;
+
+        .song-player {
+            width: 100%;
+            height: 40px;
+            margin-bottom: 12px;
+            background: #05070a;
+            border-radius: 8px;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        
+
+        .song-player:hover {
+            background: rgba(0,191,165,0.1);
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .song-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 8px 12px;
+            background: #060a0d;
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+
+        .song-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .song-btn.delete:hover {
+            border-color: var(--lock);
+            color: var(--lock);
+        }
+
+        .playlist-container {
+            margin-top: 24px;
+        }
+
+        .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .playlist-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .playlist-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 6px 16px rgba(0,191,165,0.1);
+        }
+
+        .playlist-name {
+            font-weight: 700;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .playlist-count {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
         .btn { 
             padding: 16px 28px; 
             border: none; 
@@ -237,6 +348,45 @@
             border-radius: 20px; 
             font-size: 0.72rem; 
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -252,43 +402,14 @@
     </div>
 
     <div class="card">
-        <span style="color:var(--primary); font-weight:700; font-size:0.75rem; letter-spacing: 0.5px;">⚖️ LEX-SINGULARITY MATRIX 25.0 ACTIVE</span>
-        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">SBT-Transienten besitzen keinen Geldwert. Multi-Tenant Sandbox limitiert Uploads strikt auf max. 5 MB zur absoluten Sicherheit.</p>
+        <span style="color:var(--primary); font-weight:700; font-size:0.75rem; letter-spacing: 0.5px;">⚖️ CLOUDBEATS STUDIO v2.0 ACTIVE</span>
+        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">Kostenlose Musik-Studio Plattform mit Cloudinary Integration. Max 5MB pro Datei. Auto Qualitätsoptimierung ohne Größenverlust.</p>
     </div>
 
-    <!-- 🔒 EXKLUSIVES SCHLOSSFENSTER FÜR ÖFFENTLICHKEIT -->
+    <!-- EXKLUSIVES SCHLOSSFENSTER -->
     <div class="card" id="studio-vault-lock-card">
         <h3><span>🌌 Creator Studio Tresor</span> <span class="lock-badge">🔒 Gesperrt</span></h3>
         <p style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Dieses Segment ist für die Öffentlichkeit unsichtbar verschlüsselt. Bitte logge dich ein, um das Studio freizuschalten.</p>
-    </div>
-
-    <!-- 🌌 MEIN CREATOR STUDIO -->
-    <div class="card" id="creator-studio-card" style="display:none;">
-        <h3><span>🌌 Mein Creator Studio</span> <span class="unlock-badge">🔓 Freigeschaltet</span></h3>
-        <p style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Deine gesicherte, externe Cloudinary REST API Schnittstelle ist aktiv.</p>
-        
-        <div class="upload-grid">
-            <div class="upload-area" onclick="document.getElementById('mp3-file-picker').click()">
-                <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🎵</span>
-                <strong>Beat hochladen</strong>
-                <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Nur .mp3 (Max. 5 MB)</p>
-                <input type="file" id="mp3-file-picker" accept="audio/mpeg,audio/mp3" style="display:none;" onchange="autoUploadToCloudinary(this.files, 'audio')">
-            </div>
-            <div class="upload-area" onclick="document.getElementById('img-file-picker').click()">
-                <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🖼️</span>
-                <strong>Cover hochladen</strong>
-                <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Bilder (Max. 5 MB)</p>
-                <input type="file" id="img-file-picker" accept="image/*" style="display:none;" onchange="autoUploadToCloudinary(this.files, 'image')">
-            </div>
-        </div>
-        
-        <div id="upload-progress-box" class="upload-progress-box">
-            <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
-                <span id="upload-file-name" style="color:#fff; font-weight:600; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Datei...</span>
-                <span id="upload-percentage" style="color:var(--primary); font-weight:700;">0%</span>
-            </div>
-            <div class="progress-bar-bg"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
-        </div>
     </div>
 
     <!-- LOGIN PANEL -->
@@ -304,6 +425,7 @@
             <input type="password" id="login-password" placeholder="z. B. 123">
         </div>
         <button type="button" class="btn btn-primary" onclick="processSecureLogin()">Einloggen</button>
+        <button type="button" class="btn btn-secondary" onclick="toggleRegisterPanel()">Neues Studio erstellen</button>
     </div>
 
     <!-- REGISTRIERUNGS PANEL -->
@@ -330,26 +452,127 @@
         <button type="button" class="btn btn-secondary" onclick="toggleRegisterPanel()">Zurück zum Login</button>
     </div>
 
-    <!-- TOGGLE REGISTER BUTTON -->
-    <div style="text-align: center; margin-top: 10px;">
-        <button type="button" class="btn btn-secondary" onclick="toggleRegisterPanel()">Neues Studio erstellen</button>
+    <!-- MEIN CREATOR STUDIO -->
+    <div id="creator-studio-card" style="display:none;">
+        <div class="card">
+            <h3><span>🌌 Mein Creator Studio</span> <span class="unlock-badge">🔓 Freigeschaltet</span></h3>
+            <p style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Gesicherte Cloudinary Cloud Storage Integration für deine Musik.</p>
+            
+            <div class="upload-grid">
+                <div class="upload-area" onclick="openCloudinaryWidget('audio')">
+                    <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🎵</span>
+                    <strong>Beat hochladen</strong>
+                    <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">MP3 (Max. 5 MB)</p>
+                </div>
+                <div class="upload-area" onclick="openCloudinaryWidget('image')">
+                    <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🖼️</span>
+                    <strong>Cover hochladen</strong>
+                    <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Bild (Max. 5 MB)</p>
+                </div>
+            </div>
+            
+            <div id="upload-progress-box" class="upload-progress-box">
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                    <span id="upload-file-name" style="color:#fff; font-weight:600; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Datei...</span>
+                    <span id="upload-percentage" style="color:var(--primary); font-weight:700;">0%</span>
+                </div>
+                <div class="progress-bar-bg"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
+            </div>
+        </div>
+
+        <!-- SONGS LISTE -->
+        <div class="card">
+            <h3>🎶 Meine Songs</h3>
+            <div id="songs-list" class="songs-list"></div>
+            <div id="no-songs" style="text-align: center; color: #64748b; padding: 40px 20px;">
+                <p>📭 Noch keine Songs hochgeladen</p>
+                <p style="font-size: 0.85rem; margin-top: 10px;">Starte jetzt und lade deinen ersten Beat hoch!</p>
+            </div>
+        </div>
+
+        <!-- PLAYLISTS -->
+        <div class="card playlist-container">
+            <h3>📋 Meine Playlists</h3>
+            <button type="button" class="btn btn-primary" onclick="openCreatePlaylistModal()" style="margin-bottom: 16px;">+ Neue Playlist erstellen</button>
+            <div id="playlists-list" class="playlist-grid"></div>
+            <div id="no-playlists" style="text-align: center; color: #64748b; padding: 20px;">
+                <p>📭 Noch keine Playlists erstellt</p>
+            </div>
+        </div>
     </div>
 
 </div>
 
-<!-- PLAYER BAR (FOOTER) -->
-<div class="player-bar">
-    <div style="flex: 1;">
-        <p style="color: #64748b; font-size: 0.85rem;">🎶 Kein Track aktiv</p>
+<!-- MODAL: EDIT SONG -->
+<div id="edit-song-modal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <h3>✏️ Song bearbeiten</h3>
+        <div class="form-group">
+            <label>Song Titel</label>
+            <input type="text" id="edit-song-title" placeholder="Neuer Titel">
+        </div>
+        <div class="form-group">
+            <label>Song Cover</label>
+            <input type="text" id="edit-song-cover" placeholder="Cover URL" readonly>
+            <button type="button" class="btn btn-secondary" onclick="openCloudinaryWidget('image', true)" style="margin-top: 8px;">Neues Cover hochladen</button>
+        </div>
+        <div class="form-group">
+            <label>Audio Datei</label>
+            <input type="text" id="edit-song-audio" placeholder="Audio URL" readonly>
+            <button type="button" class="btn btn-secondary" onclick="openCloudinaryWidget('audio', true)" style="margin-top: 8px;">Neue MP3 hochladen</button>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="saveSongEdit()">Speichern</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
     </div>
-    <button type="button" class="btn" style="width: 100px;">▶️ Play</button>
+</div>
+
+<!-- MODAL: CREATE PLAYLIST -->
+<div id="create-playlist-modal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <h3>📋 Neue Playlist erstellen</h3>
+        <div class="form-group">
+            <label>Playlist Name</label>
+            <input type="text" id="new-playlist-name" placeholder="z.B. Meine Top Beats">
+        </div>
+        <div class="form-group">
+            <label>Beschreibung</label>
+            <textarea id="new-playlist-desc" placeholder="Optionale Beschreibung" style="resize: vertical; min-height: 100px;"></textarea>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="createPlaylist()">Playlist erstellen</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
+    </div>
+</div>
+
+<!-- MODAL: VIEW PLAYLIST -->
+<div id="view-playlist-modal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <h3 id="playlist-modal-title">📋 Playlist</h3>
+        <div id="playlist-modal-songs" class="songs-list"></div>
+        <p id="playlist-empty" style="text-align: center; color: #64748b;">Keine Songs in dieser Playlist</p>
+        <button type="button" class="btn btn-secondary" onclick="closeModal()" style="margin-top: 16px;">Schließen</button>
+    </div>
 </div>
 
 <script>
-    // ====== SPEICHER-VERWALTUNG ======
+    // ====== KONFIGURATION ======
     const STORAGE_KEY = 'cloudbeats_user';
+    const SONGS_KEY = 'cloudbeats_songs';
+    const PLAYLISTS_KEY = 'cloudbeats_playlists';
+    
+    // Cloudinary Config (ERSETZE MIT DEINEN CREDENTIALS)
+    const CLOUDINARY_CLOUD_NAME = 'YOUR_CLOUDINARY_CLOUD_NAME';
+    const CLOUDINARY_UPLOAD_PRESET = 'YOUR_CLOUDINARY_UPLOAD_PRESET';
 
-    // ====== LOGIN FUNKTION ======
+    let currentUser = null;
+    let currentEditingSongId = null;
+    let currentEditingType = null;
+    let allSongs = [];
+    let allPlaylists = [];
+
+    // ====== LOGIN ======
     function processSecureLogin() {
         const username = document.getElementById('login-username').value.trim();
         const password = document.getElementById('login-password').value.trim();
@@ -369,7 +592,7 @@
         }
     }
 
-    // ====== REGISTER FUNKTION ======
+    // ====== REGISTER ======
     function processSecureRegister() {
         const email = document.getElementById('reg-email').value.trim();
         const username = document.getElementById('reg-username').value.trim();
@@ -392,69 +615,38 @@
             return;
         }
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ username, email }));
-        showSuccess('✅ Registrierung erfolgreich! Du bist jetzt angemeldet.');
+        const newUser = { username, email };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
+        localStorage.setItem(SONGS_KEY + '_' + username, JSON.stringify([]));
+        localStorage.setItem(PLAYLISTS_KEY + '_' + username, JSON.stringify([]));
+        
+        showSuccess('✅ Registrierung erfolgreich!');
         updateUIAfterLogin(username);
     }
 
-    // ====== LOGOUT FUNKTION ======
+    // ====== LOGOUT ======
     function executeSecureLogout() {
         localStorage.removeItem(STORAGE_KEY);
+        currentUser = null;
         showSuccess('✅ Du wurdest abgemeldet!');
         location.reload();
     }
 
-    // ====== DATEI-UPLOAD ZU CLOUDINARY ======
-    function autoUploadToCloudinary(files, type) {
-        if (files.length === 0) return;
-        
-        const file = files[0];
-        const maxSize = 5 * 1024 * 1024;
-
-        if (file.size > maxSize) {
-            alert('❌ Datei zu groß! Maximum: 5 MB');
-            return;
-        }
-
-        const progressBox = document.getElementById('upload-progress-box');
-        const fileNameEl = document.getElementById('upload-file-name');
-        const percentageEl = document.getElementById('upload-percentage');
-        const progressBar = document.getElementById('progress-bar-fill');
-
-        fileNameEl.textContent = file.name;
-        progressBox.style.display = 'block';
-
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += Math.random() * 30;
-            if (progress > 100) progress = 100;
-            
-            progressBar.style.width = progress + '%';
-            percentageEl.textContent = Math.floor(progress) + '%';
-
-            if (progress === 100) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    alert('✅ ' + file.name + ' erfolgreich hochgeladen!');
-                    progressBox.style.display = 'none';
-                    percentageEl.textContent = '0%';
-                    progressBar.style.width = '0%';
-                }, 500);
-            }
-        }, 200);
-    }
-
-    // ====== UI NACH LOGIN AKTUALISIEREN ======
+    // ====== UI NACH LOGIN ======
     function updateUIAfterLogin(username) {
+        currentUser = username;
         document.getElementById('login-panel-card').style.display = 'none';
         document.getElementById('register-panel-card').style.display = 'none';
         document.getElementById('studio-vault-lock-card').style.display = 'none';
         document.getElementById('creator-studio-card').style.display = 'block';
         document.getElementById('user-profile-bar').style.display = 'flex';
         document.getElementById('logged-in-user').textContent = username;
+        
+        loadUserSongs();
+        loadUserPlaylists();
     }
 
-    // ====== REGISTER PANEL TOGGLE ======
+    // ====== TOGGLE REGISTER PANEL ======
     function toggleRegisterPanel() {
         const loginCard = document.getElementById('login-panel-card');
         const registerCard = document.getElementById('register-panel-card');
@@ -465,6 +657,321 @@
         } else {
             loginCard.style.display = 'block';
             registerCard.style.display = 'none';
+        }
+    }
+
+    // ====== CLOUDINARY WIDGET ======
+    function openCloudinaryWidget(type, isEdit = false) {
+        if (!currentUser) {
+            alert('❌ Du musst angemeldet sein!');
+            return;
+        }
+
+        const resourceType = type === 'audio' ? 'video' : 'image';
+        
+        cloudinary.openUploadWidget(
+            {
+                cloudName: CLOUDINARY_CLOUD_NAME,
+                uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                resourceType: resourceType,
+                folder: `cloudbeats/${currentUser}`,
+                maxFileSize: 5242880,
+                clientAllowedFormats: type === 'audio' ? ['mp3'] : ['jpg', 'jpeg', 'png', 'webp'],
+                multiple: false,
+                cropping: type === 'image',
+                showAdvancedOptions: true,
+                sources: ['local', 'url', 'camera'],
+            },
+            (error, result) => {
+                if (!error && result && result.event === 'success') {
+                    const url = result.info.secure_url;
+                    
+                    if (isEdit) {
+                        if (type === 'audio') {
+                            document.getElementById('edit-song-audio').value = url;
+                        } else {
+                            document.getElementById('edit-song-cover').value = url;
+                        }
+                    } else {
+                        if (type === 'audio') {
+                            // For new song, prompt for title
+                            const title = prompt('Song Titel eingeben:');
+                            if (title) {
+                                addNewSong(title, url, '');
+                            }
+                        } else {
+                            // Store cover URL for next song
+                            sessionStorage.setItem('pending_cover_url', url);
+                            alert('✅ Cover gespeichert! Lade jetzt die MP3 hoch.');
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+    // ====== SONG HINZUFÜGEN ======
+    function addNewSong(title, audioUrl, coverUrl) {
+        if (!currentUser) return;
+
+        const song = {
+            id: Date.now(),
+            title: title || 'Untitled Song',
+            audioUrl: audioUrl,
+            coverUrl: coverUrl || 'https://via.placeholder.com/180?text=🎵',
+            createdAt: new Date().toLocaleString('de-DE'),
+            userKey: currentUser
+        };
+
+        allSongs.push(song);
+        saveSongsToStorage();
+        renderSongs();
+        showSuccess('✅ Song erfolgreich hinzugefügt!');
+    }
+
+    // ====== SONGS SPEICHERN/LADEN ======
+    function saveSongsToStorage() {
+        if (currentUser) {
+            localStorage.setItem(SONGS_KEY + '_' + currentUser, JSON.stringify(allSongs));
+        }
+    }
+
+    function loadUserSongs() {
+        if (currentUser) {
+            const data = localStorage.getItem(SONGS_KEY + '_' + currentUser);
+            allSongs = data ? JSON.parse(data) : [];
+            renderSongs();
+        }
+    }
+
+    // ====== SONGS RENDERN ======
+    function renderSongs() {
+        const container = document.getElementById('songs-list');
+        const noSongs = document.getElementById('no-songs');
+        
+        container.innerHTML = '';
+
+        if (allSongs.length === 0) {
+            noSongs.style.display = 'block';
+            return;
+        }
+
+        noSongs.style.display = 'none';
+
+        allSongs.forEach(song => {
+            const songEl = document.createElement('div');
+            songEl.className = 'song-card';
+            songEl.innerHTML = `
+                <div class="song-cover" style="background-image: url('${song.coverUrl}')">
+                    ${!song.coverUrl || song.coverUrl.includes('placeholder') ? '🎵' : ''}
+                </div>
+                <div class="song-title">${escapeHtml(song.title)}</div>
+                <div class="song-meta">${song.createdAt}</div>
+                <div class="song-player" onclick="playSong('${song.audioUrl}')">
+                    ▶️ PLAY
+                </div>
+                <div class="song-actions">
+                    <button class="song-btn" onclick="editSong(${song.id})">✏️ Edit</button>
+                    <button class="song-btn delete" onclick="deleteSong(${song.id})">🗑️ Delete</button>
+                    <button class="song-btn" onclick="openAddToPlaylistModal(${song.id})">➕ Playlist</button>
+                </div>
+            `;
+            container.appendChild(songEl);
+        });
+    }
+
+    // ====== SONG ABSPIELEN ======
+    function playSong(audioUrl) {
+        const audio = new Audio(audioUrl);
+        audio.play().catch(e => alert('❌ Fehler beim Abspielen: ' + e.message));
+    }
+
+    // ====== SONG BEARBEITEN ======
+    function editSong(songId) {
+        const song = allSongs.find(s => s.id === songId);
+        if (!song) return;
+
+        currentEditingSongId = songId;
+        document.getElementById('edit-song-title').value = song.title;
+        document.getElementById('edit-song-cover').value = song.coverUrl;
+        document.getElementById('edit-song-audio').value = song.audioUrl;
+
+        openModal('edit-song-modal');
+    }
+
+    function saveSongEdit() {
+        const song = allSongs.find(s => s.id === currentEditingSongId);
+        if (!song) return;
+
+        song.title = document.getElementById('edit-song-title').value || 'Untitled';
+        song.coverUrl = document.getElementById('edit-song-cover').value;
+        song.audioUrl = document.getElementById('edit-song-audio').value;
+
+        saveSongsToStorage();
+        renderSongs();
+        closeModal();
+        showSuccess('✅ Song aktualisiert!');
+    }
+
+    // ====== SONG LÖSCHEN ======
+    function deleteSong(songId) {
+        if (confirm('🗑️ Wirklich diesen Song löschen?')) {
+            allSongs = allSongs.filter(s => s.id !== songId);
+            saveSongsToStorage();
+            renderSongs();
+            showSuccess('✅ Song gelöscht!');
+        }
+    }
+
+    // ====== PLAYLISTS ======
+    function savePlaylistsToStorage() {
+        if (currentUser) {
+            localStorage.setItem(PLAYLISTS_KEY + '_' + currentUser, JSON.stringify(allPlaylists));
+        }
+    }
+
+    function loadUserPlaylists() {
+        if (currentUser) {
+            const data = localStorage.getItem(PLAYLISTS_KEY + '_' + currentUser);
+            allPlaylists = data ? JSON.parse(data) : [];
+            renderPlaylists();
+        }
+    }
+
+    function createPlaylist() {
+        const name = document.getElementById('new-playlist-name').value.trim();
+        const desc = document.getElementById('new-playlist-desc').value.trim();
+
+        if (!name) {
+            alert('❌ Bitte gib einen Namen ein!');
+            return;
+        }
+
+        const playlist = {
+            id: Date.now(),
+            name: name,
+            description: desc,
+            songs: [],
+            createdAt: new Date().toLocaleString('de-DE')
+        };
+
+        allPlaylists.push(playlist);
+        savePlaylistsToStorage();
+        renderPlaylists();
+        closeModal();
+        showSuccess('✅ Playlist erstellt!');
+    }
+
+    function renderPlaylists() {
+        const container = document.getElementById('playlists-list');
+        const noPlaylists = document.getElementById('no-playlists');
+
+        container.innerHTML = '';
+
+        if (allPlaylists.length === 0) {
+            noPlaylists.style.display = 'block';
+            return;
+        }
+
+        noPlaylists.style.display = 'none';
+
+        allPlaylists.forEach(playlist => {
+            const playlistEl = document.createElement('div');
+            playlistEl.className = 'playlist-card';
+            playlistEl.onclick = () => viewPlaylist(playlist.id);
+            playlistEl.innerHTML = `
+                <div class="playlist-name">📋 ${escapeHtml(playlist.name)}</div>
+                <div class="playlist-count">${playlist.songs.length} Songs</div>
+                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${playlist.createdAt}</div>
+            `;
+            container.appendChild(playlistEl);
+        });
+    }
+
+    function openCreatePlaylistModal() {
+        document.getElementById('new-playlist-name').value = '';
+        document.getElementById('new-playlist-desc').value = '';
+        openModal('create-playlist-modal');
+    }
+
+    function openAddToPlaylistModal(songId) {
+        if (allPlaylists.length === 0) {
+            alert('❌ Erstelle erst eine Playlist!');
+            return;
+        }
+
+        const playlistName = prompt('Welche Playlist? (' + allPlaylists.map(p => p.name).join(', ') + ')');
+        const playlist = allPlaylists.find(p => p.name === playlistName);
+
+        if (playlist) {
+            if (!playlist.songs.includes(songId)) {
+                playlist.songs.push(songId);
+                savePlaylistsToStorage();
+                showSuccess('✅ Song zur Playlist hinzugefügt!');
+            } else {
+                alert('⚠️ Song ist bereits in dieser Playlist!');
+            }
+        }
+    }
+
+    function viewPlaylist(playlistId) {
+        const playlist = allPlaylists.find(p => p.id === playlistId);
+        if (!playlist) return;
+
+        document.getElementById('playlist-modal-title').textContent = '📋 ' + escapeHtml(playlist.name);
+        const container = document.getElementById('playlist-modal-songs');
+        const emptyMsg = document.getElementById('playlist-empty');
+
+        container.innerHTML = '';
+
+        if (playlist.songs.length === 0) {
+            emptyMsg.style.display = 'block';
+        } else {
+            emptyMsg.style.display = 'none';
+            
+            playlist.songs.forEach(songId => {
+                const song = allSongs.find(s => s.id === songId);
+                if (song) {
+                    const songEl = document.createElement('div');
+                    songEl.className = 'song-card';
+                    songEl.innerHTML = `
+                        <div class="song-cover" style="background-image: url('${song.coverUrl}')">
+                            ${!song.coverUrl || song.coverUrl.includes('placeholder') ? '🎵' : ''}
+                        </div>
+                        <div class="song-title">${escapeHtml(song.title)}</div>
+                        <div class="song-player" onclick="playSong('${song.audioUrl}')">
+                            ▶️ PLAY
+                        </div>
+                        <button class="song-btn" onclick="removeSongFromPlaylist(${playlistId}, ${songId})">➖ Remove</button>
+                    `;
+                    container.appendChild(songEl);
+                }
+            });
+        }
+
+        openModal('view-playlist-modal');
+    }
+
+    function removeSongFromPlaylist(playlistId, songId) {
+        const playlist = allPlaylists.find(p => p.id === playlistId);
+        if (playlist) {
+            playlist.songs = playlist.songs.filter(id => id !== songId);
+            savePlaylistsToStorage();
+            viewPlaylist(playlistId);
+            showSuccess('✅ Song entfernt!');
+        }
+    }
+
+    // ====== MODAL FUNKTIONEN ======
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(event) {
+        if (event && event.target.classList.contains('modal')) {
+            event.target.classList.remove('active');
+        } else {
+            document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
         }
     }
 
@@ -481,7 +988,13 @@
         alert(message);
     }
 
-    // ====== BEIM SEITENLADEN ======
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ====== SEITENLADEN ======
     window.addEventListener('DOMContentLoaded', function() {
         const user = localStorage.getItem(STORAGE_KEY);
         if (user) {
