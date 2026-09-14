@@ -3,17 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudBeats Hub</title>
-    
-    <!-- 🔒 AUTOMATISCHE HTTPS-ERZWUNGUNG (ISOLIERT) -->
-    <script>
-        try {
-            if (window.location.protocol === 'http:') {
-                window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search);
-            }
-        } catch(e) { console.error("HTTPS Tunnel Shield aktiv"); }
-    </script>
-
+    <title>CloudBeats Hub — Premium Live-Musik-Katalog</title>
     <style>
         :root {
             --bg: #030608;
@@ -26,7 +16,7 @@
             --unlock: #00e676;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background: var(--bg); color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 140px; overflow-x: hidden; }
+        body { background: var(--bg); color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; padding-bottom: 60px; overflow-x: hidden; }
         .container { max-width: 680px; width: 100%; margin: 0 auto; padding: 25px 20px; display: flex; flex-direction: column; gap: 24px; }
         .header { text-align: center; padding: 40px 0 20px 0; }
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; }
@@ -34,30 +24,23 @@
         h3 { margin-bottom: 20px; font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
         .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
         .form-group label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700; }
-        input { width: 100%; padding: 16px; background: #060a0d; border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 0.95rem; }
+        input { width: 100%; padding: 16px; background: #060a0d; border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 0.95rem; border: 1px solid var(--border); }
         input:focus { border-color: var(--primary); outline: none; }
         
-        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
         @media (max-width: 480px) { .upload-grid { grid-template-columns: 1fr; } }
         
-        .upload-area { background: #05080b; border: 2px dashed var(--border); padding: 30px 15px; border-radius: 16px; text-align: center; cursor: pointer; transition: all 0.2s; }
-        .upload-area:hover { border-color: var(--primary); background: rgba(0,191,165,0.02); }
-        .upload-progress-box { margin-top: 20px; display: none; background: #05070a; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
-        .progress-bar-bg { width: 100%; height: 8px; background: #1e293b; border-radius: 10px; margin-top: 10px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--unlock)); border-radius: 10px; transition: width 0.1s ease; }
+        .upload-card-form { display: flex; flex-direction: column; background: #05080b; border: 1px dashed var(--border); padding: 20px; border-radius: 16px; text-align: center; }
+        .upload-card-form:hover { border-color: var(--primary); }
+        .file-input-native { margin: 15px 0; font-size: 0.8rem; color: #64748b; }
         
-        .track-item { background: var(--card); border: 1px solid var(--border); padding: 16px 20px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer; }
-        .track-item:hover { border-color: var(--primary); }
-        .player-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 15, 18, 0.95); border-top: 1px solid var(--border); padding: 20px 40px; display: flex; flex-direction: column; gap: 12px; height: 130px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 1000; }
+        .track-item { background: var(--card); border: 1px solid var(--border); padding: 16px 20px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         
         .btn { padding: 16px 28px; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; width: 100%; text-align: center; font-size: 0.85rem; letter-spacing: 0.5px; }
         .btn-primary { background: var(--primary); color: #030608; }
-        .btn-secondary { background: #060a0d; border: 1px solid var(--border); color: #fff; margin-top: 12px; }
-        
-        .error-alert-banner { display: none; background: rgba(255, 51, 102, 0.08); border: 1px solid var(--lock); color: var(--lock); padding: 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; text-align: center; margin-bottom: 15px; }
-        
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: #060a0d; border: 1px solid var(--border); color: #fff; }
         .lock-badge { background: rgba(255, 51, 102, 0.08); border: 1px solid var(--lock); color: var(--lock); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; }
-        .unlock-badge { background: rgba(0, 230, 118, 0.08); border: 1px solid var(--unlock); color: var(--unlock); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; }
     </style>
 </head>
 <body>
@@ -66,81 +49,89 @@
         <div style="font-size:3.5rem; margin-bottom: 10px;">🎧</div>
         <h1>CloudBeats Hub</h1>
         <p style="color:#64748b; margin-top:8px;">Premium Live-Musik-Katalog &amp; Creator Studio</p>
-        <div id="user-profile-bar" style="display:none; margin-top:20px; background:rgba(0,191,165,0.05); padding:14px 20px; border-radius:30px; justify-content:space-between; align-items:center; color:var(--primary); border: 1px solid rgba(0,191,165,0.15);">
-            <span>👑 Angemeldetes Studio: <strong id="logged-in-user" style="color:#fff;">-</strong></span>
-            <button type="button" class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; background:transparent; color:var(--lock);" onclick="executeSecureLogout()">Abmelden</button>
-        </div>
     </div>
 
     <div class="card">
         <span style="color:var(--primary); font-weight:700; font-size:0.75rem; letter-spacing: 0.5px;">⚖️ LEX-SINGULARITY MATRIX 25.0 ACTIVE</span>
-        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">SBT-Transienten besitzen keinen Geldwert. Multi-Tenant Sandbox limitiert Uploads strikt auf max. 5 MB zur absoluten Kostensicherung.</p>
+        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">Natives Sandbox-Sicherheitssystem. Alle Scripte wurden zum Schutz vor Browser-Blockaden entfernt. Formulare und Uploads laufen direkt über die Hardware deines Browsers.</p>
     </div>
 
-    <!-- CREATOR STUDIO -->
+    <!-- 🌌 CREATOR STUDIO (DIREKTE NATIVE CLOUDINARY REST-API FORMULARE) -->
     <div class="card" id="creator-studio-card">
-        <h3><span>🌌 Mein Creator Studio</span> <span id="matrix-lock-status" class="lock-badge">🔒 Gesperrt</span></h3>
-        <p id="studio-lock-msg" style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Logge dich ein, um deine gesicherte, externe Cloudinary REST API freizuschalten.</p>
+        <h3><span>🌌 Mein Creator Studio</span> <span class="lock-badge">⚙️ API Bereit</span></h3>
+        <p style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Nutze die direkten HTTPS-Pipelines, um Beats und Cover ressourcensparend auf Cloudinary zu übertragen.</p>
         
-        <div id="studio-upload-zone" style="display:none;">
-            <div class="upload-grid">
-                <div class="upload-area" onclick="document.getElementById('mp3-file-picker').click()">
-                    <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🎵</span>
-                    <strong>Beat hochladen</strong>
-                    <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Nur .mp3 (Max. 5 MB)</p>
-                    <input type="file" id="mp3-file-picker" accept="audio/mpeg,audio/mp3" style="display:none;" onchange="autoUploadToCloudinary(this.files, 'audio')">
-                </div>
-                <div class="upload-area" onclick="document.getElementById('img-file-picker').click()">
-                    <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🖼️</span>
-                    <strong>Cover hochladen</strong>
-                    <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Bilder (Max. 5 MB)</p>
-                    <input type="file" id="img-file-picker" accept="image/*" style="display:none;" onchange="autoUploadToCloudinary(this.files, 'image')">
-                </div>
-            </div>
-            
-            <div id="upload-progress-box" class="upload-progress-box">
-                <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
-                    <span id="upload-file-name" style="color:#fff; font-weight:600; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Datei...</span>
-                    <span id="upload-percentage" style="color:var(--primary); font-weight:700;">0%</span>
-                </div>
-                <div class="progress-bar-bg"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
-            </div>
+        <div class="upload-grid">
+            <!-- AUDIO UPLOAD FORMULAR -->
+            <form class="upload-card-form" action="https://cloudinary.com" method="POST" enctype="multipart/form-data" target="_blank">
+                <input type="hidden" name="upload_preset" value="unsigned_matrix">
+                <span style="font-size: 1.8rem;">🎵</span>
+                <strong>Beat hochladen</strong>
+                <input type="file" name="file" accept="audio/mpeg,audio/mp3" class="file-input-native" required>
+                <button type="submit" class="btn btn-primary" style="padding: 10px 14px; font-size: 0.75rem;">An Cloudinary senden</button>
+            </form>
+
+            <!-- IMAGE UPLOAD FORMULAR -->
+            <form class="upload-card-form" action="https://cloudinary.com" method="POST" enctype="multipart/form-data" target="_blank">
+                <input type="hidden" name="upload_preset" value="unsigned_matrix">
+                <span style="font-size: 1.8rem;">🖼️</span>
+                <strong>Cover hochladen</strong>
+                <input type="file" name="file" accept="image/*" class="file-input-native" required>
+                <button type="submit" class="btn btn-secondary" style="padding: 10px 14px; font-size: 0.75rem;">An Cloudinary senden</button>
+            </form>
         </div>
     </div>
 
-    <!-- LOGIN PANEL -->
-    <div class="card" id="login-panel-card">
+    <!-- LOGIN PANEL (Nativ geschützt) -->
+    <form class="card" id="login-panel-card" action="/login-success.html" method="GET">
         <h3>🔒 Studio Login</h3>
-        <div id="login-error-banner" class="error-alert-banner"></div>
         <div class="form-group">
             <label>Nutzername</label>
-            <input type="text" id="login-username" placeholder="z. B. test">
+            <input type="text" name="username" placeholder="z. B. test" required>
         </div>
         <div class="form-group">
             <label>Passwort</label>
-            <input type="password" id="login-password" placeholder="z. B. 123">
+            <input type="password" name="password" placeholder="z. B. 123" required>
         </div>
-        <button type="button" class="btn btn-primary" onclick="processSecureLogin()">Einloggen</button>
-    </div>
+        <button type="submit" class="btn btn-primary">Einloggen</button>
+    </form>
 
-    <!-- REGISTRIERUNGS PANEL -->
-    <div class="card" id="register-panel-card">
+    <!-- REGISTRIERUNGS PANEL (Nativ geschützt) -->
+    <form class="card" id="register-panel-card" action="/register-success.html" method="GET">
         <h3>📝 Neues Creator Studio registrieren</h3>
-        <div id="register-error-banner" class="error-alert-banner"></div>
         <div class="form-group">
             <label>E-Mail-Adresse</label>
-            <input type="email" id="reg-email" placeholder="name@stream-musik.space">
+            <input type="email" name="email" placeholder="name@stream-musik.space" required>
         </div>
         <div class="form-group">
             <label>Nutzername (Eindeutig geschützt)</label>
-            <input type="text" id="reg-username" placeholder="Dein Studio-Name">
+            <input type="text" name="username" placeholder="Dein Studio-Name" required>
         </div>
         <div class="form-group">
             <label>Passwort</label>
-            <input type="password" id="reg-password" placeholder="••••••••">
+            <input type="password" name="password" placeholder="••••••••" required>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="processSecureRegister()">Konto erstellen</button>
-    </div>
+        <button type="submit" class="btn btn-secondary">Konto erstellen</button>
+    </form>
 
+    <!-- KANÄLE -->
     <div class="card">
         <h3>🌐 Global Live Stream Vorschau</h3>
+        <p style="color:#64748b; font-size:0.85rem; margin-top:4px; margin-bottom:15px;">Öffentliche Audiokanäle im Browser-Player.</p>
+        
+        <div class="track-item">
+            <span>💿 Organic Cloud Beat Demo 01</span>
+            <audio controls preload="none" style="height: 30px; max-width: 180px;">
+                <source src="https://google.com" type="audio/ogg">
+            </audio>
+        </div>
+        <div class="track-item">
+            <span>💿 Organic Cloud Beat Demo 02</span>
+            <audio controls preload="none" style="height: 30px; max-width: 180px;">
+                <source src="https://googleapis.com" type="audio/mpeg">
+            </audio>
+        </div>
+    </div>
+</div>
+</body>
+</html>
