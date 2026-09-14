@@ -66,7 +66,7 @@
         <p style="color:#64748b; margin-top:8px;">Premium Live-Musik-Katalog &amp; Creator Studio</p>
         <div id="user-profile-bar" style="display:none; margin-top:20px; background:rgba(0,191,165,0.05); padding:14px 20px; border-radius:30px; justify-content:space-between; align-items:center; color:var(--primary); border: 1px solid rgba(0,191,165,0.15);">
             <span>👑 Angemeldetes Studio: <strong id="logged-in-user" style="color:#fff;">-</strong></span>
-            <button class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; background:transparent; color:var(--lock);" onclick="executeSecureLogout()">Abmelden</button>
+            <button type="button" class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; background:transparent; color:var(--lock);" id="logout-trigger">Abmelden</button>
         </div>
     </div>
 
@@ -75,23 +75,24 @@
         <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">SBT-Transienten besitzen keinen Geldwert. Multi-Tenant Sandbox limitiert Uploads strikt auf max. 5 MB zur absoluten Kostensicherung.</p>
     </div>
 
+    <!-- CREATOR STUDIO -->
     <div class="card" id="creator-studio-card">
         <h3><span>🌌 Mein Creator Studio</span> <span id="matrix-lock-status" class="lock-badge">🔒 Gesperrt</span></h3>
         <p id="studio-lock-msg" style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Logge dich ein, um deine gesicherte, externe Cloudinary REST API freizuschalten.</p>
         
         <div id="studio-upload-zone" style="display:none;">
             <div class="upload-grid">
-                <div class="upload-area" onclick="document.getElementById('mp3-file-picker').click()">
+                <div class="upload-area" id="audio-click-zone">
                     <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🎵</span>
                     <strong>Beat hochladen</strong>
                     <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Nur .mp3 (Max. 5 MB)</p>
-                    <input type="file" id="mp3-file-picker" accept="audio/mpeg,audio/mp3" style="display:none;" onchange="autoUploadToCloudinary(this.files, 'audio')">
+                    <input type="file" id="mp3-file-picker" accept="audio/mpeg,audio/mp3" style="display:none;">
                 </div>
-                <div class="upload-area" onclick="document.getElementById('img-file-picker').click()">
+                <div class="upload-area" id="image-click-zone">
                     <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🖼️</span>
                     <strong>Cover hochladen</strong>
                     <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Bilder (Max. 5 MB)</p>
-                    <input type="file" id="img-file-picker" accept="image/*" style="display:none;" onchange="autoUploadToCloudinary(this.files, 'image')">
+                    <input type="file" id="img-file-picker" accept="image/*" style="display:none;">
                 </div>
             </div>
             
@@ -105,22 +106,39 @@
         </div>
     </div>
 
-    <div class="card" id="login-panel-card">
+    <!-- NATIVES LOGIN FORMULAR (UNZERSTÖRBAR) -->
+    <form class="card" id="login-panel-card" onsubmit="return false;">
         <h3>🔒 Studio Login</h3>
         <div id="login-error-banner" class="error-alert-banner"></div>
-        <div class="form-group"><label>Nutzername</label><input type="text" id="login-username" placeholder="z. B. test"></div>
-        <div class="form-group"><label>Passwort</label><input type="password" id="login-password" placeholder="z. B. 123"></div>
-        <button class="btn btn-primary" onclick="processSecureLogin()">Einloggen</button>
-    </div>
+        <div class="form-group">
+            <label>Nutzername</label>
+            <input type="text" id="login-username" placeholder="z. B. test" required>
+        </div>
+        <div class="form-group">
+            <label>Passwort</label>
+            <input type="password" id="login-password" placeholder="z. B. 123" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="login-submit-btn">Einloggen</button>
+    </form>
 
-    <div class="card" id="register-panel-card">
+    <!-- NATIVES REGISTRIERUNGS FORMULAR -->
+    <form class="card" id="register-panel-card" onsubmit="return false;">
         <h3>📝 Neues Creator Studio registrieren</h3>
         <div id="register-error-banner" class="error-alert-banner"></div>
-        <div class="form-group"><label>E-Mail-Adresse</label><input type="email" id="reg-email" placeholder="name@stream-musik.space"></div>
-        <div class="form-group"><label>Nutzername (Eindeutig geschützt)</label><input type="text" id="reg-username" placeholder="Dein Studio-Name"></div>
-        <div class="form-group"><label>Passwort</label><input type="password" id="reg-password" placeholder="••••••••"></div>
-        <button class="btn btn-secondary" onclick="processSecureRegister()">Konto erstellen</button>
-    </div>
+        <div class="form-group">
+            <label>E-Mail-Adresse</label>
+            <input type="email" id="reg-email" placeholder="name@stream-musik.space" required>
+        </div>
+        <div class="form-group">
+            <label>Nutzername (Eindeutig geschützt)</label>
+            <input type="text" id="reg-username" placeholder="Dein Studio-Name" required>
+        </div>
+        <div class="form-group">
+            <label>Passwort</label>
+            <input type="password" id="reg-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-secondary" id="register-submit-btn">Konto erstellen</button>
+    </form>
 
     <div class="card">
         <h3>🌐 Global Live Stream Vorschau</h3>
@@ -130,5 +148,3 @@
 </div>
 
 <div class="player-bar">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
