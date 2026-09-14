@@ -33,7 +33,10 @@
         input { width: 100%; padding: 16px; background: #060a0d; border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 0.95rem; }
         input:focus { border-color: var(--primary); outline: none; }
         
-        .upload-area { background: #05080b; border: 2px dashed var(--border); padding: 40px 20px; border-radius: 16px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 480px) { .upload-grid { grid-template-columns: 1fr; } }
+        
+        .upload-area { background: #05080b; border: 2px dashed var(--border); padding: 30px 15px; border-radius: 16px; text-align: center; cursor: pointer; transition: all 0.2s; }
         .upload-area:hover { border-color: var(--primary); background: rgba(0,191,165,0.02); }
         .upload-progress-box { margin-top: 20px; display: none; background: #05070a; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
         .progress-bar-bg { width: 100%; height: 8px; background: #1e293b; border-radius: 10px; margin-top: 10px; overflow: hidden; }
@@ -64,7 +67,7 @@
 
     <div class="card">
         <span style="color:var(--primary); font-weight:700; font-size:0.75rem; letter-spacing: 0.5px;">⚖️ LEX-SINGULARITY MATRIX 25.0 ACTIVE</span>
-        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">SBT-Transienten besitzen keinen Geldwert. Zero-PII Middleware verschlüsselt und isoliert Daten direkt im Browser-RAM.</p>
+        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">SBT-Transienten besitzen keinen Geldwert. Multi-Tenant Sandbox limitiert Uploads strikt auf max. 5 MB zur absoluten Kostensicherung.</p>
     </div>
 
     <div class="card" id="creator-studio-card">
@@ -72,12 +75,23 @@
         <p id="studio-lock-msg" style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Logge dich ein, um deine gesicherte, externe Cloudinary REST API freizuschalten.</p>
         
         <div id="studio-upload-zone" style="display:none;">
-            <div class="upload-area" onclick="document.getElementById('mp3-file-picker').click()">
-                <span style="font-size: 2rem; display:block; margin-bottom: 8px;">📤</span>
-                <strong>MP3-Datei vom Gerät auswählen</strong>
-                <p style="color:#64748b; font-size: 0.75rem; margin-top: 4px;">Läuft verschlüsselt und ressourcensparend über deine Cloudinary Cloud</p>
-                <input type="file" id="mp3-file-picker" accept="audio/mpeg,audio/mp3" style="display:none;" onchange="window.autoUploadToCloudinary(this.files)">
+            <div class="upload-grid">
+                <!-- AUDIO UPLOAD -->
+                <div class="upload-area" onclick="document.getElementById('mp3-file-picker').click()">
+                    <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🎵</span>
+                    <strong>Beat hochladen</strong>
+                    <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Nur .mp3 (Max. 5 MB)</p>
+                    <input type="file" id="mp3-file-picker" accept="audio/mpeg,audio/mp3" style="display:none;" onchange="window.autoUploadToCloudinary(this.files, 'audio')">
+                </div>
+                <!-- IMAGE UPLOAD -->
+                <div class="upload-area" onclick="document.getElementById('img-file-picker').click()">
+                    <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🖼️</span>
+                    <strong>Cover hochladen</strong>
+                    <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Bilder (Max. 5 MB)</p>
+                    <input type="file" id="img-file-picker" accept="image/*" style="display:none;" onchange="window.autoUploadToCloudinary(this.files, 'image')">
+                </div>
             </div>
+            
             <div id="upload-progress-box" class="upload-progress-box">
                 <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
                     <span id="upload-file-name" style="color:#fff; font-weight:600; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Datei...</span>
@@ -116,26 +130,3 @@
             <strong id="p-title" style="color:#fff; font-size:0.95rem; display:block; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Kein Beat geladen</strong>
             <span id="p-status" style="color:#64748b; font-size:0.75rem;">System Bereit</span>
         </div>
-        <button id="play-trigger" onclick="window.togglePlayback()" style="background:var(--primary); border:none; padding:10px 18px; border-radius:8px; color:#030608; font-weight:700; cursor:pointer; display:none;">▶ PLAY</button>
-    </div>
-    <div style="width:100%; height:6px; background:#05070a; border-radius:10px; overflow:hidden; margin-top:5px; cursor:pointer;" onclick="window.seekAudio(event)">
-        <div id="progress-fill" style="height:100%; width:0%; background:linear-gradient(90deg, var(--primary), var(--accent-quantum));"></div>
-    </div>
-</div>
-
-<script>
-    (function() {
-        var activeAudio = null;
-        var currentUserSession = null;
-        var progressInterval = null;
-        
-        var CLOUDINARY_CLOUD_NAME = "sda9jage";
-        var CLOUDINARY_PRESET = "unsigned_matrix";
-
-        var localMemoryDb = { 
-            users: { 
-                "test": { password: "123", displayName: "TestStudio", tracks: [] } 
-            } 
-        };
-
-        var globalTracks = [
