@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudBeats Hub</title>
     
-    <!-- 🔒 AUTOMATISCHE HTTPS-ERZWUNGUNG -->
+    <!-- 🔒 AUTOMATISCHE HTTPS-ERZWUNGUNG (ISOLIERT) -->
     <script>
-        if (window.location.protocol === 'http:') {
-            window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search);
-        }
+        try {
+            if (window.location.protocol === 'http:') {
+                window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search);
+            }
+        } catch(e) { console.error("HTTPS Tunnel Shield aktiv"); }
     </script>
 
     <style>
@@ -106,39 +108,39 @@
         </div>
     </div>
 
-    <!-- LOGIN FORMULAR (Nativ geschützt) -->
-    <form class="card" id="login-panel-card">
+    <!-- LOGIN STRUKTUR (ISOLIERTES DIV, KEIN FORM-TAG!) -->
+    <div class="card" id="login-panel-card">
         <h3>🔒 Studio Login</h3>
         <div id="login-error-banner" class="error-alert-banner"></div>
         <div class="form-group">
             <label>Nutzername</label>
-            <input type="text" id="login-username" placeholder="z. B. test" required>
+            <input type="text" id="login-username" placeholder="z. B. test">
         </div>
         <div class="form-group">
             <label>Passwort</label>
-            <input type="password" id="login-password" placeholder="z. B. 123" required>
+            <input type="password" id="login-password" placeholder="z. B. 123">
         </div>
-        <button type="submit" class="btn btn-primary" id="login-submit-btn">Einloggen</button>
-    </form>
+        <button type="button" class="btn btn-primary" id="login-submit-btn">Einloggen</button>
+    </div>
 
-    <!-- REGISTRIERUNGS FORMULAR (Nativ geschützt) -->
-    <form class="card" id="register-panel-card">
+    <!-- REGISTRIERUNGS STRUKTUR (ISOLIERTES DIV, KEIN FORM-TAG!) -->
+    <div class="card" id="register-panel-card">
         <h3>📝 Neues Creator Studio registrieren</h3>
         <div id="register-error-banner" class="error-alert-banner"></div>
         <div class="form-group">
             <label>E-Mail-Adresse</label>
-            <input type="email" id="reg-email" placeholder="name@stream-musik.space" required>
+            <input type="email" id="reg-email" placeholder="name@stream-musik.space">
         </div>
         <div class="form-group">
             <label>Nutzername (Eindeutig geschützt)</label>
-            <input type="text" id="reg-username" placeholder="Dein Studio-Name" required>
+            <input type="text" id="reg-username" placeholder="Dein Studio-Name">
         </div>
         <div class="form-group">
             <label>Passwort</label>
-            <input type="password" id="reg-password" placeholder="••••••••" required>
+            <input type="password" id="reg-password" placeholder="••••••••">
         </div>
-        <button type="submit" class="btn btn-secondary" id="register-submit-btn">Konto erstellen</button>
-    </form>
+        <button type="button" class="btn btn-secondary" id="register-submit-btn">Konto erstellen</button>
+    </div>
 
     <div class="card">
         <h3>🌐 Global Live Stream Vorschau</h3>
@@ -148,5 +150,3 @@
 </div>
 
 <div class="player-bar">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
