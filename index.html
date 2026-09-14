@@ -333,6 +333,36 @@
             font-weight: 500;
             margin-bottom: 15px;
         }
+
+        .success-alert-banner {
+            display: none;
+            background: rgba(0, 230, 118, 0.08);
+            border: 1px solid var(--unlock);
+            color: var(--unlock);
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            max-width: 500px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
         
         .lock-badge { 
             background: rgba(255, 51, 102, 0.08); 
@@ -405,13 +435,13 @@
 
     <div class="card">
         <span style="color:var(--primary); font-weight:700; font-size:0.75rem; letter-spacing: 0.5px;">⚖️ CLOUDBEATS STUDIO v3.0 ACTIVE - AUTO-DELETE ENABLED</span>
-        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">Kostenlose Musik-Studio Plattform mit Cloudinary Integration. Max 5MB pro Datei. Auto-Löschen aktiviert - Dateien verschwinden automatisch aus der Cloud!</p>
+        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">Kostenlose Musik-Studio Plattform mit Cloudinary Integration. Max 5MB pro Datei. Auto-Löschen aktiviert - Dateien werden automatisch verwaltet!</p>
     </div>
 
     <!-- EXKLUSIVES SCHLOSSFENSTER -->
     <div class="card" id="studio-vault-lock-card">
         <h3><span>🌌 Creator Studio Tresor</span> <span class="lock-badge">🔒 Gesperrt</span></h3>
-        <p style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Dieses Segment ist für die Öffentlichkeit unsichtbar verschlüsselt. Bitte logge dich ein, um das Studio freizuschalten.</p>
+        <p style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Dieses Segment ist für die Öffentlichkeit unsichtbar verschlüsselt. Bitte logge dich ein, um das Studio zu entsperren!</p>
     </div>
 
     <!-- LOGIN PANEL -->
@@ -575,6 +605,56 @@
     let currentEditingType = null;
     let allSongs = [];
     let allPlaylists = [];
+
+    // ====== UTILITY FUNKTIONEN ======
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function showSuccess(message) {
+        const banner = document.createElement('div');
+        banner.className = 'success-alert-banner';
+        banner.textContent = message;
+        document.body.appendChild(banner);
+        banner.style.display = 'block';
+        
+        setTimeout(() => {
+            banner.style.animation = 'slideUp 0.3s ease forwards';
+            setTimeout(() => banner.remove(), 300);
+        }, 3000);
+    }
+
+    function showError(element, message) {
+        if (element) {
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+    }
+
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('active');
+        }
+    }
+
+    function closeModal(event) {
+        if (event && event.target.id && event.target.id !== 'edit-song-modal' && event.target.id !== 'create-playlist-modal' && event.target.id !== 'view-playlist-modal') {
+            return;
+        }
+        const modals = document.querySelectorAll('.modal.active');
+        modals.forEach(modal => modal.classList.remove('active'));
+    }
 
     // ====== CLOUDINARY DELETE FUNKTION ======
     async function deleteFromCloudinary(url) {
@@ -801,12 +881,12 @@
             const songEl = document.createElement('div');
             songEl.className = 'song-card';
             songEl.innerHTML = `
-                <div class="song-cover" style="background-image: url('${song.coverUrl}')">
+                <div class="song-cover" style="background-image: url('${escapeHtml(song.coverUrl)}')">
                     ${!song.coverUrl || song.coverUrl.includes('placeholder') ? '🎵' : ''}
                 </div>
                 <div class="song-title">${escapeHtml(song.title)}</div>
-                <div class="song-meta">${song.createdAt}</div>
-                <div class="song-player" onclick="playSong('${song.audioUrl}')">
+                <div class="song-meta">${escapeHtml(song.createdAt)}</div>
+                <div class="song-player" onclick="playSong('${escapeHtml(song.audioUrl)}')">
                     ▶️ PLAY
                 </div>
                 <div class="song-actions">
@@ -947,7 +1027,7 @@
             playlistEl.innerHTML = `
                 <div class="playlist-name">📋 ${escapeHtml(playlist.name)}</div>
                 <div class="playlist-count">${playlist.songs.length} Songs</div>
-                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${playlist.createdAt}</div>
+                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${escapeHtml(playlist.createdAt)}</div>
             `;
             container.appendChild(playlistEl);
         });
@@ -1000,14 +1080,13 @@
                     const songEl = document.createElement('div');
                     songEl.className = 'song-card';
                     songEl.innerHTML = `
-                        <div class="song-cover" style="background-image: url('${song.coverUrl}')">
+                        <div class="song-cover" style="background-image: url('${escapeHtml(song.coverUrl)}')">
                             ${!song.coverUrl || song.coverUrl.includes('placeholder') ? '🎵' : ''}
                         </div>
                         <div class="song-title">${escapeHtml(song.title)}</div>
-                        <div class="song-player" onclick="playSong('${song.audioUrl}')">
+                        <div class="song-player" onclick="playSong('${escapeHtml(song.audioUrl)}')">
                             ▶️ PLAY
                         </div>
-                        <button class="song-btn" onclick="removeSongFromPlaylist(${playlistId}, ${songId})">➖ Remove</button>
                     `;
                     container.appendChild(songEl);
                 }
@@ -1017,57 +1096,18 @@
         openModal('view-playlist-modal');
     }
 
-    function removeSongFromPlaylist(playlistId, songId) {
-        const playlist = allPlaylists.find(p => p.id === playlistId);
-        if (playlist) {
-            playlist.songs = playlist.songs.filter(id => id !== songId);
-            savePlaylistsToStorage();
-            viewPlaylist(playlistId);
-            showSuccess('✅ Song entfernt!');
-        }
-    }
-
-    // ====== MODAL FUNKTIONEN ======
-    function openModal(modalId) {
-        document.getElementById(modalId).classList.add('active');
-    }
-
-    function closeModal(event) {
-        if (event && event.target.classList.contains('modal')) {
-            event.target.classList.remove('active');
-        } else {
-            document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
-        }
-    }
-
-    // ====== FEHLER & ERFOLGS-NACHRICHTEN ======
-    function showError(element, message) {
-        element.textContent = message;
-        element.style.display = 'block';
-        setTimeout(() => {
-            element.style.display = 'none';
-        }, 5000);
-    }
-
-    function showSuccess(message) {
-        alert(message);
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // ====== SEITENLADEN ======
-    window.addEventListener('DOMContentLoaded', function() {
-        const user = localStorage.getItem(STORAGE_KEY);
-        if (user) {
-            const userData = JSON.parse(user);
+    // ====== INITIALISIERUNG ======
+    function initializeApp() {
+        const storedUser = localStorage.getItem(STORAGE_KEY);
+        if (storedUser) {
+            const userData = JSON.parse(storedUser);
             updateUIAfterLogin(userData.username);
         }
-    });
-</script>
+    }
 
+    // Starte App beim Laden
+    document.addEventListener('DOMContentLoaded', initializeApp);
+    window.addEventListener('load', initializeApp);
+</script>
 </body>
 </html>
