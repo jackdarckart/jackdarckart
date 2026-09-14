@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudBeats Hub — Premium Creator Studio</title>
-    <!-- AUTOMATISCHE HTTPS-ERZWUNGUNG FÜR INTEGRITÄT -->
+    <title>CloudBeats Hub — Lex-Singularity Matrix 25.0</title>
+    <!-- 🔒 AUTOMATISCHE HTTPS- & SSL/TLS-ERZWUNGUNG -->
     <script>
         if (location.protocol === 'http:') {
             location.replace(`https://${location.host}${location.pathname}${location.search}`);
@@ -43,7 +43,6 @@
 
         .container { max-width: 680px; width: 100%; margin: 0 auto; padding: 25px 20px; display: flex; flex-direction: column; gap: 24px; }
         
-        /* WUNDERSCHÖNER VISUELLER HEADER */
         .header { text-align: center; padding: 40px 0 20px 0; position: relative; }
         .logo-glow {
             font-size: 3.5rem;
@@ -59,13 +58,12 @@
         h1 { font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, #fff 30%, var(--primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
         .subtitle { color: var(--text-muted); font-size: 1rem; margin-top: 8px; font-weight: 400; letter-spacing: 0.3px; }
 
-        /* CREATOR ACCREDITATION HUD */
         #user-profile-bar { 
             margin-top: 20px; 
             display: none; 
             background: rgba(0, 191, 165, 0.05); 
             border: 1px solid rgba(0, 191, 165, 0.15); 
-            padding: 10px 18px; 
+            padding: 12px 18px; 
             border-radius: 30px; 
             font-size: 0.85rem; 
             color: var(--primary); 
@@ -74,7 +72,6 @@
         }
         .user-meta-wrapper { display: flex; align-items: center; gap: 8px; }
 
-        /* KARTEN-ARCHITEKTUR */
         .card { 
             background: var(--surface); 
             border: 1px solid var(--border); 
@@ -83,15 +80,16 @@
             box-shadow: 0 12px 40px rgba(0,0,0,0.6); 
             position: relative; 
             overflow: hidden; 
-            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .card:hover { border-color: rgba(0, 191, 165, 0.25); box-shadow: 0 16px 48px rgba(0, 191, 165, 0.05); }
         .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--accent-quantum)); }
         
         h3 { margin-bottom: 20px; font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
         h3 span.icon { color: var(--primary); }
 
-        /* REGULÄRE FORMULARE */
+        .compliance-box { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+        .compliance-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 191, 165, 0.05); border: 1px solid rgba(0, 191, 165, 0.15); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.8px; }
+        .lock-badge { background: rgba(157, 78, 221, 0.08); border: 1px solid rgba(157, 78, 221, 0.3); color: var(--accent-quantum); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
         .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
         .form-group label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.8px; }
         input { 
@@ -104,9 +102,8 @@
             font-size: 0.95rem; 
             transition: all 0.2s ease; 
         }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 191, 165, 0.1); outline: none; background: #090e12; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 191, 165, 0.1); outline: none; }
 
-        /* UPLOAD PORTAL */
         .upload-area { 
             background: #05080b; 
             border: 2px dashed var(--border); 
@@ -114,15 +111,13 @@
             border-radius: 16px; 
             text-align: center; 
             cursor: pointer; 
-            transition: all 0.2s ease; 
         }
         .upload-area:hover { border-color: var(--primary); background: rgba(0, 191, 165, 0.02); }
         .upload-area .up-icon { font-size: 2.2rem; display: block; margin-bottom: 12px; filter: drop-shadow(0 0 8px var(--primary-glow)); }
         .upload-area h4 { font-size: 1.05rem; margin-bottom: 4px; color: #fff; }
         .upload-area p { color: var(--text-muted); font-size: 0.8rem; }
-        .upload-progress { margin-top: 20px; font-size: 0.9rem; color: var(--primary); display: none; font-weight: 600; text-align: center; letter-spacing: 0.3px; }
+        .upload-progress { margin-top: 20px; font-size: 0.9rem; color: var(--primary); display: none; font-weight: 600; text-align: center; }
 
-        /* TRACKLIST ITEMS */
         .track-item { 
             background: var(--card); 
             border: 1px solid var(--border); 
@@ -141,7 +136,6 @@
         .track-title { font-weight: 600; font-size: 0.95rem; color: #fff; }
         .track-badge { font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* PREMIUM CONTROLS SYSTEM PLAYER BAR */
         .player-bar { 
             position: fixed; 
             bottom: 0; 
@@ -165,7 +159,6 @@
         .progress-container { width: 100%; height: 6px; background: #05070a; border-radius: 10px; cursor: pointer; position: relative; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent-quantum)); border-radius: 10px; box-shadow: 0 0 10px var(--primary); }
 
-        /* BUTTON DESIGN SCHIENEN */
         .btn { padding: 16px 28px; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.8px; transition: all 0.22s ease; width: 100%; text-align: center; }
         .btn-primary { background: var(--primary); color: #030608; }
         .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 0 16px var(--primary-glow); }
@@ -173,20 +166,18 @@
         .btn-secondary:hover { border-color: var(--text-muted); background: #0c1318; }
         
         .btn-logout { background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px; font-size: 0.75rem; border-radius: 20px; font-weight: 700; cursor: pointer; width: auto; }
-        .btn-logout:hover { border-color: var(--lock); color: var(--lock); background: rgba(255,51,102,0.03); }
+        .btn-logout:hover { border-color: var(--lock); color: var(--lock); }
         .btn-delete { background: transparent; border: 1px solid rgba(255, 51, 102, 0.15); color: var(--lock); padding: 8px 16px; font-size: 0.75rem; border-radius: 20px; font-weight: 700; cursor: pointer; margin-left: 8px; width: auto; }
-        .btn-delete:hover { background: rgba(255, 51, 102, 0.05); border-color: var(--lock); }
+        .btn-delete:hover { background: rgba(255, 51, 102, 0.05); }
         
         .alert-box { color: var(--lock); background: rgba(255,51,102,0.05); border: 1px solid rgba(255,51,102,0.15); padding: 12px; border-radius: 10px; font-size: 0.85rem; margin-top: 14px; text-align: center; font-weight: 600; display: none; }
-        .badge-studio { border: 1px solid rgba(157, 78, 221, 0.3); background: rgba(157, 78, 221, 0.08); color: var(--accent-quantum); filter: drop-shadow(0 0 4px var(--accent-glow)); }
+        .badge-studio { border: 1px solid rgba(157, 78, 221, 0.3); background: rgba(157, 78, 221, 0.08); color: var(--accent-quantum); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- MASTER LOGO HEADER -->
+    <!-- WUNDERSCHÖNER HEADER -->
     <div class="header">
-        <div class="logo-glow">🌌</div>
+        <div class="logo-glow">🎧</div>
         <h1>CloudBeats Hub</h1>
-        <p class="subtitle">Premium Live-Musik-Katalog &amp; Creator Studio</p>
-        
