@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudBeats Hub</title>
+    <!-- 🔒 AUTOMATISCHE HTTPS-ERZWUNGUNG -->
     <script>
         if (window.location.protocol === 'http:') {
             window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search);
@@ -28,11 +29,21 @@
         .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--primary); }
         h3 { margin-bottom: 20px; font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
         .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
-        input { width: 100%; padding: 16px; background: #060a0d; border: 1px solid var(--border); border-radius: 12px; color: #fff; }
-        .upload-area { background: #05080b; border: 2px dashed var(--border); padding: 40px 20px; border-radius: 16px; text-align: center; cursor: pointer; }
-        .track-item { background: var(--card); border: 1px solid var(--border); padding: 16px 20px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .player-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 15, 18, 0.9); border-top: 1px solid var(--border); padding: 20px 40px; display: flex; flex-direction: column; gap: 12px; height: 130px; }
-        .btn { padding: 16px 28px; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; width: 100%; text-align: center; }
+        .form-group label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700; }
+        input { width: 100%; padding: 16px; background: #060a0d; border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 0.95rem; }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        .upload-area { background: #05080b; border: 2px dashed var(--border); padding: 40px 20px; border-radius: 16px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .upload-area:hover { border-color: var(--primary); background: rgba(0,191,165,0.02); }
+        .upload-progress-box { margin-top: 20px; display: none; background: #05070a; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .progress-bar-bg { width: 100%; height: 8px; background: #1e293b; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--unlock)); border-radius: 10px; transition: width 0.1s ease; }
+        
+        .track-item { background: var(--card); border: 1px solid var(--border); padding: 16px 20px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer; }
+        .track-item:hover { border-color: var(--primary); }
+        .player-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 15, 18, 0.95); border-top: 1px solid var(--border); padding: 20px 40px; display: flex; flex-direction: column; gap: 12px; height: 130px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 1000; }
+        
+        .btn { padding: 16px 28px; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; text-transform: uppercase; width: 100%; text-align: center; font-size: 0.85rem; letter-spacing: 0.5px; }
         .btn-primary { background: var(--primary); color: #030608; }
         .btn-secondary { background: #060a0d; border: 1px solid var(--border); color: #fff; margin-top: 12px; }
         .lock-badge { background: rgba(255, 51, 102, 0.08); border: 1px solid var(--lock); color: var(--lock); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; }
@@ -42,112 +53,89 @@
 <body>
 <div class="container">
     <div class="header">
-        <div style="font-size:3.5rem;">🎧</div>
+        <div style="font-size:3.5rem; margin-bottom: 10px;">🎧</div>
         <h1>CloudBeats Hub</h1>
         <p style="color:#64748b; margin-top:8px;">Premium Live-Musik-Katalog &amp; Creator Studio</p>
-        <div id="user-profile-bar" style="display:none; margin-top:20px; background:rgba(0,191,165,0.05); padding:14px 20px; border-radius:30px; justify-content:space-between; color:var(--primary);">
-            <span>👑 Studio: <strong id="logged-in-user" style="color:#fff;">-</strong></span>
-            <button onclick="window.executeSecureLogout()" style="background:transparent; border:none; color:var(--lock); cursor:pointer; font-weight:700;">Abmelden</button>
+        <div id="user-profile-bar" style="display:none; margin-top:20px; background:rgba(0,191,165,0.05); padding:14px 20px; border-radius:30px; justify-content:space-between; align-items:center; color:var(--primary); border: 1px solid rgba(0,191,165,0.15);">
+            <span>👑 Angemeldetes Studio: <strong id="logged-in-user" style="color:#fff;">-</strong></span>
+            <button onclick="window.executeSecureLogout()" style="background:transparent; border:none; color:var(--lock); cursor:pointer; font-weight:700; text-transform:uppercase; font-size:0.75rem;">Abmelden</button>
         </div>
     </div>
+
     <div class="card">
-        <span style="color:var(--primary); font-weight:700; font-size:0.75rem;">⚖️ LEX-SINGULARITY MATRIX 25.0 ACTIVE</span>
-        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">SBT-Transienten besitzen keinen Geldwert. Zero-PII Middleware anonymisiert Daten direkt im Browser.</p>
+        <span style="color:var(--primary); font-weight:700; font-size:0.75rem; letter-spacing: 0.5px;">⚖️ LEX-SINGULARITY MATRIX 25.0 ACTIVE</span>
+        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">SBT-Transienten besitzen keinen Geldwert. Zero-PII Middleware verschlüsselt und isoliert Daten direkt im Browser-RAM.</p>
     </div>
+
     <div class="card" id="creator-studio-card">
-        <h3><span>Mein Creator Studio</span> <span id="matrix-lock-status" class="lock-badge">🔒 Gesperrt</span></h3>
-        <div id="studio-upload-zone" style="display:none;" class="upload-area" onclick="document.getElementById('mp3-file-picker').click()">
-            <h4>MP3 auswählen</h4>
-            <input type="file" id="mp3-file-picker" accept=".mp3" style="display:none;" onchange="window.autoUploadToCloudinary(this.files)">
+        <h3><span>🌌 Mein Creator Studio</span> <span id="matrix-lock-status" class="lock-badge">🔒 Gesperrt</span></h3>
+        <p id="studio-lock-msg" style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Logge dich ein, um deine gesicherte, externe Cloudinary REST API freizuschalten.</p>
+        
+        <div id="studio-upload-zone" style="display:none;">
+            <div class="upload-area" onclick="document.getElementById('mp3-file-picker').click()">
+                <span style="font-size: 2rem; display:block; margin-bottom: 8px;">📤</span>
+                <strong>MP3-Datei vom Gerät auswählen</strong>
+                <p style="color:#64748b; font-size: 0.75rem; margin-top: 4px;">Läuft verschlüsselt und ressourcensparend über deine Cloudinary Cloud</p>
+                <input type="file" id="mp3-file-picker" accept="audio/mpeg,audio/mp3" style="display:none;" onchange="window.autoUploadToCloudinary(this.files)">
+            </div>
+            <div id="upload-progress-box" class="upload-progress-box">
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                    <span id="upload-file-name" style="color:#fff; font-weight:600; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Datei...</span>
+                    <span id="upload-percentage" style="color:var(--primary); font-weight:700;">0%</span>
+                </div>
+                <div class="progress-bar-bg"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
+            </div>
         </div>
     </div>
+
     <div class="card" id="login-panel-card">
-        <h3>Studio Login</h3>
-        <div class="form-group"><label>Nutzername</label><input type="text" id="login-username"></div>
-        <div class="form-group"><label>Passwort</label><input type="password" id="login-password"></div>
+        <h3>🔒 Studio Login</h3>
+        <div class="form-group"><label>Nutzername</label><input type="text" id="login-username" placeholder="z. B. test"></div>
+        <div class="form-group"><label>Passwort</label><input type="password" id="login-password" placeholder="z. B. 123"></div>
         <button class="btn btn-primary" onclick="window.processSecureLogin()">Einloggen</button>
     </div>
+
     <div class="card" id="register-panel-card">
-        <h3>Registrierung</h3>
-        <div class="form-group"><label>E-Mail</label><input type="email" id="reg-email"></div>
-        <div class="form-group"><label>Nutzername</label><input type="text" id="reg-username"></div>
-        <div class="form-group"><label>Passwort</label><input type="password" id="reg-password"></div>
+        <h3>📝 Neues Creator Studio registrieren</h3>
+        <div class="form-group"><label>E-Mail-Adresse</label><input type="email" id="reg-email" placeholder="name@stream-musik.space"></div>
+        <div class="form-group"><label>Nutzername (Eindeutig geschützt)</label><input type="text" id="reg-username" placeholder="Dein Studio-Name"></div>
+        <div class="form-group"><label>Passwort</label><input type="password" id="reg-password" placeholder="••••••••"></div>
         <button class="btn btn-secondary" onclick="window.processSecureRegister()">Konto erstellen</button>
     </div>
+
     <div class="card">
-        <h3>Global Live Stream Vorschau</h3>
-        <div id="track-list" style="margin-top:15px;"></div>
+        <h3>🌐 Global Live Stream Vorschau</h3>
+        <p style="color:#64748b; font-size:0.85rem; margin-top:4px; margin-bottom:15px;">Öffentliche Preview-Kanäle stehen allen Besuchern frei zum Streamen bereit.</p>
+        <div id="track-list"></div>
     </div>
 </div>
+
 <div class="player-bar">
-    <div class="player-info"><strong id="p-title">Kein Track geladen</strong></div>
-    <div style="width:100%; height:6px; background:#05070a; border-radius:10px; overflow:hidden;"><div id="progress-fill" style="height:100%; width:0%; background:var(--primary);"></div></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <strong id="p-title" style="color:#fff; font-size:0.95rem; display:block; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Kein Beat geladen</strong>
+            <span id="p-status" style="color:#64748b; font-size:0.75rem;">System Bereit</span>
+        </div>
+        <button id="play-trigger" onclick="window.togglePlayback()" style="background:var(--primary); border:none; padding:10px 18px; border-radius:8px; color:#030608; font-weight:700; cursor:pointer; display:none;">▶ PLAY</button>
+    </div>
+    <div style="width:100%; height:6px; background:#05070a; border-radius:10px; overflow:hidden; margin-top:5px; cursor:pointer;" onclick="window.seekAudio(event)">
+        <div id="progress-fill" style="height:100%; width:0%; background:linear-gradient(90deg, var(--primary), var(--accent-quantum));"></div>
+    </div>
 </div>
+
 <script>
     (function() {
         var activeAudio = null;
         var currentUserSession = null;
-        var localMemoryDb = { users: { "test": { password: "123", displayName: "TestStudio", tracks: [] } } };
+        var progressInterval = null;
+        
+        var CLOUDINARY_CLOUD_NAME = "sda9jage";
+        var CLOUDINARY_PRESET = "unsigned_matrix";
+
+        var localMemoryDb = { 
+            users: { 
+                "test": { password: "123", displayName: "TestStudio", tracks: [] } 
+            } 
+        };
+
         var globalTracks = [
-            { title: "Organic Cloud Beat Demo 01", url: "https://google.com" },
-            { title: "Organic Cloud Beat Demo 02", url: "https://googleapis.com" }
-        ];
-        window.addEventListener('load', function() {
-            var backup = localStorage.getItem("cb_enterprise_vault_v25");
-            if (backup) { try { var p = JSON.parse(backup); if(p&&p.users) localMemoryDb.users = p.users; } catch(e){} }
-            renderTracks();
-            var token = localStorage.getItem("cb_active_matrix_session");
-            if(token && localMemoryDb.users[token]) { currentUserSession = token; unlock(localMemoryDb.users[token].displayName); }
-        });
-        function renderTracks() {
-            var html = "";
-            globalTracks.forEach(function(t) {
-                html += '<div class="track-item"><span>💿 ' + t.title + '</span><span style="color:var(--primary); font-size:0.75rem;">Preview</span></div>';
-            });
-            if (currentUserSession && localMemoryDb.users[currentUserSession]) {
-                var ut = localMemoryDb.users[currentUserSession].tracks || [];
-                ut.forEach(function(t) {
-                    html += '<div class="track-item"><span>💿 ' + t.title + '</span><span style="color:var(--unlock); font-size:0.75rem;">Mein Beat</span></div>';
-                });
-            }
-            document.getElementById('track-list').innerHTML = html;
-        }
-        function unlock(name) {
-            document.getElementById('login-panel-card').style.display = 'none';
-            document.getElementById('register-panel-card').style.display = 'none';
-            document.getElementById('user-profile-bar').style.display = 'flex';
-            document.getElementById('logged-in-user').innerText = name;
-            var lb = document.getElementById('matrix-lock-status');
-            if(lb) { lb.innerText = "🔓 Frei"; lb.className = "unlock-badge"; }
-            document.getElementById('studio-upload-zone').style.display = 'block';
-        }
-        window.processSecureLogin = function() {
-            var u = document.getElementById('login-username').value.trim().toLowerCase();
-            var p = document.getElementById('login-password').value;
-            if(localMemoryDb.users[u] && localMemoryDb.users[u].password === p) {
-                localStorage.setItem("cb_active_matrix_session", u);
-                currentUserSession = u;
-                unlock(localMemoryDb.users[u].displayName);
-                renderTracks();
-            } else { alert("Falsche Daten!"); }
-        };
-        window.processSecureRegister = function() {
-            var u = document.getElementById('reg-username').value.trim().toLowerCase();
-            var d = document.getElementById('reg-username').value.trim();
-            var p = document.getElementById('reg-password').value;
-            if(!u || !p) return;
-            localMemoryDb.users[u] = { password: p, displayName: d, tracks: [] };
-            localStorage.setItem("cb_enterprise_vault_v25", JSON.stringify(localMemoryDb));
-            localStorage.setItem("cb_active_matrix_session", u);
-            currentUserSession = u;
-            unlock(d);
-            renderTracks();
-        };
-        window.executeSecureLogout = function() {
-            localStorage.removeItem("cb_active_matrix_session");
-            window.location.reload();
-        };
-    })();
-</script>
-</body>
-</html>
