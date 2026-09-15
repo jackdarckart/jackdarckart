@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME & 8 TELEMETRIE-STATUS-ITEMS) -->
+        <!-- 2. STUDIO-LAB (GAME & BOOST-UPGRADES SHOP) -->
         <div id="view-game" class="view-page hidden w-full max-w-lg mx-auto text-center space-y-4">
             
             <!-- Auth Gateway -->
@@ -113,60 +113,53 @@
                     <button type="button" id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] px-3 py-1.5 rounded-xl font-mono cursor-pointer transition">🚪 Abmelden</button>
                 </div>
 
-                <!-- Strikt fixierter Master-Beat Button (+1 Beat fest) -->
+                <!-- Strikt fixierter Klick-Button: Exakt +1 Beat -->
                 <button type="button" id="produce-beat-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-black py-5 px-6 rounded-[2rem] shadow-2xl shadow-purple-900/40 text-lg cursor-pointer active:scale-[0.98] border border-white/10 flex flex-col items-center justify-center gap-1">
                     <span class="flex items-center gap-2">🎧 Master-Beat Einspielen</span>
                     <span class="text-xs font-mono font-normal text-purple-200/80">(Strikt +1 Beat pro Klick)</span>
                 </button>
 
-                <div class="grid grid-cols-2 gap-3 text-left">
-                    <div class="glass-panel p-4 rounded-2xl border-purple-500/20">
-                        <p class="text-[10px] font-mono text-purple-300 uppercase tracking-widest">Gesamt Beats</p>
-                        <p id="beats-count" class="text-2xl font-black text-white font-mono mt-0.5">3.449</p>
+                <div class="grid grid-cols-3 gap-2 text-left">
+                    <div class="glass-panel p-3 rounded-2xl border-purple-500/20">
+                        <p class="text-[9px] font-mono text-purple-300 uppercase tracking-widest">Beats</p>
+                        <p id="beats-count" class="text-xl font-black text-white font-mono mt-0.5">3.449</p>
                     </div>
-                    <div class="glass-panel p-4 rounded-2xl border-pink-500/20">
-                        <p class="text-[10px] font-mono text-pink-300 uppercase tracking-widest">Aktive Fans</p>
-                        <p id="fans-count" class="text-2xl font-black text-white font-mono mt-0.5">586</p>
+                    <div class="glass-panel p-3 rounded-2xl border-emerald-500/20">
+                        <p class="text-[9px] font-mono text-emerald-300 uppercase tracking-widest">Boost / Sek</p>
+                        <p id="bps-count" class="text-xl font-black text-emerald-400 font-mono mt-0.5">+1</p>
+                    </div>
+                    <div class="glass-panel p-3 rounded-2xl border-pink-500/20">
+                        <p class="text-[9px] font-mono text-pink-300 uppercase tracking-widest">Fans</p>
+                        <p id="fans-count" class="text-xl font-black text-white font-mono mt-0.5">586</p>
                     </div>
                 </div>
 
-                <!-- 8 System-Telemetrie Status-Items (Item 03 ersetzt) -->
+                <!-- Studio Boost Upgrades (Erhöhen den Boost pro Sekunde) -->
                 <div class="glass-panel p-5 rounded-[2rem] text-left space-y-3">
                     <h3 class="text-xs font-mono uppercase tracking-widest text-purple-400 flex items-center gap-2">
-                        <span>📊</span> Nexus System-Telemetrie (8 Status-Metriken)
+                        <span>⚡</span> Studio-Boost Upgrades (Beats/Sekunde)
                     </h3>
-                    <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[9px] text-slate-400 block">01 // KERN-STATUS</span>
-                            <span class="text-emerald-400 font-bold">Online / Stabil</span>
+                    <div class="space-y-2">
+                        <div class="bg-[#030508]/80 p-3 rounded-xl border border-slate-800/80 flex justify-between items-center gap-3">
+                            <div>
+                                <p class="text-xs font-bold text-white">🎹 Sub-Bass Modul</p>
+                                <p class="text-[10px] text-slate-400 font-mono">+1 Beat/Sekunde (Anzahl: <span id="upg1-count">0</span>)</p>
+                            </div>
+                            <button type="button" id="buy-upgrade-1" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">100 B</button>
                         </div>
-                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[9px] text-slate-400 block">02 // KLICK-FAKTOR</span>
-                            <span class="text-purple-400 font-bold">Strikt 1:1 (+1)</span>
+                        <div class="bg-[#030508]/80 p-3 rounded-xl border border-slate-800/80 flex justify-between items-center gap-3">
+                            <div>
+                                <p class="text-xs font-semibold text-white">🚀 Cloud Synthesizer</p>
+                                <p class="text-[10px] text-slate-400 font-mono">+5 Beats/Sekunde (Anzahl: <span id="upg2-count">0</span>)</p>
+                            </div>
+                            <button type="button" id="buy-upgrade-2" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">500 B</button>
                         </div>
-                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[9px] text-slate-400 block">03 // KERN-LOCK</span>
-                            <span class="text-indigo-400 font-bold">Aktiv & Geschützt</span>
-                        </div>
-                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[9px] text-slate-400 block">04 // SPEICHER-ENGINE</span>
-                            <span class="text-cyan-400 font-bold">Local-Client (100%)</span>
-                        </div>
-                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[9px] text-slate-400 block">05 // STREAM-SYNC</span>
-                            <span class="text-emerald-400 font-bold">Bio-Garden Active</span>
-                        </div>
-                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[9px] text-slate-400 block">06 // SICHERHEITS-HUB</span>
-                            <span class="text-blue-400 font-bold">PIN Gesichert</span>
-                        </div>
-                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[9px] text-slate-400 block">07 // STANDORT-NODE</span>
-                            <span class="text-amber-400 font-bold">Meckenheim, NRW</span>
-                        </div>
-                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[9px] text-slate-400 block">08 // PROTOKOLL</span>
-                            <span class="text-pink-400 font-bold">Standalone v3.5</span>
+                        <div class="bg-[#030508]/80 p-3 rounded-xl border border-slate-800/80 flex justify-between items-center gap-3">
+                            <div>
+                                <p class="text-xs font-semibold text-white">💎 Nexus Core Booster</p>
+                                <p class="text-[10px] text-slate-400 font-mono">+20 Beats/Sekunde (Anzahl: <span id="upg3-count">0</span>)</p>
+                            </div>
+                            <button type="button" id="buy-upgrade-3" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">2.000 B</button>
                         </div>
                     </div>
                 </div>
@@ -253,21 +246,25 @@
         document.addEventListener('DOMContentLoaded', function() {
 
             /* ========================================================
-               MODUL 1: GAME & ECONOMY ENGINE (Strikt +1 Beat pro Klick)
+               MODUL 1: GAME & ECONOMY ENGINE (+Boost pro Sekunde)
                ======================================================== */
             const GameEngine = {
                 beats: 3449,
                 fans: 586,
+                upg1: 0,
+                upg2: 0,
+                upg3: 0,
                 loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || 'artur.hamm90@gmail.com',
                 
                 init() {
                     let usersDB = {};
                     try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
                     if (!usersDB[this.loggedInUser]) {
-                        usersDB[this.loggedInUser] = { pin: '1234', beats: 3449, fans: 586 };
+                        usersDB[this.loggedInUser] = { pin: '1234', beats: 3449, fans: 586, u1: 0, u2: 0, u3: 0 };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     }
                     this.load();
+                    this.startAutoBoostInterval();
                 },
 
                 load() {
@@ -277,6 +274,9 @@
                             let u = db[this.loggedInUser];
                             this.beats = Number(u.beats) || 3449;
                             this.fans = Number(u.fans) || 586;
+                            this.upg1 = Number(u.u1) || 0;
+                            this.upg2 = Number(u.u2) || 0;
+                            this.upg3 = Number(u.u3) || 0;
                         }
                     } catch(e) {}
                 },
@@ -288,28 +288,88 @@
                         db[this.loggedInUser] = { 
                             pin: '1234', 
                             beats: this.beats, 
-                            fans: this.fans 
+                            fans: this.fans,
+                            u1: this.upg1,
+                            u2: this.upg2,
+                            u3: this.upg3
                         };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
                     } catch(e) {}
                 },
 
+                getBPS() {
+                    return (this.upg1 * 1) + (this.upg2 * 5) + (this.upg3 * 20);
+                },
+
+                startAutoBoostInterval() {
+                    setInterval(() => {
+                        let bps = this.getBPS();
+                        if (bps > 0 && this.loggedInUser) {
+                            this.beats += bps;
+                            this.updateUI();
+                            this.save();
+                        }
+                    }, 1000);
+                },
+
                 updateUI() {
                     const bEl = document.getElementById('beats-count');
                     const fEl = document.getElementById('fans-count');
+                    const bpsEl = document.getElementById('bps-count');
+                    const u1El = document.getElementById('upg1-count');
+                    const u2El = document.getElementById('upg2-count');
+                    const u3El = document.getElementById('upg3-count');
+
                     if(bEl) bEl.innerText = Math.floor(this.beats).toLocaleString('de-DE');
                     if(fEl) fEl.innerText = Math.floor(this.fans).toLocaleString('de-DE');
+                    if(bpsEl) bpsEl.innerText = "+" + this.getBPS();
+                    if(u1El) u1El.innerText = this.upg1;
+                    if(u2El) u2El.innerText = this.upg2;
+                    if(u3El) u3El.innerText = this.upg3;
                 }
             };
 
             GameEngine.init();
 
-            // Strikt fixierter Klick-Wert: Exakt +1 Beat, absolut unantastbar
+            // Strikt fixierter Klick-Button: Exakt +1 Beat (unveränderbar)
             document.getElementById('produce-beat-btn').addEventListener('click', () => {
                 GameEngine.beats += 1;
                 GameEngine.fans += 1;
                 GameEngine.updateUI();
                 GameEngine.save();
+            });
+
+            // Upgrade 1: +1 Beat/Sekunde (Kosten: 100)
+            document.getElementById('buy-upgrade-1').addEventListener('click', () => {
+                let cost = 100 * Math.pow(1.15, GameEngine.upg1);
+                if (GameEngine.beats >= cost) {
+                    GameEngine.beats -= cost;
+                    GameEngine.upg1 += 1;
+                    GameEngine.updateUI();
+                    GameEngine.save();
+                }
+            });
+
+            // Upgrade 2: +5 Beats/Sekunde (Kosten: 500)
+            document.getElementById('buy-upgrade-2').addEventListener('click', () => {
+                let cost = 500 * Math.pow(1.15, GameEngine.upg2);
+                if (GameEngine.beats >= cost) {
+                    GameEngine.beats -= cost;
+                    GameEngine.upg2 += 1;
+                    GameEngine.updateUI();
+                    GameEngine.save();
+                }
+            });
+
+            // Upgrade 3: +20 Beats/Sekunde (Kosten: 2000)
+            document.getElementById('buy-upgrade-3').addEventListener('click', () => {
+                let cost = 2000 * Math.pow(1.15, GameEngine.upg3);
+                if (GameEngine.beats >= cost) {
+                    GameEngine.beats -= cost;
+                    GameEngine.upg3 += 1;
+                    GameEngine.updateUI();
+                    GameEngine.save();
+                }
             });
 
             document.getElementById('submit-login-btn').addEventListener('click', () => {
