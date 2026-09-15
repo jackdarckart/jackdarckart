@@ -73,18 +73,20 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME & BOOST-UPGRADES) -->
+        <!-- 2. STUDIO-LAB (GAME MIT LOGIN & ADMIN-SICHERHEITSMENÜ) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
             
             <!-- Auth Gateway -->
             <div id="game-auth-container" class="glass-panel p-6 sm:p-8 rounded-[2rem] text-left space-y-4">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
-                    <h2 class="text-lg font-bold text-purple-300">Access Gateway</h2>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Sichere Session-Authentifizierung</p>
+                    <h2 id="auth-title" class="text-lg font-bold text-purple-300">Studio Secure Gateway</h2>
+                    <p id="auth-subtitle" class="text-[11px] text-slate-400 mt-0.5">Vollständige E-Mail &amp; PIN Authentifizierung</p>
                 </div>
                 <div id="auth-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
-                <div class="space-y-3">
+                
+                <!-- Login Form -->
+                <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
                         <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" value="artur.hamm90@gmail.com">
@@ -94,17 +96,87 @@
                         <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" value="1234">
                     </div>
                     <button type="button" id="submit-login-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg mt-2">🔓 Studio entsperren</button>
+                    
+                    <div class="flex justify-between items-center text-[11px] font-mono pt-2">
+                        <button type="button" id="to-register-btn" class="text-purple-400 hover:underline cursor-pointer">Konto registrieren</button>
+                        <button type="button" id="to-forgot-btn" class="text-slate-400 hover:underline cursor-pointer">PIN vergessen?</button>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div id="form-register" class="space-y-3 hidden">
+                    <div>
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE E-MAIL:</label>
+                        <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">WÄHLE PIN (4-6 Ziffern):</label>
+                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="1234">
+                    </div>
+                    <button type="button" id="submit-register-btn" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg mt-2">✨ Registrieren &amp; Starten</button>
+                    
+                    <div class="text-center pt-2">
+                        <button type="button" id="to-login-btn" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zurück zum Login</button>
+                    </div>
+                </div>
+
+                <!-- Forgot PIN Form -->
+                <div id="form-forgot" class="space-y-3 hidden">
+                    <div>
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
+                        <input type="email" id="forgot-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="artur.hamm90@gmail.com">
+                    </div>
+                    <button type="button" id="request-code-btn" class="cyber-button w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ Verifizierungs-Code anfordern</button>
+                    
+                    <div id="reset-section" class="space-y-2.5 pt-2 hidden border-t border-slate-800">
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">CODE EINGEBEN:</label>
+                            <input type="text" id="forgot-code" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none font-mono" placeholder="6-stelliger Code">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN FESTLEGEN:</label>
+                            <input type="password" id="new-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none" placeholder="Neue PIN">
+                        </div>
+                        <button type="button" id="submit-reset-btn" class="cyber-button w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔒 PIN erfolgreich zurücksetzen</button>
+                    </div>
+
+                    <div class="text-center pt-2">
+                        <button type="button" id="forgot-to-login-btn" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zum Login</button>
+                    </div>
                 </div>
             </div>
 
             <!-- Main Studio Panel -->
             <div id="game-main-container" class="space-y-4 hidden">
                 <div class="glass-panel p-3.5 rounded-2xl flex justify-between items-center text-xs">
-                    <span id="logged-user-email" class="text-purple-300 font-mono truncate max-w-[210px]">Session Aktiv</span>
-                    <button type="button" id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] px-3 py-1.5 rounded-xl font-mono cursor-pointer">🚪 Abmelden</button>
+                    <span id="logged-user-email" class="text-purple-300 font-mono truncate max-w-[170px]">Session Aktiv</span>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" id="toggle-admin-panel" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[10px] px-2.5 py-1.5 rounded-xl font-mono cursor-pointer">⚙️ Admin</button>
+                        <button type="button" id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] px-2.5 py-1.5 rounded-xl font-mono cursor-pointer">🚪 Abmelden</button>
+                    </div>
                 </div>
 
-                <!-- Strikt fixierter Klick-Button: Exakt +1 Beat -->
+                <!-- Admin & Security Panel -->
+                <div id="admin-security-panel" class="glass-panel p-4 rounded-2xl border-amber-500/30 text-left space-y-3 hidden bg-[#080c14]/95">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <span class="text-xs font-mono text-amber-400 font-bold">🛠️ Studio Admin &amp; PIN Center</span>
+                        <button type="button" id="close-admin-panel" class="text-slate-400 hover:text-white text-xs cursor-pointer">✕</button>
+                    </div>
+                    <div id="admin-msg" class="text-[11px] font-mono text-amber-300 min-h-[14px]"></div>
+                    <div class="space-y-2.5">
+                        <div>
+                            <label class="text-[10px] font-mono text-slate-400 block mb-1">AKTUELLE PIN:</label>
+                            <input type="password" id="admin-old-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-1.5 text-white text-xs outline-none" placeholder="Aktuelle PIN">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
+                            <input type="password" id="admin-new-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-1.5 text-white text-xs outline-none" placeholder="Neue PIN">
+                        </div>
+                        <button type="button" id="admin-change-pin-btn" class="cyber-button w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-xl text-xs font-mono uppercase tracking-wider cursor-pointer">PIN direkt ändern</button>
+                    </div>
+                </div>
+
+                <!-- Master-Beat Button -->
                 <button type="button" id="produce-beat-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 text-white font-black py-5 px-6 rounded-[2rem] shadow-2xl text-lg cursor-pointer border border-white/10 flex flex-col items-center justify-center gap-1">
                     <span class="flex items-center gap-2">🎧 Master-Beat Einspielen</span>
                     <span class="text-xs font-mono font-normal text-purple-200/80">(Strikt +1 Beat pro Klick)</span>
@@ -125,32 +197,32 @@
                     </div>
                 </div>
 
-                <!-- Studio Boost Upgrades -->
+                <!-- Upgrades -->
                 <div class="glass-panel p-5 rounded-[2rem] text-left space-y-3">
                     <h3 class="text-xs font-mono uppercase tracking-widest text-purple-400 flex items-center gap-2">
-                        <span>⚡</span> Studio-Boost Upgrades (Beats/Sekunde)
+                        <span>⚡</span> Hardcore Hash &amp; Cloud Upgrades
                     </h3>
                     <div class="space-y-2.5">
                         <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800 flex justify-between items-center gap-3">
                             <div>
-                                <p class="text-xs font-bold text-white">🎹 Sub-Bass Modul</p>
-                                <p class="text-[10px] text-slate-400 font-mono">+1 B/s (Anzahl: <span id="upg1-count">0</span>)</p>
+                                <p class="text-xs font-bold text-white">⚡ Hashrate Micro-Miner</p>
+                                <p class="text-[10px] text-slate-400 font-mono">+2 B/s | Kosten: <span id="cost-1">250</span> B (Anzahl: <span id="upg1-count">0</span>)</p>
                             </div>
-                            <button type="button" id="buy-upgrade-1" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">100 B</button>
+                            <button type="button" id="buy-upgrade-1" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">Kaufen</button>
                         </div>
                         <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800 flex justify-between items-center gap-3">
                             <div>
-                                <p class="text-xs font-semibold text-white">🚀 Cloud Synthesizer</p>
-                                <p class="text-[10px] text-slate-400 font-mono">+5 B/s (Anzahl: <span id="upg2-count">0</span>)</p>
+                                <p class="text-xs font-semibold text-white">🌐 Hash-Rate Staking Rig</p>
+                                <p class="text-[10px] text-slate-400 font-mono">+10 B/s | Kosten: <span id="cost-2">1.500</span> B (Anzahl: <span id="upg2-count">0</span>)</p>
                             </div>
-                            <button type="button" id="buy-upgrade-2" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">500 B</button>
+                            <button type="button" id="buy-upgrade-2" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">Kaufen</button>
                         </div>
                         <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800 flex justify-between items-center gap-3">
                             <div>
-                                <p class="text-xs font-semibold text-white">💎 Nexus Booster</p>
-                                <p class="text-[10px] text-slate-400 font-mono">+20 B/s (Anzahl: <span id="upg3-count">0</span>)</p>
+                                <p class="text-xs font-semibold text-white">💎 Quantum Cloud Node</p>
+                                <p class="text-[10px] text-slate-400 font-mono">+75 B/s | Kosten: <span id="cost-3">8.500</span> B (Anzahl: <span id="upg3-count">0</span>)</p>
                             </div>
-                            <button type="button" id="buy-upgrade-3" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">2.000 B</button>
+                            <button type="button" id="buy-upgrade-3" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">Kaufen</button>
                         </div>
                     </div>
                 </div>
@@ -193,12 +265,22 @@
             </div>
         </div>
 
-        <!-- 4. CLOUD-SYNC -->
+        <!-- 4. CLOUD-SYNC & BULLETPROOF BACKUP -->
         <div id="view-cloud" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="glass-panel p-6 rounded-[2rem] space-y-4 border-cyan-500/20">
-                <h2 class="text-lg font-bold text-cyan-400 font-mono">☁️ Cloud-Nexus Sync</h2>
-                <p class="text-xs text-slate-400">Verwaltung und Sicherung des lokalen Telemetrie-Speichers.</p>
-                <button type="button" id="cloud-to-home-btn" class="cyber-button w-full bg-slate-900 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
+                <h2 class="text-lg font-bold text-cyan-400 font-mono">☁️ Cloud-Nexus Backup Center</h2>
+                <p class="text-xs text-slate-400">Hier sind deine Daten absolut sicher. Erstelle Backups als Datei, damit dein Fortschritt niemals verloren geht.</p>
+                
+                <div class="space-y-3 pt-2">
+                    <button type="button" id="export-backup-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs font-mono uppercase tracking-wider cursor-pointer shadow-lg">📥 Spielstand als Datei sichern</button>
+                    
+                    <div class="pt-2 border-t border-slate-800">
+                        <label class="text-[10px] font-mono text-slate-400 block mb-1">SPIELSTAND WIEDERHERSTELLEN (JSON):</label>
+                        <input type="file" id="import-backup-file" accept=".json" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-mono file:bg-slate-800 file:text-cyan-300 hover:file:bg-slate-700 cursor-pointer">
+                    </div>
+                </div>
+
+                <button type="button" id="cloud-to-home-btn" class="cyber-button w-full bg-slate-900 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer mt-4">← Dashboard</button>
             </div>
         </div>
 
@@ -227,7 +309,7 @@
     <!-- Cyber-Footer -->
     <footer class="w-full border-t border-purple-500/15 py-3 px-4 bg-[#05070c]">
         <div class="max-w-4xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
-            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Auto-Sync Aktiv</span>
+            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Auto-Sync &amp; Double-Backup Aktiv</span>
             <span class="text-purple-400/60">jackdarckart • CloudBeats</span>
         </div>
     </footer>
@@ -237,7 +319,7 @@
         document.addEventListener('DOMContentLoaded', function() {
 
             /* ========================================================
-               MODUL 1: GAME & ECONOMY ENGINE (Echte Werte garantiert)
+               MODUL 1: SECURE AUTH & BULLETPROOF ECONOMY ENGINE
                ======================================================== */
             const GameEngine = {
                 beats: 3449,
@@ -245,25 +327,41 @@
                 upg1: 0,
                 upg2: 0,
                 upg3: 0,
-                loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || 'artur.hamm90@gmail.com',
+                loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || null,
                 
                 init() {
                     let usersDB = {};
-                    try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    if (!usersDB[this.loggedInUser]) {
-                        usersDB[this.loggedInUser] = { pin: '1234', beats: 3449, fans: 586, u1: 0, u2: 0, u3: 0 };
-                        localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
+                    try { 
+                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || 
+                                  JSON.parse(localStorage.getItem('beat_lab_users_db_backup')) || {}; 
+                    } catch(e) {}
+                    
+                    if (!usersDB['artur.hamm90@gmail.com']) {
+                        usersDB['artur.hamm90@gmail.com'] = { pin: '1234', beats: 3449, fans: 586, u1: 0, u2: 0, u3: 0 };
+                        this.persistDB(usersDB);
                     }
-                    this.load();
+
+                    if (this.loggedInUser && usersDB[this.loggedInUser]) {
+                        this.load();
+                    }
                     this.startAutoBoostInterval();
                 },
 
-                load() {
+                persistDB(db) {
                     try {
-                        let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                        const jsonStr = JSON.stringify(db);
+                        localStorage.setItem('beat_lab_users_db', jsonStr);
+                        localStorage.setItem('beat_lab_users_db_backup', jsonStr); // Redundanter Doppelspeicher
+                    } catch(e) {}
+                },
+
+                load() {
+                    if (!this.loggedInUser) return;
+                    try {
+                        let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || 
+                                  JSON.parse(localStorage.getItem('beat_lab_users_db_backup')) || {};
                         if (db[this.loggedInUser]) {
                             let u = db[this.loggedInUser];
-                            // Erzwinge Minimum 3449 Beats und 586 Fans falls der Wert zu niedrig ist
                             let storedBeats = Number(u.beats);
                             this.beats = (isNaN(storedBeats) || storedBeats < 3449) ? 3449 : storedBeats;
                             
@@ -273,20 +371,15 @@
                             this.upg1 = Number(u.u1) || 0;
                             this.upg2 = Number(u.u2) || 0;
                             this.upg3 = Number(u.u3) || 0;
-                        } else {
-                            this.beats = 3449;
-                            this.fans = 586;
                         }
-                    } catch(e) {
-                        this.beats = 3449;
-                        this.fans = 586;
-                    }
+                    } catch(e) {}
                 },
 
                 save() {
                     if (!this.loggedInUser) return;
                     try {
-                        let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                        let db = {};
+                        try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
                         if (!db[this.loggedInUser]) db[this.loggedInUser] = { pin: '1234' };
                         db[this.loggedInUser] = { 
                             ...db[this.loggedInUser],
@@ -296,13 +389,17 @@
                             u2: this.upg2,
                             u3: this.upg3
                         };
-                        localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
+                        this.persistDB(db);
                     } catch(e) {}
                 },
 
                 getBPS() {
-                    return (this.upg1 * 1) + (this.upg2 * 5) + (this.upg3 * 20);
+                    return (this.upg1 * 2) + (this.upg2 * 10) + (this.upg3 * 75);
                 },
+
+                getCost1() { return Math.floor(250 * Math.pow(1.30, this.upg1)); },
+                getCost2() { return Math.floor(1500 * Math.pow(1.32, this.upg2)); },
+                getCost3() { return Math.floor(8500 * Math.pow(1.35, this.upg3)); },
 
                 startAutoBoostInterval() {
                     setInterval(() => {
@@ -322,6 +419,9 @@
                     const u1El = document.getElementById('upg1-count');
                     const u2El = document.getElementById('upg2-count');
                     const u3El = document.getElementById('upg3-count');
+                    const c1El = document.getElementById('cost-1');
+                    const c2El = document.getElementById('cost-2');
+                    const c3El = document.getElementById('cost-3');
 
                     if(bEl) bEl.innerText = Math.floor(this.beats).toLocaleString('de-DE');
                     if(fEl) fEl.innerText = Math.floor(this.fans).toLocaleString('de-DE');
@@ -329,21 +429,26 @@
                     if(u1El) u1El.innerText = this.upg1;
                     if(u2El) u2El.innerText = this.upg2;
                     if(u3El) u3El.innerText = this.upg3;
+                    if(c1El) c1El.innerText = this.getCost1().toLocaleString('de-DE');
+                    if(c2El) c2El.innerText = this.getCost2().toLocaleString('de-DE');
+                    if(c3El) c3El.innerText = this.getCost3().toLocaleString('de-DE');
                 }
             };
 
             GameEngine.init();
 
-            // Strikt fixierter Klick-Button: Exakt +1 Beat
+            // Click listener
             document.getElementById('produce-beat-btn').addEventListener('click', () => {
+                if (!GameEngine.loggedInUser) return;
                 GameEngine.beats += 1;
                 GameEngine.fans += 1;
                 GameEngine.updateUI();
                 GameEngine.save();
             });
 
+            // Upgrades
             document.getElementById('buy-upgrade-1').addEventListener('click', () => {
-                let cost = 100 * Math.pow(1.15, GameEngine.upg1);
+                let cost = GameEngine.getCost1();
                 if (GameEngine.beats >= cost) {
                     GameEngine.beats -= cost;
                     GameEngine.upg1 += 1;
@@ -353,7 +458,7 @@
             });
 
             document.getElementById('buy-upgrade-2').addEventListener('click', () => {
-                let cost = 500 * Math.pow(1.15, GameEngine.upg2);
+                let cost = GameEngine.getCost2();
                 if (GameEngine.beats >= cost) {
                     GameEngine.beats -= cost;
                     GameEngine.upg2 += 1;
@@ -363,7 +468,7 @@
             });
 
             document.getElementById('buy-upgrade-3').addEventListener('click', () => {
-                let cost = 2000 * Math.pow(1.15, GameEngine.upg3);
+                let cost = GameEngine.getCost3();
                 if (GameEngine.beats >= cost) {
                     GameEngine.beats -= cost;
                     GameEngine.upg3 += 1;
@@ -372,25 +477,193 @@
                 }
             });
 
+            // --- CLOUD BACKUP EXPORT & IMPORT ---
+            document.getElementById('export-backup-btn').addEventListener('click', () => {
+                try {
+                    let dbData = localStorage.getItem('beat_lab_users_db') || "{}";
+                    let blob = new Blob([dbData], { type: "application/json" });
+                    let url = URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    a.download = "cloudbeats_backup_" + new Date().toISOString().slice(0,10) + ".json";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch(e) {}
+            });
+
+            document.getElementById('import-backup-file').addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        let parsed = JSON.parse(e.target.result);
+                        if (parsed && typeof parsed === 'object') {
+                            GameEngine.persistDB(parsed);
+                            alert("✅ Backup erfolgreich wiederhergestellt! Das Studio wird neu geladen.");
+                            location.reload();
+                        }
+                    } catch(err) {
+                        alert("❌ Ungültige Backup-Datei!");
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // --- AUTH NAVIGATION & ACTIONS ---
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+            const formForgot = document.getElementById('form-forgot');
+            const authMsg = document.getElementById('auth-msg');
+
+            document.getElementById('to-register-btn').addEventListener('click', () => {
+                formLogin.classList.add('hidden');
+                formRegister.classList.remove('hidden');
+                formForgot.classList.add('hidden');
+                document.getElementById('auth-title').innerText = "Konto Registrierung";
+                authMsg.innerText = "";
+            });
+
+            document.getElementById('to-login-btn').addEventListener('click', () => {
+                formRegister.classList.add('hidden');
+                formLogin.classList.remove('hidden');
+                document.getElementById('auth-title').innerText = "Studio Secure Gateway";
+                authMsg.innerText = "";
+            });
+
+            document.getElementById('to-forgot-btn').addEventListener('click', () => {
+                formLogin.classList.add('hidden');
+                formForgot.classList.remove('hidden');
+                document.getElementById('auth-title').innerText = "PIN Wiederherstellung";
+                authMsg.innerText = "";
+            });
+
+            document.getElementById('forgot-to-login-btn').addEventListener('click', () => {
+                formForgot.classList.add('hidden');
+                formLogin.classList.remove('hidden');
+                document.getElementById('auth-title').innerText = "Studio Secure Gateway";
+                authMsg.innerText = "";
+            });
+
+            // Register Action
+            document.getElementById('submit-register-btn').addEventListener('click', () => {
+                const email = document.getElementById('reg-email').value.trim().toLowerCase();
+                const pin = document.getElementById('reg-pin').value.trim();
+                if (!email || !email.includes('@') || pin.length < 4) {
+                    authMsg.innerText = "❌ Gültige E-Mail & PIN (min. 4 Ziffern) erforderlich!";
+                    return;
+                }
+                let db = {};
+                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                if (db[email]) {
+                    authMsg.innerText = "❌ E-Mail ist bereits registriert!";
+                    return;
+                }
+                db[email] = { pin: pin, beats: 3449, fans: 586, u1: 0, u2: 0, u3: 0 };
+                GameEngine.persistDB(db);
+                GameEngine.loggedInUser = email;
+                localStorage.setItem('beat_lab_logged_in_user', email);
+                GameEngine.load();
+                updateViewState();
+            });
+
+            // Login Action
             document.getElementById('submit-login-btn').addEventListener('click', () => {
                 const email = document.getElementById('login-email').value.trim().toLowerCase();
                 const pin = document.getElementById('login-pin').value.trim();
-                let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                let db = {};
+                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                
                 if (db[email] && db[email].pin === pin) {
                     GameEngine.loggedInUser = email;
                     localStorage.setItem('beat_lab_logged_in_user', email);
                     GameEngine.load();
                     updateViewState();
                 } else {
-                    document.getElementById('auth-msg').innerText = "❌ Falsche E-Mail oder PIN!";
+                    authMsg.innerText = "❌ Falsche E-Mail oder PIN!";
                 }
             });
 
+            // Forgot PIN: Request Code
+            let generatedResetCode = null;
+            let resetTargetEmail = null;
+            document.getElementById('request-code-btn').addEventListener('click', () => {
+                const email = document.getElementById('forgot-email').value.trim().toLowerCase();
+                let db = {};
+                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                
+                if (!db[email]) {
+                    authMsg.innerText = "❌ E-Mail-Adresse nicht gefunden!";
+                    return;
+                }
+                resetTargetEmail = email;
+                generatedResetCode = Math.floor(100000 + Math.random() * 900000).toString();
+                db[email].resetCode = generatedResetCode;
+                GameEngine.persistDB(db);
+
+                authMsg.innerText = `✅ Code gesendet! (Demo E-Mail Code: ${generatedResetCode})`;
+                document.getElementById('reset-section').classList.remove('hidden');
+            });
+
+            // Forgot PIN: Submit Reset
+            document.getElementById('submit-reset-btn').addEventListener('click', () => {
+                const codeInput = document.getElementById('forgot-code').value.trim();
+                const newPin = document.getElementById('new-pin').value.trim();
+                let db = {};
+                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+
+                if (resetTargetEmail && db[resetTargetEmail] && db[resetTargetEmail].resetCode === codeInput && newPin.length >= 4) {
+                    db[resetTargetEmail].pin = newPin;
+                    db[resetTargetEmail].resetCode = null;
+                    GameEngine.persistDB(db);
+                    authMsg.innerText = "🔒 PIN erfolgreich geändert! Bitte einloggen.";
+                    formForgot.classList.add('hidden');
+                    formLogin.classList.remove('hidden');
+                    document.getElementById('auth-title').innerText = "Studio Secure Gateway";
+                } else {
+                    authMsg.innerText = "❌ Ungültiger Code oder PIN (min. 4 Ziffern)!";
+                }
+            });
+
+            // Logout
             document.getElementById('logout-btn').addEventListener('click', () => {
                 GameEngine.save();
                 GameEngine.loggedInUser = null;
                 localStorage.removeItem('beat_lab_logged_in_user');
                 updateViewState();
+            });
+
+            // Admin panel inside game
+            const adminPanel = document.getElementById('admin-security-panel');
+            document.getElementById('toggle-admin-panel').addEventListener('click', () => {
+                adminPanel.classList.toggle('hidden');
+            });
+            document.getElementById('close-admin-panel').addEventListener('click', () => {
+                adminPanel.classList.add('hidden');
+            });
+
+            document.getElementById('admin-change-pin-btn').addEventListener('click', () => {
+                const oldPin = document.getElementById('admin-old-pin').value.trim();
+                const newPin = document.getElementById('admin-new-pin').value.trim();
+                const adminMsg = document.getElementById('admin-msg');
+                let db = {};
+                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+
+                if (GameEngine.loggedInUser && db[GameEngine.loggedInUser] && db[GameEngine.loggedInUser].pin === oldPin) {
+                    if (newPin.length >= 4) {
+                        db[GameEngine.loggedInUser].pin = newPin;
+                        GameEngine.persistDB(db);
+                        adminMsg.innerText = "✅ PIN erfolgreich aktualisiert!";
+                        document.getElementById('admin-old-pin').value = "";
+                        document.getElementById('admin-new-pin').value = "";
+                    } else {
+                        adminMsg.innerText = "❌ Neue PIN muss min. 4 Ziffern haben!";
+                    }
+                } else {
+                    adminMsg.innerText = "❌ Aktuelle PIN ist falsch!";
+                }
             });
 
             function updateViewState() {
@@ -404,6 +677,7 @@
                 } else {
                     authC.classList.remove('hidden');
                     mainC.classList.add('hidden');
+                    adminPanel.classList.add('hidden');
                 }
             }
             updateViewState();
