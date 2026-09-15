@@ -471,7 +471,7 @@
             
             <!-- Input-Feld -->
             <div id="modalInputContainer">
-                <input type="password" id="modalInput" placeholder="Master-PIN eingeben..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-center text-white text-lg tracking-widest focus:outline-none focus:border-indigo-500">
+                <input type="text" id="modalInput" placeholder="Master-PIN eingeben..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-center text-white text-lg tracking-widest focus:outline-none focus:border-indigo-500">
             </div>
 
             <!-- Interaktiver Button für "PIN vergessen?" -->
@@ -533,7 +533,6 @@
         let modalCallback = null;
         let modalMode = 'pin';
         
-        // Variablen für den sicheren Bestätigungs-Flow
         let pendingNewPin = '';
         let pendingNewEmail = '';
         let pendingVerificationCode = '';
@@ -584,6 +583,8 @@
                 actionContainer.classList.add('hidden');
             }
 
+            document.getElementById('customModal').classList.add('hidden'); // Fix: keep hidden until called correctly or managed via state
+            // Re-open info properly
             document.getElementById('customModal').classList.remove('hidden');
             modalCallback = null;
         }
@@ -601,7 +602,7 @@
             closeCustomModal(true, val);
         }
 
-        // --- SICHERER 2-FAKTOR SETUP FLOW (PIN + E-MAIL + BESTÄTIGUNGSCODE) ---
+        // --- DIREKTER 3-SCHRITT SETUP WIZARD ---
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
@@ -610,6 +611,7 @@
         }
 
         function startPinEmailSetupWizard() {
+            // Schritt 1: Neuen PIN eingeben
             showCustomModal('setup', '🔒 Neuer Master-PIN', 'Lege deinen geheimen Master-PIN fest:', 'Neuen PIN eingeben...', false);
             modalCallback = function(success, pinVal) {
                 if (!success || !pinVal) {
@@ -620,38 +622,36 @@
                 }
                 pendingNewPin = pinVal;
 
-                showCustomModal('setup', '📧 E-Mail-Adresse', 'Gib deine E-Mail-Adresse ein, um den Bestätigungscode zu erhalten:', 'Deine E-Mail-Adresse...', false);
-                modalCallback = function(succ2, emailVal) {
-                    if (!succ2 || !emailVal) {
-                        localStorage.setItem('jackAdminPin', pendingNewPin);
-                        localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                        showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                        return;
-                    }
-                    pendingNewEmail = emailVal;
+                // Schritt 2: E-Mail-Adresse eingeben
+                setTimeout(() => {
+                    showCustomModal('setup', '📧 E-Mail-Adresse', 'Gib deine E-Mail-Adresse für den Bestätigungscode ein:', 'Deine E-Mail-Adresse...', false);
+                    modalCallback = function(succ2, emailVal) {
+                        if (!succ2 || !emailVal) {
+                            localStorage.setItem('jackAdminPin', pendingNewPin);
+                            localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
+                            showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                            return;
+                        }
+                        pendingNewEmail = emailVal;
 
-                    // 6-stelligen Bestätigungscode generieren (Simulierter E-Mail-Versand)
-                    pendingVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+                        // 6-stelligen Code generieren
+                        pendingVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-                    let codeBtnHtml = `<button onclick="promptForVerificationCode()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">📥 Bestätigungscode jetzt eingeben</button>`;
-                    showInfoModal('📨 Bestätigungscode gesendet', `Ein Bestätigungscode wurde an "${pendingNewEmail}" gesendet.\n\n(Simuliertes Postfach: Dein Code lautet: ${pendingVerificationCode})`, codeBtnHtml);
-                };
-            };
-        }
-
-        function promptForVerificationCode() {
-            document.getElementById('customModal').classList.add('hidden');
-            showCustomModal('setup', '🔑 Code bestätigen', 'Gib den 6-stelligen Bestätigungscode ein, den du erhalten hast:', '6-stelliger Code...', false);
-            modalCallback = function(succ, codeInput) {
-                if (!succ || !codeInput) return;
-                if (codeInput.trim() === pendingVerificationCode) {
-                    localStorage.setItem('jackAdminPin', pendingNewPin);
-                    localStorage.setItem('jackAdminEmail', pendingNewEmail);
-                    showInfoModal('✅ Erfolgreich verifiziert', 'Dein Master-PIN und deine E-Mail wurden erfolgreich bestätigt und gespeichert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                } else {
-                    let retryBtnHtml = `<button onclick="promptForVerificationCode()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🔄 Erneut versuchen</button>`;
-                    showInfoModal('❌ Falscher Code', 'Der eingegebene Bestätigungscode ist leider falsch. Bitte versuche es erneut.', retryBtnHtml);
-                }
+                        // Schritt 3: Direktes Code-Eingabefenster öffnen
+                        setTimeout(() => {
+                            showCustomModal('setup', '🔑 Bestätigungscode eingeben', `Ein Code wurde an "${pendingNewEmail}" gesendet.\n\n(Dein Code lautet: ${pendingVerificationCode})\n\nGib den 6-stelligen Code hier ein:`, '6-stelliger Code...', false);
+                            modalCallback = function(succ3, codeInput) {
+                                if (succ3 && codeInput && codeInput.trim() === pendingVerificationCode) {
+                                    localStorage.setItem('jackAdminPin', pendingNewPin);
+                                    localStorage.setItem('jackAdminEmail', pendingNewEmail);
+                                    showInfoModal('✅ Erfolgreich', 'Master-PIN und E-Mail wurden erfolgreich verifiziert und gespeichert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                                } else {
+                                    showInfoModal('❌ Falscher Code', 'Der eingegebene Bestätigungscode war leider falsch. Bitte starte den PIN-Wechsel erneut.');
+                                }
+                            };
+                        }, 300);
+                    };
+                }, 300);
             };
         }
 
