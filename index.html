@@ -33,7 +33,7 @@
 </head>
 <body class="bg-darkbg text-gray-100 font-sans antialiased selection:bg-accent selection:text-white" oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" onclick="unlockAudioOnce()">
 
-    <!-- Globaler Audio Player (startet niemals automatisch) -->
+    <!-- Globaler Persistenter Audio Player -->
     <div class="hidden">
         <audio id="radioStream" crossorigin="anonymous" preload="auto">
             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
@@ -538,7 +538,7 @@
             </button>
             <div class="hidden sm:inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Musik- & Spiel-Synchronisierter HD-Garten</span>
+                <span>Interaktiver & Musik-Synchronisierter HD-Garten</span>
             </div>
         </div>
 
@@ -559,9 +559,10 @@
         </div>
 
         <!-- VOLLSTÄNDIG RESPONSIVES HD CANVAS-FENSTER -->
-        <div class="relative w-full flex justify-center items-center bg-darkbg rounded-3xl p-2 border-2 border-emerald-500/50 shadow-2xl overflow-hidden">
+        <div class="relative w-full flex justify-center items-center bg-darkbg rounded-3xl p-2 border-2 border-emerald-500/50 shadow-2xl overflow-hidden cursor-pointer" title="Klicke in den Garten für Klang & Interaktion!">
             <canvas id="gardenCanvas" class="rounded-2xl shadow-2xl block mx-auto"></canvas>
         </div>
+        <p class="text-xs text-gray-400">💡 Tipp: Klicke in den Garten, um Klangtöne zu erzeugen und Stauden-Erfahrung zu sammeln!</p>
     </div>
 
     <!-- CUSTOM DESIGN MODAL -->
@@ -579,7 +580,7 @@
                 <p id="modalText" class="text-sm text-gray-400 leading-relaxed">Bitte Eingabe tätigen.</p>
             </div>
             
-            <div id="modalInputContainer">
+            <div id="modalInputContainer" class="hidden">
                 <input type="text" id="modalInput" placeholder="Eingabe..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-center text-white text-lg tracking-widest focus:outline-none focus:border-indigo-500">
             </div>
 
@@ -624,22 +625,22 @@
 
             localStorage.setItem('jackCurrentView', view);
             
-            home.classList.add('hidden');
-            game.classList.add('hidden');
+            if (home) home.classList.add('hidden');
+            if (game) game.classList.add('hidden');
             if (garden) garden.classList.add('hidden');
 
             if (view === 'game') {
-                game.classList.remove('hidden');
+                if (game) game.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 checkLoginState();
             } else if (view === 'garden') {
-                garden.classList.remove('hidden');
+                if (garden) garden.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 setTimeout(resizeCanvas, 60);
                 initAudioAnalyser();
-                // Kein automatisches Starten des Streams beim Betreten des Gartens
+                unlockAudioOnce();
             } else {
-                home.classList.remove('hidden');
+                if (home) home.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
@@ -696,22 +697,26 @@
             const switchBtn = document.getElementById('authSwitchModeBtn');
 
             if (isRegisterMode) {
-                title.innerText = 'Beat-Lab Konto erstellen';
-                sub.innerText = 'Registriere dich, um deinen Spielstand dauerhaft zu sichern.';
-                btn.innerText = 'Konto registrieren';
-                switchBtn.innerText = 'Bereits ein Konto? Hier anmelden';
+                if (title) title.innerText = 'Beat-Lab Konto erstellen';
+                if (sub) sub.innerText = 'Registriere dich, um deinen Spielstand dauerhaft zu sichern.';
+                if (btn) btn.innerText = 'Konto registrieren';
+                if (switchBtn) switchBtn.innerText = 'Bereits ein Konto? Hier anmelden';
             } else {
-                title.innerText = 'Beat-Lab Anmelden';
-                sub.innerText = 'Melde dich mit deiner E-Mail und deinem PIN an.';
-                btn.innerText = 'Anmelden';
-                switchBtn.innerText = 'Noch kein Konto? Hier registrieren';
+                if (title) title.innerText = 'Beat-Lab Anmelden';
+                if (sub) sub.innerText = 'Melde dich mit deiner E-Mail und deinem PIN an.';
+                if (btn) btn.innerText = 'Anmelden';
+                if (switchBtn) switchBtn.innerText = 'Noch kein Konto? Hier registrieren';
             }
         }
 
         function handleAuthSubmit() {
             unlockAudioOnce();
-            const email = document.getElementById('authEmail').value.trim().toLowerCase();
-            const pin = document.getElementById('authPin').value.trim();
+            const emailInput = document.getElementById('authEmail');
+            const pinInput = document.getElementById('authPin');
+            if (!emailInput || !pinInput) return;
+
+            const email = emailInput.value.trim().toLowerCase();
+            const pin = pinInput.value.trim();
 
             if (!email || !pin) {
                 showInfoModal('⚠️ Fehler', 'Bitte fülle alle Felder aus.');
@@ -738,7 +743,9 @@
         }
 
         function handleForgotPin() {
-            const email = document.getElementById('authEmail').value.trim().toLowerCase();
+            const emailInput = document.getElementById('authEmail');
+            if (!emailInput) return;
+            const email = emailInput.value.trim().toLowerCase();
             if (!email) {
                 showInfoModal('⚠️ E-Mail eingeben', 'Trage bitte zuerst deine E-Mail-Adresse in das Feld ein.');
                 return;
@@ -765,8 +772,10 @@
         function logoutUser() {
             saveGame();
             localStorage.removeItem('jackLoggedInEmail');
-            document.getElementById('authEmail').value = '';
-            document.getElementById('authPin').value = '';
+            const emailInput = document.getElementById('authEmail');
+            const pinInput = document.getElementById('authPin');
+            if (emailInput) emailInput.value = '';
+            if (pinInput) pinInput.value = '';
             checkLoginState();
         }
 
@@ -788,13 +797,14 @@
             const mainContent = document.getElementById('gameMainContent');
 
             if (loggedInEmail) {
-                authScreen.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                document.getElementById('loggedInEmailDisplay').innerText = loggedInEmail;
+                if (authScreen) authScreen.classList.add('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                const display = document.getElementById('loggedInEmailDisplay');
+                if (display) display.innerText = loggedInEmail;
                 loadGameForUser(loggedInEmail);
             } else {
-                authScreen.classList.remove('hidden');
-                mainContent.classList.add('hidden');
+                if (authScreen) authScreen.classList.remove('hidden');
+                if (mainContent) mainContent.classList.add('hidden');
             }
         }
 
@@ -841,7 +851,7 @@
         }
 
         function playCleanCrispSound() {
-            targetPulse = 0.85;
+            targetPulse = 0.95;
 
             if (!gameSoundEnabled) return; 
             try {
@@ -854,12 +864,12 @@
 
                 const gainNode = audioCtx.createGain();
                 gainNode.gain.setValueAtTime(0.0001, now);
-                gainNode.gain.linearRampToValueAtTime(0.1, now + 0.01);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+                gainNode.gain.linearRampToValueAtTime(0.12, now + 0.015);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
 
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(5000, now);
+                filter.frequency.setValueAtTime(6000, now);
 
                 gainNode.connect(filter);
                 filter.connect(audioCtx.destination);
@@ -870,41 +880,55 @@
                 osc.connect(gainNode);
 
                 osc.start(now);
-                osc.stop(now + 0.25);
+                osc.stop(now + 0.35);
             } catch(e) {}
         }
 
         function showInfoModal(title, text, htmlButton = null) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalText').innerText = text;
-            document.getElementById('modalInputContainer').classList.add('hidden');
-            
+            const mTitle = document.getElementById('modalTitle');
+            const mText = document.getElementById('modalText');
+            const inputContainer = document.getElementById('modalInputContainer');
             const cancelBtn = document.getElementById('modalCancelBtn');
-            cancelBtn.style.display = 'block';
-            cancelBtn.innerText = 'Schließen';
-            
             const actionContainer = document.getElementById('modalActionContainer');
-            if (htmlButton) {
-                actionContainer.innerHTML = htmlButton;
-                actionContainer.classList.remove('hidden');
-            } else {
-                actionContainer.classList.add('hidden');
+
+            if (mTitle) mTitle.innerText = title;
+            if (mText) mText.innerText = text;
+            if (inputContainer) inputContainer.classList.add('hidden');
+            
+            if (cancelBtn) {
+                cancelBtn.style.display = 'block';
+                cancelBtn.innerText = 'Schließen';
+            }
+            
+            if (actionContainer) {
+                if (htmlButton) {
+                    actionContainer.innerHTML = htmlButton;
+                    actionContainer.classList.remove('hidden');
+                } else {
+                    actionContainer.classList.add('hidden');
+                }
             }
 
-            document.getElementById('customModal').classList.remove('hidden');
+            const modal = document.getElementById('customModal');
+            if (modal) modal.classList.remove('hidden');
             modalCallback = null;
         }
 
         function closeCustomModal(result, value) {
-            document.getElementById('customModal').classList.add('hidden');
+            const modal = document.getElementById('customModal');
+            if (modal) modal.classList.add('hidden');
             if (modalCallback) {
                 modalCallback(result, value);
                 modalCallback = null;
             }
         }
 
+        function handleModalConfirm() {
+            closeCustomModal(true);
+        }
+
         function handleBackdropClick(e) {
-            if (e.target.id === 'customModal') {
+            if (e.target && e.target.id === 'customModal') {
                 closeCustomModal(false);
             }
         }
@@ -960,7 +984,8 @@
                 ];
             }
 
-            document.getElementById('cloudIdDisplay').innerText = gameData.cloudId;
+            const cloudDisplay = document.getElementById('cloudIdDisplay');
+            if (cloudDisplay) cloudDisplay.innerText = gameData.cloudId;
             updateGameUI();
         }
 
@@ -1076,7 +1101,7 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- SYNCHRONISIERTE & RESPONSIVE HD-GARTEN RENDER ENGINE ---
+        // --- RENDER ENGINE ---
         const VIRTUAL_W = 1200;
         const VIRTUAL_H = 720;
         let animTime = 0;
@@ -1120,6 +1145,20 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             requestAnimationFrame(animationLoop);
+
+            const canvasElem = document.getElementById('gardenCanvas');
+            if (canvasElem) {
+                canvasElem.addEventListener('click', function(e) {
+                    unlockAudioOnce();
+                    playCleanCrispSound();
+                    
+                    gameData.garden[0].exp += 3;
+                    gameData.beats += Math.max(1, Math.floor(getBps() * 0.2));
+                    checkGardenLevel(0);
+                    updateGameUI();
+                    saveGame();
+                });
+            }
         });
 
         function drawCineastichGarden() {
@@ -1131,7 +1170,6 @@
             const scaleY = canvas.height / VIRTUAL_H;
             ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
 
-            // Audio-Analyse auslesen, falls Webradio aktiv läuft
             if (audioAnalyser && audioDataArray) {
                 try {
                     audioAnalyser.getByteFrequencyData(audioDataArray);
@@ -1144,14 +1182,15 @@
                 } catch(e) {}
             }
 
-            if (targetPulse < 0.08) {
+            let bps = getBps();
+            let bpsPulseBoost = Math.min(0.4, bps * 0.002);
+
+            if (targetPulse < 0.08 + bpsPulseBoost) {
                 const audioElem = document.getElementById('radioStream');
                 const isPlaying = audioElem && !audioElem.paused;
-                if (isPlaying) {
-                    targetPulse = Math.sin(animTime * 6) * 0.2 + 0.2;
-                } else {
-                    targetPulse = Math.sin(animTime * 2) * 0.08 + 0.08;
-                }
+                
+                let beatSpeed = isPlaying ? 6 : 3;
+                targetPulse = Math.sin(animTime * beatSpeed) * (0.12 + bpsPulseBoost) + (0.12 + bpsPulseBoost);
             }
 
             animTime += 0.01;
@@ -1278,7 +1317,7 @@
             ctx.font = 'bold 13px sans-serif';
             ctx.shadowBlur = 8;
             ctx.shadowColor = 'rgba(0,0,0,0.9)';
-            ctx.fillText('🌿 Lounge & Terrasse', VIRTUAL_W/2 - 70, 715);
+            ctx.fillText('🌿 Lounge & Terrasse (Klickbar!)', VIRTUAL_W/2 - 100, 715);
             ctx.fillText('💧 Klang-Teich', pondX - 45, pondY + 125);
             ctx.fillText('🌸 Stauden-Garten', 600, 85);
             ctx.fillText('🎵 Studio & Baumhain', 120, 85);
@@ -1369,11 +1408,12 @@
 
                 updateGameUI();
 
-                const isGameActive = !document.getElementById('gameView').classList.contains('hidden') && !document.getElementById('gameMainContent').classList.contains('hidden');
+                const gardenView = document.getElementById('gardenView');
+                const isGardenActive = gardenView && !gardenView.classList.contains('hidden');
                 
-                if (isGameActive) {
+                if (isGardenActive && bps > 0) {
                     ambientTimer++;
-                    let triggerThreshold = Math.max(15, 60 - Math.floor(bps / 10));
+                    let triggerThreshold = Math.max(12, 50 - Math.floor(bps / 8));
                     if (ambientTimer >= triggerThreshold) {
                         ambientTimer = 0;
                         playCleanCrispSound();
