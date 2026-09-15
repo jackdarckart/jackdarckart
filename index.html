@@ -87,7 +87,7 @@
                     <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
                 </h1>
                 <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
-                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit interaktivem HD-Garten!
+                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit harmonischem HD-Garten!
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
@@ -185,7 +185,7 @@
 
                     <!-- Audio Player -->
                     <div class="bg-darkbg p-6 rounded-2xl border border-gray-800 text-center space-y-4">
-                        <p class="text-gray-300 text-sm">Starte den Audiostream (der interaktive Garten reagiert im Hintergrund):</p>
+                        <p class="text-gray-300 text-sm">Starte den Audiostream (der HD-Garten reagiert im Hintergrund):</p>
                         <audio id="radioStream" controls preload="auto" class="w-full mx-auto max-w-md accent-indigo-600">
                             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
                             Dein Browser unterstützt kein Audio-Element.
@@ -349,11 +349,11 @@
                 <span>Beat-Lab (Studio & Upgrades)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, erweitere dein Studio und öffne deinen interaktiven HD-Garten!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, erweitere dein Studio und öffne deinen harmonischen HD-Garten!</p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
                 <button onclick="switchView('garden')" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-xl shadow-emerald-600/30 transition inline-flex items-center space-x-2">
                     <i class="fa-solid fa-seedling"></i>
-                    <span>🌿 Interaktiven HD-Garten öffnen</span>
+                    <span>🌿 HD-Garten öffnen</span>
                 </button>
                 <button id="soundToggleBtnGame" onclick="toggleGameSound()" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-5 py-3 rounded-2xl text-sm font-semibold transition shadow-md inline-flex items-center space-x-2">
                     <i class="fa-solid fa-volume-high"></i>
@@ -520,52 +520,52 @@
         </div>
     </div>
 
-    <!-- SEPARATE INTERAKTIVE HD-GARTEN ANSICHT -->
-    <div id="gardenView" class="hidden py-8 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-6 text-center">
+    <!-- SEPARATE HARMONISCHE HD-GARTEN ANSICHT (REINE VISUELLE ANIMATION OHNE KLICKS & OHNE TÖNE) -->
+    <div id="gardenView" class="hidden py-4 px-2 sm:px-6 max-w-7xl mx-auto space-y-4 text-center">
         <div class="flex items-center justify-between px-2">
-            <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg">
+            <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg">
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Zum Beat-Lab</span>
             </button>
-            <div class="inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
+            <div class="hidden sm:inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Interaktiver HD-Garten • Klicke auf Pflanzen, Bäume oder Teich!</span>
+                <span>Harmonischer HD-Garten</span>
             </div>
         </div>
 
         <!-- Minimalistisches HUD -->
-        <div class="grid grid-cols-3 gap-3 bg-cardbg/80 backdrop-blur-md border border-emerald-500/30 rounded-2xl p-4 text-xs shadow-xl max-w-3xl mx-auto">
+        <div class="grid grid-cols-3 gap-2 bg-cardbg/80 backdrop-blur-md border border-emerald-500/30 rounded-2xl p-3 text-xs shadow-xl max-w-2xl mx-auto">
             <div>
-                <span class="text-gray-400 block mb-1">Stauden Level</span>
-                <span id="gardenLvl0" class="text-emerald-400 font-black text-base">1</span>
+                <span class="text-gray-400 block mb-0.5">Stauden Level</span>
+                <span id="gardenLvl0" class="text-emerald-400 font-black text-sm">1</span>
             </div>
             <div>
-                <span class="text-gray-400 block mb-1">Bäume Level</span>
-                <span id="gardenLvl1" class="text-purple-400 font-black text-base">1</span>
+                <span class="text-gray-400 block mb-0.5">Bäume Level</span>
+                <span id="gardenLvl1" class="text-purple-400 font-black text-sm">1</span>
             </div>
             <div>
-                <span class="text-gray-400 block mb-1">Teich Level</span>
-                <span id="gardenLvl2" class="text-pink-400 font-black text-base">1</span>
+                <span class="text-gray-400 block mb-0.5">Teich Level</span>
+                <span id="gardenLvl2" class="text-pink-400 font-black text-sm">1</span>
             </div>
         </div>
 
-        <!-- RESPONSIVES GROSSES HD CANVAS-FENSTER -->
-        <div class="relative w-full flex justify-center bg-darkbg rounded-3xl p-3 border-2 border-emerald-500/50 shadow-2xl overflow-hidden">
-            <canvas id="gardenCanvas" class="w-full h-auto rounded-2xl shadow-2xl cursor-pointer"></canvas>
+        <!-- VOLLSTÄNDIG RESPONSIVES HD CANVAS-FENSTER -->
+        <div class="relative w-full flex justify-center items-center bg-darkbg rounded-3xl p-2 border-2 border-emerald-500/50 shadow-2xl overflow-hidden">
+            <canvas id="gardenCanvas" class="rounded-2xl shadow-2xl block mx-auto"></canvas>
         </div>
 
         <!-- Dünger & Audio Mute Steuerung -->
-        <div class="flex flex-wrap justify-center gap-3 pt-2">
-            <button id="btnGarden0" onclick="feedPlant(0)" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+        <div class="flex flex-wrap justify-center gap-2 pt-1">
+            <button id="btnGarden0" onclick="feedPlant(0)" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md">
                 Stauden düngen (<span id="gardenCost0">50</span> B)
             </button>
-            <button id="btnGarden1" onclick="feedPlant(1)" class="bg-purple-600/30 hover:bg-purple-600 border border-purple-500 text-purple-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+            <button id="btnGarden1" onclick="feedPlant(1)" class="bg-purple-600/30 hover:bg-purple-600 border border-purple-500 text-purple-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md">
                 Bäume düngen (<span id="gardenCost1">200</span> B)
             </button>
-            <button id="btnGarden2" onclick="feedPlant(2)" class="bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+            <button id="btnGarden2" onclick="feedPlant(2)" class="bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md">
                 Teich düngen (<span id="gardenCost2">1000</span> B)
             </button>
-            <button id="soundToggleBtn" onclick="toggleGameSound()" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5">
+            <button id="soundToggleBtn" onclick="toggleGameSound()" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5">
                 <i class="fa-solid fa-volume-high"></i>
                 <span>Sound: An</span>
             </button>
@@ -626,7 +626,7 @@
             const garden = document.getElementById('gardenView');
 
             if (view === 'garden' && !localStorage.getItem('jackLoggedInEmail')) {
-                showInfoModal('🔒 Anmeldung erforderlich', 'Bitte melde dich zuerst im Beat-Lab an, um den interaktiven HD-Garten zu betreten.');
+                showInfoModal('🔒 Anmeldung erforderlich', 'Bitte melde dich zuerst im Beat-Lab an, um den HD-Garten zu betreten.');
                 view = 'game';
             }
 
@@ -660,10 +660,10 @@
             const btn2 = document.getElementById('soundToggleBtnGame');
             
             if (gameSoundEnabled) {
-                if (btn1) { btn1.innerHTML = '<i class="fa-solid fa-volume-high"></i><span>Sound: An</span>'; btn1.className = 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5'; }
+                if (btn1) { btn1.innerHTML = '<i class="fa-solid fa-volume-high"></i><span>Sound: An</span>'; btn1.className = 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5'; }
                 if (btn2) { btn2.innerHTML = '<i class="fa-solid fa-volume-high"></i><span>Sound: An</span>'; btn2.className = 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-5 py-3 rounded-2xl text-sm font-semibold transition shadow-md inline-flex items-center space-x-2'; }
             } else {
-                if (btn1) { btn1.innerHTML = '<i class="fa-solid fa-volume-mute"></i><span>Sound: Aus</span>'; btn1.className = 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5'; }
+                if (btn1) { btn1.innerHTML = '<i class="fa-solid fa-volume-mute"></i><span>Sound: Aus</span>'; btn1.className = 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5'; }
                 if (btn2) { btn2.innerHTML = '<i class="fa-solid fa-volume-mute"></i><span>Sound: Aus</span>'; btn2.className = 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 px-5 py-3 rounded-2xl text-sm font-semibold transition shadow-md inline-flex items-center space-x-2'; }
             }
         }
@@ -747,7 +747,7 @@
             localStorage.removeItem('jackLoggedInEmail');
             document.getElementById('authEmail').value = '';
             document.getElementById('authPin').value = '';
-            checkLoginState(); // Bleibt exakt an derselben Scroll-Position!
+            checkLoginState();
         }
 
         function checkLoginState() {
@@ -1057,12 +1057,11 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- HOCHAUFLÖSENDE & INTERAKTIVE HD-GARTEN RENDER ENGINE ---
+        // --- VOLLSTÄNDIG RESPONSIVE HD-GARTEN RENDER ENGINE (REIN VISUELL) ---
         const VIRTUAL_W = 1200;
-        const VIRTUAL_H = 750;
+        const VIRTUAL_H = 720;
         let animTime = 0;
         let particles = [];
-        let floatingNotes = [];
 
         for(let i=0; i<35; i++) {
             particles.push({
@@ -1080,43 +1079,27 @@
             if (!canvas) return;
             const container = canvas.parentElement;
             if (!container) return;
-            const displayWidth = container.clientWidth - 24;
-            const displayHeight = Math.min(displayWidth * (VIRTUAL_H / VIRTUAL_W), 700);
-            canvas.width = displayWidth;
-            canvas.height = displayHeight;
+
+            const maxW = container.clientWidth - 16;
+            const maxH = window.innerHeight * 0.58;
+
+            let w = Math.min(maxW, 1150);
+            let h = w * (VIRTUAL_H / VIRTUAL_W);
+
+            if (h > maxH) {
+                h = maxH;
+                w = h * (VIRTUAL_W / VIRTUAL_H);
+            }
+
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            canvas.width = VIRTUAL_W;
+            canvas.height = VIRTUAL_H;
         }
 
         window.addEventListener('resize', resizeCanvas);
 
-        function setupGardenInteraction() {
-            const canvas = document.getElementById('gardenCanvas');
-            if (!canvas) return;
-
-            canvas.addEventListener('click', function(e) {
-                const rect = canvas.getBoundingClientRect();
-                const scaleX = VIRTUAL_W / canvas.clientWidth;
-                const scaleY = VIRTUAL_H / canvas.clientHeight;
-                const x = (e.clientX - rect.left) * scaleX;
-                const y = (e.clientY - rect.top) * scaleY;
-
-                playCleanCrispSound();
-                gameData.beats += 1;
-                updateGameUI();
-
-                floatingNotes.push({
-                    x: x,
-                    y: y,
-                    vy: -2.5,
-                    alpha: 1.0,
-                    text: ['♪', '♫', '♥', '+1 Beat'][Math.floor(Math.random() * 4)]
-                });
-
-                targetPulse = 1.2;
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
-            setupGardenInteraction();
             requestAnimationFrame(animationLoop);
         });
 
@@ -1147,24 +1130,24 @@
             ctx.strokeRect(15, 15, VIRTUAL_W - 30, VIRTUAL_H - 30);
 
             ctx.fillStyle = '#4a2e18';
-            ctx.fillRect(VIRTUAL_W/2 - 280, 530, 560, 180);
+            ctx.fillRect(VIRTUAL_W/2 - 280, 520, 560, 185);
             ctx.strokeStyle = '#2d1b0e';
             ctx.lineWidth = 3;
             for(let x = VIRTUAL_W/2 - 280; x <= VIRTUAL_W/2 + 280; x += 40) {
-                ctx.beginPath(); ctx.moveTo(x, 530); ctx.lineTo(x, 710); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(x, 520); ctx.lineTo(x, 705); ctx.stroke();
             }
             ctx.fillStyle = 'rgba(255,255,255,0.05)';
-            ctx.fillRect(VIRTUAL_W/2 - 280, 530, 560, 50);
+            ctx.fillRect(VIRTUAL_W/2 - 280, 520, 560, 45);
 
             let terraceSway = Math.sin(animTime * 1.5) * (0.8 + reactFactor * 1.5);
             ctx.fillStyle = '#94a3b8'; 
-            ctx.fillRect(VIRTUAL_W/2 - 60, 580 + terraceSway, 120, 65);
+            ctx.fillRect(VIRTUAL_W/2 - 60, 570 + terraceSway, 120, 65);
             ctx.fillStyle = '#64748b'; 
-            ctx.fillRect(VIRTUAL_W/2 - 100, 595 + terraceSway, 28, 38); 
-            ctx.fillRect(VIRTUAL_W/2 + 72, 595 + terraceSway, 28, 38);
+            ctx.fillRect(VIRTUAL_W/2 - 100, 585 + terraceSway, 28, 38); 
+            ctx.fillRect(VIRTUAL_W/2 + 72, 585 + terraceSway, 28, 38);
 
-            let pondX = 850, pondY = 380, pondW = 280, pondH = 220;
-            let pondGrad = ctx.createRadialGradient(pondX, pondY, 20, pondX, pondY, 140);
+            let pondX = 850, pondY = 360, pondW = 270, pondH = 200;
+            let pondGrad = ctx.createRadialGradient(pondX, pondY, 20, pondX, pondY, 130);
             pondGrad.addColorStop(0, '#38bdf8');
             pondGrad.addColorStop(0.6, '#0284c7');
             pondGrad.addColorStop(1, '#0369a1');
@@ -1182,26 +1165,26 @@
             ctx.beginPath(); ctx.ellipse(pondX, pondY, w2*1.3, w2, 0, 0, Math.PI*2); ctx.stroke();
 
             ctx.fillStyle = '#1e293b';
-            ctx.fillRect(80, 250, 260, 240);
+            ctx.fillRect(80, 240, 250, 230);
             ctx.strokeStyle = '#334155';
             ctx.lineWidth = 4;
-            ctx.strokeRect(80, 250, 260, 240);
+            ctx.strokeRect(80, 240, 250, 230);
             ctx.fillStyle = '#0f172a';
-            for(let y = 280; y < 460; y += 40) {
-                for(let x = 110; x < 310; x += 65) {
-                    ctx.fillRect(x, y, 45, 25);
+            for(let y = 265; y < 440; y += 38) {
+                for(let x = 105; x < 300; x += 60) {
+                    ctx.fillRect(x, y, 42, 22);
                 }
             }
 
             let treeLvl = gameData.garden[1].level;
             let windSway = Math.sin(animTime * 1.0) * (2.5 + reactFactor * 3);
-            let baseRadius = (45 + Math.min(treeLvl * 3, 22)) * (1 + reactFactor * 0.08);
-            let treePositions = [[140, 120], [270, 120], [140, 200], [270, 200]];
+            let baseRadius = (42 + Math.min(treeLvl * 3, 20)) * (1 + reactFactor * 0.08);
+            let treePositions = [[135, 115], [260, 115], [135, 185], [260, 185]];
             
             treePositions.forEach((pos, idx) => {
                 let sW = windSway * (idx % 2 === 0 ? 1 : 0.8);
                 ctx.fillStyle = '#3d2314';
-                ctx.fillRect(pos[0] - 8 + sW*0.4, pos[1], 16, 50);
+                ctx.fillRect(pos[0] - 8 + sW*0.4, pos[1], 16, 45);
                 
                 let tGrad = ctx.createRadialGradient(pos[0]-12 + sW, pos[1]-20, 8, pos[0] + sW, pos[1]-15, baseRadius);
                 tGrad.addColorStop(0, '#4ade80');
@@ -1212,16 +1195,16 @@
             });
 
             let bigTreeSway = Math.sin(animTime * 0.8) * (3.5 + reactFactor * 4);
-            let bigRadius = (90 + Math.cos(animTime * 0.6) * 5) * (1 + reactFactor * 0.1);
+            let bigRadius = (85 + Math.cos(animTime * 0.6) * 5) * (1 + reactFactor * 0.1);
             ctx.fillStyle = '#3d2314';
-            ctx.fillRect(950 - 12 + bigTreeSway*0.4, 110, 24, 70);
+            ctx.fillRect(950 - 12 + bigTreeSway*0.4, 105, 24, 65);
 
-            let bigGrad = ctx.createRadialGradient(940 + bigTreeSway, 90, 15, 950 + bigTreeSway, 110, bigRadius);
+            let bigGrad = ctx.createRadialGradient(940 + bigTreeSway, 85, 15, 950 + bigTreeSway, 105, bigRadius);
             bigGrad.addColorStop(0, '#34d399');
             bigGrad.addColorStop(0.7, '#059669');
             bigGrad.addColorStop(1, '#022c22');
             ctx.fillStyle = bigGrad;
-            ctx.beginPath(); ctx.arc(950 + bigTreeSway, 100, bigRadius, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(950 + bigTreeSway, 95, bigRadius, 0, Math.PI * 2); ctx.fill();
 
             let flowerLvl = gameData.garden[0].level;
             let flowerColors = ['#f472b6', '#e879f9', '#38bdf8', '#facc15', '#fb7185', '#34d399', '#c084fc'];
@@ -1229,8 +1212,8 @@
                 ctx.fillStyle = flowerColors[i % flowerColors.length];
                 ctx.beginPath();
                 let fS = (6 + Math.sin(animTime * 2 + i) * 1.2) * (1 + reactFactor * 0.15);
-                let fx = 600 + ((i % 5) * 35) + Math.sin(i) * 15;
-                let fy = 120 + (Math.floor(i / 5) * 22);
+                let fx = 580 + ((i % 5) * 35) + Math.sin(i) * 15;
+                let fy = 110 + (Math.floor(i / 5) * 22);
                 ctx.arc(fx, fy, Math.max(2, fS), 0, Math.PI * 2);
                 ctx.fill();
             }
@@ -1249,33 +1232,14 @@
                 ctx.globalAlpha = 1.0;
             });
 
-            for (let i = floatingNotes.length - 1; i >= 0; i--) {
-                let note = floatingNotes[i];
-                note.y += note.vy;
-                note.alpha -= 0.02;
-
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, note.alpha);
-                ctx.font = 'bold 28px sans-serif';
-                ctx.fillStyle = '#38bdf8';
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = '#38bdf8';
-                ctx.fillText(note.text, note.x, note.y);
-                ctx.restore();
-
-                if (note.alpha <= 0) {
-                    floatingNotes.splice(i, 1);
-                }
-            }
-
             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.font = 'bold 14px sans-serif';
+            ctx.font = 'bold 13px sans-serif';
             ctx.shadowBlur = 8;
             ctx.shadowColor = 'rgba(0,0,0,0.9)';
-            ctx.fillText('🌿 Lounge & Terrasse', VIRTUAL_W/2 - 75, 735);
-            ctx.fillText('💧 Klang-Teich (Klickbar!)', pondX - 70, pondY + 135);
-            ctx.fillText('🌸 Stauden-Garten', 620, 95);
-            ctx.fillText('🎵 Studio & Baumhain', 130, 95);
+            ctx.fillText('🌿 Lounge & Terrasse', VIRTUAL_W/2 - 70, 715);
+            ctx.fillText('💧 Klang-Teich', pondX - 45, pondY + 125);
+            ctx.fillText('🌸 Stauden-Garten', 600, 85);
+            ctx.fillText('🎵 Studio & Baumhain', 120, 85);
             ctx.shadowBlur = 0;
         }
 
@@ -1357,7 +1321,7 @@
 
         function getBaseButtonClasses(btnId) {
             if (btnId.startsWith('btnGarden')) {
-                return 'px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md';
+                return 'px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md';
             } else {
                 return 'text-white text-xs px-4 py-2.5 rounded-lg font-bold transition';
             }
@@ -1382,10 +1346,10 @@
 
                 updateGameUI();
 
+                // Töne werden NUR im aktiven Spiel (Beat-Lab) abgespielt, NICHT im Garten
                 const isGameActive = !document.getElementById('gameView').classList.contains('hidden') && !document.getElementById('gameMainContent').classList.contains('hidden');
-                const isGardenActive = !document.getElementById('gardenView').classList.contains('hidden');
                 
-                if (isGameActive || isGardenActive) {
+                if (isGameActive) {
                     ambientTimer++;
                     let triggerThreshold = Math.max(15, 60 - Math.floor(bps / 10));
                     if (ambientTimer >= triggerThreshold) {
