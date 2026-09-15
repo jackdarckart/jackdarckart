@@ -516,24 +516,52 @@
         </div>
     </div>
 
-    <!-- REINE, VOLLSTÄNDIG IMMERSIVE HD-GARTEN ANSICHT (NUR DER GARTEN ZU SEHEN) -->
-    <div id="gardenView" class="hidden py-10 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-6 text-center">
+    <!-- SEPARATE HD-GARTEN ANSICHT (NUR DER GARTEN & HARMONISCHES HUD) -->
+    <div id="gardenView" class="hidden py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-6 text-center">
         <div class="flex items-center justify-between px-2">
             <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>Zurück zum Beat-Lab</span>
+                <span>Zum Beat-Lab</span>
             </button>
             <div class="inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Live Audiovisueller HD-Garten</span>
+                <span>Live HD-Garten Ansicht</span>
             </div>
         </div>
 
-        <!-- REINES CANVAS-FENSTER OHNE STÖRENDE BUTTONS ODER MENÜS -->
-        <div class="relative w-full flex justify-center bg-darkbg rounded-3xl p-3 border-2 border-emerald-500/40 shadow-2xl">
-            <canvas id="gardenCanvas" width="800" height="650" class="w-full max-w-3xl rounded-2xl cursor-pointer shadow-2xl"></canvas>
+        <!-- Sleek Garden HUD / Status -->
+        <div class="grid grid-cols-3 gap-3 bg-cardbg/80 backdrop-blur-md border border-emerald-500/30 rounded-2xl p-4 text-xs shadow-xl">
+            <div>
+                <span class="text-gray-400 block mb-1">Stauden Level</span>
+                <span id="gardenLvl0" class="text-emerald-400 font-black text-base">1</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block mb-1">Bäume Level</span>
+                <span id="gardenLvl1" class="text-purple-400 font-black text-base">1</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block mb-1">Teich Level</span>
+                <span id="gardenLvl2" class="text-pink-400 font-black text-base">1</span>
+            </div>
         </div>
-        <p class="text-xs text-gray-400">Tippe/Klicke in den Garten, um zusätzliche Klangenergie und Beats zu erzeugen!</p>
+
+        <!-- REINES CANVAS-FENSTER (OHNE KLICK-BEATS) -->
+        <div class="relative w-full flex justify-center bg-darkbg rounded-3xl p-3 border-2 border-emerald-500/40 shadow-2xl">
+            <canvas id="gardenCanvas" width="800" height="650" class="w-full max-w-3xl rounded-2xl shadow-2xl"></canvas>
+        </div>
+
+        <!-- Dünger / Upgrade Steuerung -->
+        <div class="flex flex-wrap justify-center gap-3 pt-2">
+            <button onclick="feedPlant(0)" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+                Stauden düngen (<span id="gardenCost0">50</span> B)
+            </button>
+            <button onclick="feedPlant(1)" class="bg-purple-600/30 hover:bg-purple-600 border border-purple-500 text-purple-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+                Bäume düngen (<span id="gardenCost1">200</span> B)
+            </button>
+            <button onclick="feedPlant(2)" class="bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+                Teich düngen (<span id="gardenCost2">1000</span> B)
+            </button>
+        </div>
     </div>
 
     <!-- CUSTOM DESIGN MODAL -->
@@ -957,6 +985,22 @@
             saveGame();
         }
 
+        function feedPlant(index) {
+            let costs = [50 * gameData.garden[0].level, 200 * gameData.garden[1].level, 1000 * gameData.garden[2].level];
+            let cost = costs[index];
+
+            if (gameData.beats >= cost) {
+                gameData.beats -= cost;
+                gameData.garden[index].exp += Math.floor(gameData.garden[index].maxExp * 0.4);
+                checkGardenLevel(index);
+                playCleanCrispSound();
+                updateGameUI();
+                saveGame();
+            } else {
+                showInfoModal('⚠️ Nicht genug Beats', 'Du benötigst mehr produzierte Beats, um diesen Bereich zu düngen!');
+            }
+        }
+
         function checkGardenLevel(index) {
             while (gameData.garden[index].exp >= gameData.garden[index].maxExp) {
                 gameData.garden[index].exp -= gameData.garden[index].maxExp;
@@ -1127,19 +1171,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const canvas = document.getElementById('gardenCanvas');
-            if(canvas) {
-                canvas.addEventListener('click', function(e) {
-                    const rect = canvas.getBoundingClientRect();
-                    const scaleX = canvas.width / rect.width;
-                    const scaleY = canvas.height / rect.height;
-                    const clickX = (e.clientX - rect.left) * scaleX;
-                    const clickY = (e.clientY - rect.top) * scaleY;
-
-                    // Direkter Klick in den Garten triggert Beats & EXP
-                    clickBeat();
-                });
-            }
+            // Klick-Listener auf den Garten-Canvas bewusst entfernt, damit reiner Animationsgenuss ohne Sound/Tippen entsteht.
             requestAnimationFrame(animationLoop);
         });
 
@@ -1171,6 +1203,21 @@
             const coLabel = document.getElementById('costLabel');
             if (cLabel) cLabel.innerText = gameData.label;
             if (coLabel) coLabel.innerText = Math.floor(4000 * Math.pow(1.22, gameData.label)).toLocaleString();
+
+            // Garden HUD Levels & Costs
+            const gLvl0 = document.getElementById('gardenLvl0');
+            const gLvl1 = document.getElementById('gardenLvl1');
+            const gLvl2 = document.getElementById('gardenLvl2');
+            if (gLvl0) gLvl0.innerText = gameData.garden[0].level;
+            if (gLvl1) gLvl1.innerText = gameData.garden[1].level;
+            if (gLvl2) gLvl2.innerText = gameData.garden[2].level;
+
+            const gCost0 = document.getElementById('gardenCost0');
+            const gCost1 = document.getElementById('gardenCost1');
+            const gCost2 = document.getElementById('gardenCost2');
+            if (gCost0) gCost0.innerText = (50 * gameData.garden[0].level).toLocaleString();
+            if (gCost1) gCost1.innerText = (200 * gameData.garden[1].level).toLocaleString();
+            if (gCost2) gCost2.innerText = (1000 * gameData.garden[2].level).toLocaleString();
         }
 
         setInterval(function() {
