@@ -33,9 +33,9 @@
 </head>
 <body class="bg-darkbg text-gray-100 font-sans antialiased selection:bg-accent selection:text-white" oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" onclick="unlockAudioOnce()">
 
-    <!-- Globaler Audio Player -->
+    <!-- Globaler Audio Player (startet niemals automatisch) -->
     <div class="hidden">
-        <audio id="radioStream" preload="auto">
+        <audio id="radioStream" crossorigin="anonymous" preload="auto">
             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
         </audio>
     </div>
@@ -538,7 +538,7 @@
             </button>
             <div class="hidden sm:inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Spiel-Synchronisierter HD-Garten</span>
+                <span>Musik- & Spiel-Synchronisierter HD-Garten</span>
             </div>
         </div>
 
@@ -636,7 +636,8 @@
                 garden.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 setTimeout(resizeCanvas, 60);
-                // Kein automatisches Abspielen mehr beim Betreten des Gartens
+                initAudioAnalyser();
+                // Kein automatisches Starten des Streams beim Betreten des Gartens
             } else {
                 home.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -798,6 +799,9 @@
         }
 
         let audioCtx = null;
+        let audioAnalyser = null;
+        let audioDataArray = null;
+        let analyserInitialized = false;
         let ambientTimer = 0;
         let targetPulse = 0;
         let currentPulse = 0;
@@ -814,8 +818,29 @@
             } catch(e) {}
         }
 
+        function initAudioAnalyser() {
+            if (analyserInitialized) return;
+            try {
+                unlockAudioOnce();
+                if (!audioCtx) return;
+                const audioElem = document.getElementById('radioStream');
+                if (!audioElem) return;
+
+                const source = audioCtx.createMediaElementSource(audioElem);
+                audioAnalyser = audioCtx.createAnalyser();
+                audioAnalyser.fftSize = 256;
+                source.connect(audioAnalyser);
+                audioAnalyser.connect(audioCtx.destination);
+
+                audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+                analyserInitialized = true;
+            } catch(e) {
+                console.log("Audio Analyser Fallback aktiv:", e);
+                analyserInitialized = true;
+            }
+        }
+
         function playCleanCrispSound() {
-            // Löst direkten visuellen Impuls im HD-Garten aus, wenn Töne/Klicks im Spiel erfolgen
             targetPulse = 0.85;
 
             if (!gameSoundEnabled) return; 
@@ -1051,7 +1076,7 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- SPIEL-SYNCHRONISIERTE HD-GARTEN RENDER ENGINE ---
+        // --- SYNCHRONISIERTE & RESPONSIVE HD-GARTEN RENDER ENGINE ---
         const VIRTUAL_W = 1200;
         const VIRTUAL_H = 720;
         let animTime = 0;
@@ -1106,9 +1131,32 @@
             const scaleY = canvas.height / VIRTUAL_H;
             ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
 
+            // Audio-Analyse auslesen, falls Webradio aktiv läuft
+            if (audioAnalyser && audioDataArray) {
+                try {
+                    audioAnalyser.getByteFrequencyData(audioDataArray);
+                    let bassSum = 0;
+                    for (let i = 0; i < 12; i++) { bassSum += audioDataArray[i]; }
+                    let bassAvg = bassSum / 12;
+                    if (bassAvg > 25) {
+                        targetPulse = Math.max(targetPulse, (bassAvg / 255) * 1.0);
+                    }
+                } catch(e) {}
+            }
+
+            if (targetPulse < 0.08) {
+                const audioElem = document.getElementById('radioStream');
+                const isPlaying = audioElem && !audioElem.paused;
+                if (isPlaying) {
+                    targetPulse = Math.sin(animTime * 6) * 0.2 + 0.2;
+                } else {
+                    targetPulse = Math.sin(animTime * 2) * 0.08 + 0.08;
+                }
+            }
+
             animTime += 0.01;
             currentPulse += (targetPulse - currentPulse) * 0.2;
-            targetPulse += (0.05 - targetPulse) * 0.08; // Sanfter Ruhepuls, der bei Spieltönen stark ausschlägt
+            targetPulse += (0 - targetPulse) * 0.08;
 
             let reactFactor = currentPulse;
 
