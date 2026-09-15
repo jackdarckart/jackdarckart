@@ -42,7 +42,7 @@
             <!-- Hero Card -->
             <div class="bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-purple-500/30 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
                 <span class="inline-block text-4xl p-3 bg-purple-600/20 rounded-2xl mb-3 border border-purple-500/30">🤘</span>
-                <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">organic-cloud-beats-hub.net</h1>
+                <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">CloudBeats & Rock-Lab Hub</h1>
                 <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">CloudBeats Audio Ecosystem • Meckenheim, NRW</p>
                 <p class="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto">
                     Das offizielle Web-Ökosystem von jackdarckart. Hier verschmelzen High-End Audio-Mediathek, tokenisierte Hash-Rate-Economy und kraftvolle Musik-Produktionen zu einem meisterhaften Gesamtkunstwerk.
@@ -273,7 +273,7 @@
 
         </div>
 
-        <!-- 3. BIO-GARDEN SEITE (Eingeschränkt auf angemeldete Benutzer) -->
+        <!-- 3. BIO-GARDEN SEITE (Mit Webradio & Live Visualizer) -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             
             <!-- Garten Auth Container (falls nicht eingeloggt) -->
@@ -290,16 +290,31 @@
             <div id="garten-main-container" class="hidden bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
-                    <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Klang-Biotop</h2>
-                    <p class="text-gray-300 text-xs">Generatives Klang-Biotop. Töne erklingen vollkommen zufällig, entspannt und wachsen extrem langsam und behutsam mit deinen Upgrades.</p>
+                    <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Live Visualizer</h2>
+                    <p class="text-gray-300 text-xs">Aktiviere unten den Webradio-Stream oder das Mikrofon, damit der Bio-Garten synchron zur Musik lebendig wird und im Takt pulsiert.</p>
                 </div>
 
-                <!-- Großes, detailliertes grafisches Garten-Canvas (Ohne Overlay-Text) -->
+                <!-- Musik-Steuerung für den Webradio Stream & Visualizer -->
+                <div class="bg-[#0b0f19] border border-emerald-500/30 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="text-emerald-400 font-bold">🎵 Audio-Quelle:</span>
+                        <button type="button" id="toggle-radio-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer">
+                            📻 Laut.fm Stream starten
+                        </button>
+                        <button type="button" id="toggle-mic-btn" class="bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer">
+                            🎤 Mikrofon
+                        </button>
+                    </div>
+                    <span id="audio-status-text" class="text-gray-400 text-[11px]">Bereit</span>
+                </div>
+                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" crossorigin="anonymous" preload="none"></audio>
+
+                <!-- Großes, detailliertes grafisches Garten-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-2xl bg-[#06101e]">
                     <canvas id="garden-canvas" width="600" height="380" class="w-full h-auto cursor-pointer block"></canvas>
                 </div>
 
-                <!-- Wiederhergestellte, kleine & unauffällige Pflanzen-Buttons -->
+                <!-- Kleine & unauffällige Pflanzen-Buttons -->
                 <div class="flex justify-center items-center gap-2 pt-1 flex-wrap">
                     <button type="button" id="plant-1-btn" class="bg-[#0b0f19] hover:bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] transition cursor-pointer shadow">
                         🌿 Farn (+2)
@@ -365,11 +380,11 @@
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Live auto-gesichert</span>
-            <span class="text-gray-500">organic-cloud-beats-hub.net</span>
+            <span class="text-gray-500">CloudBeats Audio Ecosystem</span>
         </div>
     </footer>
 
-    <!-- GENERATIVE STOCHASTIC AMBIENT ENGINE -->
+    <!-- GENERATIVE AUDIO ENGINE & WEBRADIO VISUALIZER -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -573,27 +588,102 @@
                 });
             }
 
-            // 🎵 LUSH GENERATIVE SYNTH ENGINE (Strikt nur in 'game' und 'garten')
+            // 🎵 AUDIO ANALYSER & WEBRADIO VISUALIZER SETUP
             let globalAudioCtx = null;
+            let analyserNode = null;
+            let audioSourceNode = null;
+            let freqDataArray = null;
+            let isStreamingRadio = false;
+            let isUsingMic = false;
+
             const studioScale = [
                 130.81, 146.83, 164.81, 196.00, 220.00,
                 261.63, 293.66, 329.63, 392.00, 440.00,
                 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50
             ];
 
+            function initAudioContext() {
+                if (!globalAudioCtx) {
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    globalAudioCtx = new window.AudioContext();
+                    analyserNode = globalAudioCtx.createAnalyser();
+                    analyserNode.fftSize = 256;
+                    freqDataArray = new Uint8Array(analyserNode.frequencyBinCount);
+                }
+                if (globalAudioCtx.state === 'suspended') {
+                    globalAudioCtx.resume();
+                }
+            }
+
+            const radioStreamEl = document.getElementById('external-audio-stream');
+            const toggleRadioBtn = document.getElementById('toggle-radio-btn');
+            const audioStatusText = document.getElementById('audio-status-text');
+
+            if (toggleRadioBtn && radioStreamEl) {
+                toggleRadioBtn.addEventListener('click', async () => {
+                    initAudioContext();
+                    if (!isStreamingRadio) {
+                        try {
+                            if (!audioSourceNode) {
+                                audioSourceNode = globalAudioCtx.createMediaElementSource(radioStreamEl);
+                                audioSourceNode.connect(analyserNode);
+                                analyserNode.connect(globalAudioCtx.destination);
+                            }
+                            await radioStreamEl.play();
+                            isStreamingRadio = true;
+                            isUsingMic = false;
+                            toggleRadioBtn.innerText = "⏹️ Stream stoppen";
+                            toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
+                            if(audioStatusText) audioStatusText.innerText = "🟢 Laut.fm Stream aktiv & synchronisiert";
+                        } catch(e) {
+                            alert("⚠️ Stream konnte nicht gestartet werden.");
+                        }
+                    } else {
+                        radioStreamEl.pause();
+                        isStreamingRadio = false;
+                        toggleRadioBtn.innerText = "📻 Laut.fm Stream starten";
+                        toggleRadioBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
+                        if(audioStatusText) audioStatusText.innerText = "Bereit";
+                    }
+                });
+            }
+
+            const toggleMicBtn = document.getElementById('toggle-mic-btn');
+            if (toggleMicBtn) {
+                toggleMicBtn.addEventListener('click', async () => {
+                    initAudioContext();
+                    if (!isUsingMic) {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                            let micSource = globalAudioCtx.createMediaStreamSource(stream);
+                            micSource.connect(analyserNode);
+                            isUsingMic = true;
+                            if (isStreamingRadio && radioStreamEl) {
+                                radioStreamEl.pause();
+                                isStreamingRadio = false;
+                                if(toggleRadioBtn) {
+                                    toggleRadioBtn.innerText = "📻 Laut.fm Stream starten";
+                                    toggleRadioBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
+                                }
+                            }
+                            toggleMicBtn.innerText = "⏹️ Mikrofon stoppen";
+                            toggleMicBtn.className = "bg-red-900 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer border border-red-700";
+                            if(audioStatusText) audioStatusText.innerText = "🎤 Mikrofon aktiv";
+                        } catch(e) {
+                            alert("⚠️ Mikrofon-Zugriff verweigert.");
+                        }
+                    } else {
+                        window.location.reload();
+                    }
+                });
+            }
+
             function playSingleTone(customFreq = null) {
                 if (!soundEnabled) return;
                 if (currentView !== 'game' && currentView !== 'garten') return;
 
                 try {
-                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-                    if (!globalAudioCtx) {
-                        globalAudioCtx = new window.AudioContext();
-                    }
-                    if (globalAudioCtx.state === 'suspended') {
-                        globalAudioCtx.resume();
-                    }
-
+                    initAudioContext();
                     const now = globalAudioCtx.currentTime;
                     let freq = customFreq !== null ? customFreq : studioScale[Math.floor(Math.random() * studioScale.length)];
                     if (customFreq === null && Math.random() > 0.7) {
@@ -683,7 +773,7 @@
                 saveGame();
             }
 
-            // --- ANIMATED GARDEN CANVAS ---
+            // --- ANIMATED GARDEN CANVAS WITH MUSIC SYNCHRONIZATION ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
@@ -697,6 +787,18 @@
             function drawGarden() {
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                let bassEnergy = 0;
+                if (analyserNode && freqDataArray) {
+                    analyserNode.getByteFrequencyData(freqDataArray);
+                    let bassSum = 0;
+                    for (let i = 0; i < 8; i++) { bassSum += freqDataArray[i]; }
+                    bassEnergy = bassSum / 8 / 255;
+
+                    if (bassEnergy > 0.65 && Math.random() < 0.15) {
+                        triggerGardenRipple();
+                    }
+                }
 
                 let time = Date.now() / 400;
 
@@ -722,15 +824,15 @@
                 ctx.lineWidth = 3;
                 ctx.strokeRect(320, 110, 220, 180);
 
-                let fountainRadius = 15 + Math.sin(time * 2) * 4;
-                ctx.strokeStyle = 'rgba(110, 231, 183, 0.4)';
-                ctx.lineWidth = 2;
+                let fountainRadius = 15 + (bassEnergy * 12) + Math.sin(time * 2) * 4;
+                ctx.strokeStyle = `rgba(110, 231, 183, ${0.4 + bassEnergy * 0.6})`;
+                ctx.lineWidth = 2 + (bassEnergy * 2);
                 ctx.beginPath();
                 ctx.arc(430, 200, fountainRadius, 0, Math.PI * 2);
                 ctx.stroke();
 
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 1.8;
+                    rip.radius += 1.8 + (bassEnergy * 1.5);
                     rip.alpha -= 0.015;
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
@@ -751,7 +853,7 @@
                     ctx.beginPath(); ctx.moveTo(x, 310); ctx.lineTo(x, 380); ctx.stroke();
                 }
 
-                let pScale = 1 + (plantPulse * 0.12);
+                let pScale = 1 + (plantPulse * 0.12) + (bassEnergy * 0.25);
                 if (plantPulse > 0) plantPulse -= 0.03;
 
                 ctx.fillStyle = '#15803d';
@@ -759,11 +861,11 @@
                 ctx.beginPath(); ctx.arc(200, 75, 26 * pScale, 0, Math.PI*2); ctx.fill();
                 ctx.beginPath(); ctx.arc(270, 80, 20 * pScale, 0, Math.PI*2); ctx.fill();
 
-                let windOffset = Math.sin(time) * 3;
+                let windOffset = Math.sin(time) * (3 + bassEnergy * 5);
                 ctx.fillStyle = '#db2777';
                 for(let b=0; b<12; b++) {
                     ctx.beginPath();
-                    ctx.arc(545 + Math.sin(b)*5, 120 + b*14 + windOffset, 7, 0, Math.PI*2);
+                    ctx.arc(545 + Math.sin(b)*5, 120 + b*14 + windOffset, 7 + (bassEnergy * 3), 0, Math.PI*2);
                     ctx.fill();
                 }
                 ctx.fillStyle = '#9333ea';
@@ -926,7 +1028,6 @@
             bindClick('account-to-home-btn', () => switchView('home'));
             bindClick('admin-to-home-btn', () => switchView('home'));
 
-            // Bio-Garden Pflanzen-Button Bindings
             bindClick('plant-1-btn', () => harvestPlant(2, 261.63));
             bindClick('plant-2-btn', () => harvestPlant(5, 329.63));
             bindClick('plant-3-btn', () => harvestPlant(10, 196.00));
@@ -958,12 +1059,10 @@
                 });
             }
 
-            // AUTO-PRODUKTION & SANFTE LOGARITHMISCHE STOCHASTISCHE AMBIENT-LOGIK
             setInterval(() => {
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
-                        
                         let totalUpgrades = rigs + albums + aiAgents;
                         let triggerChance = 0.004 + (Math.log(1 + totalUpgrades) * 0.0012); 
                         triggerChance = Math.min(triggerChance, 0.025);
