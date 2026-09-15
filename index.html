@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Tycoon-Logik mit unendlicher Sound-Vielfalt & Synthesizer -->
+    <!-- High-End Studio Synthesizer & Tycoon-Logik -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -539,18 +539,22 @@
                 });
             }
 
-            // UNTERSCHIEDLICHE SYNTH-SOUNDS & MULTI-TON GENERATOR BEI JEDEM KLICK
+            // HIGH-END WEB AUDIO API SYNTHESIZER (Studio-Qualität mit Lowpass-Filter & unendlicher Vielfalt)
             let audioCtx = null;
-            const soundPresets = [
-                { type: 'sawtooth', base: 220, mult: 1.5, decay: 0.15 },
-                { type: 'square', base: 146.83, mult: 2.0, decay: 0.1 },
-                { type: 'triangle', base: 440, mult: 0.8, decay: 0.2 },
-                { type: 'sine', base: 587.33, mult: 1.2, decay: 0.12 },
-                { type: 'sawtooth', base: 110, mult: 3.0, decay: 0.25 }, // Tiefer Sub-Bass Hit
-                { type: 'square', base: 659.25, mult: 0.5, decay: 0.08 }, // Hoher Pluck
-                { type: 'triangle', base: 329.63, mult: 1.33, decay: 0.18 }
+            const studioPatches = [
+                { type: 'sawtooth', base: 130.81, detune: -6, cutoff: 1400, decay: 0.28 }, // Sub Bass
+                { type: 'square', base: 261.63, detune: 5, cutoff: 2800, decay: 0.20 },   // Lead Synth
+                { type: 'triangle', base: 523.25, detune: 0, cutoff: 4500, decay: 0.32 }, // Crystal Bell
+                { type: 'sawtooth', base: 196.00, detune: 8, cutoff: 2000, decay: 0.22 }, // Pluck
+                { type: 'sine', base: 329.63, detune: 0, cutoff: 3500, decay: 0.40 },      // Soft Atmosphere Pad
+                { type: 'square', base: 392.00, detune: -8, cutoff: 2400, decay: 0.18 }, // Punchy Chord
+                { type: 'sawtooth', base: 220.00, detune: 12, cutoff: 4000, decay: 0.25 },// Modern Synth
+                { type: 'triangle', base: 164.81, detune: -4, cutoff: 1800, decay: 0.30 },// Warm Chord
+                { type: 'square', base: 493.88, detune: 6, cutoff: 5000, decay: 0.15 },  // High Sparkle
+                { type: 'sawtooth', base: 98.00, detune: -12, cutoff: 950, decay: 0.45 }, // Deep Sub-Hit
+                { type: 'triangle', base: 349.23, detune: 4, cutoff: 3000, decay: 0.24 }, // Melodic Fave
+                { type: 'sawtooth', base: 440.00, detune: -5, cutoff: 3800, decay: 0.19 }  // Bright Lead
             ];
-            const pitchMultipliers = [1, 1.125, 1.25, 1.334, 1.5, 1.667, 1.875, 2.0, 2.5];
 
             function playBeatSound() {
                 if (!soundEnabled || currentView === 'home') return;
@@ -558,35 +562,45 @@
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
-                    // Wähle völlig zufällig ein Preset und eine Tonhöhe für extreme Abwechslung
-                    let preset = soundPresets[Math.floor(Math.random() * soundPresets.length)];
-                    let pitch = pitchMultipliers[Math.floor(Math.random() * pitchMultipliers.length)];
-                    let targetFreq = preset.base * pitch;
+                    const now = audioCtx.currentTime;
+                    // Völlig freier Zufall aus dem Patch-Katalog + zufällige Halbton-Transposition (-12 bis +12)
+                    let patch = studioPatches[Math.floor(Math.random() * studioPatches.length)];
+                    let randomSemitone = Math.floor(Math.random() * 25) - 12;
+                    let finalFreq = patch.base * Math.pow(2, randomSemitone / 12);
 
                     let osc1 = audioCtx.createOscillator();
                     let osc2 = audioCtx.createOscillator();
+                    let filter = audioCtx.createBiquadFilter();
                     let gain = audioCtx.createGain();
 
-                    osc1.type = preset.type;
-                    osc2.type = Math.random() > 0.5 ? 'sine' : 'triangle';
+                    osc1.type = patch.type;
+                    osc2.type = Math.random() > 0.4 ? 'sawtooth' : 'sine';
 
-                    osc1.frequency.setValueAtTime(targetFreq * preset.mult, audioCtx.currentTime);
-                    osc1.frequency.exponentialRampToValueAtTime(targetFreq, audioCtx.currentTime + preset.decay);
+                    osc1.frequency.setValueAtTime(finalFreq, now);
+                    osc2.frequency.setValueAtTime(finalFreq * 1.5, now); // Akkord-Intervalle
 
-                    osc2.frequency.setValueAtTime(targetFreq * 0.5, audioCtx.currentTime);
-                    osc2.frequency.exponentialRampToValueAtTime(targetFreq * 0.25, audioCtx.currentTime + preset.decay);
+                    osc1.detune.setValueAtTime(patch.detune, now);
+                    osc2.detune.setValueAtTime(-patch.detune, now);
 
-                    gain.gain.setValueAtTime(0.75, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + preset.decay + 0.05);
+                    // Lowpass-Filter für warmen, professionellen Studio-Klang ohne digitalen Schmerz
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(patch.cutoff, now);
+                    filter.frequency.exponentialRampToValueAtTime(patch.cutoff * 0.25, now + patch.decay);
 
-                    osc1.connect(gain);
-                    osc2.connect(gain);
+                    // Dynamische Lautstärke-Enveloppe (Attack + Decay)
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.linearRampToValueAtTime(0.45, now + 0.015);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + patch.decay);
+
+                    osc1.connect(filter);
+                    osc2.connect(filter);
+                    filter.connect(gain);
                     gain.connect(audioCtx.destination);
 
-                    osc1.start();
-                    osc2.start();
-                    osc1.stop(audioCtx.currentTime + preset.decay + 0.05);
-                    osc2.stop(audioCtx.currentTime + preset.decay + 0.05);
+                    osc1.start(now);
+                    osc2.start(now);
+                    osc1.stop(now + patch.decay);
+                    osc2.stop(now + patch.decay);
                 } catch (e) {}
             }
 
