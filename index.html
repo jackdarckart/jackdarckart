@@ -191,7 +191,7 @@
                     ← Zurück zur Startseite
                 </button>
 
-                <!-- 🛠️ VOLLSTÄNDIGER ADMIN-BEREICH GANZ UNTEN IM GAME-BEREICH (INKLUSIVE RESET-BUTTON) -->
+                <!-- 🛠️ VOLLSTÄNDIGER ADMIN-BEREICH GANZ UNTEN IM GAME-BEREICH (MIT SICHEREM SPIEL-RESET) -->
                 <div class="bg-[#131b2e] border border-amber-500/40 p-5 rounded-3xl shadow-2xl space-y-4 text-left mt-8">
                     <div class="flex items-center gap-2 border-b border-gray-800 pb-2">
                         <span class="text-xl">🛠️</span>
@@ -225,10 +225,10 @@
                         <button type="button" id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN aktualisieren</button>
                     </div>
 
-                    <!-- GEFAHRENZONE: SPIELSTAND ZURÜCKSETZEN -->
+                    <!-- GEFAHRENZONE: NUR SPIELSTAND ZURÜCKSETZEN (Account bleibt sicher erhalten!) -->
                     <div class="border-t border-red-900/50 pt-3 space-y-2">
                         <h4 class="font-bold text-xs text-red-400">⚠️ Gefahrenzone</h4>
-                        <button type="button" id="admin-reset-game-btn" class="w-full bg-red-900/60 hover:bg-red-900 text-red-200 font-semibold py-2 rounded-xl text-xs transition shadow border border-red-700/50">Gesamten Spielstand zurücksetzen</button>
+                        <button type="button" id="admin-reset-game-btn" class="w-full bg-red-900/60 hover:bg-red-900 text-red-200 font-semibold py-2 rounded-xl text-xs transition shadow border border-red-700/50">Nur Spielstand zurücksetzen (Account bleibt erhalten)</button>
                     </div>
                 </div>
 
@@ -280,7 +280,7 @@
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
                 <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ System Hub</h2>
-                <p class="text-xs text-gray-400">Nutze den spezifischen Administrator-Bereich direkt im Game-Modul (nach erfolgreichem Login), um deine Spiel-Metriken, PINs und den Spielstand zu verwalten.</p>
+                <p class="text-xs text-gray-400">Nutze den spezifischen Administrator-Bereich direkt im Game-Modul (nach erfolgreichem Login), um deine Spiel-Metriken und PINs zu verwalten.</p>
                 <button type="button" id="admin-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
@@ -297,7 +297,7 @@
         </div>
     </footer>
 
-    <!-- Robuste JavaScript Logik mit Fallbacks -->
+    <!-- Robuste JavaScript Logik mit absolutem Account-Schutz -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 40430;
@@ -350,7 +350,7 @@
                 });
             }
 
-            // Registrierung mit Einzigartigkeitsprüfung & Schutz vor Fehlern
+            // Registrierung mit Einzigartigkeitsprüfung
             const submitRegisterBtn = document.getElementById('submit-register-btn');
             if(submitRegisterBtn) {
                 submitRegisterBtn.addEventListener('click', () => {
@@ -588,20 +588,23 @@
                 }
             }
 
-            // Exklusiver Administrator-Reset (Nur im geschützten Admin-Bereich des Games)
+            // ⚠️ SICHERER SPIEL-RESET: Löscht NUR Spielstand-Daten, die Account-Datenbank bleibt unangetastet!
             const adminResetGameBtn = document.getElementById('admin-reset-game-btn');
             if(adminResetGameBtn) {
                 adminResetGameBtn.addEventListener('click', () => {
-                    if (confirm("⚠️ ACHTUNG: Möchtest du wirklich den gesamten Spielstand unwiderruflich zurücksetzen?")) {
-                        localStorage.clear();
-                        beats = 40430; fans = 14603; bps = 161.0; username = 'jackdarckart';
-                        loggedInUser = null;
-                        let ud = document.getElementById('user-display');
-                        if(ud) ud.innerText = username;
-                        updateGameViewState();
+                    if (confirm("⚠️ ACHTUNG: Möchtest du wirklich nur den Spielstand (Beats, Fans, BPS) zurücksetzen? Dein Account bleibt absolut sicher!")) {
+                        // Lösche NUR Spiel-Variablen aus dem LocalStorage (users_db wird NICHT berührt!)
+                        localStorage.removeItem('beat_lab_beats');
+                        localStorage.removeItem('beat_lab_fans');
+                        localStorage.removeItem('beat_lab_bps');
+
+                        beats = 0;
+                        fans = 0;
+                        bps = 0.0;
+
                         updateDisplay();
                         saveGame();
-                        alert("🔄 Spielstand wurde komplett zurückgesetzt.");
+                        alert("🔄 Spielstand wurde erfolgreich zurückgesetzt. Dein Account ist sicher geblieben!");
                     }
                 });
             }
