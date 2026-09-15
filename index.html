@@ -87,7 +87,7 @@
                     <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
                 </h1>
                 <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
-                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit cineastischem HD-Garten!
+                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit musik-reaktivem HD-Garten!
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
@@ -183,10 +183,10 @@
                         </a>
                     </div>
 
-                    <!-- Persistent Audio Player -->
+                    <!-- Persistent Audio Player mit CORS für Visualizer -->
                     <div class="bg-darkbg p-6 rounded-2xl border border-gray-800 text-center space-y-4">
-                        <p class="text-gray-300 text-sm">Starte den Audiostream direkt hier (läuft auch beim Neuladen & bei Bildschirmsperre weiter):</p>
-                        <audio id="radioStream" controls preload="auto" class="w-full mx-auto max-w-md accent-indigo-600">
+                        <p class="text-gray-300 text-sm">Starte den Audiostream (der Garten reagiert live im Takt zur Musik):</p>
+                        <audio id="radioStream" controls crossorigin="anonymous" preload="auto" class="w-full mx-auto max-w-md accent-indigo-600">
                             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
                             Dein Browser unterstützt kein Audio-Element.
                         </audio>
@@ -353,7 +353,7 @@
             <div class="mt-6">
                 <button onclick="switchView('garden')" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-xl shadow-emerald-600/30 transition inline-flex items-center space-x-2">
                     <i class="fa-solid fa-seedling"></i>
-                    <span>🌿 Cineastischen HD-Garten öffnen</span>
+                    <span>🌿 Musik-reaktiven HD-Garten öffnen</span>
                 </button>
             </div>
         </div>
@@ -516,7 +516,7 @@
         </div>
     </div>
 
-    <!-- SEPARATE CINEASTISCHE HD-GARTEN ANSICHT -->
+    <!-- SEPARATE MUSIK-REAKTIVE HD-GARTEN ANSICHT -->
     <div id="gardenView" class="hidden py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-6 text-center">
         <div class="flex items-center justify-between px-2">
             <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg">
@@ -525,7 +525,7 @@
             </button>
             <div class="inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Cineastischer HD-Garten</span>
+                <span>Musik-reaktiver HD-Garten</span>
             </div>
         </div>
 
@@ -545,7 +545,7 @@
             </div>
         </div>
 
-        <!-- CINEASTISCHES CANVAS-FENSTER (REINE ANIMATION) -->
+        <!-- AUDIO-REAKTIVES CANVAS-FENSTER -->
         <div class="relative w-full flex justify-center bg-darkbg rounded-3xl p-3 border-2 border-emerald-500/50 shadow-2xl overflow-hidden">
             <canvas id="gardenCanvas" width="800" height="650" class="w-full max-w-3xl rounded-2xl shadow-2xl"></canvas>
         </div>
@@ -729,7 +729,19 @@
         }
 
         function checkLoginState() {
-            const loggedInEmail = localStorage.getItem('jackLoggedInEmail');
+            let loggedInEmail = localStorage.getItem('jackLoggedInEmail');
+            if (!loggedInEmail) {
+                for (let i = 0; i < localStorage.length; i++) {
+                    let k = localStorage.key(i);
+                    if (k && k.startsWith('jackBeatLabUserSave_')) {
+                        let potentialEmail = k.replace('jackBeatLabUserSave_', '').replace(/_/g, '@');
+                        loggedInEmail = potentialEmail;
+                        localStorage.setItem('jackLoggedInEmail', loggedInEmail);
+                        break;
+                    }
+                }
+            }
+
             const authScreen = document.getElementById('gameAuthScreen');
             const mainContent = document.getElementById('gameMainContent');
 
@@ -741,13 +753,14 @@
             } else {
                 authScreen.classList.remove('hidden');
                 mainContent.classList.add('hidden');
-                document.getElementById('authEmail').value = '';
-                document.getElementById('authPin').value = '';
             }
         }
 
-        // --- AUDIO SYSTEM ---
+        // --- AUDIO & MUSIC-REACTIVITY SYSTEM (WEB AUDIO API) ---
         let audioCtx = null;
+        let audioAnalyser = null;
+        let audioDataArray = null;
+        let audioSourceConnected = false;
         let ambientTimer = 0;
         let targetPulse = 0;
         let currentPulse = 0;
@@ -760,6 +773,22 @@
                 }
                 if (audioCtx.state === 'suspended') {
                     audioCtx.resume();
+                }
+
+                // Webradio Stream an den Visualizer / Analyser anbinden
+                const audioEl = document.getElementById('radioStream');
+                if (audioEl && !audioSourceConnected) {
+                    try {
+                        const source = audioCtx.createMediaElementSource(audioEl);
+                        audioAnalyser = audioCtx.createAnalyser();
+                        audioAnalyser.fftSize = 256;
+                        source.connect(audioAnalyser);
+                        audioAnalyser.connect(audioCtx.destination);
+                        audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+                        audioSourceConnected = true;
+                    } catch(err) {
+                        console.log("Audio Source already connected or restricted", err);
+                    }
                 }
             } catch(e) {
                 console.log("Audio init error:", e);
@@ -777,7 +806,7 @@
                 unlockAudio();
                 if (!audioCtx) return;
 
-                targetPulse = 1.0; 
+                targetPulse = 1.2; 
 
                 const now = audioCtx.currentTime;
                 const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66];
@@ -860,48 +889,40 @@
         };
 
         function loadGameForUser(email) {
-            let safeKey = 'jackBeatLabUserSave_' + email.replace(/[^a-z0-9]/g, '_');
-            let saved = localStorage.getItem(safeKey);
+            let bestSave = null;
+            let maxBeats = -1;
 
-            if (!saved) {
-                for (let i = 0; i < localStorage.length; i++) {
-                    let k = localStorage.key(i);
-                    if (k && k.startsWith('jackBeatLabUserSave_')) {
-                        let potentialSave = localStorage.getItem(k);
-                        if (potentialSave && potentialSave.includes('beats')) {
-                            saved = potentialSave;
-                            break;
-                        }
+            for (let i = 0; i < localStorage.length; i++) {
+                let k = localStorage.key(i);
+                if (k && (k.startsWith('jackBeatLabUserSave_') || k === 'jackBeatLabSave' || k.includes('BeatLab'))) {
+                    let val = localStorage.getItem(k);
+                    if (val && val.includes('beats')) {
+                        try {
+                            let parsed = JSON.parse(val);
+                            if (parsed && typeof parsed.beats === 'number' && parsed.beats > maxBeats) {
+                                maxBeats = parsed.beats;
+                                bestSave = parsed;
+                            }
+                        } catch(e) {}
                     }
                 }
             }
 
-            if (!saved) {
-                gameData = { 
-                    beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, 
-                    cloudId: 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-                    garden: [
-                        { level: 1, exp: 0, maxExp: 50 },
-                        { level: 1, exp: 0, maxExp: 250 },
-                        { level: 1, exp: 0, maxExp: 1200 }
-                    ]
-                };
-            } else {
-                try {
-                    let parsed = JSON.parse(saved);
-                    gameData = { ...gameData, ...parsed };
-                    if (!gameData.cloudId) {
-                        gameData.cloudId = 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-                    }
-                    if (!gameData.garden) {
-                        gameData.garden = [
-                            { level: 1, exp: 0, maxExp: 50 },
-                            { level: 1, exp: 0, maxExp: 250 },
-                            { level: 1, exp: 0, maxExp: 1200 }
-                        ];
-                    }
-                } catch(e) { console.error("Ladefehler", e); }
+            if (bestSave) {
+                gameData = { ...gameData, ...bestSave };
             }
+
+            if (!gameData.cloudId) {
+                gameData.cloudId = 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            }
+            if (!gameData.garden) {
+                gameData.garden = [
+                    { level: 1, exp: 0, maxExp: 50 },
+                    { level: 1, exp: 0, maxExp: 250 },
+                    { level: 1, exp: 0, maxExp: 1200 }
+                ];
+            }
+
             document.getElementById('cloudIdDisplay').innerText = gameData.cloudId;
             updateGameUI();
         }
@@ -1034,7 +1055,7 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- HOCHWERTIGE CINEASTISCHE HD GARTEN RENDER ENGINE ---
+        // --- MUSIK-REAKTIVE CINEASTISCHE HD GARTEN RENDER ENGINE ---
         let animTime = 0;
         let particles = [];
 
@@ -1043,7 +1064,7 @@
                 x: Math.random() * 800,
                 y: Math.random() * 650,
                 vx: (Math.random() - 0.5) * 0.4,
-                vy: -Math.random() * 0.5 - 0.2, // Steigen leicht auf (Magie-Effekt)
+                vy: -Math.random() * 0.5 - 0.2,
                 size: Math.random() * 2.8 + 0.8,
                 alpha: Math.random() * 0.6 + 0.2
             });
@@ -1056,12 +1077,24 @@
             const w = canvas.width;
             const h = canvas.height;
 
-            animTime += 0.02 + (getBps() * 0.0003);
+            // Musik-Bass & Frequenzanalyse auslesen (falls Musik läuft)
+            let audioBass = 0;
+            if (audioAnalyser && audioDataArray) {
+                audioAnalyser.getByteFrequencyData(audioDataArray);
+                // Niedrige Frequenzen (Bass) für den Beat nutzen (Durchschnitt der ersten 8 Bins)
+                let bassSum = 0;
+                for (let i = 0; i < 8; i++) bassSum += audioDataArray[i];
+                audioBass = (bassSum / 8) / 255.0; // Wert zwischen 0.0 und 1.0
+            }
 
-            currentPulse += (targetPulse - currentPulse) * 0.1;
-            targetPulse += (0 - targetPulse) * 0.08;
+            animTime += 0.02 + (getBps() * 0.0003) + (audioBass * 0.03);
 
-            // 1. Tiefen-Rasen mit feinem Vignettierungs-Gradient
+            currentPulse += (targetPulse - currentPulse) * 0.15;
+            targetPulse += (0 - targetPulse) * 0.1;
+
+            // Musik-Reaktivitätsfaktor kombinieren
+            let reactFactor = currentPulse + (audioBass * 0.8);
+
             let bgGrad = ctx.createRadialGradient(w/2, h/2, 80, w/2, h/2, w * 0.8);
             bgGrad.addColorStop(0, '#0f3822');
             bgGrad.addColorStop(0.6, '#092415');
@@ -1069,14 +1102,12 @@
             ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, w, h);
 
-            // 2. Umgebende Natur-Hecke mit plastischer Schattierung
             ctx.fillStyle = '#061c0e';
             ctx.fillRect(0, 0, w, 28);
             ctx.fillRect(0, 0, 28, h);
             ctx.fillRect(w - 28, 0, 28, h);
             ctx.fillRect(0, h - 28, w, 28);
 
-            // 3. Edle Holzterrasse mit Maserung & Glanz
             ctx.fillStyle = '#613d20';
             ctx.fillRect(140, 470, 520, 160);
             ctx.strokeStyle = '#3d2512';
@@ -1084,37 +1115,34 @@
             for(let x = 140; x <= 660; x += 30) {
                 ctx.beginPath(); ctx.moveTo(x, 470); ctx.lineTo(x, 630); ctx.stroke();
             }
-            // Terassen-Lichtschein
             ctx.fillStyle = 'rgba(255,255,255,0.04)';
             ctx.fillRect(140, 470, 520, 45);
 
-            // Lounge-Möbel sanft im Wind
-            let terraceSway = Math.sin(animTime * 2) * (1.2 + currentPulse * 2.5);
+            let terraceSway = Math.sin(animTime * 2) * (1.2 + reactFactor * 4);
             ctx.fillStyle = '#cbd5e1'; 
             ctx.fillRect(350, 520 + terraceSway, 100, 55);
             ctx.fillStyle = '#94a3b8'; 
             ctx.fillRect(315, 532 + terraceSway, 22, 32); 
             ctx.fillRect(463, 532 + terraceSway, 22, 32);
 
-            // 4. Cineastischer Klang-Teich mit lebendigen Reflexionen
-            let pondGrad = ctx.createRadialGradient(500, 330, 15, 500, 330, 120);
+            // Klang-Teich reagiert stark auf Bass!
+            let pondGrad = ctx.createRadialGradient(500, 330, 15 + audioBass*10, 500, 330, 120 + audioBass*30);
             pondGrad.addColorStop(0, '#38bdf8');
             pondGrad.addColorStop(0.6, '#0284c7');
             pondGrad.addColorStop(1, '#0369a1');
             ctx.fillStyle = '#0c4a6e'; ctx.fillRect(376, 212, 248, 238);
             ctx.fillStyle = pondGrad; ctx.fillRect(382, 218, 236, 226);
 
-            // Organische Wasser-Ripples
-            ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-            ctx.lineWidth = 1.5 + (currentPulse * 1.5);
-            let r1 = (Math.sin(animTime * 1.4) * 14 + 40 + currentPulse * 7);
-            let r2 = (Math.cos(animTime * 1.1) * 18 + 65 + currentPulse * 12);
-            let r3 = (Math.sin(animTime * 0.9) * 22 + 90 + currentPulse * 16);
+            // Dynamische Wellenringe im Musik-Takt
+            ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+            ctx.lineWidth = 1.5 + (reactFactor * 2.5);
+            let r1 = (Math.sin(animTime * 1.4) * 14 + 40 + reactFactor * 15);
+            let r2 = (Math.cos(animTime * 1.1) * 18 + 65 + reactFactor * 22);
+            let r3 = (Math.sin(animTime * 0.9) * 22 + 90 + reactFactor * 30);
             ctx.beginPath(); ctx.arc(500, 330, Math.abs(r1), 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath(); ctx.arc(500, 330, Math.abs(r2), 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath(); ctx.arc(500, 330, Math.abs(r3), 0, Math.PI * 2); ctx.stroke();
 
-            // 5. Steinplatten-Weg
             ctx.fillStyle = '#334155';
             ctx.fillRect(150, 250, 210, 190);
             ctx.fillStyle = '#1e293b';
@@ -1124,19 +1152,16 @@
                 }
             }
 
-            // 6. Organisch biegende Kugelbäume (Zone B) mit multi-schichtiger Krone
             let treeLvl = gameData.garden[1].level;
-            let windSway = Math.sin(animTime * 1.8) * 4; // Windbiegung
-            let baseRadius = (30 + Math.min(treeLvl * 2, 16)) * (1 + currentPulse * 0.1);
+            let windSway = Math.sin(animTime * 1.8) * (4 + audioBass * 8);
+            let baseRadius = (30 + Math.min(treeLvl * 2, 16)) * (1 + reactFactor * 0.15);
             let treePositions = [[110, 100], [210, 100], [110, 180], [210, 180]];
             
             treePositions.forEach((pos, idx) => {
                 let sW = windSway * (idx % 2 === 0 ? 1 : 0.8);
-                // Baumstamm
                 ctx.fillStyle = '#451a03';
                 ctx.fillRect(pos[0] - 5 + sW*0.5, pos[1], 10, 35);
                 
-                // Mehrschichtige Krone für plastischen Look
                 let tGrad = ctx.createRadialGradient(pos[0]-8 + sW, pos[1]-15, 5, pos[0] + sW, pos[1]-10, baseRadius);
                 tGrad.addColorStop(0, '#4ade80');
                 tGrad.addColorStop(0.7, '#16a34a');
@@ -1145,9 +1170,8 @@
                 ctx.beginPath(); ctx.arc(pos[0] + sW, pos[1] - 5, baseRadius, 0, Math.PI * 2); ctx.fill();
             });
 
-            // 7. Großer Solitärbaum (Oasen-Baum Oben Rechts)
-            let bigTreeSway = Math.sin(animTime * 1.5) * 5;
-            let bigRadius = (60 + Math.cos(animTime * 1.2) * 4) * (1 + currentPulse * 0.12);
+            let bigTreeSway = Math.sin(animTime * 1.5) * (5 + audioBass * 10);
+            let bigRadius = (60 + Math.cos(animTime * 1.2) * 4) * (1 + reactFactor * 0.18);
             ctx.fillStyle = '#451a03';
             ctx.fillRect(620 - 7 + bigTreeSway*0.5, 90, 14, 50);
 
@@ -1158,33 +1182,31 @@
             ctx.fillStyle = bigGrad;
             ctx.beginPath(); ctx.arc(620 + bigTreeSway, 85, bigRadius, 0, Math.PI * 2); ctx.fill();
 
-            // 8. Lebendige Blumenrabatten (Zone A) mit feinen Blütenkelchen
             let flowerLvl = gameData.garden[0].level;
             let flowerColors = ['#f472b6', '#e879f9', '#38bdf8', '#facc15', '#fb7185', '#34d399'];
             for(let i = 0; i < 35 + flowerLvl * 8; i++) {
                 ctx.fillStyle = flowerColors[i % flowerColors.length];
                 ctx.beginPath();
-                let fS = (4.5 + Math.sin(animTime * 3 + i) * 1.2) * (1 + currentPulse * 0.2);
+                let fS = (4.5 + Math.sin(animTime * 3 + i) * 1.2) * (1 + reactFactor * 0.3);
                 ctx.arc(635 + ((i % 3) * 18), 210 + (i * 7.2), Math.max(1.8, fS), 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // 9. Magische Glühwürmchen & Staubpartikel im Wind
-            ctx.fillStyle = 'rgba(250, 204, 21, 0.7)';
+            // Partikel tanzen schneller bei lautem Bass
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.8)';
             particles.forEach(p => {
-                p.x += p.vx + (Math.sin(animTime) * 0.3);
-                p.y += p.vy;
+                p.x += p.vx + (Math.sin(animTime) * (0.3 + audioBass * 1.5));
+                p.y += p.vy - (audioBass * 0.8);
                 if(p.y < 10) p.y = h - 10;
                 if(p.x < 10 || p.x > w-10) p.vx *= -1;
 
-                ctx.globalAlpha = p.alpha;
+                ctx.globalAlpha = p.alpha + (audioBass * 0.3);
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, p.size + (audioBass * 1.5), 0, Math.PI * 2);
                 ctx.fill();
                 ctx.globalAlpha = 1.0;
             });
 
-            // Edle, dezente Bereichsbeschriftung im Glas-Stil
             ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
             ctx.font = 'bold 11px sans-serif';
             ctx.shadowBlur = 6;
@@ -1315,7 +1337,7 @@
             audio.addEventListener('pause', function() { localStorage.setItem('streamPlaying', 'false'); });
         }
 
-        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('contextcommon', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'F12' || (e.ctrlKey && ['u','s','p','c','x','a'].includes(e.key.toLowerCase())) || (e.ctrlKey && e.shiftKey)) {
                 e.preventDefault(); return false;
