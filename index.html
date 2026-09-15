@@ -341,7 +341,7 @@
                 <span>Exklusives Studio-Minigame (PIN-Geschützt)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Melde dich an, um zu spielen!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Genieße verschiedenste wohltuende Ambient-Töne beim Produzieren!</p>
         </div>
 
         <!-- GESPERRTER ZUSTAND (WENN ABGEMELDET) -->
@@ -556,17 +556,17 @@
 
         let modalCallback = null;
         let modalMode = 'pin';
-        
-        // Admin-Status aus dem lokalen Speicher laden (bleibt beim Neuladen erhalten)
         let isAdminLoggedIn = localStorage.getItem('jackAdminLoggedIn') === 'true';
         
         let pendingNewPin = '';
         let pendingNewEmail = '';
         let pendingVerificationCode = '';
 
-        // --- WEB AUDIO SYNTHESIZER FÜR SCHÖNE TÖNE ---
+        // --- ERWEITERTER AMBIENT SYNTHESIZER FÜR WOHLGEFÜHL- TÖNE & AKKORDE ---
         let audioCtx = null;
-        function playPleasantTone() {
+        let ambientTimer = 0;
+
+        function playAmbientChord() {
             try {
                 if (!audioCtx) {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -574,23 +574,44 @@
                 if (audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
-                const osc = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                
-                const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
-                const randomNote = notes[Math.floor(Math.random() * notes.length)];
-                
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(randomNote, audioCtx.currentTime);
-                
-                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
-                
-                osc.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.35);
+
+                // Verschiedene wunderschöne Wohlfühl-Skalen & Akkorde für abwechslungsreiche Vielfalt
+                const chordSets = [
+                    [261.63, 329.63, 392.00, 523.25], // C-Dur (Harmonisch & Warm)
+                    [293.66, 369.99, 440.00, 587.33], // D-Modus (Sphärisch)
+                    [329.63, 392.00, 493.88, 659.25], // E-Moll/Dur-Mix (Sanft)
+                    [349.23, 440.00, 523.25, 698.46], // F-Lydian (Traumhaft)
+                    [392.00, 493.88, 587.33, 783.99]  // G-Dur (Offen & Weit)
+                ];
+
+                const randomChord = chordSets[Math.floor(Math.random() * chordSets.length)];
+
+                randomChord.forEach((freq, index) => {
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+
+                    // Tiefpassfilter für weichen, runden Klang ohne harte Höhen
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(1000 + (index * 250), audioCtx.currentTime);
+
+                    // Wechsel zwischen reiner Sinus- und sanfter Dreieckswelle
+                    osc.type = index % 2 === 0 ? 'sine' : 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                    // Butterweicher Arpeggio-Versatz & langes, wohltuendes Ausklingen (1.2 Sekunden)
+                    const startTime = audioCtx.currentTime + (index * 0.05);
+                    gainNode.gain.setValueAtTime(0.0001, startTime);
+                    gainNode.gain.linearRampToValueAtTime(0.04, startTime + 0.08);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.2);
+
+                    osc.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + 1.2);
+                });
             } catch(e) {}
         }
 
@@ -892,7 +913,7 @@
             if (!isAdminLoggedIn) return;
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
-            playPleasantTone();
+            playAmbientChord(); // Spielt einen satten, zufälligen Wohlfühl-Akkord
             updateGameUI();
             saveGame();
         }
@@ -911,7 +932,7 @@
                 if (type === 'synth') gameData.synth++;
                 if (type === 'desk') gameData.desk++;
                 if (type === 'label') gameData.label++;
-                playPleasantTone();
+                playAmbientChord(); // Feierlicher Wohlfühl-Akkord beim Upgrade-Kauf
                 updateGameUI();
                 saveGame();
             }
@@ -951,6 +972,7 @@
             if (coLabel) coLabel.innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
         }
 
+        // Passives Einkommen & dezente Ambient-Töne im Hintergrund (Zufallsvielfalt je nach BPS)
         setInterval(function() {
             if (!isAdminLoggedIn) return;
             let bps = getBps();
@@ -958,6 +980,13 @@
                 gameData.beats += bps / 10;
                 gameData.fans += (bps / 50);
                 updateGameUI();
+
+                // Wenn Upgrades aktiv sind, spielt das Studio alle paar Sekunden ganz dezent einen zufälligen Wohlfühlton
+                ambientTimer++;
+                if (ambientTimer >= Math.max(15, 60 - bps)) { // Je mehr BPS, desto öfter (aber angenehm dosiert)
+                    ambientTimer = 0;
+                    playAmbientChord();
+                }
             }
         }, 100);
 
