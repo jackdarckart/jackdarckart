@@ -351,17 +351,17 @@
             </div>
             <div class="text-center">
                 <h3 id="authTitle" class="text-2xl font-bold mb-2">Beat-Lab Anmelden</h3>
-                <p id="authSubtitle" class="text-sm text-gray-400">Melde dich mit deiner E-Mail und deinem PIN an, um deinen Spielstand wieder abzurufen.</p>
+                <p id="authSubtitle" class="text-sm text-gray-400">Melde dich mit deiner E-Mail und deinem PIN an, um deinen Spielstand abzurufen.</p>
             </div>
 
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">E-Mail-Adresse</label>
-                    <input type="email" id="authEmail" placeholder="artur.hamm90@gmail.com" class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    <input type="email" id="authEmail" autocomplete="off" placeholder="artur.hamm90@gmail.com" class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Master-PIN</label>
-                    <input type="password" id="authPin" placeholder="Dein geheimer PIN..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-white text-sm tracking-widest focus:outline-none focus:border-indigo-500">
+                    <input type="password" id="authPin" autocomplete="off" placeholder="Dein geheimer PIN..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-white text-sm tracking-widest focus:outline-none focus:border-indigo-500">
                 </div>
             </div>
 
@@ -526,9 +526,14 @@
         </div>
     </div>
 
-    <!-- CUSTOM DESIGN MODAL -->
-    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
-        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 max-w-md w-full mx-auto shadow-2xl text-center space-y-6">
+    <!-- CUSTOM DESIGN MODAL (MIT X-BUTTON & BACKDROP-KLICK ZUM SCHLIESSEN) -->
+    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4" onclick="handleBackdropClick(event)">
+        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 max-w-md w-full mx-auto shadow-2xl text-center space-y-6 relative">
+            <!-- X-Button zum Schließen -->
+            <button onclick="closeCustomModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-white w-9 h-9 rounded-full bg-darkbg border border-gray-700 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
             <div id="modalIcon" class="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-2xl mx-auto border border-indigo-500/30">
                 <i class="fa-solid fa-circle-info"></i>
             </div>
@@ -544,7 +549,7 @@
             <div id="modalActionContainer" class="hidden"></div>
 
             <div class="flex items-center justify-center gap-3 pt-2">
-                <button id="modalCancelBtn" onclick="closeCustomModal(false)" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 py-3 rounded-xl font-semibold text-sm transition">Abbrechen</button>
+                <button id="modalCancelBtn" onclick="closeCustomModal(false)" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 py-3 rounded-xl font-semibold text-sm transition">Schließen</button>
                 <button id="modalConfirmBtn" onclick="handleModalConfirm()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-semibold text-sm transition shadow-lg shadow-indigo-600/30">Bestätigen</button>
             </div>
         </div>
@@ -602,7 +607,7 @@
 
             if (isRegisterMode) {
                 title.innerText = 'Beat-Lab Konto erstellen';
-                sub.innerText = 'Registriere dich, um deinen Spielstand dauerhaft zu sichern und überall abzurufen.';
+                sub.innerText = 'Registriere dich, um deinen Spielstand dauerhaft zu sichern.';
                 btn.innerText = 'Konto registrieren';
                 switchBtn.innerText = 'Bereits ein Konto? Hier anmelden';
             } else {
@@ -627,7 +632,7 @@
 
             if (isRegisterMode) {
                 if (users[email]) {
-                    showInfoModal('❌ E-Mail bereits vergeben', 'Diese E-Mail ist bereits registriert. Bitte melde dich an.');
+                    showInfoModal('❌ E-Mail bereits vergeben', 'Diese E-Mail ist bereits registriert.');
                     return;
                 }
                 users[email] = pin;
@@ -645,13 +650,13 @@
         function handleForgotPin() {
             const email = document.getElementById('authEmail').value.trim().toLowerCase();
             if (!email) {
-                showInfoModal('⚠️ E-Mail eingeben', 'Trage bitte zuerst deine E-Mail-Adresse in das obere Feld ein, um den PIN anzufordern.');
+                showInfoModal('⚠️ E-Mail eingeben', 'Trage bitte zuerst deine E-Mail-Adresse in das Feld ein.');
                 return;
             }
 
             let users = JSON.parse(localStorage.getItem('jackBeatLabUsers') || '{}');
             if (!users[email]) {
-                showInfoModal('❌ E-Mail nicht gefunden', 'Es ist kein Konto unter dieser E-Mail-Adresse registriert.');
+                showInfoModal('❌ E-Mail nicht gefunden', 'Es ist kein Konto unter dieser E-Mail registriert.');
                 return;
             }
 
@@ -659,7 +664,7 @@
             users[email] = tempPin;
             localStorage.setItem('jackBeatLabUsers', JSON.stringify(users));
 
-            showInfoModal('📨 Temporärer PIN generiert', 'Ein temporärer PIN wurde für deine E-Mail erstellt:\n\n' + tempPin + '\n\nDu kannst dich jetzt damit anmelden.');
+            showInfoModal('📨 Temporärer PIN generiert', 'Dein temporärer PIN lautet:\n\n' + tempPin + '\n\nDu kannst dich jetzt damit anmelden.');
         }
 
         function loginUserSession(email) {
@@ -670,6 +675,8 @@
         function logoutUser() {
             saveGame();
             localStorage.removeItem('jackLoggedInEmail');
+            document.getElementById('authEmail').value = '';
+            document.getElementById('authPin').value = '';
             checkLoginState();
         }
 
@@ -691,7 +698,7 @@
             }
         }
 
-        // --- HOCHWERTIGES, SAUBERES AUDIO-SYSTEM (OHNE HALL) ---
+        // --- AUDIO SYSTEM ---
         let audioCtx = null;
         let ambientTimer = 0;
 
@@ -752,7 +759,11 @@
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalText').innerText = text;
             document.getElementById('modalInputContainer').classList.add('hidden');
-            document.getElementById('modalCancelBtn').style.display = 'none';
+            
+            // Stelle sicher, dass der Schließen-Button immer sichtbar ist
+            const cancelBtn = document.getElementById('modalCancelBtn');
+            cancelBtn.style.display = 'block';
+            cancelBtn.innerText = 'Schließen';
             
             const actionContainer = document.getElementById('modalActionContainer');
             if (htmlButton) {
@@ -774,7 +785,13 @@
             }
         }
 
-        // --- SPIELSTAND & GARTEN DATENSTRUKTUR MIT AUTOMATISCHER RETTUNG ---
+        function handleBackdropClick(e) {
+            if (e.target.id === 'customModal') {
+                closeCustomModal(false);
+            }
+        }
+
+        // --- SPIELSTAND & GARTEN DATENSTRUKTUR ---
         let gameData = { 
             beats: 0, 
             fans: 0, 
@@ -795,7 +812,6 @@
             let safeKey = 'jackBeatLabUserSave_' + email.replace(/[^a-z0-9]/g, '_');
             let saved = localStorage.getItem(safeKey);
 
-            // Automatischer Fallback: Suche nach jedem existierenden Spielstand im Browser
             if (!saved) {
                 for (let i = 0; i < localStorage.length; i++) {
                     let k = localStorage.key(i);
