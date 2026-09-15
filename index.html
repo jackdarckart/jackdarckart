@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jack's Beat-Lab</title>
+    <title>jackdarckart | Official Artist Hub & Beat-Lab</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#0b0f19] text-white min-h-screen font-sans selection:bg-purple-500 selection:text-white flex flex-col justify-between">
 
-    <!-- Header / Navigation (Keine Pop-ups, direkte Seitenwechsel) -->
+    <!-- Header / Navigation (Keine Pop-ups) -->
     <header class="w-full border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/95 px-4 py-3">
-        <div class="max-w-3xl mx-auto flex justify-between items-center overflow-x-auto">
+        <div class="max-w-4xl mx-auto flex justify-between items-center overflow-x-auto">
             
             <!-- Branding / Username -->
             <div class="flex items-center space-x-2 shrink-0">
@@ -32,27 +32,69 @@
         </div>
     </header>
 
-    <!-- Main Content Container (Alle Ansichten als eigene Seiten) -->
-    <main class="max-w-md mx-auto p-4 sm:p-6 w-full my-auto text-center">
+    <!-- Main Content Container -->
+    <main class="max-w-2xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         
-        <!-- 1. WILLKOMMENS-STARTSEITE -->
-        <div id="view-home" class="view-page w-full py-6">
-            <div class="inline-block p-4 bg-purple-600/10 border border-purple-500/20 rounded-3xl mb-4 shadow-2xl">
-                <span class="text-5xl">🎛️</span>
+        <!-- 1. KREATIVE & STYLISCHE STARTSEITE (Künstler-Hub) -->
+        <div id="view-home" class="view-page w-full py-4 space-y-6 text-left">
+            
+            <!-- Hero Card -->
+            <div class="bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-purple-500/30 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl"></div>
+                <span class="inline-block text-4xl p-3 bg-purple-600/20 rounded-2xl mb-3 border border-purple-500/30">🎛️</span>
+                <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">jackdarckart</h1>
+                <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">Official Music Hub • Meckenheim, NRW</p>
+                <p class="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto">
+                    Willkommen im kreativen Universum von jackdarckart. Erleben Sie professionelle Sound-Produktionen, moderne Web-Projekte und immersive Audiowelten.
+                </p>
+                <div class="mt-6 flex flex-wrap justify-center gap-3">
+                    <button onclick="switchView('game')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
+                        <span>🎵</span> Zum Beat-Lab Studio
+                    </button>
+                    <a href="https://laut.fm/jackdarckart" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-500/30 font-semibold py-3 px-6 rounded-2xl text-xs sm:text-sm transition flex items-center gap-2">
+                        <span>📻</span> laut.fm Stream
+                    </a>
+                </div>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">Jack's Beat-Lab</h1>
-            <p class="text-gray-400 text-xs sm:text-sm mb-8 leading-relaxed">
-                Willkommen auf deiner offiziellen Willkommensseite! Hier ist alles ruhig. Wähle unten deinen Bereich aus.
-            </p>
 
-            <div class="space-y-3">
-                <button onclick="switchView('game')" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-xl text-sm transition flex items-center justify-center gap-2">
-                    <span>🎵</span> Zum Beat-Lab (Game-Seite)
-                </button>
-                <button onclick="switchView('garten')" class="w-full bg-gray-800 text-gray-200 font-semibold py-3 px-6 rounded-2xl border border-gray-700 text-sm transition flex items-center justify-center gap-2">
-                    <span>🌱</span> Zum HD-Garten
+            <!-- Discography & Tracks Showcase -->
+            <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl space-y-4">
+                <h2 class="text-lg font-bold text-indigo-400 flex items-center gap-2">💿 Veröffentlichungen & Highlights</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
+                        <span class="text-xs text-purple-400 font-semibold">Hip-Hop / Rap (2026)</span>
+                        <h3 class="font-bold text-sm text-white">„Die Macht In Uns“</h3>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Kraftvolle Beats & treibende Lyrics.</p>
+                    </div>
+                    <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
+                        <span class="text-xs text-emerald-400 font-semibold">German Pop (2024)</span>
+                        <h3 class="font-bold text-sm text-white">„Dromedary Gletscher“</h3>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Atmosphärische Klanglandschaften.</p>
+                    </div>
+                    <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
+                        <span class="text-xs text-blue-400 font-semibold">Deutschrap</span>
+                        <h3 class="font-bold text-sm text-white">„Das Sompo Museum“</h3>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Kulturelle Tiefe im modernen Rap-Stil.</p>
+                    </div>
+                    <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
+                        <span class="text-xs text-pink-400 font-semibold">Pop Deutsch & Suno</span>
+                        <h3 class="font-bold text-sm text-white">„Stolz auf Deutschland“ & „Die Stunden Fliegen“</h3>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Vielseitige Pop- & Club-Produktionen.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radio & Streaming Integration -->
+            <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-left">
+                    <h2 class="text-md font-bold text-cyan-400">🌐 Web-Streaming & Community</h2>
+                    <p class="text-xs text-gray-400 mt-1">Verfolgen Sie die Radio-Präsenz auf laut.fm, Streema und radio.de oder vernetzen Sie sich via GitHub & Cloud-Hubs.</p>
+                </div>
+                <button onclick="switchView('cloud')" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-5 rounded-2xl text-xs transition shrink-0">
+                    ☁️ Cloud & Sync öffnen
                 </button>
             </div>
+
         </div>
 
         <!-- 2. GAME-SEITE (Beat-Lab) -->
@@ -146,7 +188,7 @@
 
     <!-- Footer -->
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
-        <div class="max-w-md mx-auto flex justify-between items-center text-xs text-gray-400">
+        <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Automatisch gespeichert</span>
             <button onclick="resetGame()" class="text-red-400 hover:underline">Zurücksetzen</button>
         </div>
@@ -165,7 +207,7 @@
 
         let audioCtx = null;
         function playBeatSound() {
-            if (!soundEnabled || currentView === 'home') return; // Stumm auf der Startseite, aktiv auf Game & Garten!
+            if (!soundEnabled || currentView === 'home') return; // Stumm auf Startseite, aktiv auf Game & Garten!
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -202,7 +244,6 @@
             let target = document.getElementById('view-' + view);
             if (target) target.classList.remove('hidden');
 
-            // Admin / Account Felder beim Öffnen befüllen
             if (view === 'admin') {
                 document.getElementById('admin-beats-input').value = Math.floor(beats);
                 document.getElementById('admin-fans-input').value = fans;
@@ -213,7 +254,6 @@
                 document.getElementById('reg-email').value = localStorage.getItem('beat_lab_email') || '';
             }
 
-            // Navigation aktiv markieren
             ['home', 'game', 'garten', 'cloud', 'account', 'admin'].forEach(v => {
                 let b = document.getElementById('nav-' + v);
                 if (b) {
