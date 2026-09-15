@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- High-End Studio Synthesizer & Tycoon-Logik (BPS nutzt exakt denselben Sound) -->
+    <!-- High-End Studio Synthesizer & Tycoon-Logik (Synchroner BPS-Takt) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -539,7 +539,7 @@
                 });
             }
 
-            // High-End Studio Synthesizer (Wird sowohl für manuelle Klicks als auch für BPS verwendet)
+            // High-End Studio Synthesizer (Identischer Sound für manuelle Klicks & BPS)
             let audioCtx = null;
             const studioPatches = [
                 { type: 'sawtooth', base: 130.81, detune: -6, cutoff: 1400, decay: 0.28 },
@@ -763,7 +763,7 @@
             bindClick('buy-rig-btn', buyRig);
             bindClick('buy-album-btn', buyAlbum);
             bindClick('buy-ai-btn', buyAI);
-            bindTest = bindClick('stake-btn', stakeBeats);
+            bindClick('stake-btn', stakeBeats);
             bindClick('unstake-btn', unstakeBeats);
             bindClick('game-to-home-btn', () => switchView('home'));
             bindClick('garten-to-home-btn', () => switchView('home'));
@@ -798,21 +798,20 @@
                 });
             }
 
-            // Automatischer BPS-Loop: Löst exakt dieselben Klick-Töne aus, sobald volle Beats generiert werden
-            let backgroundBeatAccumulator = 0;
+            // 1. Zähl-Loop (aktualisiert die Beats flüssig alle 100ms)
             setInterval(() => {
                 if (loggedInUser && bps > 0) {
-                    let generated = bps / 10;
-                    beats += generated;
+                    beats += bps / 10;
                     updateDisplay();
-
-                    backgroundBeatAccumulator += generated;
-                    if (backgroundBeatAccumulator >= 1.0) {
-                        backgroundBeatAccumulator -= 1.0;
-                        playBeatSound(); // Nutzt exakt dieselbe High-End Sound-Engine wie manuelles Klicken!
-                    }
                 }
             }, 100);
+
+            // 2. Synthesizer-Takt-Loop (spielt genau 1 sauberen Studio-Ton pro Sekunde im Hintergrund ab, wenn BPS aktiv ist)
+            setInterval(() => {
+                if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
+                    playBeatSound();
+                }
+            }, 1000);
 
             setInterval(() => { saveGame(); }, 5000);
 
