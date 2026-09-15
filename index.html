@@ -11,7 +11,7 @@
 
     <!-- Header / Navigation -->
     <header class="w-full border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/95 px-4 py-3">
-        <div class="max-w-5xl mx-auto flex justify-between items-center overflow-x-auto">
+        <div class="max-w-6xl mx-auto flex justify-between items-center overflow-x-auto">
             <div class="flex items-center space-x-2 shrink-0">
                 <span class="text-xl p-1.5 bg-purple-600/20 rounded-xl border border-purple-500/30">☁️</span>
                 <span id="user-display" class="font-extrabold text-sm tracking-wide bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">jackdarckart</span>
@@ -29,7 +29,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-5xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
+    <main class="max-w-6xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         
         <!-- 1. DASHBOARD -->
         <div id="view-home" class="view-page hidden w-full py-4 space-y-6 text-left">
@@ -109,7 +109,7 @@
             </div>
         </div>
 
-        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO -->
+        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO (GROß, HD & VOLL RESPONSIV) -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             <div id="garten-auth-container" class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl max-w-md mx-auto text-left">
                 <h2 class="text-xl font-bold text-emerald-400">Bio-Garden Access Gateway</h2>
@@ -117,10 +117,10 @@
                 <button type="button" id="garten-to-game-login-btn" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm mt-3">Zum Login</button>
             </div>
 
-            <div id="garten-main-container" class="hidden bg-[#131b2e] border border-emerald-500/40 p-5 sm:p-8 rounded-3xl shadow-2xl space-y-5">
+            <div id="garten-main-container" class="hidden bg-[#101722] border border-emerald-500/40 p-5 sm:p-8 rounded-3xl shadow-2xl space-y-5">
                 <div>
                     <span class="text-4xl mb-2 block">🏡</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-emerald-400 mb-1">Architektur-Garten &amp; Webradio</h2>
+                    <h2 class="text-2xl sm:text-3xl font-black text-emerald-400 mb-1">Architektur-Landschaftsgarten &amp; Webradio</h2>
                     <div id="current-song-display" class="text-xs sm:text-sm text-emerald-300 bg-[#080c14] border border-emerald-500/30 py-1.5 px-4 rounded-xl mt-2 inline-block shadow-inner">
                         🎶 Lade Song...
                     </div>
@@ -137,16 +137,16 @@
                 </div>
                 <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- Großes, responsives HD-Canvas im Architektur-Stil -->
-                <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-2xl bg-[#e6ede4]">
-                    <canvas id="garden-canvas" width="1100" height="750" class="w-full h-auto cursor-pointer block"></canvas>
+                <!-- Großes, ultra-detailliertes & voll responsives HD-Canvas -->
+                <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)] bg-[#d2e8cc]">
+                    <canvas id="garden-canvas" width="1400" height="900" class="w-full h-auto object-contain cursor-pointer block"></canvas>
                 </div>
 
                 <!-- Pflanzen & Interaktions-Buttons -->
                 <div class="flex justify-center items-center gap-3 pt-2 flex-wrap">
-                    <button type="button" id="plant-1-btn" class="bg-[#0b0f19] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌿 Gräser pflanzen (+2)</button>
-                    <button type="button" id="plant-2-btn" class="bg-[#0b0f19] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌸 Blumenbeet (+5)</button>
-                    <button type="button" id="plant-3-btn" class="bg-[#0b0f19] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌳 Kugelbaum (+10)</button>
+                    <button type="button" id="plant-1-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌿 Gräser pflanzen (+2)</button>
+                    <button type="button" id="plant-2-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌸 Blumenbeet (+5)</button>
+                    <button type="button" id="plant-3-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌳 Kugelbaum (+10)</button>
                 </div>
 
                 <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">← Dashboard</button>
@@ -183,7 +183,7 @@
 
     <!-- Footer -->
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
-        <div class="max-w-3xl mx-auto flex justify-between items-center text-xs text-gray-400">
+        <div class="max-w-4xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Auto-gesichert</span>
             <span class="text-gray-500">CloudBeats Ecosystem</span>
         </div>
@@ -364,139 +364,161 @@
                 });
             }
 
-            // --- ARCHITEKTUR-GARTEN CANVAS (EXAKT WIE AUF DER SKIZZE) ---
+            // --- ULTRA-DETAILREICHES ARCHITEKTUR-CANVAS (HD & RESPONSIV) ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
-            let userElements = [];
+            let customPlants = [];
 
             function addGardenElement(type) {
-                let rx = 150 + Math.random() * 800;
-                let ry = 150 + Math.random() * 350;
-                userElements.push({ x: rx, y: ry, type: type });
-                ripples.push({ x: rx, y: ry, radius: 10, alpha: 1.0 });
+                let rx = 150 + Math.random() * 1100;
+                let ry = 150 + Math.random() * 550;
+                customPlants.push({ x: rx, y: ry, type: type });
+                ripples.push({ x: rx, y: ry, radius: 12, alpha: 1.0 });
             }
 
             function drawGarden() {
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 150) + 1) / 2 : 0.1;
+                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 140) + 1) / 2 : 0.1;
 
-                // 1. Rasenfläche (Hintergrund im hellen Architekten-Stil)
-                ctx.fillStyle = '#b5e48c';
+                // 1. Hintergrund-Rasen (Edler Architekten-Lawn mit Struktur)
+                let lawnGrad = ctx.createLinearGradient(0, 0, 0, 900);
+                lawnGrad.addColorStop(0, '#c2f8cb');
+                lawnGrad.addColorStop(0.5, '#a3e635');
+                lawnGrad.addColorStop(1, '#84cc16');
+                ctx.fillStyle = lawnGrad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Feine Rasen-Textur / Struktur
-                ctx.fillStyle = '#99d98c';
-                for (let i = 0; i < canvas.width; i += 40) {
-                    ctx.fillRect(i, 0, 20, canvas.height);
+                // Feine Rasenstreifen
+                ctx.fillStyle = 'rgba(74, 222, 128, 0.25)';
+                for (let i = 0; i < canvas.width; i += 60) {
+                    ctx.fillRect(i, 0, 30, canvas.height);
                 }
 
-                // 2. Rechteckiger moderner Teich (Rechts unten)
-                ctx.fillStyle = '#2a9d8f';
-                ctx.fillRect(620, 360, 320, 240);
-                let pondGrad = ctx.createLinearGradient(620, 360, 940, 600);
-                pondGrad.addColorStop(0, '#48cae4');
-                pondGrad.addColorStop(1, '#0077b6');
+                // 2. Moderner rechteckiger Teich (Rechts unten) mit Reflexionen
+                ctx.fillStyle = '#0284c7';
+                ctx.fillRect(820, 480, 480, 320);
+                let pondGrad = ctx.createLinearGradient(820, 480, 1300, 800);
+                pondGrad.addColorStop(0, '#38bdf8');
+                pondGrad.addColorStop(0.5, '#0ea5e9');
+                pondGrad.addColorStop(1, '#0369a1');
                 ctx.fillStyle = pondGrad;
-                ctx.fillRect(630, 370, 300, 220);
+                ctx.fillRect(835, 495, 450, 290);
 
-                // Brunnenfontäne im Teich mit Takt-Puls
-                ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + pulse * 0.5})`;
-                ctx.lineWidth = 3;
+                // Teich-Schilf / Uferbepflanzung
+                ctx.fillStyle = '#166534';
+                for(let s=0; s<12; s++) {
+                    ctx.fillRect(820 + s*35, 470, 4, 30);
+                    ctx.fillStyle = '#ca8a04';
+                    ctx.fillRect(820 + s*35, 465, 4, 8); // Kolben
+                    ctx.fillStyle = '#166534';
+                }
+
+                // Brunnenfontäne im Teich mit Puls
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.6 + pulse * 0.4})`;
+                ctx.lineWidth = 4;
                 ctx.beginPath();
-                ctx.arc(780, 480, 20 + (pulse * 15), 0, Math.PI * 2);
+                ctx.arc(1060, 640, 25 + (pulse * 20), 0, Math.PI * 2);
                 ctx.stroke();
 
-                // 3. Rechteckiger Kies- / Schottergarten & Steinterrassen-Platten (Links)
-                ctx.fillStyle = '#d8f3dc';
-                ctx.fillRect(120, 150, 480, 350);
-
-                // Dunkle Steinfliessen / Platten im Muster
-                ctx.fillStyle = '#495057';
-                for (let r = 0; r < 5; r++) {
-                    ctx.fillRect(160 + r * 65, 320 + r * 30, 70, 35);
+                // 3. Kies- & Schotterbereich mit modernen Schiefer-Trittplatten (Links)
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fillRect(150, 180, 600, 450);
+                // Kies-Textur
+                ctx.fillStyle = '#cbd5e1';
+                for(let k=0; k<400; k++) {
+                    let kx = 160 + Math.random() * 580;
+                    let ky = 190 + Math.random() * 430;
+                    ctx.fillRect(kx, ky, 3, 3);
                 }
 
-                // 4. Holzterrasse im Vordergrund (Unten) mit Tisch & Stühlen
-                ctx.fillStyle = '#dda15e';
-                ctx.fillRect(200, 600, 750, 130);
-                ctx.strokeStyle = '#bc6c25';
+                // Dunkle Steinfliesen (Schieferplatten diagonal/versetzt)
+                ctx.fillStyle = '#334155';
+                for (let r = 0; r < 7; r++) {
+                    ctx.fillRect(200 + r * 65, 360 + r * 35, 80, 40);
+                }
+
+                // 4. Holzterrasse im Vordergrund (Unten) mit feiner Maserung & Möbeln
+                ctx.fillStyle = '#b45309';
+                ctx.fillRect(250, 750, 900, 140);
+                ctx.strokeStyle = '#78350f';
                 ctx.lineWidth = 2;
-                for (let x = 200; x < 950; x += 30) {
-                    ctx.beginPath(); ctx.moveTo(x, 600); ctx.lineTo(x, 730); ctx.stroke();
+                for (let x = 250; x < 1150; x += 35) {
+                    ctx.beginPath(); ctx.moveTo(x, 750); ctx.lineTo(x, 890); ctx.stroke();
                 }
-                // Terrassentisch
-                ctx.fillStyle = '#6f1d1b';
-                ctx.fillRect(500, 640, 120, 60);
+                // Terrassentisch & Stühle
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(625, 790, 150, 70);
 
                 // 5. Kugelbäume (Topiary / Buchsbaumkugeln auf Stamm)
                 function drawTopiary(bx, by) {
-                    ctx.fillStyle = '#3a5a40';
-                    ctx.fillRect(bx - 6, by, 12, 60); // Stamm
-                    ctx.fillStyle = '#588157';
-                    ctx.beginPath(); ctx.arc(bx, by - 15, 35 * (1 + pulse * 0.08), 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#a3b18a';
-                    ctx.beginPath(); ctx.arc(bx - 8, by - 25, 15, 0, Math.PI * 2); ctx.fill(); // Glanzpunkt
+                    ctx.fillStyle = '#3f3f46';
+                    ctx.fillRect(bx - 8, by, 16, 80); // Stamm
+                    ctx.fillStyle = '#15803d';
+                    ctx.beginPath(); ctx.arc(bx, by - 20, 42 * (1 + pulse * 0.08), 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#4ade80';
+                    ctx.beginPath(); ctx.arc(bx - 10, by - 32, 18, 0, Math.PI * 2); ctx.fill(); // Glanzpunkt
                 }
-                drawTopiary(220, 240);
-                drawTopiary(320, 240);
-                drawTopiary(440, 260);
-                drawTopiary(540, 260);
+                drawTopiary(260, 260);
+                drawTopiary(380, 260);
+                drawTopiary(540, 280);
+                drawTopiary(660, 280);
 
-                // 6. Großer Baum oben rechts
-                ctx.fillStyle = '#3a5a40';
-                ctx.fillRect(830, 80, 25, 120);
-                ctx.fillStyle = '#588157';
-                ctx.beginPath(); ctx.arc(845, 60, 75 * (1 + pulse * 0.05), 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#a3b18a';
-                ctx.beginPath(); ctx.arc(820, 45, 45, 0, Math.PI * 2); ctx.fill();
+                // 6. Großer, mächtiger Baum oben rechts
+                ctx.fillStyle = '#27272a';
+                ctx.fillRect(1080, 80, 30, 150);
+                ctx.fillStyle = '#14532d';
+                ctx.beginPath(); ctx.arc(1095, 60, 95 * (1 + pulse * 0.05), 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#22c55e';
+                ctx.beginPath(); ctx.arc(1055, 40, 55, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(1135, 45, 55, 0, Math.PI * 2); ctx.fill();
 
-                // 7. Farbenprächtige Blumenbeete (Seitenränder in Pink, Lila, Blau)
-                function drawFlowerBed(fx, fy, fw, fh, color1, color2) {
-                    ctx.fillStyle = color1;
+                // 7. Farbenprächtige Blumenbeete & Staudenrabatten (Seitenränder)
+                function drawRichFlowerBed(fx, fy, fw, fh, mainCol, accentCol) {
+                    ctx.fillStyle = mainCol;
                     ctx.fillRect(fx, fy, fw, fh);
-                    // Blumenpunkte
-                    for (let f = 0; f < 15; f++) {
-                        ctx.fillStyle = f % 2 === 0 ? color2 : '#ffffff';
+                    // Dichte Blumencluster
+                    for (let f = 0; f < 35; f++) {
+                        ctx.fillStyle = f % 2 === 0 ? accentCol : '#ffffff';
                         ctx.beginPath();
-                        ctx.arc(fx + Math.random() * fw, fy + Math.random() * fh, 5 + Math.random() * 5, 0, Math.PI * 2);
+                        ctx.arc(fx + Math.random() * fw, fy + Math.random() * fh, 6 + Math.random() * 8, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 }
-                // Rechtes Blumenbeet (Staudenrabatte)
-                drawFlowerBed(950, 180, 110, 420, '#b5179e', '#7209b7');
+                // Rechtes Blumenbeet (Staudenmeer)
+                drawRichFlowerBed(1300, 150, 80, 600, '#a21caf', '#e879f9');
                 // Linkes Blumenbeet
-                drawFlowerBed(40, 380, 80, 250, '#f72585', '#4cc9f0');
+                drawRichFlowerBed(30, 400, 90, 300, '#db2777', '#f472b6');
 
                 // 8. Benutzer-gepflanzte Elemente
-                userElements.forEach(el => {
+                customPlants.forEach(el => {
                     ctx.save();
                     ctx.translate(el.x, el.y);
                     if (el.type === 'grass') {
-                        ctx.fillStyle = '#2d6a4f';
-                        ctx.fillRect(-15, -10, 30, 20);
+                        ctx.fillStyle = '#166534';
+                        ctx.fillRect(-18, -12, 36, 24);
                     } else if (el.type === 'flowers') {
-                        ctx.fillStyle = '#ff758f';
-                        ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI*2); ctx.fill();
-                        ctx.fillStyle = '#ffb3c6';
-                        ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#f43f5e';
+                        ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#fde047';
+                        ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.fill();
                     } else if (el.type === 'tree') {
                         drawTopiary(0, 0);
                     }
                     ctx.restore();
                 });
 
-                // Ripples
+                // Dynamische Wasser-Ripples
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 2.5;
-                    rip.alpha -= 0.02;
+                    rip.radius += 3;
+                    rip.alpha -= 0.015;
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
                     } else {
-                        ctx.strokeStyle = `rgba(0, 119, 182, ${rip.alpha})`;
-                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${rip.alpha})`;
+                        ctx.lineWidth = 2.5;
                         ctx.beginPath();
                         ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
                         ctx.stroke();
@@ -515,8 +537,8 @@
                     const clickX = (e.clientX - rect.left) * scaleX;
                     const clickY = (e.clientY - rect.top) * scaleY;
 
-                    userElements.push({ x: clickX, y: clickY, type: 'flowers' });
-                    ripples.push({ x: clickX, y: clickY, radius: 8, alpha: 1.0 });
+                    customPlants.push({ x: clickX, y: clickY, type: 'flowers' });
+                    ripples.push({ x: clickX, y: clickY, radius: 10, alpha: 1.0 });
 
                     beats += 5;
                     updateDisplay();
