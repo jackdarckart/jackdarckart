@@ -238,7 +238,7 @@
                             <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">💎 Beat-Staking Pool</h3>
                             <span id="staked-count" class="text-xs text-emerald-300">Gesperrt: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Sperre Beats im Pool für passive Zinsen (+10% BPS Ertrag).</p>
+                        <p class="text-[11px] text-gray-400">Sperre Beats im Pool für passive Zinsen (+0.5 BPS Bonus).</p>
                         <div class="flex gap-2">
                             <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">100 Staken</button>
                             <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 rounded-xl text-xs transition shadow">Unstake</button>
@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Ressourcensparende Tycoon-Logik -->
+    <!-- Tycoon-Logik mit dynamischen Leucht- und Pulsier-Effekten -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -361,7 +361,6 @@
             let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
             let currentView = localStorage.getItem('beat_lab_current_view') || 'home';
 
-            // Kosten-Variablen
             let rigCost = 50;
             let albumCost = 250;
             let aiCost = 1000;
@@ -540,7 +539,6 @@
                 });
             }
 
-            // Sound generator
             let audioCtx = null;
             function playBeatSound() {
                 if (!soundEnabled || currentView === 'home') return;
@@ -607,8 +605,8 @@
                 if (beats >= rigCost) {
                     beats -= rigCost;
                     rigs += 1;
-                    hashRate += 5; // +5 TH/s pro Rig
-                    bps += 1.0;    // +1 BPS pro Rig
+                    hashRate += 5;
+                    bps += 1.0;
                     rigCost = Math.floor(rigCost * 1.35);
                     updateDisplay();
                     saveGame();
@@ -621,8 +619,8 @@
                 if (beats >= albumCost) {
                     beats -= albumCost;
                     albums += 1;
-                    fans += 50;    // +50 Fans
-                    bps += 2.0;    // +2 BPS
+                    fans += 50;
+                    bps += 2.0;
                     albumCost = Math.floor(albumCost * 1.5);
                     updateDisplay();
                     saveGame();
@@ -635,7 +633,7 @@
                 if (beats >= aiCost) {
                     beats -= aiCost;
                     aiAgents += 1;
-                    bps += 8.0;    // +8 BPS
+                    bps += 8.0;
                     aiCost = Math.floor(aiCost * 1.4);
                     updateDisplay();
                     saveGame();
@@ -648,7 +646,7 @@
                 if (beats >= 100) {
                     beats -= 100;
                     stakedBeats += 100;
-                    bps += 0.5; // Staking Bonus BPS
+                    bps += 0.5;
                     updateDisplay();
                     saveGame();
                 } else {
@@ -665,6 +663,17 @@
                     saveGame();
                 } else {
                     alert("❌ Keine gestakten Beats vorhanden!");
+                }
+            }
+
+            // Helper zum Verwalten der Leucht- und Pulsier-Effekte
+            function checkAffordability(elementId, cost) {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+                if (beats >= cost) {
+                    el.classList.add('animate-pulse', 'ring-2', 'ring-offset-2', 'ring-offset-[#131b2e]', 'shadow-lg');
+                } else {
+                    el.classList.remove('animate-pulse', 'ring-2', 'ring-offset-2', 'ring-offset-[#131b2e]', 'shadow-lg');
                 }
             }
 
@@ -687,6 +696,12 @@
                 if(document.getElementById('ai-count')) document.getElementById('ai-count').innerText = "Agenten: " + aiAgents;
                 if(document.getElementById('ai-cost')) document.getElementById('ai-cost').innerText = aiCost;
                 if(document.getElementById('staked-count')) document.getElementById('staked-count').innerText = "Gesperrt: " + stakedBeats;
+
+                // Dynamisches Leuchten prüfen, wenn genug Guthaben da ist
+                checkAffordability('buy-rig-btn', rigCost);
+                checkAffordability('buy-album-btn', albumCost);
+                checkAffordability('buy-ai-btn', aiCost);
+                checkAffordability('stake-btn', 100);
             }
 
             // Event Bindings
