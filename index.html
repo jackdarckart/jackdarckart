@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | Offizielles Musik-Hub & Beat-Lab</title>
+    <title>jackdarckart | Offizielles Musik- & Kunst-Hub</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -35,51 +35,80 @@
     <!-- Main Content Container -->
     <main class="max-w-2xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         
-        <!-- 1. STARTSEITE (Künstler-Hub) -->
+        <!-- 1. STARTSEITE -->
         <div id="view-home" class="view-page w-full py-4 space-y-6 text-left">
+            
+            <!-- Hero Card -->
             <div class="bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-purple-500/30 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl"></div>
                 <span class="inline-block text-4xl p-3 bg-purple-600/20 rounded-2xl mb-3 border border-purple-500/30">🎛️</span>
                 <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">jackdarckart</h1>
-                <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">Offizielles Musik-Hub • Meckenheim, NRW</p>
+                <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">Offizielles Musik- & Kunst-Hub • Meckenheim, NRW</p>
                 <p class="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto">
-                    Willkommen im kreativen Universum von jackdarckart. Professionelle Sound-Produktionen, moderne Web-Projekte und immersive Audiowelten.
+                    Willkommen im kreativen Universum von jackdarckart. Entdecke professionelle Audioproduktionen, immersive Soundwelten und interaktive Web-Projekte.
                 </p>
                 <div class="mt-6 flex flex-wrap justify-center gap-3">
                     <button onclick="switchView('game')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
                         <span>🎵</span> Zum Beat-Lab Studio
                     </button>
                     <a href="https://laut.fm/jackdarckart" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-500/30 font-semibold py-3 px-6 rounded-2xl text-xs sm:text-sm transition flex items-center gap-2">
-                        <span>📻</span> laut.fm Stream
+                        <span>📻</span> laut.fm Webradio ↗
                     </a>
                 </div>
             </div>
 
-            <!-- Discography Showcase -->
+            <!-- Discography & Tracks Showcase -->
             <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl space-y-4">
-                <h2 class="text-lg font-bold text-indigo-400 flex items-center gap-2">💿 Veröffentlichungen & Highlights</h2>
+                <h2 class="text-lg font-bold text-indigo-400 flex items-center gap-2">💿 Diskografie & Veröffentlichungen</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-purple-400 font-semibold">Hip-Hop / Rap (2026)</span>
                         <h3 class="font-bold text-sm text-white">„Die Macht In Uns“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Kraftvolle Beats & treibende Lyrics.</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Kraftvolle Beats, tiefe Lyrics & moderne Club-Ästhetik.</p>
                     </div>
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-emerald-400 font-semibold">German Pop (2024)</span>
                         <h3 class="font-bold text-sm text-white">„Dromedary Gletscher“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Atmosphärische Klanglandschaften.</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Atmosphärische Soundscapes & experimentelle Pop-Vibes.</p>
                     </div>
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-blue-400 font-semibold">Deutschrap</span>
                         <h3 class="font-bold text-sm text-white">„Das Sompo Museum“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Kulturelle Tiefe im modernen Rap-Stil.</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Kulturelle Tiefe, urbane Rhythmen & prägnanter Flow.</p>
                     </div>
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-pink-400 font-semibold">Pop Deutsch & Suno</span>
                         <h3 class="font-bold text-sm text-white">„Stolz auf Deutschland“ & „Die Stunden Fliegen“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Vielseitige Pop- & Club-Produktionen.</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Vielseitige Produktionen zwischen Club-Hymne und Melancholie.</p>
                     </div>
                 </div>
             </div>
+
+            <!-- Netzwerke (Ohne DeviantArt) -->
+            <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl space-y-4">
+                <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2">🌐 Offizielle Netzwerke</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <a href="https://github.com/jackdarckart/CloudBieats-Hub" target="_blank" class="bg-[#0b0f19]/70 hover:bg-[#0b0f19] border border-purple-500/30 p-4 rounded-2xl transition block text-center group">
+                        <span class="text-2xl block mb-1">💻</span>
+                        <h3 class="font-bold text-xs text-purple-300 group-hover:underline">GitHub CloudBieats ↗</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Open Source Web-Dev & Deployments.</p>
+                    </a>
+                    <a href="https://www.reddit.com/user/jackdarckart" target="_blank" class="bg-[#0b0f19]/70 hover:bg-[#0b0f19] border border-orange-500/30 p-4 rounded-2xl transition block text-center group">
+                        <span class="text-2xl block mb-1">💬</span>
+                        <h3 class="font-bold text-xs text-orange-300 group-hover:underline">Reddit Pro Hub ↗</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Verified Community & Trends.</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bio & Background Details -->
+            <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl space-y-2 text-xs text-gray-300 leading-relaxed">
+                <h2 class="text-sm font-bold text-amber-400 mb-1">📍 Über den Creator & Standort</h2>
+                <p>
+                    Ansässig in <strong class="text-white">Meckenheim (Nordrhein-Westfalen)</strong>, vereint jackdarckart musikalische Sound-Engineering-Leidenschaft mit moderner Web-Technologie. Ob im Webradio über <a href="https://laut.fm/jackdarckart" target="_blank" class="text-emerald-400 underline">laut.fm</a>, durch automatisierte GitHub-Workflows oder als interaktives Fan-Spiel (Beat-Lab) – hier entsteht ein nahtloses Ökosystem für Audiokultur.
+                </p>
+            </div>
+
         </div>
 
         <!-- 2. GAME-SEITE (Beat-Lab) -->
