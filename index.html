@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- High-End Studio Synthesizer & Tycoon-Logik (mit aktivem BPS-Sound) -->
+    <!-- High-End Studio Synthesizer & Tycoon-Logik (BPS nutzt exakt denselben Sound) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -539,7 +539,7 @@
                 });
             }
 
-            // High-End Studio Synthesizer für manuelle Klicks
+            // High-End Studio Synthesizer (Wird sowohl für manuelle Klicks als auch für BPS verwendet)
             let audioCtx = null;
             const studioPatches = [
                 { type: 'sawtooth', base: 130.81, detune: -6, cutoff: 1400, decay: 0.28 },
@@ -598,37 +598,6 @@
                     osc2.start(now);
                     osc1.stop(now + patch.decay);
                     osc2.stop(now + patch.decay);
-                } catch (e) {}
-            }
-
-            // Sanfter Hintergrund-Sound für aktive BPS (läuft im Takt mit)
-            function playBpsBackgroundSound() {
-                if (!soundEnabled || currentView === 'home') return;
-                try {
-                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    if (audioCtx.state === 'suspended') audioCtx.resume();
-
-                    const now = audioCtx.currentTime;
-                    let osc = audioCtx.createOscillator();
-                    let filter = audioCtx.createBiquadFilter();
-                    let gain = audioCtx.createGain();
-
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(220, now); // warmer Grundton
-
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(1200, now);
-
-                    gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.15, now + 0.05); // dezent leiser als manuelle Klicks
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(audioCtx.destination);
-
-                    osc.start(now);
-                    osc.stop(now + 0.4);
                 } catch (e) {}
             }
 
@@ -794,7 +763,7 @@
             bindClick('buy-rig-btn', buyRig);
             bindClick('buy-album-btn', buyAlbum);
             bindClick('buy-ai-btn', buyAI);
-            bindClick('stake-btn', stakeBeats);
+            bindTest = bindClick('stake-btn', stakeBeats);
             bindClick('unstake-btn', unstakeBeats);
             bindClick('game-to-home-btn', () => switchView('home'));
             bindClick('garten-to-home-btn', () => switchView('home'));
@@ -829,18 +798,18 @@
                 });
             }
 
-            // Hintergrund-Loop für BPS (produziert Beats & spielt rhythmischen Studio-Sound ab)
-            let bpsSoundCounter = 0;
+            // Automatischer BPS-Loop: Löst exakt dieselben Klick-Töne aus, sobald volle Beats generiert werden
+            let backgroundBeatAccumulator = 0;
             setInterval(() => {
                 if (loggedInUser && bps > 0) {
-                    beats += bps / 10;
+                    let generated = bps / 10;
+                    beats += generated;
                     updateDisplay();
 
-                    // Spiele etwa einmal pro Sekunde (alle 10 Ticks) einen dezenten Hintergrundton ab
-                    bpsSoundCounter += 1;
-                    if (bpsSoundCounter >= 10) {
-                        bpsSoundCounter = 0;
-                        playBpsBackgroundSound();
+                    backgroundBeatAccumulator += generated;
+                    if (backgroundBeatAccumulator >= 1.0) {
+                        backgroundBeatAccumulator -= 1.0;
+                        playBeatSound(); // Nutzt exakt dieselbe High-End Sound-Engine wie manuelles Klicken!
                     }
                 }
             }, 100);
