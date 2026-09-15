@@ -462,15 +462,15 @@
                 </div>
             </div>
 
-            <!-- DER LEBENDIGE, MUSIK-REAKTIVE GARTENPLAN (CANVAS) -->
+            <!-- HOCHAUFLÖSENDER, 60-FPS GARTENPLAN -->
             <div class="bg-cardbg border-2 border-emerald-500/60 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
                 
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-gray-800 pb-4">
                     <div>
                         <h3 class="text-xl font-black text-white flex items-center space-x-3">
-                            <span>Interaktiver Gartenplan (Musik-Takt & Bio-Rhythmus) 🌿🎵</span>
+                            <span>HD-Gartenplan & Musik-Bio-Rhythmus 🌿✨</span>
                         </h3>
-                        <p class="text-xs text-gray-400 mt-1">Dein Garten pulsiert im Takt der Beats und entfaltet sich lebendig mit jedem Upgrade!</p>
+                        <p class="text-xs text-gray-400 mt-1">Flüssige High-End Animationen: Pflanzen atmen im Takt, Partikel schweben im Garten.</p>
                     </div>
                     <div class="flex flex-wrap gap-2 text-xs">
                         <button onclick="feedPlant(0)" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-3 py-1.5 rounded-lg transition">Stauden düngen (<span id="btnCost0">50</span> B)</button>
@@ -481,7 +481,7 @@
 
                 <!-- CANVAS ELEMENT -->
                 <div class="relative w-full flex justify-center bg-darkbg rounded-2xl p-2 border border-emerald-900/50 shadow-inner">
-                    <canvas id="gardenCanvas" width="800" height="650" class="w-full max-w-3xl rounded-xl cursor-pointer border border-emerald-500/30"></canvas>
+                    <canvas id="gardenCanvas" width="800" height="650" class="w-full max-w-3xl rounded-xl cursor-pointer border border-emerald-500/30 shadow-2xl"></canvas>
                 </div>
 
             </div>
@@ -697,10 +697,10 @@
             }
         }
 
-        // --- AUDIO SYSTEM & GARTEN-TAKT ---
+        // --- AUDIO SYSTEM ---
         let audioCtx = null;
         let ambientTimer = 0;
-        let gardenPulse = 0; // Puls-Effekt für den Rhythmus
+        let gardenPulse = 0;
 
         function unlockAudio() {
             try {
@@ -727,8 +727,7 @@
                 unlockAudio();
                 if (!audioCtx) return;
 
-                // Takt-Puls für den Garten auslösen
-                gardenPulse = 14;
+                gardenPulse = 18; // Starker optischer Impuls für den Garten
 
                 const now = audioCtx.currentTime;
                 const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66];
@@ -985,8 +984,21 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- GARTEN-CANVAS IM TAKT DER MUSIK ---
-        let pondAnimFrame = 0;
+        // --- HD 60-FPS GARTEN RENDER ENGINE ---
+        let animTime = 0;
+        let particles = [];
+
+        // Partikel initialisieren (Glühwürmchen & Musiknoten)
+        for(let i=0; i<15; i++) {
+            particles.push({
+                x: Math.random() * 800,
+                y: Math.random() * 650,
+                vx: (Math.random() - 0.5) * 0.6,
+                vy: (Math.random() - 0.5) * 0.6,
+                size: Math.random() * 3 + 1,
+                alpha: Math.random() * 0.5 + 0.2
+            });
+        }
 
         function drawGardenPlan() {
             const canvas = document.getElementById('gardenCanvas');
@@ -995,92 +1007,136 @@
             const w = canvas.width;
             const h = canvas.height;
 
-            // Musik-Takt Animationen fortführen
-            pondAnimFrame += 0.08 + (getBps() * 0.002);
-            if (gardenPulse > 0) gardenPulse *= 0.85; // Puls schwingt sanft aus
+            animTime += 0.03 + (getBps() * 0.0005);
+            if (gardenPulse > 0) gardenPulse *= 0.90; // Puls klingen lassen
 
-            // 1. Rasen-Hintergrund (pulsierend bei High-BPS)
-            ctx.fillStyle = '#1e3a29';
+            // 1. Edler Rasen-Verlauf mit stimmungsvollem Vignettierungs-Glow
+            let bgGrad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w);
+            bgGrad.addColorStop(0, '#163824');
+            bgGrad.addColorStop(1, '#0c1f14');
+            ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, w, h);
 
-            // 2. Umrandende Hecke
+            // 2. Umrandende Hecke mit Textur & Schatten
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
             ctx.fillStyle = '#0f2918';
-            ctx.fillRect(0, 0, w, 20);
-            ctx.fillRect(0, 0, 20, h);
-            ctx.fillRect(w - 20, 0, 20, h);
-            ctx.fillRect(0, h - 20, w, 20);
+            ctx.fillRect(0, 0, w, 22);
+            ctx.fillRect(0, 0, 22, h);
+            ctx.fillRect(w - 22, 0, 22, h);
+            ctx.fillRect(0, h - 22, w, 22);
+            ctx.shadowBlur = 0; // Schatten zurücksetzen
 
-            // 3. Holzterrasse (unten)
-            ctx.fillStyle = '#8b5a2b';
+            // 3. Holzterrasse mit feiner Maserung & Glanz
+            ctx.fillStyle = '#784c25';
             ctx.fillRect(150, 480, 500, 150);
-            ctx.strokeStyle = '#5c3a1a';
+            ctx.strokeStyle = '#523318';
             ctx.lineWidth = 2;
             for(let x = 150; x <= 650; x += 25) {
                 ctx.beginPath(); ctx.moveTo(x, 480); ctx.lineTo(x, 630); ctx.stroke();
             }
+            // Holz-Spiegelung / Glow
+            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+            ctx.fillRect(150, 480, 500, 40);
 
-            // Tisch & Stühle auf Holzterrasse (schwingen leicht im Takt)
-            let terraceBounce = Math.sin(pondAnimFrame * 2) * (1 + gardenPulse * 0.2);
-            ctx.fillStyle = '#e2e8f0'; 
+            // Tisch & Stühle auf der Holzterrasse (schwingen im Takt)
+            let terraceBounce = Math.sin(animTime * 3) * (1 + gardenPulse * 0.15);
+            ctx.fillStyle = '#f1f5f9'; 
             ctx.fillRect(360, 530 + terraceBounce, 80, 50);
-            ctx.fillStyle = '#94a3b8'; 
+            ctx.fillStyle = '#cbd5e1'; 
             ctx.fillRect(330, 540 + terraceBounce, 20, 30); 
             ctx.fillRect(450, 540 + terraceBounce, 20, 30);
 
-            // 4. Quadratischer Klang-Teich (Mitte-Rechts mit aktiven Sound-Ripples)
-            ctx.fillStyle = '#334155'; ctx.fillRect(390, 230, 220, 220);
-            ctx.fillStyle = '#0284c7'; ctx.fillRect(400, 240, 200, 200);
-            ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-            ctx.lineWidth = 2 + (gardenPulse * 0.3);
-            let r1 = (Math.sin(pondAnimFrame) * 15 + 30 + gardenPulse * 2);
-            let r2 = (Math.cos(pondAnimFrame) * 20 + 50 + gardenPulse * 3);
+            // 4. HD Klang-Teich mit lebendigen Wellen & Reflexionen
+            let pondGrad = ctx.createRadialGradient(500, 340, 20, 500, 340, 110);
+            pondGrad.addColorStop(0, '#0ea5e9');
+            pondGrad.addColorStop(0.7, '#0284c7');
+            pondGrad.addColorStop(1, '#0369a1');
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(386, 226, 228, 228);
+            ctx.fillStyle = pondGrad; ctx.fillRect(392, 232, 216, 216);
+
+            // Dynamische Wasserwellen
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            ctx.lineWidth = 2 + (gardenPulse * 0.2);
+            let r1 = (Math.sin(animTime * 1.5) * 15 + 35 + gardenPulse * 1.5);
+            let r2 = (Math.cos(animTime * 1.2) * 20 + 55 + gardenPulse * 2.5);
             ctx.beginPath(); ctx.arc(500, 340, Math.abs(r1), 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath(); ctx.arc(500, 340, Math.abs(r2), 0, Math.PI * 2); ctx.stroke();
 
-            // 5. Steinfliesen-Weg & Steingarten (Mitte-Links)
-            ctx.fillStyle = '#64748b';
-            ctx.fillRect(160, 260, 200, 180);
+            // 5. Steinfliesen-Weg & Steingarten
             ctx.fillStyle = '#475569';
+            ctx.fillRect(160, 260, 200, 180);
+            ctx.fillStyle = '#334155';
             for(let y = 280; y < 420; y += 30) {
                 for(let x = 180; x < 340; x += 50) {
                     ctx.fillRect(x, y, 35, 18);
                 }
             }
 
-            // 6. Kugelbäume (Oben Links - Atmen im Rhythmus)
+            // 6. Kugelbäume (Oben Links) mit plastischer Schattierung
             let treeLvl = gameData.garden[1].level;
-            let treeRadius = 30 + Math.min(treeLvl * 2, 12) + (Math.sin(pondAnimFrame) * 3) + gardenPulse;
-            ctx.fillStyle = '#22c55e';
-            ctx.strokeStyle = '#15803d';
-            ctx.lineWidth = 4;
+            let treeRadius = 32 + Math.min(treeLvl * 2, 14) + (Math.sin(animTime * 2) * 3.5) + gardenPulse;
             let treePositions = [[120, 100], [220, 100], [120, 180], [220, 180]];
             treePositions.forEach(pos => {
-                ctx.beginPath(); ctx.arc(pos[0], pos[1], Math.max(10, treeRadius), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                let tGrad = ctx.createRadialGradient(pos[0]-6, pos[1]-6, 5, pos[0], pos[1], treeRadius);
+                tGrad.addColorStop(0, '#4ade80');
+                tGrad.addColorStop(1, '#15803d');
+                ctx.fillStyle = tGrad;
+                ctx.strokeStyle = '#052e16';
+                ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(pos[0], pos[1], Math.max(12, treeRadius), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
             });
 
-            // 7. Großer Solitärbaum (Oben Rechts - Reagiert stark auf Upgrades & Beats)
-            let bigTreeRadius = 55 + (Math.cos(pondAnimFrame) * 4) + (gardenPulse * 1.5);
-            ctx.fillStyle = '#166534';
+            // 7. Großer Solitärbaum (Oben Rechts) mit starkem HD-Glow
+            let bigTreeRadius = 58 + (Math.cos(animTime * 1.8) * 5) + (gardenPulse * 2);
+            let bigGrad = ctx.createRadialGradient(620-10, 100-10, 10, 620, 100, bigTreeRadius);
+            bigGrad.addColorStop(0, '#22c55e');
+            bigGrad.addColorStop(1, '#14532d');
+            ctx.fillStyle = bigGrad;
+            ctx.strokeStyle = '#052e16';
+            ctx.lineWidth = 4;
             ctx.beginPath(); ctx.arc(620, 100, Math.max(20, bigTreeRadius), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
-            // 8. Bunte Blumenrabatten (Leuchten im Takt auf)
+            // 8. Bunte Blumenrabatten (Leuchten und strahlen im Takt)
             let flowerLvl = gameData.garden[0].level;
-            let colors = ['#f472b6', '#a855f7', '#38bdf8', '#facc15'];
-            for(let i = 0; i < 25 + flowerLvl * 5; i++) {
+            let colors = ['#f472b6', '#c084fc', '#38bdf8', '#facc15', '#fb7185'];
+            for(let i = 0; i < 28 + flowerLvl * 6; i++) {
                 ctx.fillStyle = colors[i % colors.length];
                 ctx.beginPath();
-                let flowerScale = 5 + (gardenPulse * 0.4 * (i % 2 === 0 ? 1 : -1));
-                ctx.arc(640 + (i % 3) * 15, 230 + i * 8, Math.max(2, flowerScale), 0, Math.PI * 2);
+                let fSize = 5 + (gardenPulse * 0.4 * (i % 2 === 0 ? 1 : -1));
+                ctx.arc(640 + ((i % 3) * 16), 220 + (i * 7.5), Math.max(2.5, fSize), 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Beschriftung
+            // 9. Schwebende magische Glühwürmchen & Musikpartikel im Garten
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.7)';
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if(p.x < 30 || p.x > w-30) p.vx *= -1;
+                if(p.y < 30 || p.y > h-30) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size + (gardenPulse * 0.1), 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // HD-Beschriftung im Garten
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 12px sans-serif';
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
             ctx.fillText('Holzterrasse & Lounge', 330, 615);
             ctx.fillText('Klang-Teich (Zone C)', 440, 345);
             ctx.fillText('Stauden-Weg (Zone A)', 200, 350);
             ctx.fillText('Kugelbäume (Zone B)', 130, 140);
+            ctx.shadowBlur = 0;
+        }
+
+        // 60-FPS Animationsschleife per requestAnimationFrame
+        function animationLoop() {
+            drawGardenPlan();
+            requestAnimationFrame(animationLoop);
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1099,6 +1155,7 @@
                     else clickBeat();
                 });
             }
+            requestAnimationFrame(animationLoop);
         });
 
         function updateGameUI() {
@@ -1164,9 +1221,7 @@
                     }
                 }
             }
-            // Der Garten läuft jetzt in jedem Frame flüssig und musikalisch mit
-            drawGardenPlan();
-        }, 50); // Erhöhte Bildwiederholrate für butterweiche Takt-Animationen
+        }, 100);
 
         setInterval(function() { 
             if (localStorage.getItem('jackLoggedInEmail')) saveGame(); 
