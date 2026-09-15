@@ -12,6 +12,7 @@
             0% { transform: scale(1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
             50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(168, 85, 247, 0.8); }
             100% { transform: scale(1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+        }
         .audio-pulse { animation: pulseGlow 0.25s ease-in-out; }
     </style>
 </head>
@@ -200,7 +201,7 @@
                     </div>
                 </div>
 
-                <!-- TYCOON UPGRADE SEKTIONEN -->
+                <!-- TYCOON UPGRADE SEKTIONEN (Mit angepassten Button-Beschriftungen) -->
                 <div class="space-y-4 text-left">
                     
                     <!-- 1. HASH-RATE RIGS (GoMining Stil) -->
@@ -211,7 +212,7 @@
                         </div>
                         <p class="text-[11px] text-gray-400">Tokenisierte Rechenleistung für automatische Riff-Power.</p>
                         <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
-                            Miner kaufen (<span id="rig-cost">50</span> Riffs)
+                            ⚡ Miner aktivieren (<span id="rig-cost">50</span> Riffs)
                         </button>
                     </div>
 
@@ -223,7 +224,7 @@
                         </div>
                         <p class="text-[11px] text-gray-400">Veröffentliche Songs in der Cloud für treue Fans (+25 Fans, +0.8 BPS).</p>
                         <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
-                            Album droppen (<span id="album-cost">250</span> Riffs)
+                            💿 Cloud-Release droppen (<span id="album-cost">250</span> Riffs)
                         </button>
                     </div>
 
@@ -235,7 +236,7 @@
                         </div>
                         <p class="text-[11px] text-gray-400">Autonomer Producer für kontinuierliche Riff- & Fan-Generierung.</p>
                         <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
-                            AI-Agenten anheuern (<span id="ai-cost">1000</span> Riffs)
+                            🤖 AI-Producer starten (<span id="ai-cost">1000</span> Riffs)
                         </button>
                     </div>
 
@@ -247,8 +248,8 @@
                         </div>
                         <p class="text-[11px] text-gray-400">Sperre Riffs im Staking-Pool für passive Zinsen & BPS-Bonus.</p>
                         <div class="flex gap-2">
-                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">100 Staken</button>
-                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 rounded-xl text-xs transition shadow">Unstake</button>
+                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">💎 100 Beats staken</button>
+                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 rounded-xl text-xs transition shadow">🔓 Unstake</button>
                         </div>
                     </div>
 
@@ -347,7 +348,7 @@
         </div>
     </footer>
 
-    <!-- POLISHER AUDIO & TYCOON ENGINE -->
+    <!-- ENGINE SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -544,7 +545,7 @@
                 });
             }
 
-            // 🎵 HARMONISCHER NOTENPOOL & AUDIO ENGINE (Zufällige Arpeggios mit optischem Feedback)
+            // 🎵 HARMONISCHER NOTENPOOL & AUDIO ENGINE
             let audioCtx = null;
             const extendedNotePool = [
                 130.81, 146.83, 164.81, 196.00, 220.00, // Tief
@@ -677,7 +678,7 @@
                     updateDisplay();
                     saveGame();
                 } else {
-                    alert("❌ Nicht genug Riffs für einen Session-Gitarristen!");
+                    alert("❌ Nicht genug Riffs für einen AI-Producer!");
                 }
             }
 
@@ -799,7 +800,6 @@
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
-                        // Automatische Arpeggios im Takt der Hintergrund-Riffs
                         if (Math.random() < 0.35 && currentView === 'game') {
                             playRandomMelodySequence();
                         }
