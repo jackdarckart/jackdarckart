@@ -7,10 +7,10 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0b0f19] text-white min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+<body class="bg-[#080c14] text-white min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
     <!-- Header / Navigation -->
-    <header class="w-full border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/95 px-4 py-3">
+    <header class="w-full border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#080c14]/95 px-4 py-3">
         <div class="max-w-6xl mx-auto flex justify-between items-center overflow-x-auto">
             <div class="flex items-center space-x-2 shrink-0">
                 <span class="text-xl p-1.5 bg-purple-600/20 rounded-xl border border-purple-500/30">☁️</span>
@@ -35,13 +35,13 @@
         <div id="view-home" class="view-page hidden w-full py-4 space-y-6 text-left">
             <div class="bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-purple-500/30 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
                 <span class="inline-block text-4xl p-3 bg-purple-600/20 rounded-2xl mb-3 border border-purple-500/30">🤘</span>
-                <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">CloudBeats & Rock-Lab Hub</h1>
-                <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">CloudBeats Audio Ecosystem • Meckenheim, NRW</p>
+                <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">CloudBeats &amp; Rock-Lab Hub</h1>
+                <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">CloudBeats Audio Ökosystem • Meckenheim, NRW</p>
                 <p class="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto">
                     Das offizielle Web-Ökosystem von jackdarckart. Hier verschmelzen High-End Audio-Mediathek, tokenisierte Hash-Rate-Economy und kraftvolle Musik-Produktionen.
                 </p>
                 <div class="mt-6 flex flex-wrap justify-center gap-3">
-                    <button type="button" id="home-to-game-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
+                    <button type="button" id="home-to-game-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2 cursor-pointer">
                         <span>🎸</span> Studio betreten
                     </button>
                     <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-500/30 font-semibold py-3 px-6 rounded-2xl text-xs sm:text-sm transition flex items-center gap-2">
@@ -57,40 +57,40 @@
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
                     <h2 class="text-xl font-bold text-purple-400">CloudBeats Access Gateway</h2>
-                    <p class="text-xs text-gray-400 mt-1">Authentifiziere dich per E-Mail und PIN.</p>
+                    <p class="text-xs text-gray-400 mt-1">Authentifiziere dich sicher per E-Mail und PIN.</p>
                 </div>
                 <div class="flex border-b border-gray-800 mb-2">
-                    <button type="button" id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition">Anmelden</button>
-                    <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition">Registrieren</button>
+                    <button type="button" id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer">Anmelden</button>
+                    <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer">Registrieren</button>
                 </div>
                 <div id="form-login" class="space-y-3">
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">E-Mail:</label>
+                        <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
                         <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="name@domain.de">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">PIN:</label>
-                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="PIN-Code">
+                        <label class="text-xs text-gray-400 block mb-1">PIN-Code:</label>
+                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="1234">
                     </div>
-                    <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">🔒 Studio entsperren</button>
+                    <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 cursor-pointer">🔒 Studio entsperren</button>
                 </div>
                 <div id="form-register" class="space-y-3 hidden">
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">E-Mail:</label>
+                        <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
                         <input type="email" id="reg-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="name@domain.de">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">PIN festlegen:</label>
+                        <label class="text-xs text-gray-400 block mb-1">PIN festlegen (min. 3 Zeichen):</label>
                         <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="PIN-Code">
                     </div>
-                    <button type="button" id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">✨ Account erstellen</button>
+                    <button type="button" id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 cursor-pointer">✨ Account erstellen</button>
                 </div>
             </div>
 
             <div id="game-main-container" class="hidden space-y-6">
                 <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
                     <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
-                    <button type="button" id="logout-btn" class="bg-red-900/40 text-red-300 text-[10px] px-2.5 py-1 rounded-xl">🚪 Abmelden</button>
+                    <button type="button" id="logout-btn" class="bg-red-900/40 text-red-300 text-[10px] px-2.5 py-1 rounded-xl cursor-pointer">🚪 Abmelden</button>
                 </div>
                 <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl cursor-pointer">
                     🎧 Master-Beat Live einspielen (+5)
@@ -105,7 +105,7 @@
                         <p id="fans-count" class="text-xl font-black text-pink-400">0</p>
                     </div>
                 </div>
-                <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs">← Dashboard</button>
+                <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
@@ -113,36 +113,48 @@
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             <div id="garten-auth-container" class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl max-w-md mx-auto text-left">
                 <h2 class="text-xl font-bold text-emerald-400">Bio-Garden Access Gateway</h2>
-                <p class="text-xs text-gray-400 mt-1">Bitte im Studio-Lab anmelden.</p>
-                <button type="button" id="garten-to-game-login-btn" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm mt-3">Zum Login</button>
+                <p class="text-xs text-gray-400 mt-1">Bitte im Studio-Lab anmelden, um den Garten zu betreten.</p>
+                <button type="button" id="garten-to-game-login-btn" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm mt-3 cursor-pointer">Zum Login</button>
             </div>
 
             <div id="garten-main-container" class="hidden bg-[#101722] border border-emerald-500/40 p-5 sm:p-8 rounded-3xl shadow-2xl space-y-5">
                 <div>
                     <span class="text-4xl mb-2 block">🏡</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-emerald-400 mb-1">Architektur-Landschaftsgarten &amp; Webradio</h2>
+                    <h2 class="text-2xl sm:text-3xl font-black text-emerald-400 mb-1">Architektur-Landschaftsgarten &amp; Live-Visualisierer</h2>
                     <div id="current-song-display" class="text-xs sm:text-sm text-emerald-300 bg-[#080c14] border border-emerald-500/30 py-1.5 px-4 rounded-xl mt-2 inline-block shadow-inner">
-                        🎶 Lade Song...
+                        🎶 Lade Song-Informationen...
                     </div>
                 </div>
 
-                <div class="bg-[#080c14] border border-emerald-500/30 p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
-                    <div class="flex items-center gap-2">
+                <!-- Webradio Steuerung & Echtzeit-Equalizer Monitor -->
+                <div class="bg-[#080c14] border border-emerald-500/30 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm">
+                    <div class="flex items-center gap-3">
                         <span class="text-emerald-400 font-bold">🎵 Stream:</span>
                         <button type="button" id="toggle-radio-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow">
                             📻 laut.fm Stream starten
                         </button>
                     </div>
+                    <!-- Visueller Equalizer / Takt-Anzeige -->
+                    <div class="flex items-center gap-1.5 bg-[#04060a] px-3 py-2 rounded-xl border border-emerald-500/20">
+                        <span class="text-[10px] text-emerald-400 font-mono mr-1">SYNC:</span>
+                        <div class="eq-bar w-1.5 h-4 bg-emerald-500 rounded-full transition-all duration-75"></div>
+                        <div class="eq-bar w-1.5 h-6 bg-emerald-500 rounded-full transition-all duration-75"></div>
+                        <div class="eq-bar w-1.5 h-3 bg-emerald-500 rounded-full transition-all duration-75"></div>
+                        <div class="eq-bar w-1.5 h-5 bg-emerald-500 rounded-full transition-all duration-75"></div>
+                        <div class="eq-bar w-1.5 h-2 bg-emerald-500 rounded-full transition-all duration-75"></div>
+                    </div>
                     <span id="audio-status-text" class="text-gray-400 text-xs">Bereit</span>
                 </div>
-                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
+                
+                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" crossorigin="anonymous" preload="none"></audio>
 
-                <!-- Fotorealistisches, responsives HD-Canvas -->
+                <!-- Hochauflösendes, responsives HD-Canvas mit Live-Visualisierung -->
                 <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)] bg-[#b5e48c]">
-                    <canvas id="garden-canvas" width="1400" height="900" class="w-full h-auto object-contain cursor-pointer block"></canvas>
+                    <canvas id="garden-canvas" width="1400" height="900" class="w-full h-auto object-contain cursor-pointer block" title="Klicke in den Garten, um Blumen zu pflanzen!"></canvas>
                 </div>
+                <p class="text-[11px] text-emerald-400/80 italic">💡 Tipp: Klicke an eine beliebige Stelle im Garten, um farbenprächtige Blumen zu pflanzen und Beats zu generieren!</p>
 
-                <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">← Dashboard</button>
+                <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
@@ -150,17 +162,19 @@
         <div id="view-cloud" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-cyan-500/30 p-6 rounded-3xl space-y-4">
                 <h2 class="text-xl font-bold text-cyan-400">☁️ Cloud-Nexus Sync</h2>
-                <button type="button" id="cloud-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs">← Dashboard</button>
+                <p class="text-xs text-gray-400">Verwaltung der Cloud-Speicherstände und Hash-Rate-Metadaten.</p>
+                <button type="button" id="cloud-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
         <!-- 5. PROFIL -->
         <div id="view-account" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-blue-500/30 p-6 rounded-3xl space-y-3">
-                <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Profil</h2>
-                <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm" placeholder="Künstlername">
-                <button type="button" id="save-account-btn" class="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm">Speichern</button>
-                <button type="button" id="account-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs mt-2">← Dashboard</button>
+                <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Künstler-Profil</h2>
+                <label class="text-xs text-gray-400 block">Künstlername:</label>
+                <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm" placeholder="jackdarckart">
+                <button type="button" id="save-account-btn" class="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold cursor-pointer">Änderungen speichern</button>
+                <button type="button" id="account-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs mt-2 cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
@@ -168,17 +182,18 @@
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl space-y-3">
                 <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ Nexus System Hub</h2>
-                <button type="button" id="admin-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs">← Dashboard</button>
+                <p class="text-xs text-gray-400">Systemdiagnose und Audio-Stream Konfiguration.</p>
+                <button type="button" id="admin-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
+    <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#080c14]">
         <div class="max-w-4xl mx-auto flex justify-between items-center text-xs text-gray-400">
-            <span id="save-status">💾 Auto-gesichert</span>
-            <span class="text-gray-500">CloudBeats Ecosystem</span>
+            <span id="save-status">💾 Automatisch gesichert</span>
+            <span class="text-gray-500">CloudBeats Ökosystem • Meckenheim</span>
         </div>
     </footer>
 
@@ -215,7 +230,6 @@
             }
 
             if (loggedInUser) loadUserData();
-
             const userDisplay = document.getElementById('user-display');
             if (userDisplay) userDisplay.innerText = username;
 
@@ -240,6 +254,7 @@
                 }
             }
 
+            // Tabs Login/Register
             const tabLoginBtn = document.getElementById('tab-login-btn');
             const tabRegisterBtn = document.getElementById('tab-register-btn');
             const formLogin = document.getElementById('form-login');
@@ -247,14 +262,14 @@
 
             if(tabLoginBtn && tabRegisterBtn) {
                 tabLoginBtn.addEventListener('click', () => {
-                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition";
-                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition";
+                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer";
+                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
                     formLogin.classList.remove('hidden');
                     formRegister.classList.add('hidden');
                 });
                 tabRegisterBtn.addEventListener('click', () => {
-                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 border-b-2 border-emerald-500 transition";
-                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition";
+                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 border-b-2 border-emerald-500 transition cursor-pointer";
+                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
                     formRegister.classList.remove('hidden');
                     formLogin.classList.add('hidden');
                 });
@@ -265,19 +280,19 @@
                 submitRegisterBtn.addEventListener('click', () => {
                     const email = document.getElementById('reg-email').value.trim().toLowerCase();
                     const pin = document.getElementById('reg-pin').value.trim();
-                    if (!email || !email.includes('@')) { alert("Gültige E-Mail eingeben!"); return; }
-                    if (!pin || pin.length < 3) { alert("PIN mind. 3 Zeichen."); return; }
+                    if (!email || !email.includes('@')) { alert("Bitte eine gültige E-Mail-Adresse eingeben!"); return; }
+                    if (!pin || pin.length < 3) { alert("Die PIN muss mindestens 3 Zeichen lang sein."); return; }
 
                     let usersDB = {};
                     try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    if (usersDB[email]) { alert("E-Mail bereits vergeben!"); return; }
+                    if (usersDB[email]) { alert("Diese E-Mail-Adresse ist bereits registriert!"); return; }
 
                     usersDB[email] = { pin, beats: 0, fans: 0 };
                     localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     loggedInUser = email;
                     localStorage.setItem('beat_lab_logged_in_user', email);
                     updateGameViewState();
-                    alert("Account erstellt!");
+                    alert("Account erfolgreich erstellt!");
                 });
             }
 
@@ -288,12 +303,12 @@
                     const pin = document.getElementById('login-pin').value.trim();
                     let usersDB = {};
                     try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    if (!usersDB[email] || usersDB[email].pin !== pin) { alert("Falsche E-Mail oder PIN!"); return; }
+                    if (!usersDB[email] || usersDB[email].pin !== pin) { alert("Falsche E-Mail-Adresse oder PIN!"); return; }
 
                     loggedInUser = email;
                     localStorage.setItem('beat_lab_logged_in_user', email);
                     updateGameViewState();
-                    alert("Eingeloggt!");
+                    alert("Erfolgreich angemeldet!");
                 });
             }
 
@@ -307,6 +322,20 @@
                 });
             }
 
+            // Profil Speichern
+            const saveAccountBtn = document.getElementById('save-account-btn');
+            if(saveAccountBtn) {
+                saveAccountBtn.addEventListener('click', () => {
+                    const newName = document.getElementById('reg-username').value.trim();
+                    if (newName) {
+                        username = newName;
+                        localStorage.setItem('beat_lab_user', username);
+                        if (userDisplay) userDisplay.innerText = username;
+                        alert("Profil aktualisiert!");
+                    }
+                });
+            }
+
             async function fetchCurrentSong() {
                 try {
                     let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
@@ -316,7 +345,7 @@
                         if (songEl && data) {
                             let artist = data.artist ? data.artist.name : "";
                             let title = data.title || "";
-                            songEl.innerText = artist || title ? `🎶 Live: ${artist} ${title ? '– ' + title : ''}` : `🎶 laut.fm/jackdarckart On Air`;
+                            songEl.innerText = artist || title ? `🎶 Live On Air: ${artist} ${title ? '– ' + title : ''}` : `🎶 laut.fm/jackdarckart Live-Stream`;
                         }
                     }
                 } catch(e) {}
@@ -324,22 +353,50 @@
             setInterval(fetchCurrentSong, 15000);
             fetchCurrentSong();
 
+            // --- ROBUSTER AUDIO ANALYSER & VISUALISIERUNGS-SYNC ---
+            let audioCtx;
+            let analyser;
+            let dataArray;
+            let sourceNode;
+
             const radioStreamEl = document.getElementById('external-audio-stream');
             const toggleRadioBtn = document.getElementById('toggle-radio-btn');
             const audioStatusText = document.getElementById('audio-status-text');
             let isStreamingRadio = false;
 
+            function initAudioAnalyser() {
+                if (!audioCtx) {
+                    try {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        audioCtx = new AudioContext();
+                        analyser = audioCtx.createAnalyser();
+                        analyser.fftSize = 128;
+                        dataArray = new Uint8Array(analyser.frequencyBinCount);
+                        
+                        sourceNode = audioCtx.createMediaElementSource(radioStreamEl);
+                        sourceNode.connect(analyser);
+                        analyser.connect(audioCtx.destination);
+                    } catch(err) {
+                        console.warn("CORS/AudioContext Hinweis: Verwende hochentwickelten Animations-Fallback.", err);
+                    }
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+
             if (toggleRadioBtn && radioStreamEl) {
                 toggleRadioBtn.addEventListener('click', async () => {
                     if (!isStreamingRadio) {
                         try {
+                            initAudioAnalyser();
                             await radioStreamEl.play();
                             isStreamingRadio = true;
                             toggleRadioBtn.innerText = "⏹️ Stream stoppen";
                             toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
-                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio aktiv & synchronisiert";
+                            if(audioStatusText) audioStatusText.innerText = "🟢 Takt-Synchronisation aktiv";
                         } catch(e) {
-                            alert("Stream konnte nicht gestartet werden.");
+                            alert("Stream konnte nicht gestartet werden. Bitte Browser-Berechtigung prüfen.");
                         }
                     } else {
                         radioStreamEl.pause();
@@ -351,19 +408,74 @@
                 });
             }
 
-            // --- FOTOREALISTISCHES & DETAILLIERTES ARCHITEKTUR-CANVAS ---
+            // --- FOTOREALISTISCHES & HOCHGRADIG SYNCHRONISIERTES CANVAS ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
             let customFlowers = [];
+            let fireflies = [];
+
+            // Glühwürmchen & Sporen für mehr Detailreichtum
+            for(let i=0; i<25; i++) {
+                fireflies.push({
+                    x: Math.random() * 1400,
+                    y: Math.random() * 900,
+                    radius: Math.random() * 3 + 1,
+                    speedX: (Math.random() - 0.5) * 0.6,
+                    speedY: (Math.random() - 0.5) * 0.6
+                });
+            }
 
             function drawGarden() {
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 120) + 1) / 2 : 0.04;
+                // --- TASTE / BEAT ERKENNUNG ODER ROBUSTER FALLBACK ---
+                let pulse = 0.05;
+                let eqHeights = [4, 8, 3, 6, 2];
 
-                // 1. Luxus-Rasen mit feinen Strukturverläufen und Schatten
+                if (isStreamingRadio) {
+                    if (analyser && dataArray) {
+                        try {
+                            analyser.getByteFrequencyData(dataArray);
+                            let sum = 0;
+                            for(let i = 0; i < 8; i++) { sum += dataArray[i]; }
+                            let avgBass = sum / 8;
+                            pulse = avgBass / 180; // Direkter Audio-Faktor
+                            
+                            // Equalizer-Balken im HTML aktualisieren
+                            eqHeights = [
+                                Math.max(4, (dataArray[2] / 255) * 24),
+                                Math.max(6, (dataArray[4] / 255) * 28),
+                                Math.max(3, (dataArray[6] / 255) * 20),
+                                Math.max(5, (dataArray[8] / 255) * 26),
+                                Math.max(2, (dataArray[10] / 255) * 18)
+                            ];
+                        } catch(e) {
+                            // Fallback falls CORS-Beschränkungen greifen
+                            pulse = (Math.sin(Date.now() / 110) + 1) * 0.35;
+                        }
+                    } else {
+                        // Perfekt getimter Rhythmus-Fallback (ca. 120 BPM Club-Takt)
+                        let time = Date.now() / 150;
+                        pulse = (Math.sin(time) * 0.5 + 0.5) * 0.4 + (Math.sin(time * 2) > 0.7 ? 0.3 : 0);
+                        eqHeights = [Math.random()*20+4, Math.random()*24+6, Math.random()*18+3, Math.random()*22+5, Math.random()*16+2];
+                    }
+                } else {
+                    pulse = (Math.sin(Date.now() / 400) + 1) * 0.04;
+                }
+
+                // UI Equalizer-Balken anpassen
+                const eqBars = document.querySelectorAll('.eq-bar');
+                eqBars.forEach((bar, idx) => {
+                    if (isStreamingRadio) {
+                        bar.style.height = eqHeights[idx] + 'px';
+                    } else {
+                        bar.style.height = '6px';
+                    }
+                });
+
+                // 1. Luxus-Rasen mit feinen Strukturverläufen
                 let lawnGrad = ctx.createLinearGradient(0, 0, 0, 900);
                 lawnGrad.addColorStop(0, '#9ef01a');
                 lawnGrad.addColorStop(0.5, '#70e000');
@@ -371,13 +483,12 @@
                 ctx.fillStyle = lawnGrad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Feine gemähte Rasenstreifen
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
                 for (let i = 0; i < canvas.width; i += 70) {
                     ctx.fillRect(i, 0, 35, canvas.height);
                 }
 
-                // 2. Moderner Pool mit Tiefeneffekt, blauen Farbverläufen & Reflexionen
+                // 2. Moderner Pool
                 ctx.fillStyle = '#014f86';
                 ctx.fillRect(840, 480, 450, 300);
                 let poolGrad = ctx.createLinearGradient(840, 480, 1290, 780);
@@ -387,19 +498,27 @@
                 ctx.fillStyle = poolGrad;
                 ctx.fillRect(855, 495, 420, 270);
 
-                // Pool-Randsteine (Coping)
                 ctx.strokeStyle = '#adb5bd';
                 ctx.lineWidth = 6;
                 ctx.strokeRect(852, 492, 426, 276);
 
-                // Fontäne im Pool mit exaktem Takt-Puls
-                ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + pulse * 0.5})`;
-                ctx.lineWidth = 4 + (pulse * 2);
+                // Pool-Fontäne reagiert massiv auf die Musik
+                let fountainRadius = 18 + (pulse * 55);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + pulse * 0.6})`;
+                ctx.lineWidth = 4 + (pulse * 6);
                 ctx.beginPath();
-                ctx.arc(1065, 630, 22 + (pulse * 18), 0, Math.PI * 2);
+                ctx.arc(1065, 630, fountainRadius, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // 3. Kiesgarten mit feiner Körnung und Schieferplatten
+                if (pulse > 0.3) {
+                    ctx.strokeStyle = `rgba(144, 224, 239, ${pulse})`;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(1065, 630, fountainRadius * 0.5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // 3. Kiesgarten & Schieferplatten
                 ctx.fillStyle = '#e9ecef';
                 ctx.fillRect(170, 180, 580, 450);
                 ctx.fillStyle = '#ced4da';
@@ -407,23 +526,20 @@
                     ctx.fillRect(180 + Math.random() * 560, 190 + Math.random() * 430, 2.5, 2.5);
                 }
 
-                // Dunkle Schiefer-Trittplatten mit Schattenwurf
                 ctx.fillStyle = '#212529';
                 for (let r = 0; r < 6; r++) {
                     ctx.fillRect(220 + r * 68, 360 + r * 35, 85, 42);
-                    // Feine Kantenkollision
                     ctx.strokeStyle = '#343a40';
                     ctx.lineWidth = 2;
                     ctx.strokeRect(220 + r * 68, 360 + r * 35, 85, 42);
                 }
 
-                // Moderne Skulptur auf dem Kiesplatz
                 ctx.fillStyle = '#4cc9f0';
                 ctx.fillRect(380, 260, 20, 55);
                 ctx.fillStyle = '#3a86ff';
                 ctx.beginPath(); ctx.arc(390, 250, 14, 0, Math.PI*2); ctx.fill();
 
-                // 4. Hochwertige Holzterrasse im Vordergrund mit Maserung & Möbeln
+                // 4. Holzterrasse im Vordergrund
                 let woodGrad = ctx.createLinearGradient(200, 750, 200, 890);
                 woodGrad.addColorStop(0, '#bb7e3d');
                 woodGrad.addColorStop(0.5, '#a0522d');
@@ -431,32 +547,27 @@
                 ctx.fillStyle = woodGrad;
                 ctx.fillRect(200, 750, 1000, 140);
                 
-                // Holzplanken-Fugen
                 ctx.strokeStyle = '#5c2c16';
                 ctx.lineWidth = 2;
                 for (let x = 200; x < 1200; x += 32) {
                     ctx.beginPath(); ctx.moveTo(x, 750); ctx.lineTo(x, 890); ctx.stroke();
                 }
 
-                // Terrassen-Esstisch & Stühle
                 ctx.fillStyle = '#2b1b17';
                 ctx.fillRect(630, 790, 140, 65);
                 ctx.fillStyle = '#4a332a';
                 ctx.fillRect(600, 810, 25, 25);
                 ctx.fillRect(785, 810, 25, 25);
 
-                // 5. Fotorealistische Kugelbäume (Topiary) mit Schattierung
+                // 5. Kugelbäume (Topiary) pulsieren im Takt
                 function drawTopiary(bx, by) {
-                    // Schatten am Boden
                     ctx.fillStyle = 'rgba(0,0,0,0.25)';
                     ctx.beginPath(); ctx.ellipse(bx, by + 10, 25, 10, 0, 0, Math.PI*2); ctx.fill();
                     
-                    // Stamm
                     ctx.fillStyle = '#4a3b32';
                     ctx.fillRect(bx - 7, by - 20, 14, 50);
 
-                    // Mehrschichtige Blattkrone für 3D-Effekt
-                    let crownRadius = 38 * (1 + pulse * 0.04);
+                    let crownRadius = 38 * (1 + pulse * 0.18);
                     let gradDark = ctx.createRadialGradient(bx-10, by-40, 5, bx, by-35, crownRadius);
                     gradDark.addColorStop(0, '#52b788');
                     gradDark.addColorStop(0.6, '#2d6a4f');
@@ -464,16 +575,12 @@
                     
                     ctx.fillStyle = gradDark;
                     ctx.beginPath(); ctx.arc(bx, by - 35, crownRadius, 0, Math.PI * 2); ctx.fill();
-
-                    // Glanzlicht oben links
-                    ctx.fillStyle = 'rgba(116, 198, 157, 0.4)';
-                    ctx.beginPath(); ctx.arc(bx - 12, by - 45, crownRadius * 0.4, 0, Math.PI * 2); ctx.fill();
                 }
                 drawTopiary(260, 270);
                 drawTopiary(370, 270);
                 drawTopiary(530, 290);
 
-                // 6. Großer, mächtiger Baum oben rechts
+                // 6. Großer Baum oben rechts
                 function drawBigTree(bx, by) {
                     ctx.fillStyle = 'rgba(0,0,0,0.3)';
                     ctx.beginPath(); ctx.ellipse(bx, by + 15, 45, 18, 0, 0, Math.PI*2); ctx.fill();
@@ -481,36 +588,48 @@
                     ctx.fillStyle = '#3a2e2b';
                     ctx.fillRect(bx - 14, by - 40, 28, 80);
 
-                    let bigGrad = ctx.createRadialGradient(bx-20, by-70, 15, bx, by-60, 95);
+                    let bigTreeRadius = 90 * (1 + pulse * 0.1);
+                    let bigGrad = ctx.createRadialGradient(bx-20, by-70, 15, bx, by-60, bigTreeRadius + 5);
                     bigGrad.addColorStop(0, '#74c69d');
                     bigGrad.addColorStop(0.5, '#2d6a4f');
                     bigGrad.addColorStop(1, '#081c15');
 
                     ctx.fillStyle = bigGrad;
-                    ctx.beginPath(); ctx.arc(bx, by - 65, 90 * (1 + pulse * 0.03), 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(bx, by - 65, bigTreeRadius, 0, Math.PI * 2); ctx.fill();
                 }
                 drawBigTree(1080, 130);
 
-                // 7. Benutzer-Blumen (durch Klick gepflanzt)
+                // 7. Glühwürmchen & Sporen tanzen zur Musik
+                fireflies.forEach(f => {
+                    f.x += f.speedX + (isStreamingRadio ? (Math.random() - 0.5) * 3 : 0);
+                    f.y += f.speedY;
+                    if (f.x < 0) f.x = 1400; if (f.x > 1400) f.x = 0;
+                    if (f.y < 0) f.y = 900; if (f.y > 900) f.y = 0;
+
+                    ctx.fillStyle = `rgba(253, 224, 71, ${0.6 + pulse * 0.4})`;
+                    ctx.beginPath();
+                    ctx.arc(f.x, f.y, f.radius * (isStreamingRadio ? 1.5 : 1), 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                // 8. Benutzer-Blumen (tanzen im Takt)
                 customFlowers.forEach(f => {
                     ctx.save();
                     ctx.translate(f.x, f.y);
-                    let s = 1 + pulse * 0.1;
-                    // Blätterkrone
+                    let s = 1 + pulse * 0.45;
                     ctx.fillStyle = '#f72585';
                     for(let i=0; i<5; i++) {
                         let angle = (i * Math.PI * 2) / 5;
                         ctx.beginPath(); ctx.arc(Math.cos(angle)*12, Math.sin(angle)*12, 10 * s, 0, Math.PI*2); ctx.fill();
                     }
-                    // Blütenmitte
                     ctx.fillStyle = '#ffbe0b';
                     ctx.beginPath(); ctx.arc(0, 0, 8 * s, 0, Math.PI*2); ctx.fill();
                     ctx.restore();
                 });
 
-                // Wasser-Ripples
+                // Wasser-Ripples (Wellen)
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 2.8;
+                    rip.radius += 3 + (pulse * 3);
                     rip.alpha -= 0.015;
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
