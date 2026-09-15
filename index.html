@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- ULTRA-STABLE MASTER AUDIO ENGINE WITH DYNAMIC LOGARITHMIC TONE SPEED -->
+    <!-- DYNAMIC RANDOM CHORD & SLOWER SPEED SCALING AUDIO ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,12 +541,12 @@
                 });
             }
 
-            // ULTRA-STABLE AUDIO ENGINE WITH DYNAMIC LOGARITHMIC SPEED SCALING
+            // ULTIMATE RANDOMIZED DYNAMIC CHORD AUDIO ENGINE
             let audioCtx = null;
             let masterCompressor = null;
 
             function makeDistortionCurve(amount) {
-                let k = amount || 130,
+                let k = amount || 140,
                     n = 44100,
                     curve = new Float32Array(n),
                     deg = Math.PI / 180;
@@ -557,9 +557,18 @@
                 return curve;
             }
 
-            const rockNotes = [
-                65.41, 73.42, 82.41, 98.00, 110.00, 123.47, 
-                130.81, 146.83, 164.81, 196.00, 220.00, 246.94
+            const rockScale = [
+                73.42,  // D2
+                82.41,  // E2
+                92.50,  // F#2
+                98.00,  // G2
+                110.00, // A2
+                123.47, // B2
+                130.81, // C3
+                146.83, // D3
+                164.81, // E3
+                185.00, // F#3
+                196.00  // G3
             ];
 
             function playRockStudioSound() {
@@ -570,67 +579,71 @@
 
                     if (!masterCompressor) {
                         masterCompressor = audioCtx.createDynamicsCompressor();
-                        masterCompressor.threshold.setValueAtTime(-10, audioCtx.currentTime);
-                        masterCompressor.knee.setValueAtTime(2, audioCtx.currentTime);
-                        masterCompressor.ratio.setValueAtTime(10, audioCtx.currentTime);
+                        masterCompressor.threshold.setValueAtTime(-9, audioCtx.currentTime);
+                        masterCompressor.knee.setValueAtTime(3, audioCtx.currentTime);
+                        masterCompressor.ratio.setValueAtTime(12, audioCtx.currentTime);
                         masterCompressor.attack.setValueAtTime(0.001, audioCtx.currentTime);
                         masterCompressor.release.setValueAtTime(0.08, audioCtx.currentTime);
                         masterCompressor.connect(audioCtx.destination);
                     }
 
                     const now = audioCtx.currentTime;
-                    let rootFreq = rockNotes[Math.floor(Math.random() * rockNotes.length)];
+                    
+                    let rootFreq = rockScale[Math.floor(Math.random() * rockScale.length)];
+                    let chordType = Math.floor(Math.random() * 4);
 
-                    // --- DEZENTES SLAPBACK-ECHO ---
+                    let frequencies = [];
+                    if (chordType === 0) {
+                        frequencies = [rootFreq * 2, rootFreq * 3, rootFreq * 4];
+                    } else if (chordType === 1) {
+                        frequencies = [rootFreq * 2, rootFreq * 2.4, rootFreq * 3];
+                    } else if (chordType === 2) {
+                        frequencies = [rootFreq * 2, rootFreq * 3.3, rootFreq * 4];
+                    } else {
+                        frequencies = [rootFreq * 3, rootFreq * 4, rootFreq * 5];
+                    }
+
                     let delay = audioCtx.createDelay();
                     let delayFeedback = audioCtx.createGain();
                     let delayWet = audioCtx.createGain();
 
-                    delay.delayTime.setValueAtTime(0.12, now);
-                    delayFeedback.gain.setValueAtTime(0.1, now);
-                    delayWet.gain.setValueAtTime(0.06, now);
+                    delay.delayTime.setValueAtTime(0.14, now);
+                    delayFeedback.gain.setValueAtTime(0.12, now);
+                    delayWet.gain.setValueAtTime(0.07, now);
 
                     delay.connect(delayFeedback);
                     delayFeedback.connect(delay);
                     delay.connect(delayWet);
                     delayWet.connect(masterCompressor);
 
-                    // --- 4-FACHE POWER-CHORD & HARMONIE WAND ---
                     let oscs = [];
-                    let frequencies = [
-                        rootFreq * 2,       
-                        rootFreq * 3,       
-                        rootFreq * 4,       
-                        rootFreq * 5        
-                    ];
-
                     let distortion = audioCtx.createWaveShaper();
                     let filter = audioCtx.createBiquadFilter();
                     let cabinet = audioCtx.createBiquadFilter();
                     let guitarGain = audioCtx.createGain();
 
-                    distortion.curve = makeDistortionCurve(140);
+                    distortion.curve = makeDistortionCurve(150);
                     distortion.oversample = '4x';
 
                     filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(4500, now);
-                    filter.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+                    filter.frequency.setValueAtTime(rootFreq * 15, now);
+                    filter.frequency.exponentialRampToValueAtTime(rootFreq * 4, now + 0.35);
 
                     cabinet.type = 'peaking';
-                    cabinet.frequency.setValueAtTime(2200, now);
-                    cabinet.gain.setValueAtTime(9, now);
-                    if (cabinet.Q) cabinet.Q.setValueAtTime(2.5, now);
+                    cabinet.frequency.setValueAtTime(2400, now);
+                    cabinet.gain.setValueAtTime(10, now);
+                    if (cabinet.Q) cabinet.Q.setValueAtTime(3.0, now);
 
-                    let duration = 0.38;
+                    let duration = 0.4;
                     guitarGain.gain.setValueAtTime(0.0001, now);
-                    guitarGain.gain.linearRampToValueAtTime(0.16, now + 0.004);
+                    guitarGain.gain.linearRampToValueAtTime(0.18, now + 0.005);
                     guitarGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
                     frequencies.forEach((freq, idx) => {
                         let o = audioCtx.createOscillator();
-                        o.type = (idx % 2 === 0) ? 'sawtooth' : 'square';
+                        o.type = (idx % 2 === 0) ? 'sawtooth' : 'triangle';
                         o.frequency.setValueAtTime(freq, now);
-                        o.detune.setValueAtTime((idx - 1.5) * 8, now);
+                        o.detune.setValueAtTime((Math.random() - 0.5) * 14, now);
                         o.connect(filter);
                         oscs.push(o);
                     });
@@ -641,24 +654,23 @@
                     guitarGain.connect(masterCompressor);
                     guitarGain.connect(delay);
 
-                    // --- MASSIVER DUAL-SUB-BASS ---
                     let bassOsc1 = audioCtx.createOscillator();
                     let bassOsc2 = audioCtx.createOscillator();
                     let bassFilter = audioCtx.createBiquadFilter();
                     let bassGain = audioCtx.createGain();
 
                     bassOsc1.type = 'sawtooth';
-                    bassOsc2.type = 'triangle';
+                    bassOsc2.type = 'sine';
                     bassOsc1.frequency.setValueAtTime(rootFreq * 0.5, now);
                     bassOsc2.frequency.setValueAtTime(rootFreq * 0.25, now);
 
                     bassFilter.type = 'lowpass';
-                    bassFilter.frequency.setValueAtTime(900, now);
-                    bassFilter.frequency.exponentialRampToValueAtTime(80, now + 0.4);
+                    bassFilter.frequency.setValueAtTime(1000, now);
+                    bassFilter.frequency.exponentialRampToValueAtTime(70, now + 0.45);
 
-                    let bassDuration = 0.42;
+                    let bassDuration = 0.45;
                     bassGain.gain.setValueAtTime(0.0001, now);
-                    bassGain.gain.linearRampToValueAtTime(0.25, now + 0.008);
+                    bassGain.gain.linearRampToValueAtTime(0.28, now + 0.01);
                     bassGain.gain.exponentialRampToValueAtTime(0.0001, now + bassDuration);
 
                     bassOsc1.connect(bassFilter);
@@ -731,7 +743,6 @@
                 saveGame();
             }
 
-            // AUSBALANCIERTE TYCOON UPGRADE LOGIK
             function buyRig() {
                 if (beats >= rigCost) {
                     beats -= rigCost;
@@ -888,7 +899,6 @@
                 });
             }
 
-            // 1. Zähl-Loop für Riffs und passive Fans (FPS)
             setInterval(() => {
                 if (loggedInUser) {
                     if (bps > 0) beats += bps / 10;
@@ -897,22 +907,20 @@
                 }
             }, 100);
 
-            // 2. DYNAMISCHE HINTERGRUND-RIFF GESCHWINDIGKEIT (Erhöht sich pro Upgrade extrem langsam & logarithmisch)
+            // GANZ LANGSAME GESCHWINDIGKEITS-STEIGERUNG PRO UPGRADE
             function scheduleNextBackgroundSound() {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
                     playRockStudioSound();
                 }
                 
-                // Basis-Intervall bei 0 Upgrades = 1800ms. Jedes Upgrade (Rigs, AI, Alben) verkürzt das Intervall logarithmisch.
                 let upgradeScore = rigs + (aiAgents * 3) + (albums * 0.5);
-                let dynamicDelay = 1800 - (350 * Math.log(1 + upgradeScore));
-                
-                // Sicherheitsgrenze: Niemals schneller als alle 450ms, damit es absolut sauber bleibt.
-                let nextInterval = Math.max(450, Math.floor(dynamicDelay));
+                // Faktor von 350 auf 180 gesenkt -> Takt wird pro Upgrade jetzt viel langsamer/gemächlicher schneller
+                let dynamicDelay = 1800 - (180 * Math.log(1 + upgradeScore));
+                let nextInterval = Math.max(500, Math.floor(dynamicDelay));
 
                 setTimeout(scheduleNextBackgroundSound, nextInterval);
             }
-            setTimeout(scheduleNextBackgroundSound, 1500);
+            setTimeout(scheduleNextBackgroundSound, 1800);
 
             setInterval(() => { saveGame(); }, 5000);
 
