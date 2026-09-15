@@ -505,7 +505,7 @@
                 <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="hover:text-green-400 transition"><i class="fa-brands fa-spotify"></i></a>
                 <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition"><i class="fa-solid fa-radio"></i></a>
                 <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-purple-400 transition"><i class="fa-solid fa-tower-cell"></i></a>
-                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition"><i class="fa-solid fa-mobile"></i></a>
+                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition"><i class="fa-brands fa-mobile"></i></a>
             </div>
             <p class="text-xs text-gray-500">&copy; 2026 jackdarckart. Alle Rechte vorbehalten. Optimiert für GitHub & Vercel.</p>
         </div>
@@ -532,6 +532,11 @@
 
         let modalCallback = null;
         let modalMode = 'pin';
+        
+        // Variablen für den sicheren Bestätigungs-Flow
+        let pendingNewPin = '';
+        let pendingNewEmail = '';
+        let pendingVerificationCode = '';
 
         function showCustomModal(mode, title, text, placeholder, showCancel = true) {
             modalMode = mode;
@@ -596,32 +601,56 @@
             closeCustomModal(true, val);
         }
 
+        // --- SICHERER 2-FAKTOR SETUP FLOW (PIN + E-MAIL + BESTÄTIGUNGSCODE) ---
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
-                runSetupWizard();
+                startPinEmailSetupWizard();
             }
         }
 
-        function runSetupWizard() {
-            showCustomModal('setup', '🔒 Beat-Lab Admin-Einrichtung', 'Lege jetzt deinen Master-PIN fest:', 'Neuen PIN eingeben...', false);
+        function startPinEmailSetupWizard() {
+            showCustomModal('setup', '🔒 Neuer Master-PIN', 'Lege deinen geheimen Master-PIN fest:', 'Neuen PIN eingeben...', false);
             modalCallback = function(success, pinVal) {
-                if (success && pinVal) {
-                    localStorage.setItem('jackAdminPin', pinVal);
-                    showCustomModal('setup', '📧 E-Mail Wiederherstellung', 'Gib deine E-Mail-Adresse für die Wiederherstellung ein:', 'Deine E-Mail-Adresse...', false);
-                    modalCallback = function(succ2, emailVal) {
-                        if (succ2 && emailVal) {
-                            localStorage.setItem('jackAdminEmail', emailVal);
-                            showInfoModal('✅ Erfolgreich', 'Master-PIN & E-Mail erfolgreich eingerichtet!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                        } else {
-                            localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                            showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                        }
-                    };
-                } else {
+                if (!success || !pinVal) {
                     localStorage.setItem('jackAdminPin', '1234');
                     localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
                     showInfoModal('⚠️ Hinweis', 'Standard-PIN \'1234\' wurde gesetzt.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                    return;
+                }
+                pendingNewPin = pinVal;
+
+                showCustomModal('setup', '📧 E-Mail-Adresse', 'Gib deine E-Mail-Adresse ein, um den Bestätigungscode zu erhalten:', 'Deine E-Mail-Adresse...', false);
+                modalCallback = function(succ2, emailVal) {
+                    if (!succ2 || !emailVal) {
+                        localStorage.setItem('jackAdminPin', pendingNewPin);
+                        localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
+                        showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                        return;
+                    }
+                    pendingNewEmail = emailVal;
+
+                    // 6-stelligen Bestätigungscode generieren (Simulierter E-Mail-Versand)
+                    pendingVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+                    let codeBtnHtml = `<button onclick="promptForVerificationCode()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">📥 Bestätigungscode jetzt eingeben</button>`;
+                    showInfoModal('📨 Bestätigungscode gesendet', `Ein Bestätigungscode wurde an "${pendingNewEmail}" gesendet.\n\n(Simuliertes Postfach: Dein Code lautet: ${pendingVerificationCode})`, codeBtnHtml);
+                };
+            };
+        }
+
+        function promptForVerificationCode() {
+            document.getElementById('customModal').classList.add('hidden');
+            showCustomModal('setup', '🔑 Code bestätigen', 'Gib den 6-stelligen Bestätigungscode ein, den du erhalten hast:', '6-stelliger Code...', false);
+            modalCallback = function(succ, codeInput) {
+                if (!succ || !codeInput) return;
+                if (codeInput.trim() === pendingVerificationCode) {
+                    localStorage.setItem('jackAdminPin', pendingNewPin);
+                    localStorage.setItem('jackAdminEmail', pendingNewEmail);
+                    showInfoModal('✅ Erfolgreich verifiziert', 'Dein Master-PIN und deine E-Mail wurden erfolgreich bestätigt und gespeichert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                } else {
+                    let retryBtnHtml = `<button onclick="promptForVerificationCode()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🔄 Erneut versuchen</button>`;
+                    showInfoModal('❌ Falscher Code', 'Der eingegebene Bestätigungscode ist leider falsch. Bitte versuche es erneut.', retryBtnHtml);
                 }
             };
         }
@@ -649,13 +678,7 @@
 
         function changeAdminPin() {
             verifyPin(function() {
-                showCustomModal('setup', '🔒 Master-PIN ändern', 'Gib deinen neuen geheimen PIN ein:', 'Neuer PIN...');
-                modalCallback = function(succ, newPin) {
-                    if (succ && newPin) {
-                        localStorage.setItem('jackAdminPin', newPin);
-                        showInfoModal('✅ Erfolg', 'Master-PIN erfolgreich geändert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                    }
-                };
+                startPinEmailSetupWizard();
             });
         }
 
@@ -689,7 +712,7 @@
 
         function runSetupWizardFromButton() {
             document.getElementById('customModal').classList.add('hidden');
-            runSetupWizard();
+            startPinEmailSetupWizard();
         }
 
         // Mini-Game State & Cloud Sync
