@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Tycoon-Logik mit satten Synth-Tönen & Leuchteffekten -->
+    <!-- Tycoon-Logik mit dynamischem Multi-Töne-Synthesizer -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -539,31 +539,38 @@
                 });
             }
 
-            // Voller, fetter und knackiger Synth-Sound (Zwei Oszillatoren: Sawtooth + Sine)
+            // MULTI-TÖNE SYNTHESIZER (Spielt bei jedem Klick einen anderen Ton einer Melodie-Skala)
             let audioCtx = null;
+            let noteIndex = 0;
+            const synthScale = [261.63, 311.13, 349.23, 392.00, 466.16, 523.25, 622.25, 698.46, 783.99]; // C Moll Skala
+            const waveTypes = ['sawtooth', 'square', 'triangle'];
+
             function playBeatSound() {
                 if (!soundEnabled || currentView === 'home') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
+                    // Nächsten Ton der Melodie holen & Wellenform variieren
+                    let freq = synthScale[noteIndex];
+                    noteIndex = (noteIndex + 1) % synthScale.length;
+                    let wave = waveTypes[Math.floor(Math.random() * waveTypes.length)];
+
                     let osc1 = audioCtx.createOscillator();
                     let osc2 = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
 
-                    osc1.type = 'sawtooth';
+                    osc1.type = wave;
                     osc2.type = 'sine';
 
-                    // Knackiger Pitch-Sweep nach unten für elektronischen Punch
-                    osc1.frequency.setValueAtTime(320, audioCtx.currentTime);
-                    osc1.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15);
+                    osc1.frequency.setValueAtTime(freq * 1.5, audioCtx.currentTime);
+                    osc1.frequency.exponentialRampToValueAtTime(freq, audioCtx.currentTime + 0.15);
 
-                    osc2.frequency.setValueAtTime(160, audioCtx.currentTime);
-                    osc2.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.15);
+                    osc2.frequency.setValueAtTime(freq * 0.75, audioCtx.currentTime);
+                    osc2.frequency.exponentialRampToValueAtTime(freq * 0.5, audioCtx.currentTime + 0.15);
 
-                    // Satter, kräftiger Pegel (0.8)
-                    gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
 
                     osc1.connect(gain);
                     osc2.connect(gain);
@@ -571,8 +578,8 @@
 
                     osc1.start();
                     osc2.start();
-                    osc1.stop(audioCtx.currentTime + 0.15);
-                    osc2.stop(audioCtx.currentTime + 0.15);
+                    osc1.stop(audioCtx.currentTime + 0.18);
+                    osc2.stop(audioCtx.currentTime + 0.18);
                 } catch (e) {}
             }
 
