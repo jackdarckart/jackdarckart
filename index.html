@@ -191,32 +191,15 @@
                     ← Zurück zur Startseite
                 </button>
 
-                <!-- 🛠️ VOLLSTÄNDIGER ADMIN-BEREICH GANZ UNTEN IM GAME-BEREICH -->
+                <!-- 🛠️ ADMINISTRATOR-BEREICH (Ohne Cheats - Nur PIN & Reset) -->
                 <div class="bg-[#131b2e] border border-amber-500/40 p-5 rounded-3xl shadow-2xl space-y-4 text-left mt-8">
                     <div class="flex items-center gap-2 border-b border-gray-800 pb-2">
                         <span class="text-xl">🛠️</span>
                         <h3 class="font-bold text-sm text-amber-400">Administrator-Bereich</h3>
                     </div>
 
-                    <!-- Statistik Override -->
-                    <div class="space-y-3">
-                        <div>
-                            <label class="text-[11px] text-gray-400 block mb-1">Beats anpassen:</label>
-                            <input type="number" id="admin-beats-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[11px] text-gray-400 block mb-1">Fans anpassen:</label>
-                            <input type="number" id="admin-fans-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[11px] text-gray-400 block mb-1">BPS anpassen:</label>
-                            <input type="number" step="0.1" id="admin-bps-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs">
-                        </div>
-                        <button type="button" id="apply-admin-btn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">Werte übernehmen</button>
-                    </div>
-
                     <!-- PIN ÄNDERN -->
-                    <div class="border-t border-gray-800 pt-3 space-y-3">
+                    <div class="space-y-3">
                         <h4 class="font-bold text-xs text-yellow-400">🔑 Sicherheits-PIN ändern</h4>
                         <div>
                             <label class="text-[11px] text-gray-400 block mb-1">Neuen PIN eingeben:</label>
@@ -225,7 +208,7 @@
                         <button type="button" id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN aktualisieren</button>
                     </div>
 
-                    <!-- GEFAHRENZONE: SPIELSTAND ZURÜCKSETZEN (Account bleibt absolut sicher) -->
+                    <!-- GEFAHRENZONE: SPIELSTAND ZURÜCKSETZEN -->
                     <div class="border-t border-red-900/50 pt-3 space-y-2">
                         <h4 class="font-bold text-xs text-red-400">⚠️ Gefahrenzone</h4>
                         <button type="button" id="admin-reset-game-btn" class="w-full bg-red-900/60 hover:bg-red-900 text-red-200 font-semibold py-2 rounded-xl text-xs transition shadow border border-red-700/50">Nur Spielstand zurücksetzen (Account bleibt erhalten)</button>
@@ -280,7 +263,7 @@
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
                 <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ System Hub</h2>
-                <p class="text-xs text-gray-400">Nutze den spezifischen Administrator-Bereich direkt im Game-Modul (nach erfolgreichem Login), um deine Spiel-Metriken und PINs zu verwalten.</p>
+                <p class="text-xs text-gray-400">Nutze den spezifischen Administrator-Bereich direkt im Game-Modul (nach erfolgreichem Login), um deine PINs und den Spielstand sicher zu verwalten.</p>
                 <button type="button" id="admin-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
@@ -293,14 +276,14 @@
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Automatisch gespeichert</span>
-            <span class="text-gray-500">Secure Hub</span>
+            <span class="text-gray-500">Fair Play Hub</span>
         </div>
     </footer>
 
-    <!-- Account-Isolierte JavaScript Logik -->
+    <!-- Account-Isolierte JavaScript Logik ohne Beispielwerte -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Bereinige alte globale Speicherreste vom alten System automatisch
+            // Bereinige alte globale Speicherreste
             localStorage.removeItem('beat_lab_beats');
             localStorage.removeItem('beat_lab_fans');
             localStorage.removeItem('beat_lab_bps');
@@ -320,14 +303,14 @@
                 try {
                     let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
                     if (usersDB[loggedInUser]) {
-                        beats = usersDB[loggedInUser].beats !== undefined ? usersDB[loggedInUser].beats : 40430;
-                        fans = usersDB[loggedInUser].fans !== undefined ? usersDB[loggedInUser].fans : 14603;
-                        bps = usersDB[loggedInUser].bps !== undefined ? usersDB[loggedInUser].bps : 161.0;
+                        beats = usersDB[loggedInUser].beats !== undefined ? usersDB[loggedInUser].beats : 0;
+                        fans = usersDB[loggedInUser].fans !== undefined ? usersDB[loggedInUser].fans : 0;
+                        bps = usersDB[loggedInUser].bps !== undefined ? usersDB[loggedInUser].bps : 0.0;
                     }
                 } catch(e) {}
             }
 
-            // Spielstand des aktuellen Users speichern (Account-Datenbank bleibt intakt)
+            // Spielstand des aktuellen Users speichern
             function saveGame() {
                 if (!loggedInUser) return;
                 try {
@@ -387,7 +370,7 @@
                 });
             }
 
-            // Registrierung mit Startwerten und E-Mail-Einzigartigkeit
+            // Registrierung mit sauberen 0er-Startwerten
             const submitRegisterBtn = document.getElementById('submit-register-btn');
             if(submitRegisterBtn) {
                 submitRegisterBtn.addEventListener('click', () => {
@@ -415,12 +398,11 @@
                         return;
                     }
 
-                    // Neuen Account mit frischen Startwerten anlegen
                     usersDB[emailInput] = { 
                         pin: pinInput, 
-                        beats: 40430, 
-                        fans: 14603, 
-                        bps: 161.0, 
+                        beats: 0, 
+                        fans: 0, 
+                        bps: 0.0, 
                         created: Date.now() 
                     };
                     localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
@@ -433,7 +415,7 @@
                 });
             }
 
-            // Login System
+            // Login
             const submitLoginBtn = document.getElementById('submit-login-btn');
             if(submitLoginBtn) {
                 submitLoginBtn.addEventListener('click', () => {
@@ -460,7 +442,7 @@
                 });
             }
 
-            // Logout System
+            // Logout
             const logoutBtn = document.getElementById('logout-btn');
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
@@ -543,12 +525,6 @@
 
                 if (view === 'game') {
                     updateGameViewState();
-                    let bIn = document.getElementById('admin-beats-input');
-                    let fIn = document.getElementById('admin-fans-input');
-                    let bpsIn = document.getElementById('admin-bps-input');
-                    if(bIn) bIn.value = Math.floor(beats);
-                    if(fIn) fIn.value = fans;
-                    if(bpsIn) bpsIn.value = bps.toFixed(1);
                 }
                 if (view === 'account') {
                     let rUser = document.getElementById('reg-username');
@@ -584,18 +560,6 @@
                 if(bpsEl) bpsEl.innerText = bps.toFixed(1);
             }
 
-            const applyAdminBtn = document.getElementById('apply-admin-btn');
-            if(applyAdminBtn) {
-                applyAdminBtn.addEventListener('click', () => {
-                    beats = parseFloat(document.getElementById('admin-beats-input').value) || beats;
-                    fans = parseInt(document.getElementById('admin-fans-input').value) || fans;
-                    bps = parseFloat(document.getElementById('admin-bps-input').value) || bps;
-                    updateDisplay();
-                    saveGame();
-                    alert("🛠️ Admin-Werte übernommen!");
-                });
-            }
-
             function exportSave() {
                 try {
                     const saveData = { beats, fans, bps, username };
@@ -613,9 +577,9 @@
                 if (code && code.trim() !== "") {
                     try {
                         const data = JSON.parse(atob(code.trim()));
-                        beats = data.beats || 40430;
-                        fans = data.fans || 14603;
-                        bps = data.bps || 161.0;
+                        beats = data.beats || 0;
+                        fans = data.fans || 0;
+                        bps = data.bps || 0.0;
                         username = data.username || 'jackdarckart';
                         saveGame();
                         updateDisplay();
@@ -626,17 +590,17 @@
                 }
             }
 
-            // ⚠️ SICHERER SPIEL-RESET: Setzt NUR die Spielwerte des aktuellen Accounts zurück (Account bleibt absolut sicher!)
+            // Sicheres Zurücksetzen nur des Spielstands auf 0
             const adminResetGameBtn = document.getElementById('admin-reset-game-btn');
             if(adminResetGameBtn) {
                 adminResetGameBtn.addEventListener('click', () => {
-                    if (confirm("⚠️ ACHTUNG: Möchtest du wirklich nur den Spielstand (Beats, Fans, BPS) dieses Accounts auf Null zurücksetzen? Dein Account und dein PIN bleiben absolut sicher!")) {
+                    if (confirm("⚠️ ACHTUNG: Möchtest du wirklich den Spielstand dieses Accounts auf 0 zurücksetzen? Dein Account und dein PIN bleiben absolut sicher!")) {
                         beats = 0;
                         fans = 0;
                         bps = 0.0;
                         updateDisplay();
                         saveGame();
-                        alert("🔄 Spielstand dieses Accounts wurde zurückgesetzt.");
+                        alert("🔄 Spielstand wurde auf 0 zurückgesetzt.");
                     }
                 });
             }
