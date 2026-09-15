@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Automatische Umleitung von allen Vercel-Vorschau-Links zur Hauptdomain
+        if (window.location.hostname.endsWith('vercel.app')) {
+            window.location.replace('https://stream-musik.space' + window.location.pathname + window.location.search + window.location.hash);
+        }
+    </script>
     <title>jackdarckart | Offizielles Portfolio, Webradio & Beat-Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -534,7 +540,7 @@
             const ctx = canvas.getContext('2d');
             timeTick += 0.03;
 
-            // 1. Hintergrund-Farbverlauf (Satter Wald & Abendrot-Himmel)
+            // 1. Hintergrund-Farbverlauf
             let bgGrad = ctx.createLinearGradient(0, 0, 0, VIRTUAL_H);
             bgGrad.addColorStop(0, '#061a12');
             bgGrad.addColorStop(0.5, '#0b2e1f');
@@ -542,7 +548,7 @@
             ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, VIRTUAL_W, VIRTUAL_H);
 
-            // 2. Glänzender Seerosenteich (Pond)
+            // 2. Seerosenteich
             let pondGrad = ctx.createRadialGradient(900, 420, 20, 900, 420, 180);
             pondGrad.addColorStop(0, '#38bdf8');
             pondGrad.addColorStop(0.7, '#0284c7');
@@ -552,15 +558,12 @@
             ctx.ellipse(900, 420, 210, 110, Math.sin(timeTick * 0.5) * 0.05, 0, Math.PI * 2);
             ctx.fill();
 
-            // Teich-Reflexionen & Seerosen
             ctx.fillStyle = '#7dd3fc';
             ctx.beginPath(); ctx.arc(850, 390, 15, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(940, 450, 10, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = '#4ade80';
             ctx.beginPath(); ctx.arc(830, 440, 18, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(970, 390, 22, 0, Math.PI*2); ctx.fill();
 
-            // 3. Dekorative Büsche & Bäume im Hintergrund
+            // 3. Büsche
             for (let i = 0; i < 6; i++) {
                 let bx = 150 + i * 180;
                 let by = 220 + Math.sin(i) * 30;
@@ -571,15 +574,13 @@
                 ctx.beginPath(); ctx.arc(bx, by, 75, 0, Math.PI * 2); ctx.fill();
             }
 
-            // 4. Glühende Blumen & Pflanzen im Vordergrund
+            // 4. Blumen
             let flowerColors = ['#f43f5e', '#a855f7', '#fbbf24', '#ec4899', '#38bdf8'];
             for (let i = 0; i < 12; i++) {
                 let fx = 100 + i * 95;
                 let fy = 580 + Math.sin(i + timeTick) * 15;
-                // Stem
                 ctx.strokeStyle = '#059669'; ctx.lineWidth = 4;
                 ctx.beginPath(); ctx.moveTo(fx, fy + 40); ctx.lineTo(fx, fy); ctx.stroke();
-                // Petals
                 ctx.fillStyle = flowerColors[i % flowerColors.length];
                 for (let p = 0; p < 5; p++) {
                     let angle = (p * Math.PI * 2) / 5;
@@ -587,12 +588,11 @@
                     let py = fy + Math.sin(angle) * 12;
                     ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fill();
                 }
-                // Center
                 ctx.fillStyle = '#fef08a';
                 ctx.beginPath(); ctx.arc(fx, fy, 7, 0, Math.PI * 2); ctx.fill();
             }
 
-            // 5. Partikel / Magische Musiknoten (Animation)
+            // 5. Partikel / Musiknoten
             for (let i = particleEffects.length - 1; i >= 0; i--) {
                 let part = particleEffects[i];
                 part.y -= part.vy;
@@ -606,7 +606,7 @@
                 ctx.fillText('🎵', part.x, part.y);
             }
 
-            // 6. Oberes HUD / Garten UI im Canvas
+            // 6. HUD / Garten UI im Canvas
             ctx.fillStyle = 'rgba(10, 11, 16, 0.85)';
             ctx.roundRect(30, 25, 450, 90, 20);
             ctx.fill();
@@ -614,7 +614,6 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Garten Status Text
             let gLvl = gameData.garden[0].level;
             let gExp = gameData.garden[0].exp;
             let gMax = gameData.garden[0].maxExp;
@@ -628,7 +627,6 @@
             ctx.font = '14px sans-serif';
             ctx.fillText(`Erfahrung (EXP): ${gExp} / ${gMax} (${percent}%)`, 55, 88);
 
-            // EXP Fortschrittsbalken
             ctx.fillStyle = '#1f2937';
             ctx.roundRect(280, 72, 180, 10, 5);
             ctx.fill();
@@ -659,12 +657,9 @@
                         gameData.garden[0].maxExp = Math.floor(gameData.garden[0].maxExp * 1.5);
                     }
 
-                    // Klick-Partikel hinzufügen
                     const rect = cElem.getBoundingClientRect();
-                    const scaleX = VIRTUAL_W / rect.width;
-                    const scaleY = VIRTUAL_H / rect.height;
-                    let clickX = (e.clientX - rect.left) * scaleX;
-                    let clickY = (e.clientY - rect.top) * scaleY;
+                    let clickX = (e.clientX - rect.left) * (VIRTUAL_W / rect.width);
+                    let clickY = (e.clientY - rect.top) * (VIRTUAL_H / rect.height);
                     particleEffects.push({ x: clickX, y: clickY, vy: 2.5, alpha: 1.0 });
 
                     updateGameUI();
@@ -673,7 +668,6 @@
             }
         });
 
-        // Global Passive Production & BPS Audio Loop
         setInterval(function() {
             let email = localStorage.getItem('jackLoggedInEmail');
             if (!email) return;
@@ -697,7 +691,7 @@
         setInterval(function() { if (localStorage.getItem('jackLoggedInEmail')) saveGame(); }, 5000);
 
         window.onload = function() {
-            let view = localStorage.getItem('jackCurrentView') || 'home';
+            let view = localStorage.getItem('jackCurrentTestView') || localStorage.getItem('jackCurrentView') || 'home';
             switchView(view);
             resizeCanvas();
         };
