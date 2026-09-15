@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | Offizielles Portfolio & Webradio</title>
+    <title>jackdarckart | Offizielles Portfolio, Webradio & Beat-Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -36,354 +36,417 @@
     <!-- Header / Navigation -->
     <header class="sticky top-0 z-50 backdrop-blur-md bg-darkbg/80 border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                     <i class="fa-solid fa-headphones-simple text-white text-lg"></i>
                 </div>
                 <span class="text-xl font-black tracking-wider bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">jackdarckart</span>
             </div>
-            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
-                <a href="#about" class="hover:text-accent transition">Über mich</a>
-                <a href="#radio" class="hover:text-accent transition">Webradio</a>
-                <a href="#music" class="hover:text-accent transition">Diskographie</a>
-                <a href="#platforms" class="hover:text-accent transition">Plattformen</a>
-                <a href="#contact" class="hover:text-accent transition">Kontakt</a>
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-300">
+                <button onclick="switchView('home')" class="hover:text-accent transition">Startseite</button>
+                <a href="#about" onclick="switchView('home')" class="hover:text-accent transition">Über mich</a>
+                <a href="#radio" onclick="switchView('home')" class="hover:text-accent transition">Webradio</a>
+                <a href="#music" onclick="switchView('home')" class="hover:text-accent transition">Diskographie</a>
+                <a href="#platforms" onclick="switchView('home')" class="hover:text-accent transition">Plattformen</a>
+                <button onclick="switchView('game')" class="bg-indigo-600/20 border border-indigo-500/50 hover:bg-indigo-600 text-indigo-300 hover:text-white px-4 py-2 rounded-xl transition flex items-center space-x-2">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span>🎮 Beat-Lab</span>
+                </button>
             </nav>
             <div>
-                <a href="#radio" class="hidden sm:inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow-lg shadow-indigo-600/20">
-                    <i class="fa-solid fa-play text-xs"></i>
-                    <span>Stream hören</span>
-                </a>
+                <button onclick="switchView('game')" class="md:hidden bg-indigo-600 text-white px-4 py-2 rounded-xl font-semibold text-xs transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span>Beat-Lab</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden pt-20 pb-28 lg:pt-32 lg:pb-40">
-        <div class="absolute inset-0 opacity-20 pointer-events-none">
-            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/30 rounded-full blur-[120px]"></div>
-        </div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-2 rounded-full text-indigo-300 text-sm font-medium mb-8">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Offizielles Portal • stream-musik.space</span>
+    <!-- MAIN HOME VIEW -->
+    <div id="homeView" class="block">
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden pt-20 pb-28 lg:pt-32 lg:pb-40">
+            <div class="absolute inset-0 opacity-20 pointer-events-none">
+                <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/30 rounded-full blur-[120px]"></div>
             </div>
-            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-6">
-                Musik, Webradio & <br>
-                <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
-            </h1>
-            <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
-                Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und allen Streaming-Plattformen an einem Ort.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
-                    <i class="fa-solid fa-radio"></i>
-                    <span>Webradio Live starten</span>
-                </a>
-                <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-green-600/30 transition">
-                    <i class="fa-brands fa-spotify"></i>
-                    <span>Spotify Profil öffnen</span>
-                </a>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-2 rounded-full text-indigo-300 text-sm font-medium mb-8">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Offizielles Portal • stream-musik.space</span>
+                </div>
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-6">
+                    Musik, Webradio & <br>
+                    <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
+                </h1>
+                <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
+                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame!
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
+                        <i class="fa-solid fa-radio"></i>
+                        <span>Webradio Live starten</span>
+                    </a>
+                    <button onclick="switchView('game')" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/50 text-indigo-200 px-8 py-4 rounded-2xl font-bold transition">
+                        <i class="fa-solid fa-gamepad"></i>
+                        <span>🎮 Beat-Lab spielen</span>
+                    </button>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- About Section -->
-    <section id="about" class="py-24 bg-cardbg/50 border-y border-gray-800/60">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 tracking-tight">Über jackdarckart</h2>
-                    <p class="text-gray-300 text-lg leading-relaxed mb-6">
-                        <strong>jackdarckart</strong> ist ein vielseitiger Musikproduzent, Songwriter und Webradio-Betreiber mit Wurzeln in Meckenheim, Nordrhein-Westfalen. Das kreative Schaffen umfasst ein breites musikalisches Spektrum von German Pop, Rock und Deutschrap bis hin zu experimentellen Klangwelten.
-                    </p>
-                    <p class="text-gray-400 mb-8 leading-relaxed">
-                        Mit dem eigenen 24/7-Webradio auf laut.fm sowie weltweiten Veröffentlichungen auf Spotify, Apple Music, Anghami und anderen Plattformen bringt jackdarckart handgemachte und produzierte Musik direkt zu den Hörern.
-                    </p>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center">
-                            <span class="block text-2xl font-black text-indigo-400">24/7</span>
-                            <span class="text-xs text-gray-400">Webradio Stream</span>
+        <!-- About Section -->
+        <section id="about" class="py-24 bg-cardbg/50 border-y border-gray-800/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 tracking-tight">Über jackdarckart</h2>
+                        <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                            <strong>jackdarckart</strong> ist ein vielseitiger Musikproduzent, Songwriter und Webradio-Betreiber mit Wurzeln in Meckenheim, Nordrhein-Westfalen. Das kreative Schaffen umfasst ein breites musikalisches Spektrum von German Pop, Rock und Deutschrap bis hin zu experimentellen Klangwelten.
+                        </p>
+                        <p class="text-gray-400 mb-8 leading-relaxed">
+                            Mit dem eigenen 24/7-Webradio auf laut.fm sowie weltweiten Veröffentlichungen auf Spotify, Apple Music, Anghami und anderen Plattformen bringt jackdarckart handgemachte und produzierte Musik direkt zu den Hörern.
+                        </p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center">
+                                <span class="block text-2xl font-black text-indigo-400">24/7</span>
+                                <span class="text-xs text-gray-400">Webradio Stream</span>
+                            </div>
+                            <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center">
+                                <span class="block text-2xl font-black text-purple-400">Multi</span>
+                                <span class="text-xs text-gray-400">Genre Vielfalt</span>
+                            </div>
+                            <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center col-span-2 sm:col-span-1">
+                                <span class="block text-2xl font-black text-pink-400">Global</span>
+                                <span class="text-xs text-gray-400">Streaming Ready</span>
+                            </div>
                         </div>
-                        <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center">
-                            <span class="block text-2xl font-black text-purple-400">Multi</span>
-                            <span class="text-xs text-gray-400">Genre Vielfalt</span>
+                    </div>
+                    <div class="bg-darkbg border border-gray-800 p-8 rounded-3xl relative shadow-2xl">
+                        <div class="absolute -top-4 -right-4 bg-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">Featured</div>
+                        <h3 class="text-xl font-bold mb-4 flex items-center space-x-3">
+                            <i class="fa-solid fa-bullseye text-indigo-400"></i>
+                            <span>Station Info & Standort</span>
+                        </h3>
+                        <ul class="space-y-4 text-gray-300">
+                            <li class="flex items-start space-x-3">
+                                <i class="fa-solid fa-location-dot text-indigo-400 mt-1"></i>
+                                <div><strong>Standort:</strong> Meckenheim, Nordrhein-Westfalen, Deutschland</div>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <i class="fa-solid fa-radio text-indigo-400 mt-1"></i>
+                                <div><strong>Radio-Format:</strong> Musik aus aller Welt, Hip-Hop, Pop, Rock, Kassettendeck & More</div>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <i class="fa-solid fa-globe text-indigo-400 mt-1"></i>
+                                <div><strong>Domain & Web:</strong> stream-musik.space</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Radio / Stream Section -->
+        <section id="radio" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="inline-flex items-center space-x-2 text-indigo-400 text-sm font-semibold mb-3 uppercase tracking-widest">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                    <span>Live Webradio</span>
+                </div>
+                <h2 class="text-3xl sm:text-5xl font-black mb-6">laut.fm / jackdarckart Webradio</h2>
+                <p class="max-w-2xl mx-auto text-gray-400 mb-12">
+                    Höre das offizielle Webradio von jackdarckart live im Browser oder über deine Lieblings-Radio-App wie Streema, Replaio oder Phonostar.
+                </p>
+
+                <div class="max-w-3xl mx-auto bg-cardbg border border-gray-800 rounded-3xl p-8 sm:p-10 shadow-2xl">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8 pb-8 border-b border-gray-800">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-2xl">
+                                <i class="fa-solid fa-headphones"></i>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="text-xl font-bold">laut.fm jackdarckart</h3>
+                                <p class="text-sm text-gray-400">Live 24/7 Webradio Stream</p>
+                            </div>
                         </div>
-                        <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center col-span-2 sm:col-span-1">
-                            <span class="block text-2xl font-black text-pink-400">Global</span>
-                            <span class="text-xs text-gray-400">Streaming Ready</span>
+                        <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-600/30">
+                            <i class="fa-solid fa-external-link text-xs"></i>
+                            <span>Auf laut.fm öffnen</span>
+                        </a>
+                    </div>
+
+                    <!-- Persistent Audio Player -->
+                    <div class="bg-darkbg p-6 rounded-2xl border border-gray-800 text-center space-y-4">
+                        <p class="text-gray-300 text-sm">Starte den Audiostream direkt hier (läuft auch beim Neuladen & bei Bildschirmsperre weiter):</p>
+                        <audio id="radioStream" controls preload="auto" class="w-full mx-auto max-w-md accent-indigo-600">
+                            <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
+                            Dein Browser unterstützt kein Audio-Element.
+                        </audio>
+                        <div class="flex flex-wrap justify-center gap-3 pt-2">
+                            <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
+                                <i class="fa-solid fa-radio mr-1.5 text-indigo-400"></i> Streema
+                            </a>
+                            <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
+                                <i class="fa-solid fa-mobile-screen mr-1.5 text-indigo-400"></i> Replaio App
+                            </a>
+                            <a href="https://www.phonostar.de/radio/lautfm/jackdarckart/webradio" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
+                                <i class="fa-solid fa-podcast mr-1.5 text-indigo-400"></i> Phonostar
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="bg-darkbg border border-gray-800 p-8 rounded-3xl relative shadow-2xl">
-                    <div class="absolute -top-4 -right-4 bg-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">Featured</div>
-                    <h3 class="text-xl font-bold mb-4 flex items-center space-x-3">
-                        <i class="fa-solid fa-bullseye text-indigo-400"></i>
-                        <span>Station Info & Standort</span>
-                    </h3>
-                    <ul class="space-y-4 text-gray-300">
-                        <li class="flex items-start space-x-3">
-                            <i class="fa-solid fa-location-dot text-indigo-400 mt-1"></i>
-                            <div><strong>Standort:</strong> Meckenheim, Nordrhein-Westfalen, Deutschland</div>
-                        </li>
-                        <li class="flex items-start space-x-3">
-                            <i class="fa-solid fa-radio text-indigo-400 mt-1"></i>
-                            <div><strong>Radio-Format:</strong> Musik aus aller Welt, Hip-Hop, Pop, Rock, Kassettendeck & More</div>
-                        </li>
-                        <li class="flex items-start space-x-3">
-                            <i class="fa-solid fa-globe text-indigo-400 mt-1"></i>
-                            <div><strong>Domain & Web:</strong> stream-musik.space</div>
-                        </li>
-                    </ul>
+            </div>
+        </section>
+
+        <!-- Music / Discography Section -->
+        <section id="music" class="py-24 bg-cardbg/50 border-y border-gray-800/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Diskographie & Releases</span>
+                    <h2 class="text-3xl sm:text-5xl font-black mt-2">Ausgewählte Songs & Alben</h2>
+                    <p class="text-gray-400 mt-3 max-w-xl mx-auto">Veröffentlichte Musik von jackdarckart auf Spotify und weiteren Streaming-Diensten.</p>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Radio / Stream Section -->
-    <section id="radio" class="py-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="inline-flex items-center space-x-2 text-indigo-400 text-sm font-semibold mb-3 uppercase tracking-widest">
-                <i class="fa-solid fa-tower-broadcast"></i>
-                <span>Live Webradio</span>
-            </div>
-            <h2 class="text-3xl sm:text-5xl font-black mb-6">laut.fm / jackdarckart Webradio</h2>
-            <p class="max-w-2xl mx-auto text-gray-400 mb-12">
-                Höre das offizielle Webradio von jackdarckart live im Browser oder über deine Lieblings-Radio-App wie Streema, Replaio oder Phonostar.
-            </p>
-
-            <div class="max-w-3xl mx-auto bg-cardbg border border-gray-800 rounded-3xl p-8 sm:p-10 shadow-2xl">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8 pb-8 border-b border-gray-800">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-2xl">
-                            <i class="fa-solid fa-headphones"></i>
+                <!-- Spotify Artist Embed Widget -->
+                <div class="max-w-4xl mx-auto mb-16 bg-darkbg border border-gray-800 rounded-3xl p-6 shadow-2xl">
+                    <div class="flex items-center justify-between mb-4 px-2">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-brands fa-spotify text-green-400 text-2xl"></i>
+                            <span class="font-bold text-lg">Offizieller Spotify Player</span>
                         </div>
-                        <div class="text-left">
-                            <h3 class="text-xl font-bold">laut.fm jackdarckart</h3>
-                            <p class="text-sm text-gray-400">Live 24/7 Webradio Stream</p>
+                        <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="text-xs bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl font-semibold transition">Auf Spotify folgen</a>
+                    </div>
+                    <iframe style="border-radius:16px" src="https://open.spotify.com/embed/artist/52TdHUi4gScGBSvgFNFG80?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">German Pop</span>
+                                <span class="text-xs text-gray-500">2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold group-hover:text-indigo-300 transition mb-2">Dromedary Gletscher</h3>
+                            <p class="text-sm text-gray-400 mb-6">Offizielle Single-Veröffentlichung von jackdarckart auf Apple Music und weiteren digitalen Plattformen.</p>
+                        </div>
+                        <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                            <span class="text-xs text-gray-400">Apple Music</span>
+                            <a href="https://music.apple.com/us/album/dromedary-gletscher-single/1763826546" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold flex items-center space-x-1">
+                                <span>Anhören</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </a>
                         </div>
                     </div>
-                    <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-600/30">
-                        <i class="fa-solid fa-external-link text-xs"></i>
-                        <span>Auf laut.fm öffnen</span>
+
+                    <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-purple-950 text-purple-300 border border-purple-800">Rock</span>
+                                <span class="text-xs text-gray-500">2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold group-hover:text-purple-300 transition mb-2">Neverwinter</h3>
+                            <p class="text-sm text-gray-400 mb-6">Atmosphärische Rock-Single voller Energie und cineastischem Sound.</p>
+                        </div>
+                        <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                            <span class="text-xs text-gray-400">Apple Music</span>
+                            <a href="https://music.apple.com/us/album/neverwinter-single/1765348847" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 text-sm font-semibold flex items-center space-x-1">
+                                <span>Anhören</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-950 text-green-300 border border-green-800">Streaming</span>
+                                <span class="text-xs text-gray-500">Spotify</span>
+                            </div>
+                            <h3 class="text-xl font-bold group-hover:text-green-300 transition mb-2">Spotify Release Katalog</h3>
+                            <p class="text-sm text-gray-400 mb-6">Höre alle Songs, Alben und Releases direkt im offiziellen Spotify-Profil von jackdarckart.</p>
+                        </div>
+                        <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                            <span class="text-xs text-gray-400">Spotify</span>
+                            <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="text-green-400 hover:text-green-300 text-sm font-semibold flex items-center space-x-1">
+                                <span>Öffnen</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platforms Section -->
+        <section id="platforms" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <span class="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Netzwerk & Verzeichnisse</span>
+                <h2 class="text-3xl sm:text-5xl font-black mt-2 mb-12">Alle Links & Plattformen</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                    <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-green-500 p-6 rounded-2xl transition group text-left">
+                        <div class="w-12 h-12 rounded-xl bg-green-600/20 text-green-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-brands fa-spotify"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1">Spotify</h3>
+                        <p class="text-xs text-gray-400 mb-4">Musik & Alben streamen</p>
+                        <span class="text-xs text-green-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </a>
+
+                    <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-indigo-500 p-6 rounded-2xl transition group text-left">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-radio"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1">laut.fm</h3>
+                        <p class="text-xs text-gray-400 mb-4">Offizieller Webradio Sender</p>
+                        <span class="text-xs text-indigo-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </a>
+
+                    <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-purple-500 p-6 rounded-2xl transition group text-left">
+                        <div class="w-12 h-12 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-tower-cell"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1">Streema</h3>
+                        <p class="text-xs text-gray-400 mb-4">Radio-Profil & Playlist</p>
+                        <span class="text-xs text-purple-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </a>
+
+                    <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-pink-500 p-6 rounded-2xl transition group text-left">
+                        <div class="w-12 h-12 rounded-xl bg-pink-600/20 text-pink-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-mobile"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1">Replaio Radio</h3>
+                        <p class="text-xs text-gray-400 mb-4">Mobiles Webradio & App</p>
+                        <span class="text-xs text-pink-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </a>
+
+                    <a href="https://www.phonostar.de/radio/lautfm/jackdarckart/webradio" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-emerald-500 p-6 rounded-2xl transition group text-left">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-podcast"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1">Phonostar</h3>
+                        <p class="text-xs text-gray-400 mb-4">Senderprogramm & Info</p>
+                        <span class="text-xs text-emerald-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
                     </a>
                 </div>
+            </div>
+        </section>
+    </div>
 
-                <!-- Persistent Audio Player -->
-                <div class="bg-darkbg p-6 rounded-2xl border border-gray-800 text-center space-y-4">
-                    <p class="text-gray-300 text-sm">Starte den Audiostream direkt hier (läuft auch beim Neuladen & bei Bildschirmsperre weiter):</p>
-                    <audio id="radioStream" controls preload="auto" class="w-full mx-auto max-w-md accent-indigo-600">
-                        <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
-                        Dein Browser unterstützt kein Audio-Element.
-                    </audio>
-                    <div class="flex flex-wrap justify-center gap-3 pt-2">
-                        <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
-                            <i class="fa-solid fa-radio mr-1.5 text-indigo-400"></i> Streema
-                        </a>
-                        <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
-                            <i class="fa-solid fa-mobile-screen mr-1.5 text-indigo-400"></i> Replaio App
-                        </a>
-                        <a href="https://www.phonostar.de/radio/lautfm/jackdarckart/webradio" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
-                            <i class="fa-solid fa-podcast mr-1.5 text-indigo-400"></i> Phonostar
-                        </a>
+    <!-- MINI GAME VIEW ("🎮 Beat-Lab") -->
+    <div id="gameView" class="hidden py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
+                <i class="fa-solid fa-gamepad text-indigo-400"></i>
+                <span>Exklusives Studio-Minigame (PIN-gesichert)</span>
+            </div>
+            <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Dein Fortschritt ist durch deinen Geheim-PIN absolut sicher vor unbefugtem Zugriff!</p>
+        </div>
+
+        <!-- Game Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
+                <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Produzierte Beats</span>
+                <span id="gameBeats" class="text-3xl font-black text-indigo-400">0</span>
+            </div>
+            <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
+                <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Fans / Hörerschaft</span>
+                <span id="gameFans" class="text-3xl font-black text-pink-400">0</span>
+            </div>
+            <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
+                <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Beats pro Sekunde</span>
+                <span id="gameBps" class="text-3xl font-black text-emerald-400">0</span>
+            </div>
+        </div>
+
+        <!-- Main Clicker Area -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
+                <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer, um neue Beats aufzunehmen:</p>
+                <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
+                    <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
+                    <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
+                </button>
+                <span id="clickPowerText" class="text-xs text-gray-400 mt-6">+1 Beat pro Klick</span>
+            </div>
+
+            <!-- Upgrades Shop -->
+            <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 shadow-2xl space-y-4">
+                <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
+                    <i class="fa-solid fa-store text-indigo-400"></i>
+                    <span>Studio Equipment Upgrades</span>
+                </h3>
+
+                <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-sm">USB-Mikrofon</h4>
+                        <p class="text-xs text-gray-400">+1 Beat / Sekunde</p>
+                        <span class="text-xs text-indigo-300 font-semibold">Besitz: <span id="countMic">0</span></span>
                     </div>
+                    <button onclick="buyUpgrade('mic')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                        <span id="costMic">15</span> Beats
+                    </button>
+                </div>
+
+                <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-sm">Synthesizer</h4>
+                        <p class="text-xs text-gray-400">+5 Beats / Sekunde</p>
+                        <span class="text-xs text-purple-300 font-semibold">Besitz: <span id="countSynth">0</span></span>
+                    </div>
+                    <button onclick="buyUpgrade('synth')" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                        <span id="costSynth">100</span> Beats
+                    </button>
+                </div>
+
+                <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-sm">Pro Mixing Desk</h4>
+                        <p class="text-xs text-gray-400">+25 Beats / Sekunde</p>
+                        <span class="text-xs text-pink-300 font-semibold">Besitz: <span id="countDesk">0</span></span>
+                    </div>
+                    <button onclick="buyUpgrade('desk')" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                        <span id="costDesk">500</span> Beats
+                    </button>
+                </div>
+
+                <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-sm">Record Label</h4>
+                        <p class="text-xs text-gray-400">+100 Beats / Sekunde</p>
+                        <span class="text-xs text-emerald-300 font-semibold">Besitz: <span id="countLabel">0</span></span>
+                    </div>
+                    <button onclick="buyUpgrade('label')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                        <span id="costLabel">2500</span> Beats
+                    </button>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Music / Discography & Spotify Embed Section -->
-    <section id="music" class="py-24 bg-cardbg/50 border-y border-gray-800/60">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <span class="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Diskographie & Releases</span>
-                <h2 class="text-3xl sm:text-5xl font-black mt-2">Ausgewählte Songs & Alben</h2>
-                <p class="text-gray-400 mt-3 max-w-xl mx-auto">Veröffentlichte Musik von jackdarckart auf Spotify und weiteren Streaming-Diensten.</p>
+        <!-- Cloud Sync & Reset Section -->
+        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="text-left w-full sm:w-auto">
+                <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>PIN-gesicherte Cloud</h4>
+                <p class="text-xs text-gray-400">Deine Cloud-ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">Lade...</code></p>
             </div>
-
-            <!-- Spotify Artist Embed Widget -->
-            <div class="max-w-4xl mx-auto mb-16 bg-darkbg border border-gray-800 rounded-3xl p-6 shadow-2xl">
-                <div class="flex items-center justify-between mb-4 px-2">
-                    <div class="flex items-center space-x-3">
-                        <i class="fa-brands fa-spotify text-green-400 text-2xl"></i>
-                        <span class="font-bold text-lg">Offizieller Spotify Player</span>
-                    </div>
-                    <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="text-xs bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl font-semibold transition">Auf Spotify folgen</a>
-                </div>
-                <iframe style="border-radius:16px" src="https://open.spotify.com/embed/artist/52TdHUi4gScGBSvgFNFG80?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Release 1 -->
-                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">German Pop</span>
-                            <span class="text-xs text-gray-500">2024</span>
-                        </div>
-                        <h3 class="text-xl font-bold group-hover:text-indigo-300 transition mb-2">Dromedary Gletscher</h3>
-                        <p class="text-sm text-gray-400 mb-6">Offizielle Single-Veröffentlichung von jackdarckart auf Apple Music und weiteren digitalen Plattformen.</p>
-                    </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Apple Music</span>
-                        <a href="https://music.apple.com/us/album/dromedary-gletscher-single/1763826546" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold flex items-center space-x-1">
-                            <span>Anhören</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Release 2 -->
-                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-purple-950 text-purple-300 border border-purple-800">Rock</span>
-                            <span class="text-xs text-gray-500">2024</span>
-                        </div>
-                        <h3 class="text-xl font-bold group-hover:text-purple-300 transition mb-2">Neverwinter</h3>
-                        <p class="text-sm text-gray-400 mb-6">Atmosphärische Rock-Single voller Energie und cineastischem Sound.</p>
-                    </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Apple Music</span>
-                        <a href="https://music.apple.com/us/album/neverwinter-single/1765348847" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 text-sm font-semibold flex items-center space-x-1">
-                            <span>Anhören</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Release 3 -->
-                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-950 text-green-300 border border-green-800">Streaming</span>
-                            <span class="text-xs text-gray-500">Spotify</span>
-                        </div>
-                        <h3 class="text-xl font-bold group-hover:text-green-300 transition mb-2">Spotify Release Katalog</h3>
-                        <p class="text-sm text-gray-400 mb-6">Höre alle Songs, Alben und Releases direkt im offiziellen Spotify-Profil von jackdarckart.</p>
-                    </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Spotify</span>
-                        <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="text-green-400 hover:text-green-300 text-sm font-semibold flex items-center space-x-1">
-                            <span>Öffnen</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Release 4 -->
-                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-pink-950 text-pink-300 border border-pink-800">Streaming</span>
-                            <span class="text-xs text-gray-500">Release</span>
-                        </div>
-                        <h3 class="text-xl font-bold group-hover:text-pink-300 transition mb-2">Brought This On Themselves</h3>
-                        <p class="text-sm text-gray-400 mb-6">Exklusiver Track auf internationalen Streaming-Diensten wie Anghami.</p>
-                    </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Anghami</span>
-                        <a href="https://play.anghami.com/song/1298590258" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-pink-300 text-sm font-semibold flex items-center space-x-1">
-                            <span>Anhören</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Release 5 -->
-                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-800">Deutschrap</span>
-                            <span class="text-xs text-gray-500">Projekt</span>
-                        </div>
-                        <h3 class="text-xl font-bold group-hover:text-amber-300 transition mb-2">Das Sompo Museum</h3>
-                        <p class="text-sm text-gray-400 mb-6">Kreatives Deutschrap-Projekt mit einzigartigen Beats und Texten.</p>
-                    </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Katalog</span>
-                        <span class="text-gray-400 text-xs font-semibold">Veröffentlicht</span>
-                    </div>
-                </div>
-
-                <!-- Release 6 -->
-                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800">Pop Deutsch</span>
-                            <span class="text-xs text-gray-500">Projekt</span>
-                        </div>
-                        <h3 class="text-xl font-bold group-hover:text-blue-300 transition mb-2">Stolz auf Deutschland</h3>
-                        <p class="text-sm text-gray-400 mb-6">Deutscher Pop-Song mit markanter lyrischer Note.</p>
-                    </div>
-                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
-                        <span class="text-xs text-gray-400">Katalog</span>
-                        <span class="text-gray-400 text-xs font-semibold">Veröffentlicht</span>
-                    </div>
-                </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button onclick="promptLoadCloudId()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition">
+                    <i class="fa-solid fa-rotate mr-1.5"></i> Auf anderem Gerät laden
+                </button>
+                <button onclick="confirmResetGame()" class="bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
+                    <i class="fa-solid fa-lock mr-1.5"></i> Beat-Lab zurücksetzen (PIN)
+                </button>
             </div>
         </div>
-    </section>
 
-    <!-- Platforms Section -->
-    <section id="platforms" class="py-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <span class="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Netzwerk & Verzeichnisse</span>
-            <h2 class="text-3xl sm:text-5xl font-black mt-2 mb-12">Alle Links & Plattformen</h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                <!-- Spotify -->
-                <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-green-500 p-6 rounded-2xl transition group text-left">
-                    <div class="w-12 h-12 rounded-xl bg-green-600/20 text-green-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
-                        <i class="fa-brands fa-spotify"></i>
-                    </div>
-                    <h3 class="font-bold text-lg mb-1">Spotify</h3>
-                    <p class="text-xs text-gray-400 mb-4">Musik & Alben streamen</p>
-                    <span class="text-xs text-green-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
-                </a>
-
-                <!-- laut.fm -->
-                <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-indigo-500 p-6 rounded-2xl transition group text-left">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
-                        <i class="fa-solid fa-radio"></i>
-                    </div>
-                    <h3 class="font-bold text-lg mb-1">laut.fm</h3>
-                    <p class="text-xs text-gray-400 mb-4">Offizieller Webradio Sender</p>
-                    <span class="text-xs text-indigo-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
-                </a>
-
-                <!-- Streema -->
-                <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-purple-500 p-6 rounded-2xl transition group text-left">
-                    <div class="w-12 h-12 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
-                        <i class="fa-solid fa-tower-cell"></i>
-                    </div>
-                    <h3 class="font-bold text-lg mb-1">Streema</h3>
-                    <p class="text-xs text-gray-400 mb-4">Radio-Profil & Playlist</p>
-                    <span class="text-xs text-purple-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
-                </a>
-
-                <!-- Replaio -->
-                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-pink-500 p-6 rounded-2xl transition group text-left">
-                    <div class="w-12 h-12 rounded-xl bg-pink-600/20 text-pink-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
-                        <i class="fa-solid fa-mobile"></i>
-                    </div>
-                    <h3 class="font-bold text-lg mb-1">Replaio Radio</h3>
-                    <p class="text-xs text-gray-400 mb-4">Mobiles Webradio & App</p>
-                    <span class="text-xs text-pink-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
-                </a>
-
-                <!-- Phonostar -->
-                <a href="https://www.phonostar.de/radio/lautfm/jackdarckart/webradio" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-emerald-500 p-6 rounded-2xl transition group text-left">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
-                        <i class="fa-solid fa-podcast"></i>
-                    </div>
-                    <h3 class="font-bold text-lg mb-1">Phonostar</h3>
-                    <p class="text-xs text-gray-400 mb-4">Senderprogramm & Info</p>
-                    <span class="text-xs text-emerald-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
-                </a>
-            </div>
+        <div class="text-center mt-8">
+            <button onclick="switchView('home')" class="text-sm text-indigo-400 hover:text-indigo-300 font-semibold inline-flex items-center space-x-2">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Zurück zur Startseite & Webradio</span>
+            </button>
         </div>
-    </section>
+    </div>
 
     <!-- Contact & Footer -->
     <footer id="contact" class="bg-cardbg border-t border-gray-800 py-16">
@@ -403,8 +466,195 @@
         </div>
     </footer>
 
-    <!-- Advanced Audio Persistence & Security Script -->
+    <!-- Advanced Script, PIN Security & Game Logic -->
     <script>
+        // --- 1. SPA View Switcher ---
+        function switchView(view) {
+            const home = document.getElementById('homeView');
+            const game = document.getElementById('gameView');
+            if (view === 'game') {
+                home.classList.remove('block');
+                home.classList.add('hidden');
+                game.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                game.classList.add('hidden');
+                home.classList.remove('hidden');
+                home.classList.add('block');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // --- 2. Mini-Game State, Cloud Sync & PIN Security ---
+        let gameData = {
+            beats: 0,
+            fans: 0,
+            clickPower: 1,
+            mic: 0,
+            synth: 0,
+            desk: 0,
+            label: 0,
+            cloudId: ''
+        };
+
+        // PIN-Verwaltung (Admin-Sicherheit)
+        function getAdminPin() {
+            let pin = localStorage.getItem('jackAdminPin');
+            if (!pin) {
+                pin = prompt("🔒 SICHERHEITSEINRICHTUNG:\n\nLege deinen geheimen Master-PIN fest, um dein Beat-Lab vor unbefugtem Zurücksetzen durch Fremde zu schützen:");
+                if (!pin || pin.trim() === '') {
+                    pin = '1234'; // Fallback falls abgebrochen wird
+                }
+                localStorage.setItem('jackAdminPin', pin.trim());
+                alert("Geheimer PIN erfolgreich gespeichert! Merke dir diesen PIN.");
+            }
+            return localStorage.getItem('jackAdminPin');
+        }
+
+        // Cloud-ID initialisieren
+        function initCloudId() {
+            let savedId = localStorage.getItem('jackCloudId');
+            if (!savedId) {
+                savedId = 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                localStorage.setItem('jackCloudId', savedId);
+            }
+            gameData.cloudId = savedId;
+            document.getElementById('cloudIdDisplay').innerText = savedId;
+        }
+
+        function saveGame() {
+            localStorage.setItem('jackBeatLab_' + gameData.cloudId, JSON.stringify(gameData));
+            localStorage.setItem('jackBeatLab_lastId', gameData.cloudId);
+        }
+
+        function loadGame() {
+            initCloudId();
+            let lastId = localStorage.getItem('jackBeatLab_lastId') || gameData.cloudId;
+            let saved = localStorage.getItem('jackBeatLab_' + lastId);
+            if (saved) {
+                try {
+                    let parsed = JSON.parse(saved);
+                    gameData = { ...gameData, ...parsed };
+                    gameData.cloudId = lastId;
+                    document.getElementById('cloudIdDisplay').innerText = lastId;
+                } catch(e) { console.error("Ladefehler", e); }
+            }
+            updateGameUI();
+        }
+
+        // Spielstand auf anderem Gerät laden (PIN-geschützt)
+        function promptLoadCloudId() {
+            let pinInput = prompt("🔑 PIN erforderlich:\nGib deinen geheimen Master-PIN ein, um einen Spielstand zu laden:");
+            if (pinInput !== getAdminPin()) {
+                alert("❌ Falscher PIN! Zugriff verweigert.");
+                return;
+            }
+
+            let enteredId = prompt("Gib deine Cloud-ID ein:", gameData.cloudId);
+            if (enteredId && enteredId.trim() !== '') {
+                enteredId = enteredId.trim().toUpperCase();
+                let saved = localStorage.getItem('jackBeatLab_' + enteredId);
+                if (saved) {
+                    localStorage.setItem('jackBeatLab_lastId', enteredId);
+                    loadGame();
+                    alert("Spielstand erfolgreich geladen!");
+                } else {
+                    alert("Kein Spielstand unter dieser Cloud-ID gefunden.");
+                }
+            }
+        }
+
+        // Beat-Lab zurücksetzen (Streng PIN-geschützt)
+        function confirmResetGame() {
+            let pinInput = prompt("🔒 SICHERHEITSAFRAGE:\n\nUm das Beat-Lab zurückzusetzen, musst du deinen geheimen Master-PIN eingeben:");
+            if (pinInput !== getAdminPin()) {
+                alert("❌ Falscher PIN! Das Zurücksetzen wurde verweigert.");
+                return;
+            }
+
+            let confirmMsg = "⚠️ Bist du absolut sicher, dass du nur das Beat-Lab zurücksetzen möchtest?";
+            if (confirm(confirmMsg)) {
+                localStorage.removeItem('jackBeatLab_' + gameData.cloudId);
+                gameData.beats = 0;
+                gameData.fans = 0;
+                gameData.clickPower = 1;
+                gameData.mic = 0;
+                gameData.synth = 0;
+                gameData.desk = 0;
+                gameData.label = 0;
+                saveGame();
+                updateGameUI();
+                alert("Das Beat-Lab wurde erfolgreich zurückgesetzt.");
+            }
+        }
+
+        function clickBeat() {
+            gameData.beats += gameData.clickPower;
+            gameData.fans += Math.floor(Math.random() * 2);
+            updateGameUI();
+            saveGame();
+        }
+
+        function buyUpgrade(type) {
+            let cost = 0;
+            if (type === 'mic') cost = Math.floor(15 * Math.pow(1.15, gameData.mic));
+            if (type === 'synth') cost = Math.floor(100 * Math.pow(1.15, gameData.synth));
+            if (type === 'desk') cost = Math.floor(500 * Math.pow(1.15, gameData.desk));
+            if (type === 'label') cost = Math.floor(2500 * Math.pow(1.15, gameData.label));
+
+            if (gameData.beats >= cost) {
+                gameData.beats -= cost;
+                if (type === 'mic') gameData.mic++;
+                if (type === 'synth') gameData.synth++;
+                if (type === 'desk') gameData.desk++;
+                if (type === 'label') gameData.label++;
+                updateGameUI();
+                saveGame();
+            }
+        }
+
+        function getBps() {
+            return (gameData.mic * 1) + (gameData.synth * 5) + (gameData.desk * 25) + (gameData.label * 100);
+        }
+
+        function updateGameUI() {
+            document.getElementById('gameBeats').innerText = Math.floor(gameData.beats).toLocaleString();
+            document.getElementById('gameFans').innerText = Math.floor(gameData.fans).toLocaleString();
+            let bps = getBps();
+            document.getElementById('gameBps').innerText = bps.toLocaleString();
+
+            document.getElementById('countMic').innerText = gameData.mic;
+            document.getElementById('costMic').innerText = Math.floor(15 * Math.pow(1.15, gameData.mic)).toLocaleString();
+
+            document.getElementById('countSynth').innerText = gameData.synth;
+            document.getElementById('costSynth').innerText = Math.floor(100 * Math.pow(1.15, gameData.synth)).toLocaleString();
+
+            document.getElementById('countDesk').innerText = gameData.desk;
+            document.getElementById('costDesk').innerText = Math.floor(500 * Math.pow(1.15, gameData.desk)).toLocaleString();
+
+            document.getElementById('countLabel').innerText = gameData.label;
+            document.getElementById('costLabel').innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
+        }
+
+        setInterval(function() {
+            let bps = getBps();
+            if (bps > 0) {
+                gameData.beats += bps / 10;
+                gameData.fans += (bps / 50);
+                updateGameUI();
+            }
+        }, 100);
+
+        setInterval(function() {
+            saveGame();
+        }, 5000);
+
+        window.addEventListener('load', function() {
+            loadGame();
+        });
+
+
+        // --- 3. Audio Persistence & Security Script ---
         const audio = document.getElementById('radioStream');
 
         if ('mediaSession' in navigator) {
@@ -431,48 +681,21 @@
         window.addEventListener('load', function() {
             if (localStorage.getItem('streamPlaying') === 'true') {
                 audio.play().catch(function(error) {
-                    console.log("Browser blockiert automatisches Abspielen ohne initiale User-Interaktion:", error);
+                    console.log("Browser blockiert automatisches Abspielen:", error);
                 });
             }
         });
 
-        // Sicherheits-Sperren
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            return false;
-        });
-
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12') {
-                e.preventDefault();
-                return false;
-            }
-            if (e.ctrlKey && e.key.toLowerCase() === 'u') {
-                e.preventDefault();
-                return false;
-            }
-            if (e.ctrlKey && e.key.toLowerCase() === 's') {
-                e.preventDefault();
-                return false;
-            }
-            if (e.ctrlKey && e.key.toLowerCase() === 'p') {
-                e.preventDefault();
-                return false;
-            }
-            if (e.ctrlKey && (e.key.toLowerCase() === 'c' || e.key.toLowerCase() === 'x' || e.key.toLowerCase() === 'a')) {
-                e.preventDefault();
-                return false;
-            }
-            if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j' || e.key.toLowerCase() === 'c')) {
-                e.preventDefault();
-                return false;
-            }
+            if (e.key === 'F12') { e.preventDefault(); return false; }
+            if (e.ctrlKey && e.key.toLowerCase() === 'u') { e.preventDefault(); return false; }
+            if (e.ctrlKey && e.key.toLowerCase() === 's') { e.preventDefault(); return false; }
+            if (e.ctrlKey && e.key.toLowerCase() === 'p') { e.preventDefault(); return false; }
+            if (e.ctrlKey && (e.key.toLowerCase() === 'c' || e.key.toLowerCase() === 'x' || e.key.toLowerCase() === 'a')) { e.preventDefault(); return false; }
+            if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j' || e.key.toLowerCase() === 'c')) { e.preventDefault(); return false; }
         });
-
-        document.addEventListener('dragstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
     </script>
 </body>
 </html>
