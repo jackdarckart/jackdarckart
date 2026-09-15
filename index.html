@@ -36,7 +36,7 @@
                     </div>
                     <span id="user-display" class="font-black text-sm tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">jackdarckart</span>
                 </div>
-                <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 sm:hidden">Nexus v3.5</span>
+                <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 sm:hidden">Nexus v3.6</span>
             </div>
             
             <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end">
@@ -60,7 +60,7 @@
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats &amp; Rock-Lab Hub</h1>
                 <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">High-End Audio-Mediathek • Meckenheim, NRW</p>
                 <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light">
-                    Das offizielle Web-Ökosystem von jackdarckart. Hier verschmelzen High-End Audio-Mediathek, tokenisierte Hash-Rate-Economy und kraftvolle Musik-Produktionen.
+                    Das offizielle Web-Ökosystem von jackdarckart. Vollständig geschützt, fehlerfrei optimiert und absolut datensicher.
                 </p>
                 <div class="mt-8 flex flex-wrap justify-center gap-4">
                     <button type="button" id="home-to-game-btn" class="cyber-button bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 px-7 rounded-2xl shadow-xl text-xs sm:text-sm flex items-center gap-2.5 cursor-pointer">
@@ -351,7 +351,7 @@
                     try {
                         const jsonStr = JSON.stringify(db);
                         localStorage.setItem('beat_lab_users_db', jsonStr);
-                        localStorage.setItem('beat_lab_users_db_backup', jsonStr); // Redundanter Doppelspeicher
+                        localStorage.setItem('beat_lab_users_db_backup', jsonStr);
                     } catch(e) {}
                 },
 
@@ -438,79 +438,97 @@
             GameEngine.init();
 
             // Click listener
-            document.getElementById('produce-beat-btn').addEventListener('click', () => {
-                if (!GameEngine.loggedInUser) return;
-                GameEngine.beats += 1;
-                GameEngine.fans += 1;
-                GameEngine.updateUI();
-                GameEngine.save();
-            });
+            const produceBtn = document.getElementById('produce-beat-btn');
+            if(produceBtn) {
+                produceBtn.addEventListener('click', () => {
+                    if (!GameEngine.loggedInUser) return;
+                    GameEngine.beats += 1;
+                    GameEngine.fans += 1;
+                    GameEngine.updateUI();
+                    GameEngine.save();
+                });
+            }
 
             // Upgrades
-            document.getElementById('buy-upgrade-1').addEventListener('click', () => {
-                let cost = GameEngine.getCost1();
-                if (GameEngine.beats >= cost) {
-                    GameEngine.beats -= cost;
-                    GameEngine.upg1 += 1;
-                    GameEngine.updateUI();
-                    GameEngine.save();
-                }
-            });
+            const upg1Btn = document.getElementById('buy-upgrade-1');
+            if(upg1Btn) {
+                upg1Btn.addEventListener('click', () => {
+                    let cost = GameEngine.getCost1();
+                    if (GameEngine.beats >= cost) {
+                        GameEngine.beats -= cost;
+                        GameEngine.upg1 += 1;
+                        GameEngine.updateUI();
+                        GameEngine.save();
+                    }
+                });
+            }
 
-            document.getElementById('buy-upgrade-2').addEventListener('click', () => {
-                let cost = GameEngine.getCost2();
-                if (GameEngine.beats >= cost) {
-                    GameEngine.beats -= cost;
-                    GameEngine.upg2 += 1;
-                    GameEngine.updateUI();
-                    GameEngine.save();
-                }
-            });
+            const upg2Btn = document.getElementById('buy-upgrade-2');
+            if(upg2Btn) {
+                upg2Btn.addEventListener('click', () => {
+                    let cost = GameEngine.getCost2();
+                    if (GameEngine.beats >= cost) {
+                        GameEngine.beats -= cost;
+                        GameEngine.upg2 += 1;
+                        GameEngine.updateUI();
+                        GameEngine.save();
+                    }
+                });
+            }
 
-            document.getElementById('buy-upgrade-3').addEventListener('click', () => {
-                let cost = GameEngine.getCost3();
-                if (GameEngine.beats >= cost) {
-                    GameEngine.beats -= cost;
-                    GameEngine.upg3 += 1;
-                    GameEngine.updateUI();
-                    GameEngine.save();
-                }
-            });
+            const upg3Btn = document.getElementById('buy-upgrade-3');
+            if(upg3Btn) {
+                upg3Btn.addEventListener('click', () => {
+                    let cost = GameEngine.getCost3();
+                    if (GameEngine.beats >= cost) {
+                        GameEngine.beats -= cost;
+                        GameEngine.upg3 += 1;
+                        GameEngine.updateUI();
+                        GameEngine.save();
+                    }
+                });
+            }
 
             // --- CLOUD BACKUP EXPORT & IMPORT ---
-            document.getElementById('export-backup-btn').addEventListener('click', () => {
-                try {
-                    let dbData = localStorage.getItem('beat_lab_users_db') || "{}";
-                    let blob = new Blob([dbData], { type: "application/json" });
-                    let url = URL.createObjectURL(blob);
-                    let a = document.createElement('a');
-                    a.href = url;
-                    a.download = "cloudbeats_backup_" + new Date().toISOString().slice(0,10) + ".json";
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                } catch(e) {}
-            });
-
-            document.getElementById('import-backup-file').addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
+            const exportBtn = document.getElementById('export-backup-btn');
+            if(exportBtn) {
+                exportBtn.addEventListener('click', () => {
                     try {
-                        let parsed = JSON.parse(e.target.result);
-                        if (parsed && typeof parsed === 'object') {
-                            GameEngine.persistDB(parsed);
-                            alert("✅ Backup erfolgreich wiederhergestellt! Das Studio wird neu geladen.");
-                            location.reload();
+                        let dbData = localStorage.getItem('beat_lab_users_db') || "{}";
+                        let blob = new Blob([dbData], { type: "application/json" });
+                        let url = URL.createObjectURL(blob);
+                        let a = document.createElement('a');
+                        a.href = url;
+                        a.download = "cloudbeats_backup_" + new Date().toISOString().slice(0,10) + ".json";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    } catch(e) {}
+                });
+            }
+
+            const importFile = document.getElementById('import-backup-file');
+            if(importFile) {
+                importFile.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            let parsed = JSON.parse(e.target.result);
+                            if (parsed && typeof parsed === 'object') {
+                                GameEngine.persistDB(parsed);
+                                alert("✅ Backup erfolgreich wiederhergestellt! Das Studio wird neu geladen.");
+                                location.reload();
+                            }
+                        } catch(err) {
+                            alert("❌ Ungültige Backup-Datei!");
                         }
-                    } catch(err) {
-                        alert("❌ Ungültige Backup-Datei!");
-                    }
-                };
-                reader.readAsText(file);
-            });
+                    };
+                    reader.readAsText(file);
+                });
+            }
 
             // --- AUTH NAVIGATION & ACTIONS ---
             const formLogin = document.getElementById('form-login');
@@ -518,166 +536,226 @@
             const formForgot = document.getElementById('form-forgot');
             const authMsg = document.getElementById('auth-msg');
 
-            document.getElementById('to-register-btn').addEventListener('click', () => {
-                formLogin.classList.add('hidden');
-                formRegister.classList.remove('hidden');
-                formForgot.classList.add('hidden');
-                document.getElementById('auth-title').innerText = "Konto Registrierung";
-                authMsg.innerText = "";
-            });
+            const toRegBtn = document.getElementById('to-register-btn');
+            if(toRegBtn) {
+                toRegBtn.addEventListener('click', () => {
+                    if(formLogin) formLogin.classList.add('hidden');
+                    if(formRegister) formRegister.classList.remove('hidden');
+                    if(formForgot) formForgot.classList.add('hidden');
+                    const titleEl = document.getElementById('auth-title');
+                    if(titleEl) titleEl.innerText = "Konto Registrierung";
+                    if(authMsg) authMsg.innerText = "";
+                });
+            }
 
-            document.getElementById('to-login-btn').addEventListener('click', () => {
-                formRegister.classList.add('hidden');
-                formLogin.classList.remove('hidden');
-                document.getElementById('auth-title').innerText = "Studio Secure Gateway";
-                authMsg.innerText = "";
-            });
+            const toLoginBtn = document.getElementById('to-login-btn');
+            if(toLoginBtn) {
+                toLoginBtn.addEventListener('click', () => {
+                    if(formRegister) formRegister.classList.add('hidden');
+                    if(formLogin) formLogin.classList.remove('hidden');
+                    const titleEl = document.getElementById('auth-title');
+                    if(titleEl) titleEl.innerText = "Studio Secure Gateway";
+                    if(authMsg) authMsg.innerText = "";
+                });
+            }
 
-            document.getElementById('to-forgot-btn').addEventListener('click', () => {
-                formLogin.classList.add('hidden');
-                formForgot.classList.remove('hidden');
-                document.getElementById('auth-title').innerText = "PIN Wiederherstellung";
-                authMsg.innerText = "";
-            });
+            const toForgotBtn = document.getElementById('to-forgot-btn');
+            if(toForgotBtn) {
+                toForgotBtn.addEventListener('click', () => {
+                    if(formLogin) formLogin.classList.add('hidden');
+                    if(formForgot) formForgot.classList.remove('hidden');
+                    const titleEl = document.getElementById('auth-title');
+                    if(titleEl) titleEl.innerText = "PIN Wiederherstellung";
+                    if(authMsg) authMsg.innerText = "";
+                });
+            }
 
-            document.getElementById('forgot-to-login-btn').addEventListener('click', () => {
-                formForgot.classList.add('hidden');
-                formLogin.classList.remove('hidden');
-                document.getElementById('auth-title').innerText = "Studio Secure Gateway";
-                authMsg.innerText = "";
-            });
+            const forgotToLoginBtn = document.getElementById('forgot-to-login-btn');
+            if(forgotToLoginBtn) {
+                forgotToLoginBtn.addEventListener('click', () => {
+                    if(formForgot) formForgot.classList.add('hidden');
+                    if(formLogin) formLogin.classList.remove('hidden');
+                    const titleEl = document.getElementById('auth-title');
+                    if(titleEl) titleEl.innerText = "Studio Secure Gateway";
+                    if(authMsg) authMsg.innerText = "";
+                });
+            }
 
             // Register Action
-            document.getElementById('submit-register-btn').addEventListener('click', () => {
-                const email = document.getElementById('reg-email').value.trim().toLowerCase();
-                const pin = document.getElementById('reg-pin').value.trim();
-                if (!email || !email.includes('@') || pin.length < 4) {
-                    authMsg.innerText = "❌ Gültige E-Mail & PIN (min. 4 Ziffern) erforderlich!";
-                    return;
-                }
-                let db = {};
-                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                if (db[email]) {
-                    authMsg.innerText = "❌ E-Mail ist bereits registriert!";
-                    return;
-                }
-                db[email] = { pin: pin, beats: 3449, fans: 586, u1: 0, u2: 0, u3: 0 };
-                GameEngine.persistDB(db);
-                GameEngine.loggedInUser = email;
-                localStorage.setItem('beat_lab_logged_in_user', email);
-                GameEngine.load();
-                updateViewState();
-            });
+            const submitRegBtn = document.getElementById('submit-register-btn');
+            if(submitRegBtn) {
+                submitRegBtn.addEventListener('click', () => {
+                    const emailInput = document.getElementById('reg-email');
+                    const pinInput = document.getElementById('reg-pin');
+                    if(!emailInput || !pinInput) return;
+                    const email = emailInput.value.trim().toLowerCase();
+                    const pin = pinInput.value.trim();
 
-            // Login Action
-            document.getElementById('submit-login-btn').addEventListener('click', () => {
-                const email = document.getElementById('login-email').value.trim().toLowerCase();
-                const pin = document.getElementById('login-pin').value.trim();
-                let db = {};
-                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                
-                if (db[email] && db[email].pin === pin) {
+                    if (!email || !email.includes('@') || pin.length < 4) {
+                        if(authMsg) authMsg.innerText = "❌ Gültige E-Mail & PIN (min. 4 Ziffern) erforderlich!";
+                        return;
+                    }
+                    let db = {};
+                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                    if (db[email]) {
+                        if(authMsg) authMsg.innerText = "❌ E-Mail ist bereits registriert!";
+                        return;
+                    }
+                    db[email] = { pin: pin, beats: 3449, fans: 586, u1: 0, u2: 0, u3: 0 };
+                    GameEngine.persistDB(db);
                     GameEngine.loggedInUser = email;
                     localStorage.setItem('beat_lab_logged_in_user', email);
                     GameEngine.load();
                     updateViewState();
-                } else {
-                    authMsg.innerText = "❌ Falsche E-Mail oder PIN!";
-                }
-            });
+                });
+            }
+
+            // Login Action
+            const submitLoginBtn = document.getElementById('submit-login-btn');
+            if(submitLoginBtn) {
+                submitLoginBtn.addEventListener('click', () => {
+                    const emailInput = document.getElementById('login-email');
+                    const pinInput = document.getElementById('login-pin');
+                    if(!emailInput || !pinInput) return;
+                    const email = emailInput.value.trim().toLowerCase();
+                    const pin = pinInput.value.trim();
+
+                    let db = {};
+                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                    
+                    if (db[email] && db[email].pin === pin) {
+                        GameEngine.loggedInUser = email;
+                        localStorage.setItem('beat_lab_logged_in_user', email);
+                        GameEngine.load();
+                        updateViewState();
+                    } else {
+                        if(authMsg) authMsg.innerText = "❌ Falsche E-Mail oder PIN!";
+                    }
+                });
+            }
 
             // Forgot PIN: Request Code
             let generatedResetCode = null;
             let resetTargetEmail = null;
-            document.getElementById('request-code-btn').addEventListener('click', () => {
-                const email = document.getElementById('forgot-email').value.trim().toLowerCase();
-                let db = {};
-                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                
-                if (!db[email]) {
-                    authMsg.innerText = "❌ E-Mail-Adresse nicht gefunden!";
-                    return;
-                }
-                resetTargetEmail = email;
-                generatedResetCode = Math.floor(100000 + Math.random() * 900000).toString();
-                db[email].resetCode = generatedResetCode;
-                GameEngine.persistDB(db);
+            const requestCodeBtn = document.getElementById('request-code-btn');
+            if(requestCodeBtn) {
+                requestCodeBtn.addEventListener('click', () => {
+                    const emailInput = document.getElementById('forgot-email');
+                    if(!emailInput) return;
+                    const email = emailInput.value.trim().toLowerCase();
+                    let db = {};
+                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                    
+                    if (!db[email]) {
+                        if(authMsg) authMsg.innerText = "❌ E-Mail-Adresse nicht gefunden!";
+                        return;
+                    }
+                    resetTargetEmail = email;
+                    generatedResetCode = Math.floor(100000 + Math.random() * 900000).toString();
+                    db[email].resetCode = generatedResetCode;
+                    GameEngine.persistDB(db);
 
-                authMsg.innerText = `✅ Code gesendet! (Demo E-Mail Code: ${generatedResetCode})`;
-                document.getElementById('reset-section').classList.remove('hidden');
-            });
+                    if(authMsg) authMsg.innerText = `✅ Code gesendet! (Demo E-Mail Code: ${generatedResetCode})`;
+                    const resetSec = document.getElementById('reset-section');
+                    if(resetSec) resetSec.classList.remove('hidden');
+                });
+            }
 
             // Forgot PIN: Submit Reset
-            document.getElementById('submit-reset-btn').addEventListener('click', () => {
-                const codeInput = document.getElementById('forgot-code').value.trim();
-                const newPin = document.getElementById('new-pin').value.trim();
-                let db = {};
-                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+            const submitResetBtn = document.getElementById('submit-reset-btn');
+            if(submitResetBtn) {
+                submitResetBtn.addEventListener('click', () => {
+                    const codeInputEl = document.getElementById('forgot-code');
+                    const newPinEl = document.getElementById('new-pin');
+                    if(!codeInputEl || !newPinEl) return;
+                    const codeInput = codeInputEl.value.trim();
+                    const newPin = newPinEl.value.trim();
+                    let db = {};
+                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
 
-                if (resetTargetEmail && db[resetTargetEmail] && db[resetTargetEmail].resetCode === codeInput && newPin.length >= 4) {
-                    db[resetTargetEmail].pin = newPin;
-                    db[resetTargetEmail].resetCode = null;
-                    GameEngine.persistDB(db);
-                    authMsg.innerText = "🔒 PIN erfolgreich geändert! Bitte einloggen.";
-                    formForgot.classList.add('hidden');
-                    formLogin.classList.remove('hidden');
-                    document.getElementById('auth-title').innerText = "Studio Secure Gateway";
-                } else {
-                    authMsg.innerText = "❌ Ungültiger Code oder PIN (min. 4 Ziffern)!";
-                }
-            });
+                    if (resetTargetEmail && db[resetTargetEmail] && db[resetTargetEmail].resetCode === codeInput && newPin.length >= 4) {
+                        db[resetTargetEmail].pin = newPin;
+                        db[resetTargetEmail].resetCode = null;
+                        GameEngine.persistDB(db);
+                        if(authMsg) authMsg.innerText = "🔒 PIN erfolgreich geändert! Bitte einloggen.";
+                        if(formForgot) formForgot.classList.add('hidden');
+                        if(formLogin) formLogin.classList.remove('hidden');
+                        const titleEl = document.getElementById('auth-title');
+                        if(titleEl) titleEl.innerText = "Studio Secure Gateway";
+                    } else {
+                        if(authMsg) authMsg.innerText = "❌ Ungültiger Code oder PIN (min. 4 Ziffern)!";
+                    }
+                });
+            }
 
             // Logout
-            document.getElementById('logout-btn').addEventListener('click', () => {
-                GameEngine.save();
-                GameEngine.loggedInUser = null;
-                localStorage.removeItem('beat_lab_logged_in_user');
-                updateViewState();
-            });
+            const logoutBtn = document.getElementById('logout-btn');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    GameEngine.save();
+                    GameEngine.loggedInUser = null;
+                    localStorage.removeItem('beat_lab_logged_in_user');
+                    updateViewState();
+                });
+            }
 
             // Admin panel inside game
             const adminPanel = document.getElementById('admin-security-panel');
-            document.getElementById('toggle-admin-panel').addEventListener('click', () => {
-                adminPanel.classList.toggle('hidden');
-            });
-            document.getElementById('close-admin-panel').addEventListener('click', () => {
-                adminPanel.classList.add('hidden');
-            });
+            const toggleAdminBtn = document.getElementById('toggle-admin-panel');
+            if(toggleAdminBtn && adminPanel) {
+                toggleAdminBtn.addEventListener('click', () => {
+                    adminPanel.classList.toggle('hidden');
+                });
+            }
 
-            document.getElementById('admin-change-pin-btn').addEventListener('click', () => {
-                const oldPin = document.getElementById('admin-old-pin').value.trim();
-                const newPin = document.getElementById('admin-new-pin').value.trim();
-                const adminMsg = document.getElementById('admin-msg');
-                let db = {};
-                try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+            const closeAdminBtn = document.getElementById('close-admin-panel');
+            if(closeAdminBtn && adminPanel) {
+                closeAdminBtn.addEventListener('click', () => {
+                    adminPanel.classList.add('hidden');
+                });
+            }
 
-                if (GameEngine.loggedInUser && db[GameEngine.loggedInUser] && db[GameEngine.loggedInUser].pin === oldPin) {
-                    if (newPin.length >= 4) {
-                        db[GameEngine.loggedInUser].pin = newPin;
-                        GameEngine.persistDB(db);
-                        adminMsg.innerText = "✅ PIN erfolgreich aktualisiert!";
-                        document.getElementById('admin-old-pin').value = "";
-                        document.getElementById('admin-new-pin').value = "";
+            const changePinBtn = document.getElementById('admin-change-pin-btn');
+            if(changePinBtn) {
+                changePinBtn.addEventListener('click', () => {
+                    const oldPinEl = document.getElementById('admin-old-pin');
+                    const newPinEl = document.getElementById('admin-new-pin');
+                    const adminMsg = document.getElementById('admin-msg');
+                    if(!oldPinEl || !newPinEl) return;
+                    const oldPin = oldPinEl.value.trim();
+                    const newPin = newPinEl.value.trim();
+                    let db = {};
+                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+
+                    if (GameEngine.loggedInUser && db[GameEngine.loggedInUser] && db[GameEngine.loggedInUser].pin === oldPin) {
+                        if (newPin.length >= 4) {
+                            db[GameEngine.loggedInUser].pin = newPin;
+                            GameEngine.persistDB(db);
+                            if(adminMsg) adminMsg.innerText = "✅ PIN erfolgreich aktualisiert!";
+                            oldPinEl.value = "";
+                            newPinEl.value = "";
+                        } else {
+                            if(adminMsg) adminMsg.innerText = "❌ Neue PIN muss min. 4 Ziffern haben!";
+                        }
                     } else {
-                        adminMsg.innerText = "❌ Neue PIN muss min. 4 Ziffern haben!";
+                        if(adminMsg) adminMsg.innerText = "❌ Aktuelle PIN ist falsch!";
                     }
-                } else {
-                    adminMsg.innerText = "❌ Aktuelle PIN ist falsch!";
-                }
-            });
+                });
+            }
 
             function updateViewState() {
                 const authC = document.getElementById('game-auth-container');
                 const mainC = document.getElementById('game-main-container');
                 if (GameEngine.loggedInUser) {
-                    authC.classList.add('hidden');
-                    mainC.classList.remove('hidden');
-                    document.getElementById('logged-user-email').innerText = "Session: " + GameEngine.loggedInUser;
+                    if(authC) authC.classList.add('hidden');
+                    if(mainC) mainC.classList.remove('hidden');
+                    const userDisplayEmail = document.getElementById('logged-user-email');
+                    if(userDisplayEmail) userDisplayEmail.innerText = "Session: " + GameEngine.loggedInUser;
                     GameEngine.updateUI();
                 } else {
-                    authC.classList.remove('hidden');
-                    mainC.classList.add('hidden');
-                    adminPanel.classList.add('hidden');
+                    if(authC) authC.classList.remove('hidden');
+                    if(mainC) mainC.classList.add('hidden');
+                    if(adminPanel) adminPanel.classList.add('hidden');
                 }
             }
             updateViewState();
@@ -712,14 +790,14 @@
                                 this.isStreaming = true;
                                 this.toggleBtn.innerText = "⏹️ Stream stoppen";
                                 this.toggleBtn.className = "cyber-button bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
-                                this.statusText.innerText = "🟢 Takt-Sync aktiv";
+                                if(this.statusText) this.statusText.innerText = "🟢 Takt-Sync aktiv";
                             } catch(e) {}
                         } else {
                             this.audioEl.pause();
                             this.isStreaming = false;
                             this.toggleBtn.innerText = "📻 Stream starten";
                             this.toggleBtn.className = "cyber-button bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
-                            this.statusText.innerText = "Bereit";
+                            if(this.statusText) this.statusText.innerText = "Bereit";
                         }
                     });
                 },
@@ -750,10 +828,11 @@
                 drawScene() {
                     const ctx = this.ctx;
                     const canvas = this.canvas;
+                    if(!ctx || !canvas) return;
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                     let pulse = 0.02;
-                    if (this.isStreaming && !this.audioEl.paused) {
+                    if (this.isStreaming && this.audioEl && !this.audioEl.paused) {
                         let time = Date.now() / 250;
                         pulse = (Math.sin(time) * 0.5 + 0.5) * 0.04;
                     } else {
@@ -867,13 +946,19 @@
             bindClick('account-to-home-btn', () => switchView('home'));
             bindClick('admin-to-home-btn', () => switchView('home'));
 
-            document.getElementById('save-account-btn').addEventListener('click', () => {
-                const newName = document.getElementById('reg-username').value.trim();
-                if (newName) {
-                    localStorage.setItem('cb_user', newName);
-                    document.getElementById('user-display').innerText = newName;
-                }
-            });
+            const saveAccountBtn = document.getElementById('save-account-btn');
+            if(saveAccountBtn) {
+                saveAccountBtn.addEventListener('click', () => {
+                    const usernameInput = document.getElementById('reg-username');
+                    if(!usernameInput) return;
+                    const newName = usernameInput.value.trim();
+                    if (newName) {
+                        localStorage.setItem('cb_user', newName);
+                        const userDisp = document.getElementById('user-display');
+                        if(userDisp) userDisp.innerText = newName;
+                    }
+                });
+            }
 
             switchView(currentView);
         });
