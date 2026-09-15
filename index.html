@@ -21,13 +21,13 @@
 
             <!-- Seiten-Navigation -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="switchView('home')" id="nav-home" class="bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow">🏠 Start</button>
-                <button onclick="switchView('game')" id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🎵 Game</button>
-                <button onclick="switchView('garten')" id="nav-garten" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🌱 Garten</button>
-                <button onclick="switchView('cloud')" id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">☁️ Cloud</button>
-                <button onclick="switchView('account')" id="nav-account" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">📝 Account</button>
-                <button onclick="switchView('admin')" id="nav-admin" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🛠️ Admin</button>
-                <button onclick="toggleSound()" id="sound-btn" class="bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🔊</button>
+                <button id="nav-home" class="bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow">🏠 Start</button>
+                <button id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🎵 Game</button>
+                <button id="nav-garten" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🌱 Garten</button>
+                <button id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">☁️ Cloud</button>
+                <button id="nav-account" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">📝 Account</button>
+                <button id="nav-admin" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🛠️ Admin</button>
+                <button id="sound-btn" class="bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🔊</button>
             </div>
         </div>
     </header>
@@ -47,7 +47,7 @@
                     Willkommen im kreativen Universum von jackdarckart. Entdecke professionelle Audioproduktionen, immersive Soundwelten und interaktive Web-Projekte.
                 </p>
                 <div class="mt-6 flex flex-wrap justify-center gap-3">
-                    <button onclick="switchView('game')" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
+                    <button id="home-to-game-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
                         <span>🎵</span> Zum Beat-Lab Studio
                     </button>
                     <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-500/30 font-semibold py-3 px-6 rounded-2xl text-xs sm:text-sm transition flex items-center gap-2">
@@ -112,7 +112,7 @@
                 <p class="text-gray-400 text-xs">Produziere Beats und erweitere dein Studio!</p>
             </div>
 
-            <button onclick="produceBeat()" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl mb-6 transition border border-purple-400/30 flex items-center justify-center gap-3">
+            <button id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl mb-6 transition border border-purple-400/30 flex items-center justify-center gap-3">
                 <span class="text-2xl">🎵</span> Beat produzieren <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+1</span>
             </button>
 
@@ -131,7 +131,12 @@
                 </div>
             </div>
 
-            <button onclick="switchView('home')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
+            <!-- Exklusiver Passwort-Reset-Button im Game-Bereich -->
+            <button id="reset-game-pass-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-yellow-400 font-semibold py-3 rounded-2xl text-xs transition border border-yellow-500/30 mb-3 flex items-center justify-center gap-2">
+                <span>🔑</span> Spiel-Passwort zurücksetzen
+            </button>
+
+            <button id="game-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
                 ← Zurück zur Startseite
             </button>
         </div>
@@ -142,7 +147,7 @@
                 <span class="text-4xl mb-3 block">🌱</span>
                 <h2 class="text-2xl font-black text-emerald-400 mb-2">Dein HD-Garten</h2>
                 <p class="text-gray-300 text-xs mb-6">Hier wachsen deine musikalischen Ideen im Einklang mit der Natur. Töne sind hier aktiv.</p>
-                <button onclick="switchView('home')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
+                <button id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
                     ← Zurück zur Startseite
                 </button>
             </div>
@@ -153,9 +158,9 @@
             <div class="bg-[#131b2e] border border-cyan-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
                 <h2 class="text-xl font-bold text-cyan-400">☁️ Cloud-Sync</h2>
                 <p class="text-xs text-gray-400">Exportiere deinen Spielstand als Code oder importiere ihn auf einem anderen Gerät.</p>
-                <button onclick="exportSave()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📤 Code kopieren (Export)</button>
-                <button onclick="importSave()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📥 Code einfügen (Import)</button>
-                <button onclick="switchView('home')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
+                <button id="export-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📤 Code kopieren (Export)</button>
+                <button id="import-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📥 Code einfügen (Import)</button>
+                <button id="cloud-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
             </div>
@@ -164,7 +169,7 @@
         <!-- 5. ACCOUNT-SEITE -->
         <div id="view-account" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-blue-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
-                <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Account & Passwort</h2>
+                <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Account & Profil</h2>
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Künstlername:</label>
                     <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
@@ -177,8 +182,8 @@
                     <label class="text-xs text-gray-400 block mb-1">Neues Passwort:</label>
                     <input type="password" id="reg-password" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
-                <button onclick="submitRegister()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Account speichern</button>
-                <button onclick="switchView('home')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
+                <button id="save-account-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Account speichern</button>
+                <button id="account-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
             </div>
@@ -200,8 +205,8 @@
                     <label class="text-xs text-gray-400 block mb-1">BPS:</label>
                     <input type="number" step="0.1" id="admin-bps-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
-                <button onclick="applyAdminStats()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Werte anwenden</button>
-                <button onclick="switchView('home')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
+                <button id="apply-admin-btn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Werte anwenden</button>
+                <button id="admin-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
             </div>
@@ -213,194 +218,227 @@
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Automatisch gespeichert</span>
-            <button onclick="resetGame()" class="text-red-400 hover:underline">Zurücksetzen</button>
+            <button id="reset-game-btn" class="text-red-400 hover:underline">Zurücksetzen</button>
         </div>
     </footer>
 
-    <!-- JavaScript Logik (Sauber & Global) -->
+    <!-- JavaScript Logik -->
     <script>
-        let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 40430;
-        let fans = parseInt(localStorage.getItem('beat_lab_fans')) || 14603;
-        let bps = parseFloat(localStorage.getItem('beat_lab_bps')) || 161.0;
-        let username = localStorage.getItem('beat_lab_user') || 'jackdarckart';
-        let soundEnabled = true;
-        let currentView = 'home';
+        document.addEventListener('DOMContentLoaded', function() {
+            let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 40430;
+            let fans = parseInt(localStorage.getItem('beat_lab_fans')) || 14603;
+            let bps = parseFloat(localStorage.getItem('beat_lab_bps')) || 161.0;
+            let username = localStorage.getItem('beat_lab_user') || 'jackdarckart';
+            let soundEnabled = true;
+            let currentView = 'home';
 
-        const userDisplay = document.getElementById('user-display');
-        if (userDisplay) userDisplay.innerText = username;
+            const userDisplay = document.getElementById('user-display');
+            if (userDisplay) userDisplay.innerText = username;
 
-        let audioCtx = null;
-        function playBeatSound() {
-            if (!soundEnabled || currentView === 'home') return;
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1);
-
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
-            } catch (e) {}
-        }
-
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            let btn = document.getElementById('sound-btn');
-            if (btn) {
-                btn.innerText = soundEnabled ? "🔊" : "🔇";
-                btn.className = soundEnabled 
-                    ? "bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700" 
-                    : "bg-red-900 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-red-700";
-            }
-        }
-
-        function switchView(view) {
-            currentView = view;
-            document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
-            let target = document.getElementById('view-' + view);
-            if (target) target.classList.remove('hidden');
-
-            if (view === 'admin') {
-                let bIn = document.getElementById('admin-beats-input');
-                let fIn = document.getElementById('admin-fans-input');
-                let bpsIn = document.getElementById('admin-bps-input');
-                if(bIn) bIn.value = Math.floor(beats);
-                if(fIn) fIn.value = fans;
-                if(bpsIn) bpsIn.value = bps.toFixed(1);
-            }
-            if (view === 'account') {
-                let rUser = document.getElementById('reg-username');
-                let rEmail = document.getElementById('reg-email');
-                if(rUser) rUser.value = username;
-                if(rEmail) rEmail.value = localStorage.getItem('beat_lab_email') || '';
-            }
-
-            ['home', 'game', 'garten', 'cloud', 'account', 'admin'].forEach(v => {
-                let b = document.getElementById('nav-' + v);
-                if (b) {
-                    if (v === view) {
-                        b.className = "bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow";
-                    } else {
-                        b.className = "bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700";
-                    }
-                }
-            });
-            window.scrollTo(0, 0);
-        }
-
-        function produceBeat() {
-            beats += 1;
-            playBeatSound();
-            updateDisplay();
-            saveGame();
-        }
-
-        function updateDisplay() {
-            let bEl = document.getElementById('beats-count');
-            let fEl = document.getElementById('fans-count');
-            let bpsEl = document.getElementById('bps-count');
-            if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
-            if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
-            if(bpsEl) bpsEl.innerText = bps.toFixed(1);
-        }
-
-        function saveGame() {
-            localStorage.setItem('beat_lab_beats', beats);
-            localStorage.setItem('beat_lab_fans', fans);
-            localStorage.setItem('beat_lab_bps', bps);
-            localStorage.setItem('beat_lab_user', username);
-        }
-
-        function submitRegister() {
-            let regUser = document.getElementById('reg-username').value;
-            let regEmail = document.getElementById('reg-email').value;
-            let regPass = document.getElementById('reg-password').value;
-            if (regUser && regUser.trim() !== "") {
-                username = regUser.trim();
-                let ud = document.getElementById('user-display');
-                if(ud) ud.innerText = username;
-                localStorage.setItem('beat_lab_email', regEmail);
-                if(regPass) localStorage.setItem('beat_lab_pass', regPass);
-                saveGame();
-                alert("🎉 Account erfolgreich gespeichert!");
-            }
-        }
-
-        function applyAdminStats() {
-            beats = parseFloat(document.getElementById('admin-beats-input').value) || beats;
-            fans = parseInt(document.getElementById('admin-fans-input').value) || fans;
-            bps = parseFloat(document.getElementById('admin-bps-input').value) || bps;
-            updateDisplay();
-            saveGame();
-            alert("🛠️ Admin-Werte übernommen!");
-        }
-
-        function exportSave() {
-            try {
-                const saveData = { beats, fans, bps, username, email: localStorage.getItem('beat_lab_email') || '', pass: localStorage.getItem('beat_lab_pass') || '' };
-                const code = btoa(JSON.stringify(saveData));
-                navigator.clipboard.writeText(code).then(() => {
-                    alert("📋 Cloud-Code in die Zwischenablage kopiert!");
-                }).catch(() => { prompt("Code kopieren:", code); });
-            } catch(e) {
-                alert("❌ Fehler beim Export.");
-            }
-        }
-
-        function importSave() {
-            let code = prompt("Cloud-Code einfügen:");
-            if (code && code.trim() !== "") {
+            let audioCtx = null;
+            function playBeatSound() {
+                if (!soundEnabled || currentView === 'home') return;
                 try {
-                    const data = JSON.parse(atob(code.trim()));
-                    beats = data.beats || 40430;
-                    fans = data.fans || 14603;
-                    bps = data.bps || 161.0;
-                    username = data.username || 'jackdarckart';
-                    if(data.email) localStorage.setItem('beat_lab_email', data.email);
-                    if(data.pass) localStorage.setItem('beat_lab_pass', data.pass);
-                    let ud = document.getElementById('user-display');
-                    if(ud) ud.innerText = username;
-                    saveGame();
-                    updateDisplay();
-                    alert("🚀 Spielstand erfolgreich geladen!");
-                } catch (e) {
-                    alert("❌ Ungültiger Code!");
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1);
+
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } catch (e) {}
+            }
+
+            function toggleSound() {
+                soundEnabled = !soundEnabled;
+                let btn = document.getElementById('sound-btn');
+                if (btn) {
+                    btn.innerText = soundEnabled ? "🔊" : "🔇";
+                    btn.className = soundEnabled 
+                        ? "bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700" 
+                        : "bg-red-900 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-red-700";
                 }
             }
-        }
 
-        function resetGame() {
-            if (confirm("Wirklich alles zurücksetzen?")) {
-                localStorage.clear();
-                beats = 40430; fans = 14603; bps = 161.0; username = 'jackdarckart';
-                let ud = document.getElementById('user-display');
-                if(ud) ud.innerText = username;
+            function switchView(view) {
+                currentView = view;
+                document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
+                let target = document.getElementById('view-' + view);
+                if (target) target.classList.remove('hidden');
+
+                if (view === 'admin') {
+                    let bIn = document.getElementById('admin-beats-input');
+                    let fIn = document.getElementById('admin-fans-input');
+                    let bpsIn = document.getElementById('admin-bps-input');
+                    if(bIn) bIn.value = Math.floor(beats);
+                    if(fIn) fIn.value = fans;
+                    if(bpsIn) bpsIn.value = bps.toFixed(1);
+                }
+                if (view === 'account') {
+                    let rUser = document.getElementById('reg-username');
+                    let rEmail = document.getElementById('reg-email');
+                    if(rUser) rUser.value = username;
+                    if(rEmail) rEmail.value = localStorage.getItem('beat_lab_email') || '';
+                }
+
+                ['home', 'game', 'garten', 'cloud', 'account', 'admin'].forEach(v => {
+                    let b = document.getElementById('nav-' + v);
+                    if (b) {
+                        if (v === view) {
+                            b.className = "bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow";
+                        } else {
+                            b.className = "bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700";
+                        }
+                    }
+                });
+                window.scrollTo(0, 0);
+            }
+
+            function produceBeat() {
+                beats += 1;
+                playBeatSound();
                 updateDisplay();
                 saveGame();
             }
-        }
 
-        // Auto-production
-        setInterval(() => {
-            beats += bps / 10;
+            function updateDisplay() {
+                let bEl = document.getElementById('beats-count');
+                let fEl = document.getElementById('fans-count');
+                let bpsEl = document.getElementById('bps-count');
+                if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
+                if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
+                if(bpsEl) bpsEl.innerText = bps.toFixed(1);
+            }
+
+            function saveGame() {
+                localStorage.setItem('beat_lab_beats', beats);
+                localStorage.setItem('beat_lab_fans', fans);
+                localStorage.setItem('beat_lab_bps', bps);
+                localStorage.setItem('beat_lab_user', username);
+            }
+
+            function submitRegister() {
+                let regUser = document.getElementById('reg-username').value;
+                let regEmail = document.getElementById('reg-email').value;
+                let regPass = document.getElementById('reg-password').value;
+                if (regUser && regUser.trim() !== "") {
+                    username = regUser.trim();
+                    let ud = document.getElementById('user-display');
+                    if(ud) ud.innerText = username;
+                    localStorage.setItem('beat_lab_email', regEmail);
+                    if(regPass) localStorage.setItem('beat_lab_pass', regPass);
+                    saveGame();
+                    alert("🎉 Account erfolgreich gespeichert!");
+                }
+            }
+
+            // Funktion zum Zurücksetzen des Game-Passworts (nur im Game-Bereich)
+            function resetGamePassword() {
+                let newPass = prompt("🔑 Gib ein neues Passwort für dein Game ein:");
+                if (newPass !== null) {
+                    localStorage.setItem('beat_lab_pass', newPass.trim());
+                    alert("✅ Spiel-Passwort erfolgreich zurückgesetzt und gespeichert!");
+                }
+            }
+
+            function applyAdminStats() {
+                beats = parseFloat(document.getElementById('admin-beats-input').value) || beats;
+                fans = parseInt(document.getElementById('admin-fans-input').value) || fans;
+                bps = parseFloat(document.getElementById('admin-bps-input').value) || bps;
+                updateDisplay();
+                saveGame();
+                alert("🛠️ Admin-Werte übernommen!");
+            }
+
+            function exportSave() {
+                try {
+                    const saveData = { beats, fans, bps, username, email: localStorage.getItem('beat_lab_email') || '', pass: localStorage.getItem('beat_lab_pass') || '' };
+                    const code = btoa(JSON.stringify(saveData));
+                    navigator.clipboard.writeText(code).then(() => {
+                        alert("📋 Cloud-Code in die Zwischenablage kopiert!");
+                    }).catch(() => { prompt("Code kopieren:", code); });
+                } catch(e) {
+                    alert("❌ Fehler beim Export.");
+                }
+            }
+
+            function importSave() {
+                let code = prompt("Cloud-Code einfügen:");
+                if (code && code.trim() !== "") {
+                    try {
+                        const data = JSON.parse(atob(code.trim()));
+                        beats = data.beats || 40430;
+                        fans = data.fans || 14603;
+                        bps = data.bps || 161.0;
+                        username = data.username || 'jackdarckart';
+                        if(data.email) localStorage.setItem('beat_lab_email', data.email);
+                        if(data.pass) localStorage.setItem('beat_lab_pass', data.pass);
+                        let ud = document.getElementById('user-display');
+                        if(ud) ud.innerText = username;
+                        saveGame();
+                        updateDisplay();
+                        alert("🚀 Spielstand erfolgreich geladen!");
+                    } catch (e) {
+                        alert("❌ Ungültiger Code!");
+                    }
+                }
+            }
+
+            function resetGame() {
+                if (confirm("Wirklich alles zurücksetzen?")) {
+                    localStorage.clear();
+                    beats = 40430; fans = 14603; bps = 161.0; username = 'jackdarckart';
+                    let ud = document.getElementById('user-display');
+                    if(ud) ud.innerText = username;
+                    updateDisplay();
+                    saveGame();
+                }
+            }
+
+            // Event-Listener Bindungen
+            document.getElementById('nav-home').addEventListener('click', () => switchView('home'));
+            document.getElementById('nav-game').addEventListener('click', () => switchView('game'));
+            document.getElementById('nav-garten').addEventListener('click', () => switchView('garten'));
+            document.getElementById('nav-cloud').addEventListener('click', () => switchView('cloud'));
+            document.getElementById('nav-account').addEventListener('click', () => switchView('account'));
+            document.getElementById('nav-admin').addEventListener('click', () => switchView('admin'));
+            document.getElementById('sound-btn').addEventListener('click', toggleSound);
+
+            document.getElementById('home-to-game-btn').addEventListener('click', () => switchView('game'));
+            document.getElementById('produce-beat-btn').addEventListener('click', produceBeat);
+            document.getElementById('reset-game-pass-btn').addEventListener('click', resetGamePassword);
+            document.getElementById('game-to-home-btn').addEventListener('click', () => switchView('home'));
+            document.getElementById('garten-to-home-btn').addEventListener('click', () => switchView('home'));
+            document.getElementById('export-btn').addEventListener('click', exportSave);
+            document.getElementById('import-btn').addEventListener('click', importSave);
+            document.getElementById('cloud-to-home-btn').addEventListener('click', () => switchView('home'));
+            document.getElementById('save-account-btn').addEventListener('click', submitRegister);
+            document.getElementById('account-to-home-btn').addEventListener('click', () => switchView('home'));
+            document.getElementById('apply-admin-btn').addEventListener('click', applyAdminStats);
+            document.getElementById('admin-to-home-btn').addEventListener('click', () => switchView('home'));
+            document.getElementById('reset-game-btn').addEventListener('click', resetGame);
+
+            // Auto-production
+            setInterval(() => {
+                beats += bps / 10;
+                updateDisplay();
+            }, 100);
+
+            // Auto-save
+            setInterval(() => { saveGame(); }, 5000);
+
             updateDisplay();
-        }, 100);
-
-        // Auto-save
-        setInterval(() => { saveGame(); }, 5000);
-
-        // Init initial update
-        updateDisplay();
+        });
     </script>
 </body>
 </html>
