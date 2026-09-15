@@ -279,14 +279,14 @@
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
                     <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Klang-Biotop</h2>
-                    <p class="text-gray-300 text-xs">Interaktiver, grafisch animierter Garten mit Teich und Klangpflanzen. Klicke auf die Pflanzen oder die Elemente im Garten, um synchrone Bio-Töne zu erzeugen und $BEATS zu ernten.</p>
+                    <p class="text-gray-300 text-xs">Interaktiver, grafisch animierter Garten mit Teich und Klangpflanzen. Klicke auf die Pflanzen oder den Garten, um synchrone Bio-Töne zu erzeugen und $BEATS zu ernten.</p>
                 </div>
 
                 <!-- Grafisch animiertes Garten-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-xl bg-[#06101e]">
                     <canvas id="garden-canvas" width="400" height="220" class="w-full h-auto cursor-pointer block"></canvas>
                     <div class="absolute bottom-2 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-xl text-[10px] text-emerald-300 border border-emerald-500/30 pointer-events-none">
-                        ✨ Klicke direkt in den Garten zur Ernte
+                        ✨ Klicke direkt in den Garten zur Ernte &amp; Ton-Welle
                     </div>
                 </div>
 
@@ -385,7 +385,7 @@
         </div>
     </footer>
 
-    <!-- HIGH-END STUDIO & ANIMATED GARDEN ENGINE -->
+    <!-- ROBUST AUDIO & ANIMATED GARDEN ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -506,7 +506,7 @@
                     try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
 
                     if (usersDB[emailInput]) {
-                        alert("⚠️ Diese E-Mail is already registered!");
+                        alert("⚠️ Diese E-Mail ist bereits registriert!");
                         return;
                     }
 
@@ -579,41 +579,52 @@
                 });
             }
 
-            // 🎵 AUDIO ENGINE (Single Clean Tone)
+            // 🎵 ROBUST AUDIO ENGINE (Auto-Resume für Browser Autoplay Policy)
             let audioCtx = null;
             const studioScale = [
                 261.63, 293.66, 329.63, 392.00, 440.00,
                 523.25, 587.33, 659.25, 783.99, 880.00
             ];
 
+            function getAudioContext() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                return audioCtx;
+            }
+
             function playSingleTone(customFreq = null) {
                 if (!soundEnabled) return;
 
                 try {
-                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const ctx = getAudioContext();
+                    if (ctx.state !== 'running') return;
 
-                    const now = audioCtx.currentTime;
+                    const now = ctx.currentTime;
                     let freq = customFreq !== null ? customFreq : studioScale[Math.floor(Math.random() * studioScale.length)];
 
-                    let osc = audioCtx.createOscillator();
+                    let osc = ctx.createOscillator();
+                    let gainNode = ctx.createGain();
+
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(freq, now);
 
-                    let gainNode = audioCtx.createGain();
                     gainNode.gain.setValueAtTime(0.0001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.06, now + 0.008);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+                    gainNode.gain.linearRampToValueAtTime(0.07, now + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
 
                     osc.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
+                    gainNode.connect(ctx.destination);
 
                     osc.start(now);
-                    osc.stop(now + 0.18);
+                    osc.stop(now + 0.22);
 
                     setTimeout(() => {
                         try { osc.disconnect(); gainNode.disconnect(); } catch(e){}
-                    }, 200);
+                    }, 250);
                 } catch(e) {}
             }
 
@@ -666,14 +677,14 @@
                 saveGame();
             }
 
-            // --- ANIMATED GARDEN CANVAS (Basierend auf der Vorlage) ---
+            // --- ANIMATED GARDEN CANVAS (Synchronisierter Teich & Pflanzen) ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
             let plantPulse = 0;
 
             function triggerGardenRipple() {
-                ripples.push({ x: 260, y: 130, radius: 10, alpha: 1.0 });
+                ripples.push({ x: 260, y: 120, radius: 8, alpha: 1.0 });
                 plantPulse = 1.0;
             }
 
@@ -687,28 +698,29 @@
 
                 // Terrasse / Holzdeck unten rechts
                 ctx.fillStyle = '#221911';
-                ctx.fillRect(240, 150, 160, 70);
+                ctx.fillRect(230, 150, 170, 70);
                 ctx.strokeStyle = '#3d2b1f';
                 ctx.lineWidth = 1;
-                for(let i=240; i<400; i+=15) {
+                for(let i=230; i<400; i+=15) {
                     ctx.beginPath(); ctx.moveTo(i, 150); ctx.lineTo(i, 220); ctx.stroke();
                 }
 
                 // Quadratischer Teich (Mitte rechts)
-                ctx.fillStyle = '#103741';
-                ctx.fillRect(220, 80, 110, 80);
-                ctx.strokeStyle = '#235868';
+                ctx.fillStyle = '#0e3440';
+                ctx.fillRect(210, 75, 120, 85);
+                ctx.strokeStyle = '#1e5262';
                 ctx.lineWidth = 2;
-                ctx.strokeRect(220, 80, 110, 80);
+                ctx.strokeRect(210, 75, 120, 85);
 
-                // Wellen / Animation im Teich
+                // Wellen-Animation im Teich
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 1.2;
+                    rip.radius += 1.5;
                     rip.alpha -= 0.025;
-                    if (rip.alpha <= 0) ripples.splice(idx, 1);
-                    else {
+                    if (rip.alpha <= 0) {
+                        ripples.splice(idx, 1);
+                    } else {
                         ctx.strokeStyle = `rgba(110, 231, 183, ${rip.alpha})`;
-                        ctx.lineWidth = 1.5;
+                        ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
                         ctx.stroke();
@@ -717,37 +729,35 @@
 
                 // Steinpfad / Platten (Mitte links)
                 ctx.fillStyle = '#1e2530';
-                for(let p=0; p<5; p++) {
-                    ctx.fillRect(80 + p*25, 110 + p*15, 30, 18);
+                for(let p=0; p<6; p++) {
+                    ctx.fillRect(70 + p*24, 100 + p*16, 28, 16);
                 }
 
-                // Bäume & Sträucher (Kreis-Köpfe)
+                // Pulsierende Bäume & Pflanzen bei Klick
                 let pScale = 1 + (plantPulse * 0.15);
-                if (plantPulse > 0) plantPulse -= 0.05;
+                if (plantPulse > 0) plantPulse -= 0.04;
 
-                // Baum 1 (Links)
+                // Baumkronen (Links)
                 ctx.fillStyle = '#14532d';
-                ctx.beginPath(); ctx.arc(90, 60, 26 * pScale, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(80, 50, 24 * pScale, 0, Math.PI*2); ctx.fill();
                 ctx.fillStyle = '#166534';
-                ctx.beginPath(); ctx.arc(130, 55, 30 * pScale, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(125, 45, 28 * pScale, 0, Math.PI*2); ctx.fill();
 
-                // Blühende Beete (Farbtupfer)
-                ctx.fillStyle = '#db2777'; // Pinke Blumen
-                ctx.beginPath(); ctx.arc(40, 160, 12, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#9333ea'; // Violette Blumen
-                ctx.beginPath(); ctx.arc(360, 50, 14, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#eab308'; // Gelbe Blumen
-                ctx.beginPath(); ctx.arc(340, 40, 10, 0, Math.PI*2); ctx.fill();
+                // Blumenbeete / Farbtupfer
+                ctx.fillStyle = '#db2777'; 
+                ctx.beginPath(); ctx.arc(35, 165, 10, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#9333ea'; 
+                ctx.beginPath(); ctx.arc(360, 45, 12, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#eab308'; 
+                ctx.beginPath(); ctx.arc(335, 35, 9, 0, Math.PI*2); ctx.fill();
 
                 requestAnimationFrame(drawGarden);
             }
+
             if(canvas) {
                 requestAnimationFrame(drawGarden);
                 canvas.addEventListener('click', (e) => {
-                    let rect = canvas.getBoundingClientRect();
-                    let x = e.clientX - rect.left;
-                    let y = e.clientY - rect.top;
-                    // Klick in den Garten erzeugt Bio-Ton
+                    // Direkter Klick in den Garten löst Ton & Teichwelle aus
                     harvestPlant(5, 329.63);
                 });
             }
@@ -885,7 +895,7 @@
             bindClick('account-to-home-btn', () => switchView('home'));
             bindClick('admin-to-home-btn', () => switchView('home'));
 
-            // Pflanzen-Bindings mit Bio-Tönen
+            // Bio-Garden Plant & Canvas Bindings
             bindClick('plant-1-btn', () => harvestPlant(2, 261.63));
             bindClick('plant-2-btn', () => harvestPlant(5, 329.63));
             bindClick('plant-3-btn', () => harvestPlant(10, 196.00));
