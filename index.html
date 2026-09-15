@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Ausbalancierte Studio-Engine & Tycoon-Logik -->
+    <!-- High-End Multi-Voice Studio Synthesizer & Tycoon-Logik -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -350,7 +350,7 @@
             let beats = 0;
             let fans = 0;
             let bps = 0.0;
-            let fps = 0.0; // Fans pro Sekunde
+            let fps = 0.0;
             let hashRate = 0;
             let rigs = 0;
             let albums = 0;
@@ -541,46 +541,75 @@
                 });
             }
 
-            // ENTSPANNTE, ZUFÄLLIGE C-MOLL STUDIO-SYNTHESIZER-ENGINE
+            // HIGH-END MULTI-VOICE STUDIO SYNTHESIZER (Lush Chords, Detune, Resonanz & Stereo Panning)
             let audioCtx = null;
             const cMinorPool = [
                 130.81, 155.56, 174.61, 196.00, 233.08, 
                 261.63, 311.13, 349.23, 392.00, 466.16, 
                 523.25, 622.25, 698.46, 783.99
             ];
-            const synthTypes = ['sine', 'triangle', 'square', 'sawtooth'];
+            const synthTypes = ['sawtooth', 'triangle', 'square', 'sine'];
+            const chordMultipliers = [1, 1.25, 1.5, 2]; // Harmonie-Intervalle für Akkord-Dicke
 
-            function playRandomHarmonicSound() {
+            function playRichStudioSound() {
                 if (!soundEnabled || currentView === 'home') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
                     const now = audioCtx.currentTime;
-                    let randomFreq = cMinorPool[Math.floor(Math.random() * cMinorPool.length)];
-                    let randomType = synthTypes[Math.floor(Math.random() * synthTypes.length)];
+                    let baseFreq = cMinorPool[Math.floor(Math.random() * cMinorPool.length)];
+                    let interval = chordMultipliers[Math.floor(Math.random() * chordMultipliers.length)];
+                    let freq2 = baseFreq * interval;
 
-                    let osc = audioCtx.createOscillator();
+                    let osc1 = audioCtx.createOscillator();
+                    let osc2 = audioCtx.createOscillator();
                     let filter = audioCtx.createBiquadFilter();
                     let gain = audioCtx.createGain();
+                    let panner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
 
-                    osc.type = randomType;
-                    osc.frequency.setValueAtTime(randomFreq, now);
+                    osc1.type = synthTypes[Math.floor(Math.random() * synthTypes.length)];
+                    osc2.type = synthTypes[Math.floor(Math.random() * synthTypes.length)];
 
+                    osc1.frequency.setValueAtTime(baseFreq, now);
+                    osc2.frequency.setValueAtTime(freq2, now);
+
+                    // Analoge Verstimmung für organische Wärme
+                    osc1.detune.setValueAtTime(Math.random() * 12 - 6, now);
+                    osc2.detune.setValueAtTime(Math.random() * 16 - 8, now);
+
+                    // Filter mit warmer Resonanz (Q) und Sweep
                     filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(2500, now);
-                    filter.frequency.exponentialRampToValueAtTime(350, now + 0.6);
+                    let cutoff = 1500 + Math.random() * 2000;
+                    filter.frequency.setValueAtTime(cutoff, now);
+                    filter.frequency.exponentialRampToValueAtTime(cutoff * 0.25, now + 0.7);
+                    if (filter.Q) filter.Q.setValueAtTime(4 + Math.random() * 5, now);
 
+                    // Sanfte Dynamik-Enveloppe
+                    let decay = 0.6 + Math.random() * 0.4;
                     gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+                    gain.gain.linearRampToValueAtTime(0.24, now + 0.03);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(audioCtx.destination);
+                    // Zufällige Stereoposition (Spatial Audio)
+                    if (panner) {
+                        panner.pan.setValueAtTime(Math.random() * 0.8 - 0.4, now);
+                        osc1.connect(filter);
+                        osc2.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(panner);
+                        panner.connect(audioCtx.destination);
+                    } else {
+                        osc1.connect(filter);
+                        osc2.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(audioCtx.destination);
+                    }
 
-                    osc.start(now);
-                    osc.stop(now + 0.7);
+                    osc1.start(now);
+                    osc2.start(now);
+                    osc1.stop(now + decay);
+                    osc2.stop(now + decay);
                 } catch (e) {}
             }
 
@@ -620,7 +649,7 @@
 
             function produceBeat() {
                 beats += 1;
-                playRandomHarmonicSound();
+                playRichStudioSound();
                 updateDisplay();
                 saveGame();
             }
@@ -631,7 +660,7 @@
                     beats -= rigCost;
                     rigs += 1;
                     hashRate += 2;
-                    bps += 0.2; // Feinere Steigerung (+0.2 BPS)
+                    bps += 0.2;
                     rigCost = Math.floor(rigCost * 1.35);
                     updateDisplay();
                     saveGame();
@@ -645,8 +674,8 @@
                     beats -= albumCost;
                     albums += 1;
                     fans += 25;
-                    bps += 0.8; // Angenehme Steigerung (+0.8 BPS)
-                    fps += 0.3; // Sanfter passiver Fan-Zuwachs (+0.3 FPS)
+                    bps += 0.8;
+                    fps += 0.3;
                     albumCost = Math.floor(albumCost * 1.5);
                     updateDisplay();
                     saveGame();
@@ -659,8 +688,8 @@
                 if (beats >= aiCost) {
                     beats -= aiCost;
                     aiAgents += 1;
-                    bps += 2.5; // Solider, aber kontrollierter Zuwachs (+2.5 BPS)
-                    fps += 0.8; // Moderater Fan-Zuwachs (+0.8 FPS)
+                    bps += 2.5;
+                    fps += 0.8;
                     aiCost = Math.floor(aiCost * 1.4);
                     updateDisplay();
                     saveGame();
@@ -791,10 +820,10 @@
                 }
             }, 100);
 
-            // 2. Entspannter Hintergrund-Takt (alle 3,5 Sekunden ein Ton, wenn BPS aktiv ist)
+            // 2. Entspannter Hintergrund-Takt (alle 3,5 Sekunden ein satten, mehrstimmigen Studio-Akkord)
             setInterval(() => {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
-                    playRandomHarmonicSound();
+                    playRichStudioSound();
                 }
             }, 3500);
 
