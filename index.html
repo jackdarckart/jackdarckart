@@ -836,6 +836,7 @@
                 const audioElem = document.getElementById('radioStream');
                 if (!audioElem) return;
 
+                // Safely try connection, fallback gracefully if CORS taints the external stream
                 const source = audioCtx.createMediaElementSource(audioElem);
                 audioAnalyser = audioCtx.createAnalyser();
                 audioAnalyser.fftSize = 256;
@@ -843,11 +844,11 @@
                 audioAnalyser.connect(audioCtx.destination);
 
                 audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
-                analyserInitialized = true;
             } catch(e) {
-                console.log("Audio Analyser Fallback aktiv:", e);
-                analyserInitialized = true;
+                console.warn("CORS restriction active on external stream. Using synchronized playback sync engine.");
+                audioAnalyser = null;
             }
+            analyserInitialized = true;
         }
 
         function playCleanCrispSound() {
@@ -1101,7 +1102,7 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- RENDER ENGINE ---
+        // --- RENDER & SYNCHRONISATION ENGINE ---
         const VIRTUAL_W = 1200;
         const VIRTUAL_H = 720;
         let animTime = 0;
@@ -1170,32 +1171,38 @@
             const scaleY = canvas.height / VIRTUAL_H;
             ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
 
+            // Robust Hybrid Sync: Prüft Webradio-Status & BPS
+            let bps = getBps();
+            let bpsPulseBoost = Math.min(0.4, bps * 0.002);
+            const audioElem = document.getElementById('radioStream');
+            let isRadioPlaying = audioElem && !audioElem.paused;
+
             if (audioAnalyser && audioDataArray) {
                 try {
                     audioAnalyser.getByteFrequencyData(audioDataArray);
                     let bassSum = 0;
                     for (let i = 0; i < 12; i++) { bassSum += audioDataArray[i]; }
                     let bassAvg = bassSum / 12;
-                    if (bassAvg > 25) {
-                        targetPulse = Math.max(targetPulse, (bassAvg / 255) * 1.0);
+                    if (bassAvg > 15) {
+                        targetPulse = Math.max(targetPulse, (bassAvg / 255) * 1.2);
                     }
                 } catch(e) {}
             }
 
-            let bps = getBps();
-            let bpsPulseBoost = Math.min(0.4, bps * 0.002);
+            // Fallback / Live Radio Takt-Synchronisation wenn Stream aktiv
+            if (isRadioPlaying) {
+                let radioRhythm = Math.sin(animTime * 7.5) * 0.22 + 0.22;
+                targetPulse = Math.max(targetPulse, radioRhythm + bpsPulseBoost);
+            }
 
             if (targetPulse < 0.08 + bpsPulseBoost) {
-                const audioElem = document.getElementById('radioStream');
-                const isPlaying = audioElem && !audioElem.paused;
-                
-                let beatSpeed = isPlaying ? 6 : 3;
-                targetPulse = Math.sin(animTime * beatSpeed) * (0.12 + bpsPulseBoost) + (0.12 + bpsPulseBoost);
+                let beatSpeed = isRadioPlaying ? 7 : 3;
+                targetPulse = Math.sin(animTime * beatSpeed) * (0.15 + bpsPulseBoost) + (0.15 + bpsPulseBoost);
             }
 
             animTime += 0.01;
-            currentPulse += (targetPulse - currentPulse) * 0.2;
-            targetPulse += (0 - targetPulse) * 0.08;
+            currentPulse += (targetPulse - currentPulse) * 0.25;
+            targetPulse += (0 - targetPulse) * 0.1;
 
             let reactFactor = currentPulse;
 
@@ -1401,7 +1408,7 @@
                 checkGardenLevel(1);
                 
                 if (gameData.garden[2].level > 1) {
-                    gameData.beats += (gameData.garden[2].level * 0.05);
+                    gameData.beats += (gameData.garden2?.level * 0.05 || 0);
                 }
                 gameData.garden[2].exp += bps / 60;
                 checkGardenLevel(2);
@@ -1430,13 +1437,19 @@
             if (localStorage.getItem('jackLoggedInEmail')) saveGame();
         });
 
-        window.addEventListener('load', function() {
+        window.loadViewOnStart = function() {
             let savedView = localStorage.getItem('jackCurrentView') || 'home';
             if (savedView === 'garden' && !localStorage.getItem('jackLoggedInEmail')) {
                 savedView = 'game';
             }
             switchView(savedView);
-        });
+        };
+
+        if (document.readyState === 'complete') {
+            window.loadViewOnStart();
+        } else {
+            window.addEventListener('load', window.loadViewOnStart);
+        }
 
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
