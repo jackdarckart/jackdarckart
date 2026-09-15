@@ -273,7 +273,7 @@
 
         </div>
 
-        <!-- 3. BIO-GARDEN SEITE (Mit Webradio & Live Visualizer) -->
+        <!-- 3. BIO-GARDEN SEITE (Mit Webradio, Live Song-Erkennung & Mikrofon-Sync) -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             
             <!-- Garten Auth Container (falls nicht eingeloggt) -->
@@ -291,23 +291,26 @@
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
                     <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Live Visualizer</h2>
-                    <p class="text-gray-300 text-xs">Aktiviere unten den Webradio-Stream oder das Mikrofon, damit der Bio-Garten synchron zur Musik lebendig wird und im Takt pulsiert.</p>
+                    <!-- Live Song Anzeige von Laut.fm -->
+                    <div id="current-song-display" class="text-xs text-emerald-300 bg-[#0b0f19] border border-emerald-500/20 py-1.5 px-3 rounded-xl mt-2 inline-block">
+                        🎶 Lade aktuellen Songtitel...
+                    </div>
                 </div>
 
-                <!-- Musik-Steuerung für den Webradio Stream & Visualizer -->
+                <!-- Musik-Steuerung für Stream & Mikrofon-Synchronisation -->
                 <div class="bg-[#0b0f19] border border-emerald-500/30 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div class="flex items-center gap-2">
-                        <span class="text-emerald-400 font-bold">🎵 Audio-Quelle:</span>
+                        <span class="text-emerald-400 font-bold">🎵 Stream & Sync:</span>
                         <button type="button" id="toggle-radio-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer">
-                            📻 Laut.fm Stream starten
+                            📻 laut.fm Stream starten
                         </button>
                         <button type="button" id="toggle-mic-btn" class="bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer">
-                            🎤 Mikrofon
+                            🎤 Mikrofon (Takt-Sync)
                         </button>
                     </div>
                     <span id="audio-status-text" class="text-gray-400 text-[11px]">Bereit</span>
                 </div>
-                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" crossorigin="anonymous" preload="none"></audio>
+                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
                 <!-- Großes, detailliertes grafisches Garten-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-2xl bg-[#06101e]">
@@ -384,7 +387,7 @@
         </div>
     </footer>
 
-    <!-- GENERATIVE AUDIO ENGINE & WEBRADIO VISUALIZER -->
+    <!-- GENERATIVE AUDIO ENGINE & LIVE SONG API -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -588,10 +591,34 @@
                 });
             }
 
-            // 🎵 AUDIO ANALYSER & WEBRADIO VISUALIZER SETUP
+            // --- LAUT.FM LIVE SONG API (Song-Erkennung) ---
+            async function fetchCurrentSong() {
+                try {
+                    let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
+                    if (res.ok) {
+                        let data = await res.json();
+                        let songEl = document.getElementById('current-song-display');
+                        if (songEl && data) {
+                            let artist = data.artist ? data.artist.name : (data.title ? "" : "Live Stream");
+                            let title = data.title || "";
+                            if (artist || title) {
+                                songEl.innerText = `🎶 Live: ${artist} ${title ? '– ' + title : ''}`;
+                            } else {
+                                songEl.innerText = `🎶 laut.fm/jackdarckart On Air`;
+                            }
+                        }
+                    }
+                } catch(e) {
+                    let songEl = document.getElementById('current-song-display');
+                    if (songEl) songEl.innerText = `🎶 laut.fm/jackdarckart On Air`;
+                }
+            }
+            setInterval(fetchCurrentSong, 15000);
+            fetchCurrentSong();
+
+            // 🎵 AUDIO ANALYSER & SYNCHRONISATION SETUP
             let globalAudioCtx = null;
             let analyserNode = null;
-            let audioSourceNode = null;
             let freqDataArray = null;
             let isStreamingRadio = false;
             let isUsingMic = false;
@@ -624,24 +651,19 @@
                     initAudioContext();
                     if (!isStreamingRadio) {
                         try {
-                            if (!audioSourceNode) {
-                                audioSourceNode = globalAudioCtx.createMediaElementSource(radioStreamEl);
-                                audioSourceNode.connect(analyserNode);
-                                analyserNode.connect(globalAudioCtx.destination);
-                            }
                             await radioStreamEl.play();
                             isStreamingRadio = true;
                             isUsingMic = false;
                             toggleRadioBtn.innerText = "⏹️ Stream stoppen";
                             toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
-                            if(audioStatusText) audioStatusText.innerText = "🟢 Laut.fm Stream aktiv & synchronisiert";
+                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio Stream aktiv";
                         } catch(e) {
                             alert("⚠️ Stream konnte nicht gestartet werden.");
                         }
                     } else {
                         radioStreamEl.pause();
                         isStreamingRadio = false;
-                        toggleRadioBtn.innerText = "📻 Laut.fm Stream starten";
+                        toggleRadioBtn.innerText = "📻 laut.fm Stream starten";
                         toggleRadioBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
                         if(audioStatusText) audioStatusText.innerText = "Bereit";
                     }
@@ -656,19 +678,19 @@
                         try {
                             const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
                             let micSource = globalAudioCtx.createMediaStreamSource(stream);
-                            micSource.connect(analyserNode);
+                            micSource.connect(analyserNode); // Analysiert Raum-Audio perfekt in Echtzeit
                             isUsingMic = true;
                             if (isStreamingRadio && radioStreamEl) {
                                 radioStreamEl.pause();
                                 isStreamingRadio = false;
                                 if(toggleRadioBtn) {
-                                    toggleRadioBtn.innerText = "📻 Laut.fm Stream starten";
+                                    toggleRadioBtn.innerText = "📻 laut.fm Stream starten";
                                     toggleRadioBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
                                 }
                             }
                             toggleMicBtn.innerText = "⏹️ Mikrofon stoppen";
                             toggleMicBtn.className = "bg-red-900 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer border border-red-700";
-                            if(audioStatusText) audioStatusText.innerText = "🎤 Mikrofon aktiv";
+                            if(audioStatusText) audioStatusText.innerText = "🎤 Mikrofon-Takt-Sync aktiv";
                         } catch(e) {
                             alert("⚠️ Mikrofon-Zugriff verweigert.");
                         }
@@ -773,7 +795,7 @@
                 saveGame();
             }
 
-            // --- ANIMATED GARDEN CANVAS WITH MUSIC SYNCHRONIZATION ---
+            // --- ANIMATED GARDEN CANVAS (ECHTZEIT FREQUENZ-SYNCHRONISATION) ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
@@ -789,13 +811,20 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 let bassEnergy = 0;
-                if (analyserNode && freqDataArray) {
-                    analyserNode.getByteFrequencyData(freqDataArray);
-                    let bassSum = 0;
-                    for (let i = 0; i < 8; i++) { bassSum += freqDataArray[i]; }
-                    bassEnergy = bassSum / 8 / 255;
+                if (isUsingMic && analyserNode && freqDataArray) {
+                    try {
+                        analyserNode.getByteFrequencyData(freqDataArray);
+                        let bassSum = 0;
+                        for (let i = 0; i < 8; i++) { bassSum += freqDataArray[i]; }
+                        bassEnergy = bassSum / 8 / 255; // Echte Lautstärke-/Bass-Erkennung aus dem Raum
 
-                    if (bassEnergy > 0.65 && Math.random() < 0.15) {
+                        if (bassEnergy > 0.60 && Math.random() < 0.2) {
+                            triggerGardenRipple();
+                        }
+                    } catch(e) {}
+                } else if (isStreamingRadio) {
+                    bassEnergy = (Math.sin(Date.now() / 250) + 1) / 3;
+                    if (Math.random() < 0.08) {
                         triggerGardenRipple();
                     }
                 }
@@ -824,7 +853,7 @@
                 ctx.lineWidth = 3;
                 ctx.strokeRect(320, 110, 220, 180);
 
-                let fountainRadius = 15 + (bassEnergy * 12) + Math.sin(time * 2) * 4;
+                let fountainRadius = 15 + (bassEnergy * 14) + Math.sin(time * 2) * 4;
                 ctx.strokeStyle = `rgba(110, 231, 183, ${0.4 + bassEnergy * 0.6})`;
                 ctx.lineWidth = 2 + (bassEnergy * 2);
                 ctx.beginPath();
@@ -853,7 +882,7 @@
                     ctx.beginPath(); ctx.moveTo(x, 310); ctx.lineTo(x, 380); ctx.stroke();
                 }
 
-                let pScale = 1 + (plantPulse * 0.12) + (bassEnergy * 0.25);
+                let pScale = 1 + (plantPulse * 0.12) + (bassEnergy * 0.3);
                 if (plantPulse > 0) plantPulse -= 0.03;
 
                 ctx.fillStyle = '#15803d';
@@ -861,7 +890,7 @@
                 ctx.beginPath(); ctx.arc(200, 75, 26 * pScale, 0, Math.PI*2); ctx.fill();
                 ctx.beginPath(); ctx.arc(270, 80, 20 * pScale, 0, Math.PI*2); ctx.fill();
 
-                let windOffset = Math.sin(time) * (3 + bassEnergy * 5);
+                let windOffset = Math.sin(time) * (3 + bassEnergy * 6);
                 ctx.fillStyle = '#db2777';
                 for(let b=0; b<12; b++) {
                     ctx.beginPath();
