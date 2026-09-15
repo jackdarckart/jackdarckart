@@ -437,9 +437,6 @@
                 <button onclick="changeAdminPin()" class="bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
                     <i class="fa-solid fa-key mr-1.5"></i> Master-PIN ändern
                 </button>
-                <button onclick="forgotPin()" class="bg-amber-950/50 hover:bg-amber-900 border border-amber-800/60 text-amber-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
-                    <i class="fa-solid fa-envelope mr-1.5"></i> PIN vergessen?
-                </button>
                 <button onclick="confirmResetGame()" class="bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
                     <i class="fa-solid fa-trash-can mr-1.5"></i> Beat-Lab zurücksetzen
                 </button>
@@ -451,6 +448,37 @@
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Zurück zur Startseite & Webradio</span>
             </button>
+        </div>
+    </div>
+
+    <!-- CUSTOM DESIGN MODAL (Ersetzt hässliche Browser-Popups mit interaktivem Button/Link) -->
+    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl text-center space-y-6">
+            <div id="modalIcon" class="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-2xl mx-auto border border-indigo-500/30">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+                <h3 id="modalTitle" class="text-xl font-bold mb-2">Sicherheits-PIN</h3>
+                <p id="modalText" class="text-sm text-gray-400 leading-relaxed">Bitte gib deinen Master-PIN ein.</p>
+            </div>
+            
+            <!-- Input-Feld für PIN oder E-Mail -->
+            <div id="modalInputContainer">
+                <input type="password" id="modalInput" placeholder="Master-PIN eingeben..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-center text-white text-lg tracking-widest focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <!-- Anklickbarer Button/Link für PIN vergessen -->
+            <div id="modalLinkContainer" class="hidden">
+                <button onclick="openForgotPinModal()" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold underline transition">
+                    🔑 PIN vergessen? (Per E-Mail wiederherstellen)
+                </button>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex items-center justify-center gap-3 pt-2">
+                <button onclick="closeCustomModal(false)" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 py-3 rounded-xl font-semibold text-sm transition">Abbrechen</button>
+                <button id="modalConfirmBtn" onclick="handleModalConfirm()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-semibold text-sm transition shadow-lg shadow-indigo-600/30">Bestätigen</button>
+            </div>
         </div>
     </div>
 
@@ -472,7 +500,7 @@
         </div>
     </footer>
 
-    <!-- Script mit E-Mail-Wiederherstellung & temporärem PIN -->
+    <!-- Script mit Custom Modal, E-Mail-Wiederherstellung & Empfehlungs-Hinweis -->
     <script>
         function switchView(view) {
             const home = document.getElementById('homeView');
@@ -491,83 +519,124 @@
             }
         }
 
-        // Einmalige PIN & E-Mail Einrichtung
+        // --- CUSTOM MODAL STEUERUNG ---
+        let modalCallback = null;
+        let modalMode = 'pin'; // 'pin', 'setup', 'forgot'
+
+        function showCustomModal(mode, title, text, placeholder) {
+            modalMode = mode;
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalText').innerText = text;
+            const input = document.getElementById('modalInput');
+            input.value = '';
+            input.placeholder = placeholder || '';
+            
+            if (mode === 'setup') {
+                input.type = 'text';
+                document.getElementById('modalLinkContainer').classList.add('hidden');
+            } else if (mode === 'pin') {
+                input.type = 'password';
+                document.getElementById('modalLinkContainer').classList.remove('hidden');
+            } else if (mode === 'forgot') {
+                input.type = 'email';
+                document.getElementById('modalLinkContainer').classList.add('hidden');
+            }
+
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeCustomModal(result, value) {
+            document.getElementById('customModal').classList.add('hidden');
+            if (modalCallback) {
+                modalCallback(result, value);
+                modalCallback = null;
+            }
+        }
+
+        function handleModalConfirm() {
+            const val = document.getElementById('modalInput').value.trim();
+            closeCustomModal(true, val);
+        }
+
+        // --- PIN & SETUP LOGIK ---
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
-                let newPin = prompt("🔒 BEAT-LAB ADMIN-EINRICHTUNG:\n\nLege deinen geheimen Master-PIN fest:");
-                if (newPin && newPin.trim() !== '') {
-                    localStorage.setItem('jackAdminPin', newPin.trim());
-                    let email = prompt("📧 Bitte gib deine E-Mail-Adresse für die Wiederherstellung ein (falls du den PIN vergisst):");
-                    if (email && email.trim() !== '') {
-                        localStorage.setItem('jackAdminEmail', email.trim());
+                showCustomModal('setup', '🔒 Beat-Lab Admin-Einrichtung', 'Lege jetzt deinen Master-PIN fest:', 'Neuen PIN eingeben...');
+                modalCallback = function(success, pinVal) {
+                    if (success && pinVal) {
+                        localStorage.setItem('jackAdminPin', pinVal);
+                        showCustomModal('setup', '📧 E-Mail Wiederherstellung', 'Gib deine E-Mail-Adresse für die Wiederherstellung ein:', 'Deine E-Mail-Adresse...');
+                        modalCallback = function(succ2, emailVal) {
+                            if (succ2 && emailVal) {
+                                localStorage.setItem('jackAdminEmail', emailVal);
+                                alert("✅ Master-PIN & E-Mail erfolgreich eingerichtet!");
+                            } else {
+                                localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
+                                alert("✅ PIN gespeichert (Standard-E-Mail hinterlegt).");
+                            }
+                        };
+                    } else {
+                        localStorage.setItem('jackAdminPin', '1234');
+                        localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
+                        alert("⚠️ Standard-PIN '1234' wurde gesetzt.");
                     }
-                    alert("✅ Master-PIN & E-Mail erfolgreich eingerichtet!");
-                } else {
-                    localStorage.setItem('jackAdminPin', '1234');
-                    localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                    alert("⚠️ Standard-PIN '1234' wurde gesetzt. Du kannst ihn im Spiel jederzeit ändern.");
-                }
+                };
             }
         }
 
-        function getVerifiedPin() {
-            let pin = localStorage.getItem('jackAdminPin');
-            let tempPin = localStorage.getItem('jackTempPin');
+        function verifyPin(onSuccess) {
+            showCustomModal('pin', '🔑 Sicherheits-PIN erforderlich', 'Bitte gib deinen geheimen Master-PIN ein, um fortzufahren:', 'Master-PIN eingeben...');
+            modalCallback = function(success, enteredPin) {
+                if (!success) return;
+                let pin = localStorage.getItem('jackAdminPin');
+                let tempPin = localStorage.getItem('jackTempPin');
 
-            let input = prompt("🔑 PIN erforderlich:\nGib deinen geheimen Master-PIN ein:");
-            if (input === pin || (tempPin && input === tempPin)) {
-                // Wenn temporärer PIN genutzt wurde, wieder löschen nach erfolgreichem Login
-                if (tempPin && input === tempPin) {
-                    localStorage.removeItem('jackTempPin');
-                    alert("ℹ️ Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN nach dem Login zu ändern.");
+                if (enteredPin === pin || (tempPin && enteredPin === tempPin)) {
+                    if (tempPin && enteredPin === tempPin) {
+                        localStorage.removeItem('jackTempPin');
+                        alert("ℹ️ Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.");
+                    }
+                    onSuccess();
+                } else {
+                    alert("❌ Falscher PIN! Zugriff verweigert.");
                 }
-                return true;
-            } else {
-                alert("❌ Falscher PIN! Zugriff verweigert.");
-                return false;
-            }
+            };
         }
 
         function changeAdminPin() {
-            if (!getVerifiedPin()) return;
-            let newPin = prompt("🔒 Gib deinen neuen geheimen Master-PIN ein:");
-            if (newPin && newPin.trim() !== '') {
-                localStorage.setItem('jackAdminPin', newPin.trim());
-                alert("✅ Master-PIN erfolgreich geändert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.");
-            } else {
-                alert("Abgebrochen. Neuer PIN war leer.");
-            }
+            verifyPin(function() {
+                showCustomModal('setup', '🔒 Master-PIN ändern', 'Gib deinen neuen geheimen PIN ein:\n\n(Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.)', 'Neuer PIN...');
+                modalCallback = function(succ, newPin) {
+                    if (succ && newPin) {
+                        localStorage.setItem('jackAdminPin', newPin);
+                        alert("✅ Master-PIN erfolgreich geändert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.");
+                    }
+                };
+            });
         }
 
-        // PIN vergessen / Wiederherstellung via E-Mail
-        function forgotPin() {
-            let savedEmail = localStorage.getItem('jackAdminEmail');
-            let inputEmail = prompt("📧 Wiederherstellung via E-Mail:\nGib deine hinterlassene E-Mail-Adresse ein:");
+        function openForgotPinModal() {
+            document.getElementById('customModal').classList.add('hidden');
+            showCustomModal('forgot', '📧 PIN Wiederherstellung', 'Gib deine hinterlassene E-Mail-Adresse ein, um einen temporären PIN zu generieren:', 'E-Mail eingeben...');
+            modalCallback = function(succ, emailInput) {
+                if (!succ || !emailInput) return;
+                let savedEmail = localStorage.getItem('jackAdminEmail');
 
-            if (!inputEmail || inputEmail.trim().toLowerCase() !== (savedEmail ? savedEmail.toLowerCase() : '')) {
-                alert("❌ Diese E-Mail-Adresse ist im System nicht hinterlegt!");
-                return;
-            }
+                if (emailInput.trim().toLowerCase() !== (savedEmail ? savedEmail.toLowerCase() : '')) {
+                    alert("❌ Diese E-Mail-Adresse ist im System nicht hinterlegt!\n\n(Hinweis: Wenn noch keine hinterlegt wurde, richte sie bitte im Admin-Bereich ein.)");
+                    return;
+                }
 
-            // Temporären PIN generieren (z.B. TMP-XXXX)
-            let tempPin = 'TMP-' + Math.floor(1000 + Math.random() * 9000);
-            localStorage.setItem('jackTempPin', tempPin);
+                let tempPin = 'TMP-' + Math.floor(1000 + Math.random() * 9000);
+                localStorage.setItem('jackTempPin', tempPin);
 
-            alert("📨 Ein temporärer PIN wurde an '" + inputEmail + "' gesendet!\n\nDein temporärer PIN lautet: " + tempPin + "\n\n(Du kannst dich jetzt mit diesem PIN einloggen).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN nach dem Login zu ändern.");
+                alert("📨 Ein temporärer PIN wurde generiert!\n\nDein temporärer PIN lautet: " + tempPin + "\n\nDu kannst dich jetzt damit einloggen.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN nach dem Login zu ändern.");
+            };
         }
 
         // Mini-Game State & Cloud Sync
-        let gameData = {
-            beats: 0,
-            fans: 0,
-            clickPower: 1,
-            mic: 0,
-            synth: 0,
-            desk: 0,
-            label: 0,
-            cloudId: ''
-        };
+        let gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, cloudId: '' };
 
         function initCloudId() {
             let savedId = localStorage.getItem('jackCloudId');
@@ -600,36 +669,35 @@
         }
 
         function promptLoadCloudId() {
-            if (!getVerifiedPin()) return;
-            let enteredId = prompt("Gib deine Cloud-ID ein:", gameData.cloudId);
-            if (enteredId && enteredId.trim() !== '') {
-                enteredId = enteredId.trim().toUpperCase();
-                let saved = localStorage.getItem('jackBeatLab_' + enteredId);
-                if (saved) {
-                    localStorage.setItem('jackBeatLab_lastId', enteredId);
-                    loadGame();
-                    alert("✅ Spielstand erfolgreich geladen!");
-                } else {
-                    alert("❌ Kein Spielstand gefunden.");
-                }
-            }
+            verifyPin(function() {
+                showCustomModal('setup', '☁️ Cloud-ID laden', 'Gib die Cloud-ID ein, die du laden möchtest:', 'Cloud-ID (z.B. JB-XXXX)...');
+                modalCallback = function(succ, enteredId) {
+                    if (succ && enteredId) {
+                        enteredId = enteredId.trim().toUpperCase();
+                        let saved = localStorage.getItem('jackBeatLab_' + enteredId);
+                        if (saved) {
+                            localStorage.setItem('jackBeatLab_lastId', enteredId);
+                            loadGame();
+                            alert("✅ Spielstand erfolgreich geladen!");
+                        } else {
+                            alert("❌ Kein Spielstand unter dieser Cloud-ID gefunden.");
+                        }
+                    }
+                };
+            });
         }
 
         function confirmResetGame() {
-            if (!getVerifiedPin()) return;
-            if (confirm("⚠️ Möchtest du dein 'Beat-Lab' wirklich komplett zurücksetzen?")) {
-                localStorage.removeItem('jackBeatLab_' + gameData.cloudId);
-                gameData.beats = 0;
-                gameData.fans = 0;
-                gameData.clickPower = 1;
-                gameData.mic = 0;
-                gameData.synth = 0;
-                gameData.desk = 0;
-                gameData.label = 0;
-                saveGame();
-                updateGameUI();
-                alert("✅ Das Beat-Lab wurde erfolgreich zurückgesetzt.");
-            }
+            verifyPin(function() {
+                if (confirm("⚠️ Möchtest du dein 'Beat-Lab' wirklich komplett zurücksetzen?\n\n(Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.)")) {
+                    localStorage.removeItem('jackBeatLab_' + gameData.cloudId);
+                    gameData.beats = 0; gameData.fans = 0; gameData.clickPower = 1;
+                    gameData.mic = 0; gameData.synth = 0; gameData.desk = 0; gameData.label = 0;
+                    saveGame();
+                    updateGameUI();
+                    alert("✅ Das Beat-Lab wurde erfolgreich zurückgesetzt.");
+                }
+            });
         }
 
         function clickBeat() {
