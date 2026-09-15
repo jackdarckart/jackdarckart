@@ -45,7 +45,7 @@
                 <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">jackdarckart</h1>
                 <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">Offizielles Musik- & Kunst-Hub • Meckenheim, NRW</p>
                 <p class="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto">
-                    Willkommen im kreativen Universum von jackdarckart. Entdecke harte Rock-Produktionen, kompromisslose Gitarren-Riffs und interaktive Web-Projekte.
+                    Willkommen im kreativen Universum von jackdarckart. Entdecke harte Rock-Produktionen, fette Bass-Wände und interaktive Web-Projekte.
                 </p>
                 <div class="mt-6 flex flex-wrap justify-center gap-3">
                     <button type="button" id="home-to-game-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
@@ -64,7 +64,7 @@
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-purple-400 font-semibold">Rock & Alternative (2026)</span>
                         <h3 class="font-bold text-sm text-white">„Die Macht In Uns“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Kraftvolle Rock-Riffs, treibende Basslines & Energie.</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Kraftvolle Rock-Riffs, brachialer Bass & Energie.</p>
                     </div>
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-emerald-400 font-semibold">German Pop (2024)</span>
@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Master-Engine mit Studio Mastering Compressor & Cabinet Simulation -->
+    <!-- Master-Engine mit 3-fach Power-Chords, Massivem Sub-Bass & Pro Mastering -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,12 +541,12 @@
                 });
             }
 
-            // MASTER AUDIO ENGINE MIT STUDIO-MASTERING KOMPRESSOR & CABINET-SIMULATION
+            // ULTIMATIVE ROCK MASTER AUDIO ENGINE (3-Fach Power Chords + Massiver Sub-Bass + Pro Limiter)
             let audioCtx = null;
             let masterCompressor = null;
 
             function makeDistortionCurve(amount) {
-                let k = amount || 95,
+                let k = amount || 120,
                     n = 44100,
                     curve = new Float32Array(n),
                     deg = Math.PI / 180;
@@ -558,8 +558,8 @@
             }
 
             const rockNotes = [
-                73.42, 82.41, 98.00, 110.00, 123.47, 130.81, 
-                146.83, 164.81, 196.00, 220.00, 246.94, 293.66
+                65.41, 73.42, 82.41, 98.00, 110.00, 123.47, 
+                130.81, 146.83, 164.81, 196.00, 220.00, 246.94
             ];
 
             function playRockStudioSound() {
@@ -568,56 +568,61 @@
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
-                    // Master Kompressor initialisieren (Glättet und mastert den Sound professionell)
+                    // Master High-Gain Limiter / Kompressor
                     if (!masterCompressor) {
                         masterCompressor = audioCtx.createDynamicsCompressor();
-                        masterCompressor.threshold.setValueAtTime(-14, audioCtx.currentTime);
-                        masterCompressor.knee.setValueAtTime(4, audioCtx.currentTime);
-                        masterCompressor.ratio.setValueAtTime(6, audioCtx.currentTime);
-                        masterCompressor.attack.setValueAtTime(0.002, audioCtx.currentTime);
-                        masterCompressor.release.setValueAtTime(0.12, audioCtx.currentTime);
+                        masterCompressor.threshold.setValueAtTime(-12, audioCtx.currentTime);
+                        masterCompressor.knee.setValueAtTime(2, audioCtx.currentTime);
+                        masterCompressor.ratio.setValueAtTime(8, audioCtx.currentTime);
+                        masterCompressor.attack.setValueAtTime(0.001, audioCtx.currentTime);
+                        masterCompressor.release.setValueAtTime(0.1, audioCtx.currentTime);
                         masterCompressor.connect(audioCtx.destination);
                     }
 
                     const now = audioCtx.currentTime;
                     let rootFreq = rockNotes[Math.floor(Math.random() * rockNotes.length)];
 
-                    // --- 1. LEAD-GITARRE MIT CABINET-SIMULATION & OVERDRIVE ---
-                    let guitarOsc1 = audioCtx.createOscillator();
-                    let guitarOsc2 = audioCtx.createOscillator();
+                    // --- 1. DREISTIMMIGE POWER-CHORD LEAD-GITARRE ---
+                    let guitarOsc1 = audioCtx.createOscillator(); // Grundton
+                    let guitarOsc2 = audioCtx.createOscillator(); // Quinte (+50%)
+                    let guitarOsc3 = audioCtx.createOscillator(); // Oktave (+100%)
                     let distortion = audioCtx.createWaveShaper();
                     let guitarFilter = audioCtx.createBiquadFilter();
-                    let cabinetFilter = audioCtx.createBiquadFilter(); // Simuliert echten Gitarren-Verstärker-Speaker
+                    let cabinetFilter = audioCtx.createBiquadFilter();
                     let guitarGain = audioCtx.createGain();
 
-                    distortion.curve = makeDistortionCurve(110);
+                    distortion.curve = makeDistortionCurve(130);
                     distortion.oversample = '4x';
 
                     guitarOsc1.type = 'sawtooth';
                     guitarOsc2.type = 'square';
-                    guitarOsc1.frequency.setValueAtTime(rootFreq * 2, now);
-                    guitarOsc2.frequency.setValueAtTime(rootFreq * 3, now); // Power-Chord Quinte
+                    guitarOsc3.type = 'sawtooth';
 
-                    guitarOsc1.detune.setValueAtTime(Math.random() * 8 - 4, now);
-                    guitarOsc2.detune.setValueAtTime(Math.random() * 14 - 7, now);
+                    guitarOsc1.frequency.setValueAtTime(rootFreq * 2, now);
+                    guitarOsc2.frequency.setValueAtTime(rootFreq * 3, now);
+                    guitarOsc3.frequency.setValueAtTime(rootFreq * 4, now);
+
+                    guitarOsc1.detune.setValueAtTime(Math.random() * 10 - 5, now);
+                    guitarOsc2.detune.setValueAtTime(Math.random() * 16 - 8, now);
+                    guitarOsc3.detune.setValueAtTime(Math.random() * 6 - 3, now);
 
                     guitarFilter.type = 'lowpass';
-                    guitarFilter.frequency.setValueAtTime(3600, now);
-                    guitarFilter.frequency.exponentialRampToValueAtTime(600, now + 0.3);
+                    guitarFilter.frequency.setValueAtTime(4000, now);
+                    guitarFilter.frequency.exponentialRampToValueAtTime(700, now + 0.35);
 
-                    // Cabinet Filter (Mitten-Push für authentischen Gitarren-Druck)
                     cabinetFilter.type = 'peaking';
-                    cabinetFilter.frequency.setValueAtTime(1800, now);
-                    cabinetFilter.gain.setValueAtTime(6, now);
-                    if (cabinetFilter.Q) cabinetFilter.Q.setValueAtTime(2, now);
+                    cabinetFilter.frequency.setValueAtTime(2000, now);
+                    cabinetFilter.gain.setValueAtTime(8, now);
+                    if (cabinetFilter.Q) cabinetFilter.Q.setValueAtTime(2.5, now);
 
-                    let guitarDuration = 0.38;
+                    let duration = 0.4;
                     guitarGain.gain.setValueAtTime(0.0001, now);
-                    guitarGain.gain.linearRampToValueAtTime(0.18, now + 0.008); // Knackiger Plektrum-Attack
-                    guitarGain.gain.exponentialRampToValueAtTime(0.0001, now + guitarDuration);
+                    guitarGain.gain.linearRampToValueAtTime(0.2, now + 0.005);
+                    guitarGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
                     guitarOsc1.connect(guitarFilter);
                     guitarOsc2.connect(guitarFilter);
+                    guitarOsc3.connect(guitarFilter);
                     guitarFilter.connect(distortion);
                     distortion.connect(cabinetFilter);
                     cabinetFilter.connect(guitarGain);
@@ -625,32 +630,40 @@
 
                     guitarOsc1.start(now);
                     guitarOsc2.start(now);
-                    guitarOsc1.stop(now + guitarDuration);
-                    guitarOsc2.stop(now + guitarDuration);
+                    guitarOsc3.start(now);
+                    guitarOsc1.stop(now + duration);
+                    guitarOsc2.stop(now + duration);
+                    guitarOsc3.stop(now + duration);
 
-                    // --- 2. HEAVY ROCK-BASS (Druckvoller Sub-Kanal) ---
-                    let bassOsc = audioCtx.createOscillator();
+                    // --- 2. MASSIVER DUAL-SUB-BASS (Extremer Low-End Druck) ---
+                    let bassOsc1 = audioCtx.createOscillator();
+                    let bassOsc2 = audioCtx.createOscillator();
                     let bassFilter = audioCtx.createBiquadFilter();
                     let bassGain = audioCtx.createGain();
 
-                    bassOsc.type = 'sawtooth';
-                    bassOsc.frequency.setValueAtTime(rootFreq * 0.5, now);
+                    bassOsc1.type = 'sawtooth';
+                    bassOsc2.type = 'triangle'; // Sub-Oktaver für pure Wucht
+                    bassOsc1.frequency.setValueAtTime(rootFreq * 0.5, now);
+                    bassOsc2.frequency.setValueAtTime(rootFreq * 0.25, now);
 
                     bassFilter.type = 'lowpass';
-                    bassFilter.frequency.setValueAtTime(650, now);
-                    bassFilter.frequency.exponentialRampToValueAtTime(100, now + 0.4);
+                    bassFilter.frequency.setValueAtTime(800, now);
+                    bassFilter.frequency.exponentialRampToValueAtTime(90, now + 0.45);
 
-                    let bassDuration = 0.4;
+                    let bassDuration = 0.45;
                     bassGain.gain.setValueAtTime(0.0001, now);
-                    bassGain.gain.linearRampToValueAtTime(0.22, now + 0.012);
+                    bassGain.gain.linearRampToValueAtTime(0.28, now + 0.01);
                     bassGain.gain.exponentialRampToValueAtTime(0.0001, now + bassDuration);
 
-                    bassOsc.connect(bassFilter);
+                    bassOsc1.connect(bassFilter);
+                    bassOsc2.connect(bassFilter);
                     bassFilter.connect(bassGain);
                     bassGain.connect(masterCompressor);
 
-                    bassOsc.start(now);
-                    bassOsc.stop(now + bassDuration);
+                    bassOsc1.start(now);
+                    bassOsc2.start(now);
+                    bassOsc1.stop(now + bassDuration);
+                    bassOsc2.stop(now + bassDuration);
 
                 } catch (e) {}
             }
@@ -862,12 +875,12 @@
                 }
             }, 100);
 
-            // 2. Fetter Rock-Hintergrund-Takt (alle 1,6 Sekunden ein direktes, gemastertes Riff & Bass-Gewitter)
+            // 2. Fetter Rock-Hintergrund-Takt (alle 1,5 Sekunden ein massives Power-Chord & Sub-Bass Gewitter)
             setInterval(() => {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
                     playRockStudioSound();
                 }
-            }, 1600);
+            }, 1500);
 
             setInterval(() => { saveGame(); }, 5000);
 
