@@ -7,10 +7,10 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#080c14] text-white min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+<body class="bg-[#0b0f19] text-white min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
     <!-- Header / Navigation -->
-    <header class="w-full border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#080c14]/95 px-4 py-3">
+    <header class="w-full border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/95 px-4 py-3">
         <div class="max-w-5xl mx-auto flex justify-between items-center overflow-x-auto">
             <div class="flex items-center space-x-2 shrink-0">
                 <span class="text-xl p-1.5 bg-purple-600/20 rounded-xl border border-purple-500/30">☁️</span>
@@ -109,7 +109,7 @@
             </div>
         </div>
 
-        <!-- 3. BIO-GARDEN & WEBRADIO (GROß, RESPONSIV & HOCHAUFLÖSEND) -->
+        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             <div id="garten-auth-container" class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl max-w-md mx-auto text-left">
                 <h2 class="text-xl font-bold text-emerald-400">Bio-Garden Access Gateway</h2>
@@ -117,10 +117,10 @@
                 <button type="button" id="garten-to-game-login-btn" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm mt-3">Zum Login</button>
             </div>
 
-            <div id="garten-main-container" class="hidden bg-[#101722] border border-emerald-500/40 p-5 sm:p-8 rounded-3xl shadow-2xl space-y-5">
+            <div id="garten-main-container" class="hidden bg-[#131b2e] border border-emerald-500/40 p-5 sm:p-8 rounded-3xl shadow-2xl space-y-5">
                 <div>
-                    <span class="text-4xl mb-2 block">🌱</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden &amp; Live Visualizer</h2>
+                    <span class="text-4xl mb-2 block">🏡</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-emerald-400 mb-1">Architektur-Garten &amp; Webradio</h2>
                     <div id="current-song-display" class="text-xs sm:text-sm text-emerald-300 bg-[#080c14] border border-emerald-500/30 py-1.5 px-4 rounded-xl mt-2 inline-block shadow-inner">
                         🎶 Lade Song...
                     </div>
@@ -137,16 +137,16 @@
                 </div>
                 <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- Großes, responsives HD-Canvas für den Garten -->
-                <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)] bg-[#03070f]">
-                    <canvas id="garden-canvas" width="1200" height="650" class="w-full h-auto cursor-pointer block"></canvas>
+                <!-- Großes, responsives HD-Canvas im Architektur-Stil -->
+                <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-2xl bg-[#e6ede4]">
+                    <canvas id="garden-canvas" width="1100" height="750" class="w-full h-auto cursor-pointer block"></canvas>
                 </div>
 
-                <!-- Interaktive Pflanzen-Steuerung -->
+                <!-- Pflanzen & Interaktions-Buttons -->
                 <div class="flex justify-center items-center gap-3 pt-2 flex-wrap">
-                    <button type="button" id="plant-1-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌿 Farn pflanzen (+2)</button>
-                    <button type="button" id="plant-2-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌸 Blüte pflanzen (+5)</button>
-                    <button type="button" id="plant-3-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🍄 Pilz pflanzen (+10)</button>
+                    <button type="button" id="plant-1-btn" class="bg-[#0b0f19] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌿 Gräser pflanzen (+2)</button>
+                    <button type="button" id="plant-2-btn" class="bg-[#0b0f19] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌸 Blumenbeet (+5)</button>
+                    <button type="button" id="plant-3-btn" class="bg-[#0b0f19] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌳 Kugelbaum (+10)</button>
                 </div>
 
                 <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">← Dashboard</button>
@@ -182,7 +182,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#080c14]">
+    <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-3xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Auto-gesichert</span>
             <span class="text-gray-500">CloudBeats Ecosystem</span>
@@ -364,34 +364,16 @@
                 });
             }
 
-            // --- HOCHAUFLÖSENDES & INTERAKTIVES HD-GARTEN-CANVAS ---
+            // --- ARCHITEKTUR-GARTEN CANVAS (EXAKT WIE AUF DER SKIZZE) ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
-            let gardenPlants = [
-                {x: 200, y: 500, type: 'tree'},
-                {x: 1000, y: 480, type: 'tree'},
-                {x: 350, y: 550, type: 'fern'},
-                {x: 850, y: 530, type: 'mushroom'},
-                {x: 500, y: 580, type: 'flower'},
-                {x: 700, y: 560, type: 'flower'}
-            ];
-            let fireflies = [];
+            let userElements = [];
 
-            for(let i=0; i<35; i++) {
-                fireflies.push({
-                    x: Math.random() * 1200,
-                    y: Math.random() * 650,
-                    radius: Math.random() * 3 + 1,
-                    speedX: (Math.random() - 0.5) * 0.8,
-                    speedY: (Math.random() - 0.5) * 0.8
-                });
-            }
-
-            function addPlant(type) {
-                let rx = 100 + Math.random() * 1000;
-                let ry = 420 + Math.random() * 180;
-                gardenPlants.push({ x: rx, y: ry, type: type });
+            function addGardenElement(type) {
+                let rx = 150 + Math.random() * 800;
+                let ry = 150 + Math.random() * 350;
+                userElements.push({ x: rx, y: ry, type: type });
                 ripples.push({ x: rx, y: ry, radius: 10, alpha: 1.0 });
             }
 
@@ -399,116 +381,126 @@
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 160) + 1) / 2 : 0.12;
-                let time = Date.now() / 400;
+                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 150) + 1) / 2 : 0.1;
 
-                // 1. Hintergrund-Verlauf (Magischer Nachtwald)
-                let bgGrad = ctx.createLinearGradient(0, 0, 0, 650);
-                bgGrad.addColorStop(0, '#030712');
-                bgGrad.addColorStop(0.5, '#061a2e');
-                bgGrad.addColorStop(1, '#020d08');
-                ctx.fillStyle = bgGrad;
+                // 1. Rasenfläche (Hintergrund im hellen Architekten-Stil)
+                ctx.fillStyle = '#b5e48c';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // 2. Winding River / Magischer Bachlauf in der Mitte
-                ctx.beginPath();
-                ctx.moveTo(0, 480);
-                ctx.bezierCurveTo(400, 440, 800, 560, 1200, 500);
-                ctx.lineTo(1200, 650);
-                ctx.lineTo(0, 650);
-                ctx.closePath();
-                let riverGrad = ctx.createLinearGradient(0, 480, 0, 650);
-                riverGrad.addColorStop(0, '#042f2e');
-                riverGrad.addColorStop(1, '#022c22');
-                ctx.fillStyle = riverGrad;
-                ctx.fill();
+                // Feine Rasen-Textur / Struktur
+                ctx.fillStyle = '#99d98c';
+                for (let i = 0; i < canvas.width; i += 40) {
+                    ctx.fillRect(i, 0, 20, canvas.height);
+                }
 
-                // Bachlauf-Glanzlinie mit Takt-Puls
-                ctx.strokeStyle = `rgba(52, 211, 153, ${0.4 + pulse * 0.6})`;
-                ctx.lineWidth = 4 + (pulse * 3);
+                // 2. Rechteckiger moderner Teich (Rechts unten)
+                ctx.fillStyle = '#2a9d8f';
+                ctx.fillRect(620, 360, 320, 240);
+                let pondGrad = ctx.createLinearGradient(620, 360, 940, 600);
+                pondGrad.addColorStop(0, '#48cae4');
+                pondGrad.addColorStop(1, '#0077b6');
+                ctx.fillStyle = pondGrad;
+                ctx.fillRect(630, 370, 300, 220);
+
+                // Brunnenfontäne im Teich mit Takt-Puls
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + pulse * 0.5})`;
+                ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.moveTo(0, 490);
-                ctx.bezierCurveTo(400, 450, 800, 570, 1200, 510);
+                ctx.arc(780, 480, 20 + (pulse * 15), 0, Math.PI * 2);
                 ctx.stroke();
 
-                // 3. Gerenderte Pflanzen im Garten (sortiert nach Y-Achse für Tiefeneffekt)
-                gardenPlants.sort((a,b) => a.y - b.y).forEach(p => {
-                    ctx.save();
-                    ctx.translate(p.x, p.y);
-                    let scale = 1 + pulse * 0.15;
+                // 3. Rechteckiger Kies- / Schottergarten & Steinterrassen-Platten (Links)
+                ctx.fillStyle = '#d8f3dc';
+                ctx.fillRect(120, 150, 480, 350);
 
-                    if (p.type === 'tree') {
-                        // Majestätischer Baum
-                        ctx.fillStyle = '#291b11';
-                        ctx.fillRect(-12, -80, 24, 90);
-                        ctx.fillStyle = '#064e3b';
-                        ctx.beginPath(); ctx.arc(0, -90, 55 * scale, 0, Math.PI*2); ctx.fill();
-                        ctx.fillStyle = '#047857';
-                        ctx.beginPath(); ctx.arc(-25, -70, 40 * scale, 0, Math.PI*2); ctx.fill();
-                        ctx.beginPath(); ctx.arc(25, -70, 40 * scale, 0, Math.PI*2); ctx.fill();
-                    } else if (p.type === 'fern') {
-                        // Farn
-                        ctx.fillStyle = '#10b981';
-                        for(let f=0; f<6; f++) {
-                            ctx.beginPath();
-                            ctx.ellipse((f-2.5)*12, -15, 8, 22, (f-2.5)*0.3, 0, Math.PI*2);
-                            ctx.fill();
-                        }
-                    } else if (p.type === 'flower') {
-                        // Leuchtende Blüte
-                        ctx.strokeStyle = '#059669'; ctx.lineWidth = 3;
-                        ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0, -35); ctx.stroke();
-                        ctx.fillStyle = '#f43f5e';
-                        for(let l=0; l<5; l++) {
-                            let angle = (l * Math.PI * 2) / 5;
-                            ctx.beginPath();
-                            ctx.arc(Math.cos(angle)*12, -35 + Math.sin(angle)*12, 10 * scale, 0, Math.PI*2);
-                            ctx.fill();
-                        }
-                        ctx.fillStyle = '#fbbf24';
-                        ctx.beginPath(); ctx.arc(0, -35, 6, 0, Math.PI*2); ctx.fill();
-                    } else if (p.type === 'mushroom') {
-                        // Magischer Leuchtpilz
-                        ctx.fillStyle = '#78350f';
-                        ctx.fillRect(-5, -25, 10, 30);
-                        ctx.fillStyle = '#8b5cf6';
-                        ctx.beginPath(); ctx.arc(0, -28, 22 * scale, Math.PI, Math.PI*2); ctx.fill();
-                        ctx.fillStyle = '#ffffff';
-                        ctx.beginPath(); ctx.arc(-7, -32, 3, 0, Math.PI*2); ctx.arc(8, -30, 2.5, 0, Math.PI*2); ctx.fill();
+                // Dunkle Steinfliessen / Platten im Muster
+                ctx.fillStyle = '#495057';
+                for (let r = 0; r < 5; r++) {
+                    ctx.fillRect(160 + r * 65, 320 + r * 30, 70, 35);
+                }
+
+                // 4. Holzterrasse im Vordergrund (Unten) mit Tisch & Stühlen
+                ctx.fillStyle = '#dda15e';
+                ctx.fillRect(200, 600, 750, 130);
+                ctx.strokeStyle = '#bc6c25';
+                ctx.lineWidth = 2;
+                for (let x = 200; x < 950; x += 30) {
+                    ctx.beginPath(); ctx.moveTo(x, 600); ctx.lineTo(x, 730); ctx.stroke();
+                }
+                // Terrassentisch
+                ctx.fillStyle = '#6f1d1b';
+                ctx.fillRect(500, 640, 120, 60);
+
+                // 5. Kugelbäume (Topiary / Buchsbaumkugeln auf Stamm)
+                function drawTopiary(bx, by) {
+                    ctx.fillStyle = '#3a5a40';
+                    ctx.fillRect(bx - 6, by, 12, 60); // Stamm
+                    ctx.fillStyle = '#588157';
+                    ctx.beginPath(); ctx.arc(bx, by - 15, 35 * (1 + pulse * 0.08), 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#a3b18a';
+                    ctx.beginPath(); ctx.arc(bx - 8, by - 25, 15, 0, Math.PI * 2); ctx.fill(); // Glanzpunkt
+                }
+                drawTopiary(220, 240);
+                drawTopiary(320, 240);
+                drawTopiary(440, 260);
+                drawTopiary(540, 260);
+
+                // 6. Großer Baum oben rechts
+                ctx.fillStyle = '#3a5a40';
+                ctx.fillRect(830, 80, 25, 120);
+                ctx.fillStyle = '#588157';
+                ctx.beginPath(); ctx.arc(845, 60, 75 * (1 + pulse * 0.05), 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#a3b18a';
+                ctx.beginPath(); ctx.arc(820, 45, 45, 0, Math.PI * 2); ctx.fill();
+
+                // 7. Farbenprächtige Blumenbeete (Seitenränder in Pink, Lila, Blau)
+                function drawFlowerBed(fx, fy, fw, fh, color1, color2) {
+                    ctx.fillStyle = color1;
+                    ctx.fillRect(fx, fy, fw, fh);
+                    // Blumenpunkte
+                    for (let f = 0; f < 15; f++) {
+                        ctx.fillStyle = f % 2 === 0 ? color2 : '#ffffff';
+                        ctx.beginPath();
+                        ctx.arc(fx + Math.random() * fw, fy + Math.random() * fh, 5 + Math.random() * 5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                // Rechtes Blumenbeet (Staudenrabatte)
+                drawFlowerBed(950, 180, 110, 420, '#b5179e', '#7209b7');
+                // Linkes Blumenbeet
+                drawFlowerBed(40, 380, 80, 250, '#f72585', '#4cc9f0');
+
+                // 8. Benutzer-gepflanzte Elemente
+                userElements.forEach(el => {
+                    ctx.save();
+                    ctx.translate(el.x, el.y);
+                    if (el.type === 'grass') {
+                        ctx.fillStyle = '#2d6a4f';
+                        ctx.fillRect(-15, -10, 30, 20);
+                    } else if (el.type === 'flowers') {
+                        ctx.fillStyle = '#ff758f';
+                        ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#ffb3c6';
+                        ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI*2); ctx.fill();
+                    } else if (el.type === 'tree') {
+                        drawTopiary(0, 0);
                     }
                     ctx.restore();
                 });
 
-                // 4. Wasser-Ripples
+                // Ripples
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 3;
-                    rip.alpha -= 0.018;
+                    rip.radius += 2.5;
+                    rip.alpha -= 0.02;
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
                     } else {
-                        ctx.strokeStyle = `rgba(110, 231, 183, ${rip.alpha})`;
-                        ctx.lineWidth = 2.5;
+                        ctx.strokeStyle = `rgba(0, 119, 182, ${rip.alpha})`;
+                        ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
                         ctx.stroke();
                     }
-                });
-
-                if (isStreamingRadio && Math.random() < 0.1) {
-                    ripples.push({ x: Math.random() * 1200, y: 520 + Math.random() * 100, radius: 10, alpha: 1.0 });
-                }
-
-                // 5. Glühwürmchen & Sporen
-                fireflies.forEach(f => {
-                    f.x += f.speedX + (isStreamingRadio ? (Math.random() - 0.5) * 2 : 0);
-                    f.y += f.speedY;
-                    if (f.x < 0) f.x = 1200; if (f.x > 1200) f.x = 0;
-                    if (f.y < 0) f.y = 650; if (f.y > 650) f.y = 0;
-
-                    ctx.fillStyle = `rgba(250, 204, 21, ${0.5 + Math.sin(time + f.x) * 0.5})`;
-                    ctx.beginPath();
-                    ctx.arc(f.x, f.y, f.radius * (isStreamingRadio ? 1.4 : 1), 0, Math.PI * 2);
-                    ctx.fill();
                 });
 
                 requestAnimationFrame(drawGarden);
@@ -523,10 +515,8 @@
                     const clickX = (e.clientX - rect.left) * scaleX;
                     const clickY = (e.clientY - rect.top) * scaleY;
 
-                    const types = ['fern', 'flower', 'mushroom'];
-                    let chosen = types[Math.floor(Math.random() * types.length)];
-                    gardenPlants.push({ x: clickX, y: clickY, type: chosen });
-                    ripples.push({ x: clickX, y: clickY, radius: 10, alpha: 1.0 });
+                    userElements.push({ x: clickX, y: clickY, type: 'flowers' });
+                    ripples.push({ x: clickX, y: clickY, radius: 8, alpha: 1.0 });
 
                     beats += 5;
                     updateDisplay();
@@ -570,9 +560,9 @@
             bindClick('admin-to-home-btn', () => switchView('home'));
 
             bindClick('produce-beat-btn', () => { beats += 5; updateDisplay(); saveGame(); });
-            bindClick('plant-1-btn', () => { addPlant('fern'); beats += 2; updateDisplay(); saveGame(); });
-            bindClick('plant-2-btn', () => { addPlant('flower'); beats += 5; updateDisplay(); saveGame(); });
-            bindClick('plant-3-btn', () => { addPlant('mushroom'); beats += 10; updateDisplay(); saveGame(); });
+            bindClick('plant-1-btn', () => { addGardenElement('grass'); beats += 2; updateDisplay(); saveGame(); });
+            bindClick('plant-2-btn', () => { addGardenElement('flowers'); beats += 5; updateDisplay(); saveGame(); });
+            bindClick('plant-3-btn', () => { addGardenElement('tree'); beats += 10; updateDisplay(); saveGame(); });
 
             switchView(currentView);
         });
