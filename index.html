@@ -7,14 +7,6 @@
     <!-- Sicherheits-Header & Tailwind CSS -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes pulseGlow {
-            0% { transform: scale(1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
-            50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(168, 85, 247, 0.8); }
-            100% { transform: scale(1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
-        }
-        .audio-pulse { animation: pulseGlow 0.25s ease-in-out; }
-    </style>
 </head>
 <body class="bg-[#0b0f19] text-white min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
@@ -176,7 +168,7 @@
                     <p class="text-gray-400 text-xs">Riffs produzieren, Hash-Rate steigern, Charts stürmen & Fans gewinnen!</p>
                 </div>
 
-                <!-- Haupt-Clicker -->
+                <!-- Haupt-Clicker (Ohne jegliches Blinken) -->
                 <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl transition border border-purple-400/30 flex items-center justify-center gap-3">
                     <span class="text-2xl">🎸</span> Riff einspielen <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+1</span>
                 </button>
@@ -201,42 +193,42 @@
                     </div>
                 </div>
 
-                <!-- TYCOON UPGRADE SEKTIONEN (Mit angepassten Button-Beschriftungen) -->
+                <!-- TYCOON UPGRADE SEKTIONEN (Langsamere Progression) -->
                 <div class="space-y-4 text-left">
                     
                     <!-- 1. HASH-RATE RIGS (GoMining Stil) -->
                     <div class="bg-[#131b2e] border border-cyan-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-cyan-400 flex items-center gap-1.5">⚡ Hash-Rate Miner (GoMining Style)</h3>
+                            <h3 class="font-bold text-xs text-cyan-400 flex items-center gap-1.5">⚡ Hash-Rate Miner (+0.05 BPS)</h3>
                             <span id="rigs-count" class="text-xs text-gray-400">Anzahl: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Tokenisierte Rechenleistung für automatische Riff-Power.</p>
-                        <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
-                            ⚡ Miner aktivieren (<span id="rig-cost">50</span> Riffs)
+                        <p class="text-[11px] text-gray-400">Tokenisierte Rechenleistung für stetige Riff-Power.</p>
+                        <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">
+                            ⚡ Hash-Rate Miner kaufen (<span id="rig-cost">50</span> Riffs)
                         </button>
                     </div>
 
                     <!-- 2. MUSIK-RELEASES & CHARTS -->
                     <div class="bg-[#131b2e] border border-indigo-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 CloudBeats Album Release</h3>
+                            <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 CloudBeats Album Release (+0.2 BPS)</h3>
                             <span id="albums-count" class="text-xs text-gray-400">Releases: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Veröffentliche Songs in der Cloud für treue Fans (+25 Fans, +0.8 BPS).</p>
-                        <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
-                            💿 Cloud-Release droppen (<span id="album-cost">250</span> Riffs)
+                        <p class="text-[11px] text-gray-400">Veröffentliche Songs in der Cloud (+10 Fans, +0.2 BPS).</p>
+                        <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">
+                            💿 CloudBeats Album veröffentlichen (<span id="album-cost">250</span> Riffs)
                         </button>
                     </div>
 
                     <!-- 3. AUTONOME AI-PRODUCER -->
                     <div class="bg-[#131b2e] border border-purple-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 AI Lyric & Beat Generator</h3>
+                            <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 AI Lyric & Beat Generator (+0.8 BPS)</h3>
                             <span id="ai-count" class="text-xs text-gray-400">Agenten: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Autonomer Producer für kontinuierliche Riff- & Fan-Generierung.</p>
-                        <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
-                            🤖 AI-Producer starten (<span id="ai-cost">1000</span> Riffs)
+                        <p class="text-[11px] text-gray-400">Autonomer Producer für kontinuierliche Riff-Generierung.</p>
+                        <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">
+                            🤖 AI-Producer anheuern (<span id="ai-cost">1000</span> Riffs)
                         </button>
                     </div>
 
@@ -246,10 +238,10 @@
                             <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">💎 $GOMINING & Beat Staking</h3>
                             <span id="staked-count" class="text-xs text-emerald-300">Gesperrt: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Sperre Riffs im Staking-Pool für passive Zinsen & BPS-Bonus.</p>
+                        <p class="text-[11px] text-gray-400">Sperre 100 Riffs im Staking-Pool für passive Zinsen (+0.05 BPS).</p>
                         <div class="flex gap-2">
-                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">💎 100 Beats staken</button>
-                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 rounded-xl text-xs transition shadow">🔓 Unstake</button>
+                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">💎 100 Riffs staken</button>
+                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">🔓 Riffs auszahlen</button>
                         </div>
                     </div>
 
@@ -348,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- ENGINE SCRIPT -->
+    <!-- ENGINE & BALANCED TYCOON SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -545,23 +537,15 @@
                 });
             }
 
-            // 🎵 HARMONISCHER NOTENPOOL & AUDIO ENGINE
+            // 🎵 WARMER, GEFILTERTER SYNTHESIZER
             let audioCtx = null;
-            const extendedNotePool = [
-                130.81, 146.83, 164.81, 196.00, 220.00, // Tief
-                261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, // Mitte
-                523.25, 587.33, 659.25, 698.46, 783.99, 880.00  // Hoch
+            const richNotePool = [
+                130.81, 164.81, 196.00, 220.00,
+                261.63, 329.63, 392.00, 440.00, 523.25,
+                659.25, 783.99, 880.00
             ];
 
-            function triggerVisualPulse() {
-                const btn = document.getElementById('produce-beat-btn');
-                if (btn) {
-                    btn.classList.add('audio-pulse');
-                    setTimeout(() => btn.classList.remove('audio-pulse'), 250);
-                }
-            }
-
-            function playRandomMelodySequence() {
+            function playRichSynthSequence() {
                 if (!soundEnabled || currentView !== 'game') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -569,32 +553,44 @@
 
                     const now = audioCtx.currentTime;
                     let noteCount = 3;
-                    let step = 0.08;
+                    let step = 0.09;
 
                     for (let i = 0; i < noteCount; i++) {
                         let noteTime = now + (i * step);
-                        let freq = extendedNotePool[Math.floor(Math.random() * extendedNotePool.length)];
+                        let freq = richNotePool[Math.floor(Math.random() * richNotePool.length)];
 
-                        let osc = audioCtx.createOscillator();
-                        osc.type = (i % 2 === 0) ? 'triangle' : 'sine';
-                        osc.frequency.setValueAtTime(freq, noteTime);
+                        let gainNode = audioCtx.createGain();
+                        gainNode.gain.setValueAtTime(0.0001, noteTime);
+                        gainNode.gain.linearRampToValueAtTime(0.08, noteTime + 0.01);
+                        gainNode.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.4);
 
-                        let gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0.0001, noteTime);
-                        gain.gain.linearRampToValueAtTime(0.12, noteTime + 0.005);
-                        gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.25);
+                        let filter = audioCtx.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(1400, noteTime);
+                        filter.Q.setValueAtTime(3, noteTime);
 
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
+                        let osc1 = audioCtx.createOscillator();
+                        osc1.type = 'sawtooth';
+                        osc1.frequency.setValueAtTime(freq, noteTime);
 
-                        osc.start(noteTime);
-                        osc.stop(noteTime + 0.3);
+                        let osc2 = audioCtx.createOscillator();
+                        osc2.type = 'sine';
+                        osc2.frequency.setValueAtTime(freq * 0.5, noteTime);
+
+                        osc1.connect(filter);
+                        osc2.connect(filter);
+                        filter.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+
+                        osc1.start(noteTime);
+                        osc2.start(noteTime);
+                        osc1.stop(noteTime + 0.45);
+                        osc2.stop(noteTime + 0.45);
 
                         setTimeout(() => {
-                            try { osc.disconnect(); gain.disconnect(); } catch(e){}
-                        }, (i * step + 0.35) * 1000);
+                            try { osc1.disconnect(); osc2.disconnect(); filter.disconnect(); gainNode.disconnect(); } catch(e){}
+                        }, (i * step + 0.5) * 1000);
                     }
-                    triggerVisualPulse();
                 } catch(e) {}
             }
 
@@ -634,7 +630,7 @@
 
             function produceBeat() {
                 beats += 1;
-                playRandomMelodySequence();
+                playRichSynthSequence();
                 updateDisplay();
                 saveGame();
             }
@@ -643,9 +639,9 @@
                 if (beats >= rigCost) {
                     beats -= rigCost;
                     rigs += 1;
-                    hashRate += 2;
-                    bps += 0.2;
-                    rigCost = Math.floor(rigCost * 1.35);
+                    hashRate += 1;
+                    bps += 0.05; // Langsamerer Zuwachs
+                    rigCost = Math.floor(rigCost * 1.45); // Schnellerer Preisanstieg
                     updateDisplay();
                     saveGame();
                 } else {
@@ -657,10 +653,10 @@
                 if (beats >= albumCost) {
                     beats -= albumCost;
                     albums += 1;
-                    fans += 25;
-                    bps += 0.8;
-                    fps += 0.3;
-                    albumCost = Math.floor(albumCost * 1.5);
+                    fans += 10;
+                    bps += 0.2;
+                    fps += 0.1;
+                    albumCost = Math.floor(albumCost * 1.6);
                     updateDisplay();
                     saveGame();
                 } else {
@@ -672,9 +668,9 @@
                 if (beats >= aiCost) {
                     beats -= aiCost;
                     aiAgents += 1;
-                    bps += 2.5;
-                    fps += 0.8;
-                    aiCost = Math.floor(aiCost * 1.4);
+                    bps += 0.8;
+                    fps += 0.3;
+                    aiCost = Math.floor(aiCost * 1.55);
                     updateDisplay();
                     saveGame();
                 } else {
@@ -686,7 +682,7 @@
                 if (beats >= 100) {
                     beats -= 100;
                     stakedBeats += 100;
-                    bps += 0.2;
+                    bps += 0.05;
                     updateDisplay();
                     saveGame();
                 } else {
@@ -698,7 +694,7 @@
                 if (stakedBeats >= 100) {
                     stakedBeats -= 100;
                     beats += 100;
-                    bps = Math.max(0, bps - 0.2);
+                    bps = Math.max(0, bps - 0.05);
                     updateDisplay();
                     saveGame();
                 } else {
@@ -724,7 +720,7 @@
                 
                 if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
                 if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
-                if(bpsEl) bpsEl.innerText = bps.toFixed(1);
+                if(bpsEl) bpsEl.innerText = bps.toFixed(2);
                 if(hrEl) hrEl.innerText = hashRate + " TH/s";
 
                 if(document.getElementById('rigs-count')) document.getElementById('rigs-count').innerText = "Anzahl: " + rigs;
@@ -800,8 +796,8 @@
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
-                        if (Math.random() < 0.35 && currentView === 'game') {
-                            playRandomMelodySequence();
+                        if (Math.random() < 0.25 && currentView === 'game') {
+                            playRichSynthSequence();
                         }
                     }
                     if (fps > 0) fans += fps / 10;
