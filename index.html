@@ -341,7 +341,7 @@
                 <span>Exklusives Studio-Minigame (PIN-Geschützt)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße präsente, volle Studio-Akkorde beim Klicken & Upgraden!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße druckvolle, rockige Synth-Riffs und Power-Chords!</p>
         </div>
 
         <!-- GESPERRTER ZUSTAND (WENN ABGEMELDET) -->
@@ -380,7 +380,7 @@
             <!-- Main Clicker Area & Upgrades -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
-                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & lauten Studio-Sound:</p>
+                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & rockige Riffs:</p>
                     <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
                         <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
                         <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
@@ -562,7 +562,7 @@
         let pendingNewEmail = '';
         let pendingVerificationCode = '';
 
-        // --- LAUTER & HOCHWERTIGER HI-FI AMBIENT SYNTHESIZER ---
+        // --- DRUCKVOLLER, ROCKIGER SYNTH-ROUTER & AMBIENT SYNTHESIZER ---
         let audioCtx = null;
         let ambientTimer = 0;
 
@@ -577,57 +577,56 @@
             return audioCtx;
         }
 
-        function playLushAmbientChord() {
+        function playRockSynth() {
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
 
                 const now = ctx.currentTime;
 
-                // Wunderschöne Studio-Akkordfolgen (Cmaj7, Am7, Fmaj7, Gadd9)
-                const chordSets = [
-                    [261.63, 329.63, 392.00, 523.25], // C Major 7
-                    [220.00, 261.63, 329.63, 440.00], // A minor 7
-                    [349.23, 440.00, 523.25, 698.46], // F Major 7
-                    [392.00, 493.88, 587.33, 783.99]  // G Major add9
+                // Rockige Power-Chord & Pentatonic-Skalen für maximale Vielfalt
+                const rockSets = [
+                    [110.00, 164.81, 220.00, 329.63, 440.00], // A Power Chord / Minor Rock
+                    [82.41, 123.47, 164.81, 246.94, 329.63],  // E Power Chord / Rock
+                    [146.83, 220.00, 293.66, 369.99, 440.00], // D Rock Riff
+                    [98.00, 146.83, 196.00, 246.94, 293.66]   // G Rock Crunch
                 ];
 
-                const chord = chordSets[Math.floor(Math.random() * chordSets.length)];
+                const chord = rockSets[Math.floor(Math.random() * rockSets.length)];
 
+                // Master Gain & Rock-Filter mit Resonanz für Biss
                 const masterGain = ctx.createGain();
-                masterGain.gain.setValueAtTime(0.5, now);
+                masterGain.gain.setValueAtTime(0.45, now);
 
                 const filter = ctx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(1800, now);
-                filter.Q.setValueAtTime(1.2, now);
+                filter.frequency.setValueAtTime(2800, now);
+                filter.Q.setValueAtTime(3.5); // Mehr Resonanz für den klassischen Synth-Rock-Klang
 
                 masterGain.connect(filter);
                 filter.connect(ctx.destination);
 
                 chord.forEach((freq, idx) => {
-                    [0, 3.2].forEach((detuneCents, dIdx) => {
-                        const osc = ctx.createOscillator();
-                        const noteGain = ctx.createGain();
+                    // Sawtooth und Square für echte Rock-Harmonika
+                    const osc = ctx.createOscillator();
+                    const noteGain = ctx.createGain();
 
-                        osc.type = dIdx === 0 ? 'sine' : 'triangle';
-                        
-                        const detunedFreq = freq * Math.pow(2, detuneCents / 1200);
-                        osc.frequency.setValueAtTime(detunedFreq, now);
+                    osc.type = idx % 2 === 0 ? 'sawtooth' : 'square';
+                    osc.frequency.setValueAtTime(freq, now);
 
-                        const startTime = now + (idx * 0.06);
-                        const duration = 2.5;
+                    // Schneller, knackiger Attack und rockiges Ausklingen
+                    const startTime = now + (idx * 0.035);
+                    const duration = 1.4;
 
-                        noteGain.gain.setValueAtTime(0.0001, startTime);
-                        noteGain.gain.linearRampToValueAtTime(0.22 / chord.length, startTime + 0.1);
-                        noteGain.gain.exponentialRampToValueAtTime(0.00001, startTime + duration);
+                    noteGain.gain.setValueAtTime(0.0001, startTime);
+                    noteGain.gain.linearRampToValueAtTime(0.1 / chord.length, startTime + 0.02);
+                    noteGain.gain.exponentialRampToValueAtTime(0.00001, startTime + duration);
 
-                        osc.connect(noteGain);
-                        noteGain.connect(masterGain);
+                    osc.connect(noteGain);
+                    noteGain.connect(masterGain);
 
-                        osc.start(startTime);
-                        osc.stop(startTime + duration);
-                    });
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
                 });
             } catch(e) {
                 console.error("Audio Playback Error:", e);
@@ -932,7 +931,7 @@
             if (!isAdminLoggedIn) return;
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
-            playLushAmbientChord();
+            playRockSynth(); // Spielt sofort ein knackiges Rock-Riff ab
             updateGameUI();
             saveGame();
         }
@@ -951,7 +950,7 @@
                 if (type === 'synth') gameData.synth++;
                 if (type === 'desk') gameData.desk++;
                 if (type === 'label') gameData.label++;
-                playLushAmbientChord();
+                playRockSynth(); // Feierlicher Rock-Sound beim Kauf
                 updateGameUI();
                 saveGame();
             }
@@ -991,7 +990,7 @@
             if (coLabel) coLabel.innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
         }
 
-        // Passives Einkommen läuft weiter, aber Ambient-Töne spielen NUR, wenn das Spiel aktiv auf dem Bildschirm ist
+        // Passives Einkommen läuft weiter, Rock-Töne spielen NUR, wenn das Spiel aktiv auf dem Bildschirm ist
         setInterval(function() {
             if (!isAdminLoggedIn) return;
             let bps = getBps();
@@ -1000,13 +999,12 @@
                 gameData.fans += (bps / 50);
                 updateGameUI();
 
-                // Prüfen, ob der Spieler sich gerade im Game-View befindet
                 const isGameActive = !document.getElementById('gameView').classList.contains('hidden');
                 if (isGameActive) {
                     ambientTimer++;
-                    if (ambientTimer >= Math.max(12, 55 - bps)) {
+                    if (ambientTimer >= Math.max(10, 50 - bps)) {
                         ambientTimer = 0;
-                        playLushAmbientChord();
+                        playRockSynth();
                     }
                 }
             }
