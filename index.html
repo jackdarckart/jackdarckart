@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Tycoon-Logik mit dynamischem Multi-Töne-Synthesizer -->
+    <!-- Tycoon-Logik mit unendlicher Sound-Vielfalt & Synthesizer -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -539,11 +539,18 @@
                 });
             }
 
-            // MULTI-TÖNE SYNTHESIZER (Spielt bei jedem Klick einen anderen Ton einer Melodie-Skala)
+            // UNTERSCHIEDLICHE SYNTH-SOUNDS & MULTI-TON GENERATOR BEI JEDEM KLICK
             let audioCtx = null;
-            let noteIndex = 0;
-            const synthScale = [261.63, 311.13, 349.23, 392.00, 466.16, 523.25, 622.25, 698.46, 783.99]; // C Moll Skala
-            const waveTypes = ['sawtooth', 'square', 'triangle'];
+            const soundPresets = [
+                { type: 'sawtooth', base: 220, mult: 1.5, decay: 0.15 },
+                { type: 'square', base: 146.83, mult: 2.0, decay: 0.1 },
+                { type: 'triangle', base: 440, mult: 0.8, decay: 0.2 },
+                { type: 'sine', base: 587.33, mult: 1.2, decay: 0.12 },
+                { type: 'sawtooth', base: 110, mult: 3.0, decay: 0.25 }, // Tiefer Sub-Bass Hit
+                { type: 'square', base: 659.25, mult: 0.5, decay: 0.08 }, // Hoher Pluck
+                { type: 'triangle', base: 329.63, mult: 1.33, decay: 0.18 }
+            ];
+            const pitchMultipliers = [1, 1.125, 1.25, 1.334, 1.5, 1.667, 1.875, 2.0, 2.5];
 
             function playBeatSound() {
                 if (!soundEnabled || currentView === 'home') return;
@@ -551,26 +558,26 @@
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
-                    // Nächsten Ton der Melodie holen & Wellenform variieren
-                    let freq = synthScale[noteIndex];
-                    noteIndex = (noteIndex + 1) % synthScale.length;
-                    let wave = waveTypes[Math.floor(Math.random() * waveTypes.length)];
+                    // Wähle völlig zufällig ein Preset und eine Tonhöhe für extreme Abwechslung
+                    let preset = soundPresets[Math.floor(Math.random() * soundPresets.length)];
+                    let pitch = pitchMultipliers[Math.floor(Math.random() * pitchMultipliers.length)];
+                    let targetFreq = preset.base * pitch;
 
                     let osc1 = audioCtx.createOscillator();
                     let osc2 = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
 
-                    osc1.type = wave;
-                    osc2.type = 'sine';
+                    osc1.type = preset.type;
+                    osc2.type = Math.random() > 0.5 ? 'sine' : 'triangle';
 
-                    osc1.frequency.setValueAtTime(freq * 1.5, audioCtx.currentTime);
-                    osc1.frequency.exponentialRampToValueAtTime(freq, audioCtx.currentTime + 0.15);
+                    osc1.frequency.setValueAtTime(targetFreq * preset.mult, audioCtx.currentTime);
+                    osc1.frequency.exponentialRampToValueAtTime(targetFreq, audioCtx.currentTime + preset.decay);
 
-                    osc2.frequency.setValueAtTime(freq * 0.75, audioCtx.currentTime);
-                    osc2.frequency.exponentialRampToValueAtTime(freq * 0.5, audioCtx.currentTime + 0.15);
+                    osc2.frequency.setValueAtTime(targetFreq * 0.5, audioCtx.currentTime);
+                    osc2.frequency.exponentialRampToValueAtTime(targetFreq * 0.25, audioCtx.currentTime + preset.decay);
 
-                    gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+                    gain.gain.setValueAtTime(0.75, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + preset.decay + 0.05);
 
                     osc1.connect(gain);
                     osc2.connect(gain);
@@ -578,8 +585,8 @@
 
                     osc1.start();
                     osc2.start();
-                    osc1.stop(audioCtx.currentTime + 0.18);
-                    osc2.stop(audioCtx.currentTime + 0.18);
+                    osc1.stop(audioCtx.currentTime + preset.decay + 0.05);
+                    osc2.stop(audioCtx.currentTime + preset.decay + 0.05);
                 } catch (e) {}
             }
 
