@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- High-End Multi-Voice Studio Synthesizer & Tycoon-Logik -->
+    <!-- Master Pro DAW Multi-Preset Studio Synthesizer & Tycoon Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,75 +541,101 @@
                 });
             }
 
-            // HIGH-END MULTI-VOICE STUDIO SYNTHESIZER (Lush Chords, Detune, Resonanz & Stereo Panning)
+            // MASTER PRO DAW SYNTHESIZER ENGINE (Multi-Instrument Presets, Stereo Delay & Lush Chords)
             let audioCtx = null;
             const cMinorPool = [
-                130.81, 155.56, 174.61, 196.00, 233.08, 
-                261.63, 311.13, 349.23, 392.00, 466.16, 
-                523.25, 622.25, 698.46, 783.99
+                130.81, 146.83, 155.56, 174.61, 196.00, 220.00, 233.08, 
+                261.63, 293.66, 311.13, 349.23, 392.00, 440.00, 466.16, 
+                523.25, 587.33, 622.25, 698.46, 783.99, 880.00
             ];
-            const synthTypes = ['sawtooth', 'triangle', 'square', 'sine'];
-            const chordMultipliers = [1, 1.25, 1.5, 2]; // Harmonie-Intervalle für Akkord-Dicke
+            const presets = ['pad', 'pluck', 'bell', 'bass'];
 
-            function playRichStudioSound() {
+            function playProDAWSound() {
                 if (!soundEnabled || currentView === 'home') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
                     const now = audioCtx.currentTime;
-                    let baseFreq = cMinorPool[Math.floor(Math.random() * cMinorPool.length)];
-                    let interval = chordMultipliers[Math.floor(Math.random() * chordMultipliers.length)];
-                    let freq2 = baseFreq * interval;
+                    let rootFreq = cMinorPool[Math.floor(Math.random() * cMinorPool.length)];
+                    let preset = presets[Math.floor(Math.random() * presets.length)];
 
                     let osc1 = audioCtx.createOscillator();
                     let osc2 = audioCtx.createOscillator();
                     let filter = audioCtx.createBiquadFilter();
                     let gain = audioCtx.createGain();
+                    let delay = audioCtx.createDelay();
+                    let delayFeedback = audioCtx.createGain();
                     let panner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
 
-                    osc1.type = synthTypes[Math.floor(Math.random() * synthTypes.length)];
-                    osc2.type = synthTypes[Math.floor(Math.random() * synthTypes.length)];
+                    // Instrument Presets Setup
+                    if (preset === 'pad') {
+                        osc1.type = 'sawtooth';
+                        osc2.type = 'triangle';
+                        osc2.frequency.setValueAtTime(rootFreq * 1.5, now); // Quint-Harmonie
+                        filter.frequency.setValueAtTime(1200, now);
+                        filter.frequency.exponentialRampToValueAtTime(300, now + 1.2);
+                    } else if (preset === 'pluck') {
+                        osc1.type = 'square';
+                        osc2.type = 'sawtooth';
+                        osc2.frequency.setValueAtTime(rootFreq * 2, now); // Oktav-Harmonie
+                        filter.frequency.setValueAtTime(3000, now);
+                        filter.frequency.exponentialRampToValueAtTime(400, now + 0.4);
+                    } else if (preset === 'bell') {
+                        osc1.type = 'sine';
+                        osc2.type = 'sine';
+                        osc2.frequency.setValueAtTime(rootFreq * 2.5, now);
+                        filter.frequency.setValueAtTime(4000, now);
+                        filter.frequency.exponentialRampToValueAtTime(800, now + 0.8);
+                    } else { // bass
+                        osc1.type = 'triangle';
+                        osc2.type = 'sine';
+                        osc2.frequency.setValueAtTime(rootFreq * 0.5, now);
+                        filter.frequency.setValueAtTime(800, now);
+                        filter.frequency.exponentialRampToValueAtTime(150, now + 0.9);
+                    }
 
-                    osc1.frequency.setValueAtTime(baseFreq, now);
-                    osc2.frequency.setValueAtTime(freq2, now);
+                    osc1.frequency.setValueAtTime(rootFreq, now);
+                    osc1.detune.setValueAtTime(Math.random() * 10 - 5, now);
+                    osc2.detune.setValueAtTime(Math.random() * 14 - 7, now);
 
-                    // Analoge Verstimmung für organische Wärme
-                    osc1.detune.setValueAtTime(Math.random() * 12 - 6, now);
-                    osc2.detune.setValueAtTime(Math.random() * 16 - 8, now);
-
-                    // Filter mit warmer Resonanz (Q) und Sweep
                     filter.type = 'lowpass';
-                    let cutoff = 1500 + Math.random() * 2000;
-                    filter.frequency.setValueAtTime(cutoff, now);
-                    filter.frequency.exponentialRampToValueAtTime(cutoff * 0.25, now + 0.7);
-                    if (filter.Q) filter.Q.setValueAtTime(4 + Math.random() * 5, now);
+                    if (filter.Q) filter.Q.setValueAtTime(3 + Math.random() * 4, now);
 
-                    // Sanfte Dynamik-Enveloppe
-                    let decay = 0.6 + Math.random() * 0.4;
+                    // Dynamic Envelope
+                    let duration = preset === 'pluck' ? 0.5 : (preset === 'bell' ? 0.9 : 1.4);
                     gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.24, now + 0.03);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+                    gain.gain.linearRampToValueAtTime(0.22, now + 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-                    // Zufällige Stereoposition (Spatial Audio)
+                    // Delay / Echo Effect Network for professional depth
+                    delay.delayTime.setValueAtTime(0.25, now);
+                    delayFeedback.gain.setValueAtTime(0.35, now);
+
+                    // Routing Graph
+                    osc1.connect(filter);
+                    osc2.connect(filter);
+                    filter.connect(gain);
+
+                    // Feedback loop for echo
+                    gain.connect(delay);
+                    delay.connect(delayFeedback);
+                    delayFeedback.connect(delay);
+
                     if (panner) {
-                        panner.pan.setValueAtTime(Math.random() * 0.8 - 0.4, now);
-                        osc1.connect(filter);
-                        osc2.connect(filter);
-                        filter.connect(gain);
+                        panner.pan.setValueAtTime(Math.random() * 0.9 - 0.45, now);
                         gain.connect(panner);
+                        delay.connect(panner);
                         panner.connect(audioCtx.destination);
                     } else {
-                        osc1.connect(filter);
-                        osc2.connect(filter);
-                        filter.connect(gain);
                         gain.connect(audioCtx.destination);
+                        delay.connect(audioCtx.destination);
                     }
 
                     osc1.start(now);
                     osc2.start(now);
-                    osc1.stop(now + decay);
-                    osc2.stop(now + decay);
+                    osc1.stop(now + duration);
+                    osc2.stop(now + duration);
                 } catch (e) {}
             }
 
@@ -649,12 +675,12 @@
 
             function produceBeat() {
                 beats += 1;
-                playRichStudioSound();
+                playProDAWSound();
                 updateDisplay();
                 saveGame();
             }
 
-            // AUSBALANCIERTE TYCOON UPGRADE LOGIK (Sehr langsame, stetige Steigerung)
+            // AUSBALANCIERTE TYCOON UPGRADE LOGIK
             function buyRig() {
                 if (beats >= rigCost) {
                     beats -= rigCost;
@@ -820,12 +846,12 @@
                 }
             }, 100);
 
-            // 2. Entspannter Hintergrund-Takt (alle 3,5 Sekunden ein satten, mehrstimmigen Studio-Akkord)
+            // 2. Entspannter Hintergrund-Takt (spielt alle 3,2 Sekunden einen satten, professionellen DAW-Sound)
             setInterval(() => {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
-                    playRichStudioSound();
+                    playProDAWSound();
                 }
-            }, 3500);
+            }, 3200);
 
             setInterval(() => { saveGame(); }, 5000);
 
