@@ -22,7 +22,7 @@
 
             <!-- Seiten-Navigation -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <button type="button" id="nav-home" class="bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow">🏠 Start</button>
+                <button type="button" id="nav-home" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🏠 Start</button>
                 <button type="button" id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🎵 Game</button>
                 <button type="button" id="nav-garten" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🌱 Garten</button>
                 <button type="button" id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">☁️ Cloud</button>
@@ -106,7 +106,7 @@
 
         </div>
 
-        <!-- 2. GAME-SEITE (Login/Reg Tor + Spielbereich + Admin unten) -->
+        <!-- 2. GAME-SEITE (Login/Reg Tor + Massives Tycoon-Studio + Admin unten) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center">
             
             <!-- AUTH CONTAINER (Sichtbar wenn nicht eingeloggt) -->
@@ -154,7 +154,7 @@
                 </div>
             </div>
 
-            <!-- GAME & ADMIN CONTAINER (Wird erst NACH erfolgreichem Login sichtbar) -->
+            <!-- GAME & TYCOON CONTAINER (Wird erst NACH erfolgreichem Login sichtbar) -->
             <div id="game-main-container" class="hidden space-y-6">
                 
                 <!-- Game Header / User Bar -->
@@ -164,27 +164,87 @@
                 </div>
 
                 <div>
-                    <h2 class="text-2xl font-black text-purple-400 mb-1">Beat-Lab Studio</h2>
-                    <p class="text-gray-400 text-xs">Produziere Beats und verwalte dein Studio!</p>
+                    <h2 class="text-2xl font-black text-purple-400 mb-1">Beat-Lab Studio Pro</h2>
+                    <p class="text-gray-400 text-xs">Produziere, mine, verwebe Staking & erobere die Charts!</p>
                 </div>
 
+                <!-- Haupt-Clicker -->
                 <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl transition border border-purple-400/30 flex items-center justify-center gap-3">
                     <span class="text-2xl">🎵</span> Beat produzieren <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+1</span>
                 </button>
 
-                <div class="space-y-3.5">
-                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
-                        <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Produzierte Beats</p>
-                        <p id="beats-count" class="text-3xl font-black text-purple-400">0</p>
+                <!-- Statistik Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-3.5 rounded-2xl shadow-lg text-left">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Beats</p>
+                        <p id="beats-count" class="text-xl font-black text-purple-400">0</p>
                     </div>
-                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
-                        <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Fans / Hörerschaft</p>
-                        <p id="fans-count" class="text-3xl font-black text-pink-400">0</p>
+                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-3.5 rounded-2xl shadow-lg text-left">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Fans</p>
+                        <p id="fans-count" class="text-xl font-black text-pink-400">0</p>
                     </div>
-                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
-                        <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Beats pro Sekunde</p>
-                        <p id="bps-count" class="text-3xl font-black text-emerald-400">0.0</p>
+                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-3.5 rounded-2xl shadow-lg text-left">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Beats / Sek (BPS)</p>
+                        <p id="bps-count" class="text-xl font-black text-emerald-400">0.0</p>
                     </div>
+                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-3.5 rounded-2xl shadow-lg text-left">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Hash-Rate (TH/s)</p>
+                        <p id="hashrate-count" class="text-xl font-black text-cyan-400">0 TH/s</p>
+                    </div>
+                </div>
+
+                <!-- TYCOON UPGRADE SEKTIONEN -->
+                <div class="space-y-4 text-left">
+                    
+                    <!-- 1. HASH-RATE RIGS (GoMining Stil) -->
+                    <div class="bg-[#131b2e] border border-cyan-500/30 p-4 rounded-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-xs text-cyan-400 flex items-center gap-1.5">⚡ Mining Rig (+1 BPS)</h3>
+                            <span id="rigs-count" class="text-xs text-gray-400">Anzahl: 0</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Generiert automatische Hash-Power für dein Studio.</p>
+                        <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
+                            Rig kaufen (<span id="rig-cost">50</span> Beats)
+                        </button>
+                    </div>
+
+                    <!-- 2. MUSIK-RELEASES & CHARTS -->
+                    <div class="bg-[#131b2e] border border-indigo-500/30 p-4 rounded-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 Single / Album Release</h3>
+                            <span id="albums-count" class="text-xs text-gray-400">Releases: 0</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Drop einen Track für massiven Fan-Zuwachs (+50 Fans & +2 BPS).</p>
+                        <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
+                            Release droppen (<span id="album-cost">250</span> Beats)
+                        </button>
+                    </div>
+
+                    <!-- 3. AUTONOME AI-PRODUCER -->
+                    <div class="bg-[#131b2e] border border-purple-500/30 p-4 rounded-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 AI-Producer Agent</h3>
+                            <span id="ai-count" class="text-xs text-gray-400">Agenten: 0</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Ein KI-Agent, der unermüdlich im Hintergrund Beats produziert (+8 BPS).</p>
+                        <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
+                            Agenten anheuern (<span id="ai-cost">1000</span> Beats)
+                        </button>
+                    </div>
+
+                    <!-- 4. BEAT STAKING POOL -->
+                    <div class="bg-[#131b2e] border border-emerald-500/30 p-4 rounded-2xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">💎 Beat-Staking Pool</h3>
+                            <span id="staked-count" class="text-xs text-emerald-300">Gesperrt: 0</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Sperre Beats im Pool für passive Zinsen (+10% BPS Ertrag).</p>
+                        <div class="flex gap-2">
+                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">100 Staken</button>
+                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 rounded-xl text-xs transition shadow">Unstake</button>
+                        </div>
+                    </div>
+
                 </div>
 
                 <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
@@ -276,14 +336,13 @@
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Automatisch gespeichert</span>
-            <span class="text-gray-500">Secure Fair Play Hub</span>
+            <span class="text-gray-500">Tycoon Pro Hub</span>
         </div>
     </footer>
 
-    <!-- JavaScript Logik mit Ansichts-Speicherung -->
+    <!-- Ressourcensparende Tycoon-Logik -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Bereinige alte globale Speicherreste
             localStorage.removeItem('beat_lab_beats');
             localStorage.removeItem('beat_lab_fans');
             localStorage.removeItem('beat_lab_bps');
@@ -291,44 +350,58 @@
             let beats = 0;
             let fans = 0;
             let bps = 0.0;
+            let hashRate = 0;
+            let rigs = 0;
+            let albums = 0;
+            let aiAgents = 0;
+            let stakedBeats = 0;
+
             let username = localStorage.getItem('beat_lab_user') || 'jackdarckart';
             let soundEnabled = true;
-
-            // Letzte Ansicht laden oder Standard auf 'home'
+            let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
             let currentView = localStorage.getItem('beat_lab_current_view') || 'home';
 
-            let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
+            // Kosten-Variablen
+            let rigCost = 50;
+            let albumCost = 250;
+            let aiCost = 1000;
 
-            // Spielstand des aktuellen Users laden
             function loadUserData() {
                 if (!loggedInUser) return;
                 try {
                     let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
                     if (usersDB[loggedInUser]) {
-                        beats = usersDB[loggedInUser].beats !== undefined ? usersDB[loggedInUser].beats : 0;
-                        fans = usersDB[loggedInUser].fans !== undefined ? usersDB[loggedInUser].fans : 0;
-                        bps = usersDB[loggedInUser].bps !== undefined ? usersDB[loggedInUser].bps : 0.0;
+                        let u = usersDB[loggedInUser];
+                        beats = u.beats || 0;
+                        fans = u.fans || 0;
+                        bps = u.bps || 0.0;
+                        hashRate = u.hashRate || 0;
+                        rigs = u.rigs || 0;
+                        albums = u.albums || 0;
+                        aiAgents = u.aiAgents || 0;
+                        stakedBeats = u.stakedBeats || 0;
+                        rigCost = u.rigCost || 50;
+                        albumCost = u.albumCost || 250;
+                        aiCost = u.aiCost || 1000;
                     }
                 } catch(e) {}
             }
 
-            // Spielstand des aktuellen Users speichern
             function saveGame() {
                 if (!loggedInUser) return;
                 try {
                     let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
                     if (usersDB[loggedInUser]) {
-                        usersDB[loggedInUser].beats = beats;
-                        usersDB[loggedInUser].fans = fans;
-                        usersDB[loggedInUser].bps = bps;
+                        usersDB[loggedInUser] = {
+                            ...usersDB[loggedInUser],
+                            beats, fans, bps, hashRate, rigs, albums, aiAgents, stakedBeats, rigCost, albumCost, aiCost
+                        };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     }
                 } catch(e) {}
             }
 
-            if (loggedInUser) {
-                loadUserData();
-            }
+            if (loggedInUser) loadUserData();
 
             const userDisplay = document.getElementById('user-display');
             if (userDisplay) userDisplay.innerText = username;
@@ -350,7 +423,7 @@
                 }
             }
 
-            // Tabs Umschalten (Login / Registrieren)
+            // Tabs Login / Reg
             const tabLoginBtn = document.getElementById('tab-login-btn');
             const tabRegisterBtn = document.getElementById('tab-register-btn');
             const formLogin = document.getElementById('form-login');
@@ -363,7 +436,6 @@
                     formLogin.classList.remove('hidden');
                     formRegister.classList.add('hidden');
                 });
-
                 tabRegisterBtn.addEventListener('click', () => {
                     tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 border-b-2 border-emerald-500 transition";
                     tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition";
@@ -389,33 +461,22 @@
                     }
 
                     let usersDB = {};
-                    try {
-                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    } catch(e) {
-                        usersDB = {};
-                    }
+                    try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
 
                     if (usersDB[emailInput]) {
-                        alert("⚠️ Diese E-Mail-Adresse ist bereits registriert! Wähle eine andere oder logge dich ein.");
+                        alert("⚠️ Diese E-Mail ist bereits registriert!");
                         return;
                     }
 
-                    usersDB[emailInput] = { 
-                        pin: pinInput, 
-                        beats: 0, 
-                        fans: 0, 
-                        bps: 0.0, 
-                        created: Date.now() 
-                    };
+                    usersDB[emailInput] = { pin: pinInput, beats: 0, fans: 0, bps: 0.0, hashRate: 0, rigs: 0, albums: 0, aiAgents: 0, stakedBeats: 0, rigCost: 50, albumCost: 250, aiCost: 1000, created: Date.now() };
                     localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
 
                     loggedInUser = emailInput;
                     localStorage.setItem('beat_lab_logged_in_user', emailInput);
-
                     document.getElementById('reg-email').value = '';
                     document.getElementById('reg-pin').value = '';
 
-                    alert("🎉 Erfolgreich registriert und eingeloggt!");
+                    alert("🎉 Registriert & eingeloggt!");
                     updateGameViewState();
                 });
             }
@@ -428,20 +489,15 @@
                     const pinInput = document.getElementById('login-pin').value.trim();
 
                     let usersDB = {};
-                    try {
-                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    } catch(e) {
-                        usersDB = {};
-                    }
+                    try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
 
                     if (!usersDB[emailInput] || usersDB[emailInput].pin !== pinInput) {
-                        alert("❌ Falsche E-Mail-Adresse oder falscher PIN!");
+                        alert("❌ Falsche E-Mail oder PIN!");
                         return;
                     }
 
                     loggedInUser = emailInput;
                     localStorage.setItem('beat_lab_logged_in_user', emailInput);
-
                     document.getElementById('login-email').value = '';
                     document.getElementById('login-pin').value = '';
 
@@ -457,64 +513,49 @@
                     saveGame();
                     loggedInUser = null;
                     localStorage.removeItem('beat_lab_logged_in_user');
-                    
                     if(document.getElementById('login-email')) document.getElementById('login-email').value = '';
                     if(document.getElementById('login-pin')) document.getElementById('login-pin').value = '';
-                    if(document.getElementById('reg-email')) document.getElementById('reg-email').value = '';
-                    if(document.getElementById('reg-pin')) document.getElementById('reg-pin').value = '';
-
                     updateGameViewState();
-                    alert("🔒 Sicher abgemeldet. Alle Daten wurden bereinigt.");
+                    alert("🔒 Sicher abgemeldet.");
                 });
             }
 
-            // Admin: PIN ändern
+            // Admin PIN ändern
             const adminChangePinBtn = document.getElementById('admin-change-pin-btn');
             if(adminChangePinBtn) {
                 adminChangePinBtn.addEventListener('click', () => {
                     const newPin = document.getElementById('admin-new-pin').value.trim();
                     if (!newPin || newPin.length < 3) {
-                        alert("❌ Bitte gib einen neuen PIN (mind. 3 Zeichen) ein.");
+                        alert("❌ PIN muss mind. 3 Zeichen lang sein.");
                         return;
                     }
-
                     let usersDB = {};
-                    try {
-                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    } catch(e) {
-                        usersDB = {};
-                    }
-
+                    try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
                     if (loggedInUser && usersDB[loggedInUser]) {
                         usersDB[loggedInUser].pin = newPin;
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-                        alert("✅ Sicherheits-PIN erfolgreich aktualisiert!");
+                        alert("✅ PIN aktualisiert!");
                         document.getElementById('admin-new-pin').value = '';
-                    } else {
-                        alert("❌ Fehler: Kein aktiver Benutzer gefunden.");
                     }
                 });
             }
 
+            // Sound generator
             let audioCtx = null;
             function playBeatSound() {
                 if (!soundEnabled || currentView === 'home') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
-
                     let osc = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(440, audioCtx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1);
-
-                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
-
                     osc.start();
                     osc.stop(audioCtx.currentTime + 0.1);
                 } catch (e) {}
@@ -533,15 +574,12 @@
 
             function switchView(view) {
                 currentView = view;
-                localStorage.setItem('beat_lab_current_view', view); // Aktiven Tab speichern
-                
+                localStorage.setItem('beat_lab_current_view', view);
                 document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
                 let target = document.getElementById('view-' + view);
                 if (target) target.classList.remove('hidden');
 
-                if (view === 'game') {
-                    updateGameViewState();
-                }
+                if (view === 'game') updateGameViewState();
                 if (view === 'account') {
                     let rUser = document.getElementById('reg-username');
                     if(rUser) rUser.value = username;
@@ -550,11 +588,9 @@
                 ['home', 'game', 'garten', 'cloud', 'account', 'admin'].forEach(v => {
                     let b = document.getElementById('nav-' + v);
                     if (b) {
-                        if (v === view) {
-                            b.className = "bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow";
-                        } else {
-                            b.className = "bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700";
-                        }
+                        b.className = (v === view) 
+                            ? "bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow"
+                            : "bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700";
                     }
                 });
             }
@@ -566,67 +602,99 @@
                 saveGame();
             }
 
+            // TYCOON UPGRADE LOGIK
+            function buyRig() {
+                if (beats >= rigCost) {
+                    beats -= rigCost;
+                    rigs += 1;
+                    hashRate += 5; // +5 TH/s pro Rig
+                    bps += 1.0;    // +1 BPS pro Rig
+                    rigCost = Math.floor(rigCost * 1.35);
+                    updateDisplay();
+                    saveGame();
+                } else {
+                    alert("❌ Nicht genug Beats!");
+                }
+            }
+
+            function buyAlbum() {
+                if (beats >= albumCost) {
+                    beats -= albumCost;
+                    albums += 1;
+                    fans += 50;    // +50 Fans
+                    bps += 2.0;    // +2 BPS
+                    albumCost = Math.floor(albumCost * 1.5);
+                    updateDisplay();
+                    saveGame();
+                } else {
+                    alert("❌ Nicht genug Beats für ein Release!");
+                }
+            }
+
+            function buyAI() {
+                if (beats >= aiCost) {
+                    beats -= aiCost;
+                    aiAgents += 1;
+                    bps += 8.0;    // +8 BPS
+                    aiCost = Math.floor(aiCost * 1.4);
+                    updateDisplay();
+                    saveGame();
+                } else {
+                    alert("❌ Nicht genug Beats für einen AI-Producer!");
+                }
+            }
+
+            function stakeBeats() {
+                if (beats >= 100) {
+                    beats -= 100;
+                    stakedBeats += 100;
+                    bps += 0.5; // Staking Bonus BPS
+                    updateDisplay();
+                    saveGame();
+                } else {
+                    alert("❌ Mindestens 100 Beats zum Staken erforderlich!");
+                }
+            }
+
+            function unstakeBeats() {
+                if (stakedBeats >= 100) {
+                    stakedBeats -= 100;
+                    beats += 100;
+                    bps = Math.max(0, bps - 0.5);
+                    updateDisplay();
+                    saveGame();
+                } else {
+                    alert("❌ Keine gestakten Beats vorhanden!");
+                }
+            }
+
             function updateDisplay() {
                 let bEl = document.getElementById('beats-count');
                 let fEl = document.getElementById('fans-count');
                 let bpsEl = document.getElementById('bps-count');
+                let hrEl = document.getElementById('hashrate-count');
+                
                 if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
-                if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
+                if(fEl) fEl.innerText = fans.toLocaleString('de-DE');
                 if(bpsEl) bpsEl.innerText = bps.toFixed(1);
+                if(hrEl) hrEl.innerText = hashRate + " TH/s";
+
+                // Update UI Labels
+                if(document.getElementById('rigs-count')) document.getElementById('rigs-count').innerText = "Anzahl: " + rigs;
+                if(document.getElementById('rig-cost')) document.getElementById('rig-cost').innerText = rigCost;
+                if(document.getElementById('albums-count')) document.getElementById('albums-count').innerText = "Releases: " + albums;
+                if(document.getElementById('album-cost')) document.getElementById('album-cost').innerText = albumCost;
+                if(document.getElementById('ai-count')) document.getElementById('ai-count').innerText = "Agenten: " + aiAgents;
+                if(document.getElementById('ai-cost')) document.getElementById('ai-cost').innerText = aiCost;
+                if(document.getElementById('staked-count')) document.getElementById('staked-count').innerText = "Gesperrt: " + stakedBeats;
             }
 
-            function exportSave() {
-                try {
-                    const saveData = { beats, fans, bps, username };
-                    const code = btoa(JSON.stringify(saveData));
-                    navigator.clipboard.writeText(code).then(() => {
-                        alert("📋 Cloud-Code in die Zwischenablage kopiert!");
-                    }).catch(() => { prompt("Code kopieren:", code); });
-                } catch(e) {
-                    alert("❌ Fehler beim Export.");
-                }
-            }
-
-            function importSave() {
-                let code = prompt("Cloud-Code einfügen:");
-                if (code && code.trim() !== "") {
-                    try {
-                        const data = JSON.parse(atob(code.trim()));
-                        beats = data.beats || 0;
-                        fans = data.fans || 0;
-                        bps = data.bps || 0.0;
-                        username = data.username || 'jackdarckart';
-                        saveGame();
-                        updateDisplay();
-                        alert("🚀 Spielstand geladen!");
-                    } catch (e) {
-                        alert("❌ Ungültiger Code!");
-                    }
-                }
-            }
-
-            // Zurücksetzen des Spielstands auf 0 für den aktuellen Account
-            const adminResetGameBtn = document.getElementById('admin-reset-game-btn');
-            if(adminResetGameBtn) {
-                adminResetGameBtn.addEventListener('click', () => {
-                    if (confirm("⚠️ ACHTUNG: Möchtest du wirklich den Spielstand dieses Accounts auf 0 zurücksetzen? Dein Account und dein PIN bleiben absolut sicher!")) {
-                        beats = 0;
-                        fans = 0;
-                        bps = 0.0;
-                        updateDisplay();
-                        saveGame();
-                        alert("🔄 Spielstand wurde auf 0 zurückgesetzt.");
-                    }
-                });
-            }
-
-            // Sicherer Event-Listener Helper
+            // Event Bindings
             function bindClick(id, handler) {
                 const el = document.getElementById(id);
                 if (el) el.addEventListener('click', handler);
             }
 
-            // Event Listener Bindungen
             bindClick('nav-home', () => switchView('home'));
             bindClick('nav-game', () => switchView('game'));
             bindClick('nav-garten', () => switchView('garten'));
@@ -638,12 +706,17 @@
             bindClick('home-to-game-btn', () => switchView('game'));
             bindClick('auth-to-home-btn', () => switchView('home'));
             bindClick('produce-beat-btn', produceBeat);
+            bindClick('buy-rig-btn', buyRig);
+            bindClick('buy-album-btn', buyAlbum);
+            bindClick('buy-ai-btn', buyAI);
+            bindClick('stake-btn', stakeBeats);
+            bindClick('unstake-btn', unstakeBeats);
             bindClick('game-to-home-btn', () => switchView('home'));
             bindClick('garten-to-home-btn', () => switchView('home'));
-            bindClick('export-btn', exportSave);
-            bindClick('import-btn', importSave);
             bindClick('cloud-to-home-btn', () => switchView('home'));
-            
+            bindClick('account-to-home-btn', () => switchView('home'));
+            bindClick('admin-to-home-btn', () => switchView('home'));
+
             const saveAccountBtn = document.getElementById('save-account-btn');
             if(saveAccountBtn) {
                 saveAccountBtn.addEventListener('click', () => {
@@ -658,19 +731,32 @@
                 });
             }
 
-            bindClick('account-to-home-btn', () => switchView('home'));
-            bindClick('admin-to-home-btn', () => switchView('home'));
+            // Admin Reset
+            const adminResetGameBtn = document.getElementById('admin-reset-game-btn');
+            if(adminResetGameBtn) {
+                adminResetGameBtn.addEventListener('click', () => {
+                    if (confirm("⚠️ ACHTUNG: Möchtest du den Spielstand dieses Accounts auf 0 zurücksetzen?")) {
+                        beats = 0; fans = 0; bps = 0.0; hashRate = 0; rigs = 0; albums = 0; aiAgents = 0; stakedBeats = 0;
+                        rigCost = 50; albumCost = 250; aiCost = 1000;
+                        updateDisplay();
+                        saveGame();
+                        alert("🔄 Spielstand zurückgesetzt.");
+                    }
+                });
+            }
 
-            // Auto-production
+            // Ressourcensparende Hintergrund-Schleife (10x pro Sekunde)
             setInterval(() => {
-                beats += bps / 10;
-                if (loggedInUser) updateDisplay();
+                if (loggedInUser && bps > 0) {
+                    beats += bps / 10;
+                    updateDisplay();
+                }
             }, 100);
 
-            // Auto-save
+            // Automatisches Speichern alle 5 Sekunden
             setInterval(() => { saveGame(); }, 5000);
 
-            // Beim Start die zuletzt aktive Ansicht wiederherstellen
+            updateDisplay();
             switchView(currentView);
         });
     </script>
