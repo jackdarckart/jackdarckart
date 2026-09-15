@@ -341,7 +341,7 @@
                 <span>Exklusives Studio-Minigame (PIN-Geschützt)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße hochklassige, warme Studio-Akkorde beim Klicken & Upgraden!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße präsente, volle Studio-Akkorde beim Klicken & Upgraden!</p>
         </div>
 
         <!-- GESPERRTER ZUSTAND (WENN ABGEMELDET) -->
@@ -380,7 +380,7 @@
             <!-- Main Clicker Area & Upgrades -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
-                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & Hi-Fi Ambient-Klänge:</p>
+                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & lauten Studio-Sound:</p>
                     <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
                         <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
                         <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
@@ -562,7 +562,7 @@
         let pendingNewEmail = '';
         let pendingVerificationCode = '';
 
-        // --- ROBUUSTER & HOCHWERTIGER HI-FI AMBIENT SYNTHESIZER ---
+        // --- LAUTER & HOCHWERTIGER HI-FI AMBIENT SYNTHESIZER ---
         let audioCtx = null;
         let ambientTimer = 0;
 
@@ -594,20 +594,18 @@
 
                 const chord = chordSets[Math.floor(Math.random() * chordSets.length)];
 
-                // Master Gain & Warmer Lowpass Filter für den analogen Klang
                 const masterGain = ctx.createGain();
-                masterGain.gain.setValueAtTime(0.15, now);
+                masterGain.gain.setValueAtTime(0.5, now);
 
                 const filter = ctx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(1400, now);
-                filter.Q.setValueAtTime(1.5, now);
+                filter.frequency.setValueAtTime(1800, now);
+                filter.Q.setValueAtTime(1.2, now);
 
                 masterGain.connect(filter);
                 filter.connect(ctx.destination);
 
                 chord.forEach((freq, idx) => {
-                    // Dualer Oszillator pro Ton mit feinem Detune (Chorus-Effekt)
                     [0, 3.2].forEach((detuneCents, dIdx) => {
                         const osc = ctx.createOscillator();
                         const noteGain = ctx.createGain();
@@ -617,12 +615,11 @@
                         const detunedFreq = freq * Math.pow(2, detuneCents / 1200);
                         osc.frequency.setValueAtTime(detunedFreq, now);
 
-                        // Seidige Hüllkurve: Sanftes Einschwingen & langes, wohltuendes Ausklingen (2.5 Sekunden)
-                        const startTime = now + (idx * 0.07);
+                        const startTime = now + (idx * 0.06);
                         const duration = 2.5;
 
                         noteGain.gain.setValueAtTime(0.0001, startTime);
-                        noteGain.gain.linearRampToValueAtTime(0.05 / chord.length, startTime + 0.15);
+                        noteGain.gain.linearRampToValueAtTime(0.22 / chord.length, startTime + 0.1);
                         noteGain.gain.exponentialRampToValueAtTime(0.00001, startTime + duration);
 
                         osc.connect(noteGain);
@@ -935,7 +932,7 @@
             if (!isAdminLoggedIn) return;
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
-            playLushAmbientChord(); // Spielt sofort einen hochwertigen Studio-Akkord ab
+            playLushAmbientChord();
             updateGameUI();
             saveGame();
         }
@@ -954,7 +951,7 @@
                 if (type === 'synth') gameData.synth++;
                 if (type === 'desk') gameData.desk++;
                 if (type === 'label') gameData.label++;
-                playLushAmbientChord(); // Feierlicher Studio-Akkord beim Kauf
+                playLushAmbientChord();
                 updateGameUI();
                 saveGame();
             }
@@ -994,7 +991,7 @@
             if (coLabel) coLabel.innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
         }
 
-        // Passives Einkommen & dezente Hintergrund-Akkorde im Studio
+        // Passives Einkommen läuft weiter, aber Ambient-Töne spielen NUR, wenn das Spiel aktiv auf dem Bildschirm ist
         setInterval(function() {
             if (!isAdminLoggedIn) return;
             let bps = getBps();
@@ -1003,10 +1000,14 @@
                 gameData.fans += (bps / 50);
                 updateGameUI();
 
-                ambientTimer++;
-                if (ambientTimer >= Math.max(12, 55 - bps)) {
-                    ambientTimer = 0;
-                    playLushAmbientChord();
+                // Prüfen, ob der Spieler sich gerade im Game-View befindet
+                const isGameActive = !document.getElementById('gameView').classList.contains('hidden');
+                if (isGameActive) {
+                    ambientTimer++;
+                    if (ambientTimer >= Math.max(12, 55 - bps)) {
+                        ambientTimer = 0;
+                        playLushAmbientChord();
+                    }
                 }
             }
         }, 100);
