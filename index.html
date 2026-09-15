@@ -207,7 +207,7 @@
 
         let audioCtx = null;
         function playBeatSound() {
-            if (!soundEnabled || currentView === 'home') return; // Stumm auf Startseite, aktiv auf Game & Garten!
+            if (!soundEnabled || currentView === 'home') return;
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
