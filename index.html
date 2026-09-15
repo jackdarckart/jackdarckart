@@ -37,7 +37,7 @@
     <main class="max-w-2xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         
         <!-- 1. STARTSEITE -->
-        <div id="view-home" class="view-page w-full py-4 space-y-6 text-left">
+        <div id="view-home" class="view-page hidden w-full py-4 space-y-6 text-left">
             
             <!-- Hero Card -->
             <div class="bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-purple-500/30 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
@@ -123,7 +123,7 @@
                     <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition">Registrieren</button>
                 </div>
 
-                <!-- LOGIN FORM (Streng gesichert gegen Autocomplete & Caching) -->
+                <!-- LOGIN FORM -->
                 <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
@@ -136,7 +136,7 @@
                     <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔒 Einloggen & Studio öffnen</button>
                 </div>
 
-                <!-- REGISTRATION FORM (Streng gesichert gegen Autocomplete & Caching) -->
+                <!-- REGISTRATION FORM -->
                 <div id="form-register" class="space-y-3 hidden">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse (Einzigartig):</label>
@@ -280,7 +280,7 @@
         </div>
     </footer>
 
-    <!-- Sichere JavaScript Logik mit Feldbereinigung -->
+    <!-- JavaScript Logik mit Ansichts-Speicherung -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Bereinige alte globale Speicherreste
@@ -293,7 +293,9 @@
             let bps = 0.0;
             let username = localStorage.getItem('beat_lab_user') || 'jackdarckart';
             let soundEnabled = true;
-            let currentView = 'home';
+
+            // Letzte Ansicht laden oder Standard auf 'home'
+            let currentView = localStorage.getItem('beat_lab_current_view') || 'home';
 
             let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
 
@@ -410,7 +412,6 @@
                     loggedInUser = emailInput;
                     localStorage.setItem('beat_lab_logged_in_user', emailInput);
 
-                    // Eingabefelder sofort leeren
                     document.getElementById('reg-email').value = '';
                     document.getElementById('reg-pin').value = '';
 
@@ -441,7 +442,6 @@
                     loggedInUser = emailInput;
                     localStorage.setItem('beat_lab_logged_in_user', emailInput);
 
-                    // Eingabefelder sofort leeren
                     document.getElementById('login-email').value = '';
                     document.getElementById('login-pin').value = '';
 
@@ -450,7 +450,7 @@
                 });
             }
 
-            // Logout (Sicherheits-Bereinigung aller Felder & Sitzungen)
+            // Logout
             const logoutBtn = document.getElementById('logout-btn');
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
@@ -458,7 +458,6 @@
                     loggedInUser = null;
                     localStorage.removeItem('beat_lab_logged_in_user');
                     
-                    // Eingabefelder restlos leeren
                     if(document.getElementById('login-email')) document.getElementById('login-email').value = '';
                     if(document.getElementById('login-pin')) document.getElementById('login-pin').value = '';
                     if(document.getElementById('reg-email')) document.getElementById('reg-email').value = '';
@@ -534,6 +533,8 @@
 
             function switchView(view) {
                 currentView = view;
+                localStorage.setItem('beat_lab_current_view', view); // Aktiven Tab speichern
+                
                 document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
                 let target = document.getElementById('view-' + view);
                 if (target) target.classList.remove('hidden');
@@ -556,7 +557,6 @@
                         }
                     }
                 });
-                window.scrollTo(0, 0);
             }
 
             function produceBeat() {
@@ -670,8 +670,8 @@
             // Auto-save
             setInterval(() => { saveGame(); }, 5000);
 
-            updateDisplay();
-            updateGameViewState();
+            // Beim Start die zuletzt aktive Ansicht wiederherstellen
+            switchView(currentView);
         });
     </script>
 </body>
