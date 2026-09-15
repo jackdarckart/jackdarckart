@@ -34,7 +34,7 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-2xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
+    <main class="max-w-3xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         
         <!-- 1. DASHBOARD / STARTSEITE -->
         <div id="view-home" class="view-page hidden w-full py-4 space-y-6 text-left">
@@ -273,34 +273,33 @@
 
         </div>
 
-        <!-- 3. BIO-GARDEN SEITE (Grafisch animiertes & synchronisiertes Klang-Biotop) -->
-        <div id="view-garten" class="view-page hidden w-full max-w-md mx-auto py-4 text-center space-y-4">
+        <!-- 3. BIO-GARDEN SEITE (Riesiges, hochdetailliertes, animiertes Klang-Biotop) -->
+        <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             <div class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
                     <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Klang-Biotop</h2>
-                    <p class="text-gray-300 text-xs">Aktives Klang-Biotop. Die passive Produktion pro Sekunde spielt synchrone, harmonische Ambient-Töne und lässt den Garten im Takt pulsieren.</p>
+                    <p class="text-gray-300 text-xs">Vollständig animierter Luxusgarten. Je mehr Upgrades du kaufst, desto schneller und lebendiger spielen die harmonischen Ambient-Töne und Wellen im Takt.</p>
                 </div>
 
-                <!-- Grafisch animiertes Garten-Canvas -->
-                <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-xl bg-[#06101e]">
-                    <canvas id="garden-canvas" width="400" height="220" class="w-full h-auto cursor-pointer block"></canvas>
-                    <div class="absolute bottom-2 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-xl text-[10px] text-emerald-300 border border-emerald-500/30 pointer-events-none">
-                        ✨ Harmonische Ton-Synchronisation aktiv
+                <!-- Großes, detailliertes grafisches Garten-Canvas -->
+                <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-2xl bg-[#06101e]">
+                    <canvas id="garden-canvas" width="600" height="380" class="w-full h-auto cursor-pointer block"></canvas>
+                    <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs text-emerald-300 border border-emerald-500/30 pointer-events-none flex items-center gap-2">
+                        <span>✨</span> Klicke in den Garten, um Töne auszulösen &amp; Wellen zu erzeugen
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-3 pt-1">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                     <!-- Pflanze 1 -->
                     <button type="button" id="plant-1-btn" class="bg-[#0b0f19]/80 hover:bg-[#0b0f19] border border-emerald-500/40 p-3.5 rounded-2xl transition flex items-center justify-between text-left group cursor-pointer">
                         <div class="flex items-center gap-3">
                             <span class="text-xl p-2 bg-emerald-600/20 rounded-xl border border-emerald-500/30">🌿</span>
                             <div>
-                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Harmonie-Farn (C-Ton)</h3>
-                                <p class="text-[10px] text-gray-400">Erzeugt einen reinen Bio-Ton.</p>
+                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Harmonie-Farn</h3>
+                                <p class="text-[10px] text-gray-400">C-Ton • +2 Beats</p>
                             </div>
                         </div>
-                        <span class="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-3 py-1.5 rounded-xl border border-emerald-800/50">+2 $BEATS</span>
                     </button>
 
                     <!-- Pflanze 2 -->
@@ -308,11 +307,10 @@
                         <div class="flex items-center gap-3">
                             <span class="text-xl p-2 bg-emerald-600/20 rounded-xl border border-emerald-500/30">🌸</span>
                             <div>
-                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Melodie-Blüte (E-Ton)</h3>
-                                <p class="text-[10px] text-gray-400">Schwingt in höherer Natur-Frequenz.</p>
+                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Melodie-Blüte</h3>
+                                <p class="text-[10px] text-gray-400">E-Ton • +5 Beats</p>
                             </div>
                         </div>
-                        <span class="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-3 py-1.5 rounded-xl border border-emerald-800/50">+5 $BEATS</span>
                     </button>
 
                     <!-- Pflanze 3 -->
@@ -320,11 +318,10 @@
                         <div class="flex items-center gap-3">
                             <span class="text-xl p-2 bg-emerald-600/20 rounded-xl border border-emerald-500/30">🌳</span>
                             <div>
-                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Bass-Wurzel (G-Ton)</h3>
-                                <p class="text-[10px] text-gray-400">Tiefe, erdige Klang-Synchronisation.</p>
+                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Bass-Wurzel</h3>
+                                <p class="text-[10px] text-gray-400">G-Ton • +10 Beats</p>
                             </div>
                         </div>
-                        <span class="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-3 py-1.5 rounded-xl border border-emerald-800/50">+10 $BEATS</span>
                     </button>
                 </div>
 
@@ -385,7 +382,7 @@
         </div>
     </footer>
 
-    <!-- SYNCHRONIZED HARMONIC AUDIO & GARDEN ENGINE -->
+    <!-- HIGH-END LUSH SYNTH & DYNAMIC UPGRADE-SPEED ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -579,16 +576,17 @@
                 });
             }
 
-            // 🎵 HARMONISCHE AUDIO ENGINE & AMBIENT ARPEGGIATOR
+            // 🎵 LUSH HIGH-END SYNTH ENGINE (Zufällig, harmonisch, strikt nur in 'game' und 'garten')
             let globalAudioCtx = null;
             const studioScale = [
                 261.63, 293.66, 329.63, 392.00, 440.00,
-                523.25, 587.33, 659.25, 783.99, 880.00
+                523.25, 587.33, 659.25, 783.99, 880.00, 1046.50
             ];
-            let scaleIndex = 0;
 
             function playSingleTone(customFreq = null) {
                 if (!soundEnabled) return;
+                // STRIKTE PRÜFUNG: Töne laufen AUSSCHLIESSLICH im 'game' oder 'garten'
+                if (currentView !== 'game' && currentView !== 'garten') return;
 
                 try {
                     window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -600,30 +598,38 @@
                     }
 
                     const now = globalAudioCtx.currentTime;
-                    let freq = customFreq !== null ? customFreq : studioScale[scaleIndex];
-                    if (customFreq === null) {
-                        scaleIndex = (scaleIndex + 1) % studioScale.length;
-                    }
+                    let freq = customFreq !== null ? customFreq : studioScale[Math.floor(Math.random() * studioScale.length)];
 
-                    let osc = globalAudioCtx.createOscillator();
+                    let osc1 = globalAudioCtx.createOscillator();
+                    let osc2 = globalAudioCtx.createOscillator();
+                    let filter = globalAudioCtx.createBiquadFilter();
                     let gainNode = globalAudioCtx.createGain();
 
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now);
+                    osc1.type = 'sine';
+                    osc2.type = 'triangle';
+                    osc1.frequency.setValueAtTime(freq, now);
+                    osc2.frequency.setValueAtTime(freq * 1.003, now);
+
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(1400, now);
 
                     gainNode.gain.setValueAtTime(0.0001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.06, now + 0.015);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+                    gainNode.gain.linearRampToValueAtTime(0.06, now + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
 
-                    osc.connect(gainNode);
+                    osc1.connect(filter);
+                    osc2.connect(filter);
+                    filter.connect(gainNode);
                     gainNode.connect(globalAudioCtx.destination);
 
-                    osc.start(now);
-                    osc.stop(now + 0.35);
+                    osc1.start(now);
+                    osc2.start(now);
+                    osc1.stop(now + 0.55);
+                    osc2.stop(now + 0.55);
 
                     setTimeout(() => {
-                        try { osc.disconnect(); gainNode.disconnect(); } catch(e){}
-                    }, 400);
+                        try { osc1.disconnect(); osc2.disconnect(); filter.disconnect(); gainNode.disconnect(); } catch(e){}
+                    }, 600);
                 } catch(e) {}
             }
 
@@ -677,14 +683,14 @@
                 saveGame();
             }
 
-            // --- ANIMATED GARDEN CANVAS (Synchronisierter Teich & Pflanzen) ---
+            // --- ANIMATED GARDEN CANVAS ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
             let plantPulse = 0;
 
             function triggerGardenRipple() {
-                ripples.push({ x: 260, y: 120, radius: 8, alpha: 1.0 });
+                ripples.push({ x: 380, y: 200, radius: 10, alpha: 1.0 });
                 plantPulse = 1.0;
             }
 
@@ -692,64 +698,85 @@
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Rasen Hintergrund
+                let time = Date.now() / 300;
+
                 ctx.fillStyle = '#0f291e';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Terrasse / Holzdeck unten rechts
-                ctx.fillStyle = '#221911';
-                ctx.fillRect(230, 150, 170, 70);
-                ctx.strokeStyle = '#3d2b1f';
-                ctx.lineWidth = 1;
-                for(let i=230; i<400; i+=15) {
-                    ctx.beginPath(); ctx.moveTo(i, 150); ctx.lineTo(i, 220); ctx.stroke();
+                ctx.fillStyle = '#14532d';
+                ctx.fillRect(40, 20, 520, 30);
+                ctx.strokeStyle = '#166534';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(40, 20, 520, 30);
+
+                ctx.fillStyle = '#1a202c';
+                ctx.fillRect(80, 100, 220, 220);
+                ctx.fillStyle = '#2d3748';
+                for(let p=0; p<7; p++) {
+                    ctx.fillRect(95 + (p%3)*65, 115 + Math.floor(p/3)*65, 55, 50);
                 }
 
-                // Quadratischer Teich (Mitte rechts)
                 ctx.fillStyle = '#0e3440';
-                ctx.fillRect(210, 75, 120, 85);
-                ctx.strokeStyle = '#1e5262';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(210, 75, 120, 85);
+                ctx.fillRect(320, 110, 220, 180);
+                ctx.strokeStyle = '#235868';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(320, 110, 220, 180);
 
-                // Wellen-Animation im Teich
+                let fountainRadius = 15 + Math.sin(time * 2) * 4;
+                ctx.strokeStyle = 'rgba(110, 231, 183, 0.4)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(430, 200, fountainRadius, 0, Math.PI * 2);
+                ctx.stroke();
+
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 1.5;
-                    rip.alpha -= 0.025;
+                    rip.radius += 2.0;
+                    rip.alpha -= 0.02;
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
                     } else {
                         ctx.strokeStyle = `rgba(110, 231, 183, ${rip.alpha})`;
-                        ctx.lineWidth = 2;
+                        ctx.lineWidth = 2.5;
                         ctx.beginPath();
                         ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
                         ctx.stroke();
                     }
                 });
 
-                // Steinpfad / Platten (Mitte links)
-                ctx.fillStyle = '#1e2530';
-                for(let p=0; p<6; p++) {
-                    ctx.fillRect(70 + p*24, 100 + p*16, 28, 16);
+                ctx.fillStyle = '#221911';
+                ctx.fillRect(150, 310, 300, 70);
+                ctx.strokeStyle = '#3d2b1f';
+                ctx.lineWidth = 1;
+                for(let x=150; x<450; x+=18) {
+                    ctx.beginPath(); ctx.moveTo(x, 310); ctx.lineTo(x, 380); ctx.stroke();
                 }
 
-                // Pulsierende Bäume & Pflanzen bei Ton-Trigger
-                let pScale = 1 + (plantPulse * 0.15);
-                if (plantPulse > 0) plantPulse -= 0.04;
+                let pScale = 1 + (plantPulse * 0.12);
+                if (plantPulse > 0) plantPulse -= 0.03;
 
-                // Baumkronen (Links)
+                ctx.fillStyle = '#15803d';
+                ctx.beginPath(); ctx.arc(130, 80, 22 * pScale, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(200, 75, 26 * pScale, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(270, 80, 20 * pScale, 0, Math.PI*2); ctx.fill();
+
+                let windOffset = Math.sin(time) * 3;
+                ctx.fillStyle = '#db2777';
+                for(let b=0; b<12; b++) {
+                    ctx.beginPath();
+                    ctx.arc(545 + Math.sin(b)*5, 120 + b*14 + windOffset, 7, 0, Math.PI*2);
+                    ctx.fill();
+                }
+                ctx.fillStyle = '#9333ea';
+                for(let b=0; b<8; b++) {
+                    ctx.beginPath();
+                    ctx.arc(60 + windOffset, 150 + b*18, 8, 0, Math.PI*2);
+                    ctx.fill();
+                }
+
                 ctx.fillStyle = '#14532d';
-                ctx.beginPath(); ctx.arc(80, 50, 24 * pScale, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(500, 65, 40 * pScale, 0, Math.PI*2); ctx.fill();
                 ctx.fillStyle = '#166534';
-                ctx.beginPath(); ctx.arc(125, 45, 28 * pScale, 0, Math.PI*2); ctx.fill();
-
-                // Blumenbeete / Farbtupfer
-                ctx.fillStyle = '#db2777'; 
-                ctx.beginPath(); ctx.arc(35, 165, 10, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#9333ea'; 
-                ctx.beginPath(); ctx.arc(360, 45, 12, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#eab308'; 
-                ctx.beginPath(); ctx.arc(335, 35, 9, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(530, 50, 35 * pScale, 0, Math.PI*2); ctx.fill();
 
                 requestAnimationFrame(drawGarden);
             }
@@ -887,7 +914,6 @@
             bindClick('buy-album-btn', buyAlbum);
             bindClick('buy-ai-btn', buyAI);
             bindClick('stake-btn', stakeBeats);
-            bindGridUnstake = document.getElementById('unstake-btn');
             bindClick('unstake-btn', unstakeBeats);
             bindClick('game-to-home-btn', () => switchView('home'));
             bindClick('garten-to-home-btn', () => switchView('home'));
@@ -927,15 +953,19 @@
                 });
             }
 
-            // AUTO-PRODUKTION & HARMONISCHER AMBIENT-TICK (1x pro Sekunde im Takt, wenn bps > 0)
+            // AUTO-PRODUKTION & DYNAMISCH BESCHLEUNIGTER AMBIENT-TICK (Startet sehr langsam, wird pro Upgrade feiner & schneller)
             let ambientTimer = 0;
             setInterval(() => {
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
                         ambientTimer++;
-                        // Jede Sekunde (10 Ticks à 100ms) ein harmonischer Arpeggio-Ton & Garten-Welle
-                        if (ambientTimer >= 10) {
+                        
+                        // Dynamisches Intervall: Startet bei ca. 3,5 Sekunden (35 Ticks) und wird pro gekauftem Upgrade sehr langsam schneller
+                        let totalUpgrades = rigs + albums + aiAgents;
+                        let requiredTicks = Math.max(8, 35 - (totalUpgrades * 2));
+
+                        if (ambientTimer >= requiredTicks) {
                             ambientTimer = 0;
                             playSingleTone();
                             triggerGardenRipple();
