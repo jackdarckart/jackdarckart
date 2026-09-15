@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- WARM SYNTH & GRADUAL SLOW TONE SPEED ENGINE -->
+    <!-- CLEAN PURE SINE & DRY ENVELOPE ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -537,14 +537,14 @@
                 });
             }
 
-            // 🎵 WARMES E-PIANO SYNTHESIZER
+            // 🎵 REINER, TROCKENER SINUS-TON (Ohne Wellen-Überlagerung und ohne Echo)
             let audioCtx = null;
             const cleanHarmonicPool = [
                 261.63, 293.66, 329.63, 392.00, 440.00,
                 523.25, 587.33, 659.25, 783.99, 880.00
             ];
 
-            function playWarmInstrumentTone() {
+            function playCleanTone() {
                 if (!soundEnabled || currentView !== 'game') return;
 
                 try {
@@ -554,36 +554,26 @@
                     const now = audioCtx.currentTime;
                     let freq = cleanHarmonicPool[Math.floor(Math.random() * cleanHarmonicPool.length)];
 
-                    let osc1 = audioCtx.createOscillator();
-                    osc1.type = 'sine';
-                    osc1.frequency.setValueAtTime(freq, now);
+                    // Nur ein einzelner reiner Sinus-Oszillator (keine Wellen-Kombination)
+                    let osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
 
-                    let osc2 = audioCtx.createOscillator();
-                    osc2.type = 'triangle';
-                    osc2.frequency.setValueAtTime(freq, now);
-
-                    let filter = audioCtx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(900, now);
-
+                    // Extrem kurzer, trockener Envelope (fast kein Ausklang/Echo)
                     let gainNode = audioCtx.createGain();
                     gainNode.gain.setValueAtTime(0.0001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.06, now + 0.04);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+                    gainNode.gain.linearRampToValueAtTime(0.07, now + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
 
-                    osc1.connect(filter);
-                    osc2.connect(filter);
-                    filter.connect(gainNode);
+                    osc.connect(gainNode);
                     gainNode.connect(audioCtx.destination);
 
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc1.stop(now + 0.8);
-                    osc2.stop(now + 0.8);
+                    osc.start(now);
+                    osc.stop(now + 0.18);
 
                     setTimeout(() => {
-                        try { osc1.disconnect(); osc2.disconnect(); filter.disconnect(); gainNode.disconnect(); } catch(e){}
-                    }, 900);
+                        try { osc.disconnect(); gainNode.disconnect(); } catch(e){}
+                    }, 200);
                 } catch(e) {}
             }
 
@@ -623,18 +613,17 @@
 
             function produceBeat() {
                 beats += 1;
-                playWarmInstrumentTone();
+                playCleanTone();
                 updateDisplay();
                 saveGame();
             }
 
-            // HÖHERE BELOHNUNGEN PRO UPGRADE
             function buyRig() {
                 if (beats >= rigCost) {
                     beats -= rigCost;
                     rigs += 1;
                     hashRate += 1;
-                    bps += 0.05; // Höhere Belohnung
+                    bps += 0.05;
                     rigCost = Math.floor(rigCost * 1.40);
                     updateDisplay();
                     saveGame();
@@ -648,7 +637,7 @@
                     beats -= albumCost;
                     albums += 1;
                     fans += 10;
-                    bps += 0.20; // Höhere Belohnung
+                    bps += 0.20;
                     fps += 0.10;
                     albumCost = Math.floor(albumCost * 1.5);
                     updateDisplay();
@@ -662,7 +651,7 @@
                 if (beats >= aiCost) {
                     beats -= aiCost;
                     aiAgents += 1;
-                    bps += 0.80; // Höhere Belohnung
+                    bps += 0.80;
                     fps += 0.30;
                     aiCost = Math.floor(aiCost * 1.55);
                     updateDisplay();
@@ -676,7 +665,7 @@
                 if (beats >= 100) {
                     beats -= 100;
                     stakedBeats += 100;
-                    bps += 0.05; // Höhere Belohnung
+                    bps += 0.05;
                     updateDisplay();
                     saveGame();
                 } else {
@@ -785,18 +774,17 @@
                 });
             }
 
-            // AUTO-PRODUKTION & TON-GESCHWINDIGKEIT (Steigt SEHR langsam pro Upgrade an)
+            // AUTO-PRODUKTION & SEHR LANGSAM STEIGENDE TON-GESCHWINDIGKEIT
             setInterval(() => {
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
                         
-                        // Ton-Wahrscheinlichkeit steigt extrem langsam und gedämpft mit der Gesamtanzahl der Upgrades
                         let totalUpgrades = rigs + albums + aiAgents;
                         let dynamicToneChance = Math.min(0.20, 0.04 + (totalUpgrades * 0.001));
 
                         if (Math.random() < dynamicToneChance && currentView === 'game') {
-                            playWarmInstrumentTone();
+                            playCleanTone();
                         }
                     }
                     if (fps > 0) fans += fps / 10;
