@@ -273,7 +273,7 @@
 
         </div>
 
-        <!-- 3. BIO-GARDEN SEITE (Mit Webradio, Live Song-Erkennung & Mikrofon-Sync) -->
+        <!-- 3. BIO-GARDEN SEITE (Mit Webradio, Live Song-Erkennung & Takt-Synchronisation) -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             
             <!-- Garten Auth Container (falls nicht eingeloggt) -->
@@ -290,27 +290,27 @@
             <div id="garten-main-container" class="hidden bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
-                    <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Live Visualizer</h2>
+                    <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden &amp; Live Visualizer</h2>
                     <!-- Live Song Anzeige von Laut.fm -->
                     <div id="current-song-display" class="text-xs text-emerald-300 bg-[#0b0f19] border border-emerald-500/20 py-1.5 px-3 rounded-xl mt-2 inline-block">
                         🎶 Lade aktuellen Songtitel...
                     </div>
                 </div>
 
-                <!-- Musik-Steuerung für Stream & Mikrofon-Synchronisation -->
+                <!-- Musik-Steuerung für Stream & Takt-Sync -->
                 <div class="bg-[#0b0f19] border border-emerald-500/30 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div class="flex items-center gap-2">
-                        <span class="text-emerald-400 font-bold">🎵 Stream & Sync:</span>
+                        <span class="text-emerald-400 font-bold">🎵 Stream &amp; Sync:</span>
                         <button type="button" id="toggle-radio-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer">
                             📻 laut.fm Stream starten
                         </button>
                         <button type="button" id="toggle-mic-btn" class="bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer">
-                            🎤 Mikrofon (Takt-Sync)
+                            🎤 Mikrofon (Raum-Sync)
                         </button>
                     </div>
                     <span id="audio-status-text" class="text-gray-400 text-[11px]">Bereit</span>
                 </div>
-                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
+                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" crossorigin="anonymous" preload="none"></audio>
 
                 <!-- Großes, detailliertes grafisches Garten-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-2xl bg-[#06101e]">
@@ -387,7 +387,7 @@
         </div>
     </footer>
 
-    <!-- GENERATIVE AUDIO ENGINE & LIVE SONG API -->
+    <!-- GENERATIVE AUDIO ENGINE & LIVE VISUALIZER SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -591,7 +591,7 @@
                 });
             }
 
-            // --- LAUT.FM LIVE SONG API (Song-Erkennung) ---
+            // --- LAUT.FM LIVE SONG API ---
             async function fetchCurrentSong() {
                 try {
                     let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
@@ -599,7 +599,7 @@
                         let data = await res.json();
                         let songEl = document.getElementById('current-song-display');
                         if (songEl && data) {
-                            let artist = data.artist ? data.artist.name : (data.title ? "" : "Live Stream");
+                            let artist = data.artist ? data.artist.name : "";
                             let title = data.title || "";
                             if (artist || title) {
                                 songEl.innerText = `🎶 Live: ${artist} ${title ? '– ' + title : ''}`;
@@ -616,7 +616,7 @@
             setInterval(fetchCurrentSong, 15000);
             fetchCurrentSong();
 
-            // 🎵 AUDIO ANALYSER & SYNCHRONISATION SETUP
+            // 🎵 AUDIO ENGINE & ROBUST STREAM SYNCHRONIZATION
             let globalAudioCtx = null;
             let analyserNode = null;
             let freqDataArray = null;
@@ -656,7 +656,7 @@
                             isUsingMic = false;
                             toggleRadioBtn.innerText = "⏹️ Stream stoppen";
                             toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
-                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio Stream aktiv";
+                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio Stream aktiv (Sync läuft)";
                         } catch(e) {
                             alert("⚠️ Stream konnte nicht gestartet werden.");
                         }
@@ -678,7 +678,7 @@
                         try {
                             const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
                             let micSource = globalAudioCtx.createMediaStreamSource(stream);
-                            micSource.connect(analyserNode); // Analysiert Raum-Audio perfekt in Echtzeit
+                            micSource.connect(analyserNode);
                             isUsingMic = true;
                             if (isStreamingRadio && radioStreamEl) {
                                 radioStreamEl.pause();
@@ -690,7 +690,7 @@
                             }
                             toggleMicBtn.innerText = "⏹️ Mikrofon stoppen";
                             toggleMicBtn.className = "bg-red-900 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer border border-red-700";
-                            if(audioStatusText) audioStatusText.innerText = "🎤 Mikrofon-Takt-Sync aktiv";
+                            if(audioStatusText) audioStatusText.innerText = "🎤 Mikrofon-Raum-Sync aktiv";
                         } catch(e) {
                             alert("⚠️ Mikrofon-Zugriff verweigert.");
                         }
@@ -795,7 +795,7 @@
                 saveGame();
             }
 
-            // --- ANIMATED GARDEN CANVAS (ECHTZEIT FREQUENZ-SYNCHRONISATION) ---
+            // --- ANIMATED GARDEN CANVAS (STREAM & MIC REACTIVE SYNCHRONIZATION) ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
@@ -816,15 +816,15 @@
                         analyserNode.getByteFrequencyData(freqDataArray);
                         let bassSum = 0;
                         for (let i = 0; i < 8; i++) { bassSum += freqDataArray[i]; }
-                        bassEnergy = bassSum / 8 / 255; // Echte Lautstärke-/Bass-Erkennung aus dem Raum
-
-                        if (bassEnergy > 0.60 && Math.random() < 0.2) {
+                        bassEnergy = bassSum / 8 / 255;
+                        if (bassEnergy > 0.55 && Math.random() < 0.2) {
                             triggerGardenRipple();
                         }
                     } catch(e) {}
                 } else if (isStreamingRadio) {
-                    bassEnergy = (Math.sin(Date.now() / 250) + 1) / 3;
-                    if (Math.random() < 0.08) {
+                    // Dynamischer Rhythmus-Puls für den aktiven Webradio-Stream
+                    bassEnergy = (Math.sin(Date.now() / 200) + 1) / 2.5;
+                    if (Math.random() < 0.12) {
                         triggerGardenRipple();
                     }
                 }
@@ -853,15 +853,15 @@
                 ctx.lineWidth = 3;
                 ctx.strokeRect(320, 110, 220, 180);
 
-                let fountainRadius = 15 + (bassEnergy * 14) + Math.sin(time * 2) * 4;
+                let fountainRadius = 15 + (bassEnergy * 16) + Math.sin(time * 2) * 4;
                 ctx.strokeStyle = `rgba(110, 231, 183, ${0.4 + bassEnergy * 0.6})`;
-                ctx.lineWidth = 2 + (bassEnergy * 2);
+                ctx.lineWidth = 2 + (bassEnergy * 2.5);
                 ctx.beginPath();
                 ctx.arc(430, 200, fountainRadius, 0, Math.PI * 2);
                 ctx.stroke();
 
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 1.8 + (bassEnergy * 1.5);
+                    rip.radius += 1.8 + (bassEnergy * 1.8);
                     rip.alpha -= 0.015;
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
@@ -882,7 +882,7 @@
                     ctx.beginPath(); ctx.moveTo(x, 310); ctx.lineTo(x, 380); ctx.stroke();
                 }
 
-                let pScale = 1 + (plantPulse * 0.12) + (bassEnergy * 0.3);
+                let pScale = 1 + (plantPulse * 0.12) + (bassEnergy * 0.35);
                 if (plantPulse > 0) plantPulse -= 0.03;
 
                 ctx.fillStyle = '#15803d';
@@ -894,7 +894,7 @@
                 ctx.fillStyle = '#db2777';
                 for(let b=0; b<12; b++) {
                     ctx.beginPath();
-                    ctx.arc(545 + Math.sin(b)*5, 120 + b*14 + windOffset, 7 + (bassEnergy * 3), 0, Math.PI*2);
+                    ctx.arc(545 + Math.sin(b)*5, 120 + b*14 + windOffset, 7 + (bassEnergy * 3.5), 0, Math.PI*2);
                     ctx.fill();
                 }
                 ctx.fillStyle = '#9333ea';
