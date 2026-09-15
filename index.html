@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- ULTIMATE HARMONIC RANDOM CHORD & SLOW SCALING AUDIO ENGINE -->
+    <!-- SEQUENTIAL RANDOM ARPEGGIO & DYNAMIC MELODY ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,12 +541,12 @@
                 });
             }
 
-            // HIGH-END AUDIO ENGINE WITH INFINITE RANDOMIZATION & ULTRA-SLOW SPEED SCALING
+            // 🎸 SEQUENTIAL RANDOM ARPEGGIO & MELODY ENGINE (Töne nacheinander per Zufall)
             let audioCtx = null;
             let masterCompressor = null;
 
             function makeDistortionCurve(amount) {
-                let k = amount || 190,
+                let k = amount || 220,
                     n = 44100,
                     curve = new Float32Array(n),
                     deg = Math.PI / 180;
@@ -557,19 +557,12 @@
                 return curve;
             }
 
-            const infiniteRockScale = [
-                65.41, 73.42, 82.41, 92.50, 98.00, 110.00, 123.47, 
-                130.81, 146.83, 164.81, 185.00, 196.00, 220.00, 246.94,
-                261.63, 293.66, 329.63
-            ];
-
-            const harmonicChords = [
-                [1, 1.5, 2],       
-                [1, 1.2, 1.5],     
-                [1, 1.333, 2],     
-                [1, 2, 3],         
-                [0.75, 1, 1.5],    
-                [1, 1.25, 1.5]     
+            // Riesiger Notenpool für abwechslungsreiche Zufalls-Melodien
+            const massiveNotePool = [
+                49.00, 55.00, 61.74, 65.41, 73.42, 82.41, 92.50, 98.00, 110.00, 123.47, 
+                130.81, 138.59, 146.83, 164.81, 174.61, 185.00, 196.00, 220.00, 246.94,
+                261.63, 293.66, 329.63, 349.23, 369.99, 392.00, 440.00, 493.88, 523.25,
+                587.33, 659.25, 698.46, 783.99, 880.00
             ];
 
             function playRockStudioSound() {
@@ -580,115 +573,84 @@
 
                     if (!masterCompressor) {
                         masterCompressor = audioCtx.createDynamicsCompressor();
-                        masterCompressor.threshold.setValueAtTime(-8, audioCtx.currentTime);
-                        masterCompressor.knee.setValueAtTime(4, audioCtx.currentTime);
-                        masterCompressor.ratio.setValueAtTime(14, audioCtx.currentTime);
-                        masterCompressor.attack.setValueAtTime(0.0005, audioCtx.currentTime);
-                        masterCompressor.release.setValueAtTime(0.06, audioCtx.currentTime);
+                        masterCompressor.threshold.setValueAtTime(-7, audioCtx.currentTime);
+                        masterCompressor.knee.setValueAtTime(5, audioCtx.currentTime);
+                        masterCompressor.ratio.setValueAtTime(16, audioCtx.currentTime);
+                        masterCompressor.attack.setValueAtTime(0.0003, audioCtx.currentTime);
+                        masterCompressor.release.setValueAtTime(0.05, audioCtx.currentTime);
                         masterCompressor.connect(audioCtx.destination);
                     }
 
                     const now = audioCtx.currentTime;
 
-                    let rootFreq = infiniteRockScale[Math.floor(Math.random() * infiniteRockScale.length)];
-                    let chordPattern = harmonicChords[Math.floor(Math.random() * harmonicChords.length)];
-                    let frequencies = chordPattern.map(multiplier => rootFreq * multiplier);
-
+                    // Stereo Slapback Echo & Distortion Master Chain
                     let delay = audioCtx.createDelay();
                     let delayFeedback = audioCtx.createGain();
                     let delayWet = audioCtx.createGain();
 
-                    delay.delayTime.setValueAtTime(0.13, now);
-                    delayFeedback.gain.setValueAtTime(0.12, now);
-                    delayWet.gain.setValueAtTime(0.08, now);
+                    delay.delayTime.setValueAtTime(0.12, now);
+                    delayFeedback.gain.setValueAtTime(0.14, now);
+                    delayWet.gain.setValueAtTime(0.09, now);
 
                     delay.connect(delayFeedback);
                     delayFeedback.connect(delay);
                     delay.connect(delayWet);
                     delayWet.connect(masterCompressor);
 
-                    let oscs = [];
                     let distortion = audioCtx.createWaveShaper();
-                    let filter = audioCtx.createBiquadFilter();
-                    let cabinet = audioCtx.createBiquadFilter();
-                    let guitarGain = audioCtx.createGain();
-
-                    distortion.curve = makeDistortionCurve(190);
+                    distortion.curve = makeDistortionCurve(220);
                     distortion.oversample = '4x';
 
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(rootFreq * 14, now);
-                    filter.frequency.exponentialRampToValueAtTime(rootFreq * 3.5, now + 0.38);
-
+                    let cabinet = audioCtx.createBiquadFilter();
                     cabinet.type = 'peaking';
-                    cabinet.frequency.setValueAtTime(2600, now);
-                    cabinet.gain.setValueAtTime(12, now);
-                    if (cabinet.Q) cabinet.Q.setValueAtTime(3.5, now);
+                    cabinet.frequency.setValueAtTime(2800, now);
+                    cabinet.gain.setValueAtTime(14, now);
+                    if (cabinet.Q) cabinet.Q.setValueAtTime(4.0, now);
 
-                    let duration = 0.42;
-                    guitarGain.gain.setValueAtTime(0.0001, now);
-                    guitarGain.gain.linearRampToValueAtTime(0.2, now + 0.003);
-                    guitarGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-                    frequencies.forEach((freq, idx) => {
-                        let o = audioCtx.createOscillator();
-                        o.type = (idx === 0) ? 'sawtooth' : (idx === 1 ? 'square' : 'triangle');
-                        o.frequency.setValueAtTime(freq, now);
-                        o.detune.setValueAtTime((Math.random() - 0.5) * 16, now);
-                        o.connect(filter);
-                        oscs.push(o);
-                    });
-
-                    filter.connect(distortion);
                     distortion.connect(cabinet);
-                    cabinet.connect(guitarGain);
-                    guitarGain.connect(masterCompressor);
-                    guitarGain.connect(delay);
+                    cabinet.connect(masterCompressor);
+                    cabinet.connect(delay);
 
-                    let bassOsc1 = audioCtx.createOscillator();
-                    let bassOsc2 = audioCtx.createOscillator();
-                    let bassFilter = audioCtx.createBiquadFilter();
-                    let bassGain = audioCtx.createGain();
+                    // --- SEQUENZIELLE ZUFALLS-MELODIE (4 Töne nacheinander gespielt) ---
+                    let noteCount = 4;
+                    let stepDuration = 0.11; // Abstand zwischen den Noten
 
-                    bassOsc1.type = 'sawtooth';
-                    bassOsc2.type = 'sine';
-                    bassOsc1.frequency.setValueAtTime(rootFreq * 0.5, now);
-                    bassOsc2.frequency.setValueAtTime(rootFreq * 0.25, now);
+                    for (let i = 0; i < noteCount; i++) {
+                        let noteTime = now + (i * stepDuration);
+                        // Jeder Ton wird vollkommen zufällig aus dem großen Pool ausgewählt!
+                        let randomFreq = massiveNotePool[Math.floor(Math.random() * massiveNotePool.length)];
 
-                    bassFilter.type = 'lowpass';
-                    bassFilter.frequency.setValueAtTime(900, now);
-                    bassFilter.frequency.exponentialRampToValueAtTime(65, now + 0.45);
+                        let filter = audioCtx.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(randomFreq * 14, noteTime);
+                        filter.frequency.exponentialRampToValueAtTime(randomFreq * 3.5, noteTime + 0.28);
 
-                    let bassDuration = 0.45;
-                    bassGain.gain.setValueAtTime(0.0001, now);
-                    bassGain.gain.linearRampToValueAtTime(0.3, now + 0.005);
-                    bassGain.gain.exponentialRampToValueAtTime(0.0001, now + bassDuration);
+                        let noteGain = audioCtx.createGain();
+                        noteGain.gain.setValueAtTime(0.0001, noteTime);
+                        noteGain.gain.linearRampToValueAtTime(0.18, noteTime + 0.003);
+                        noteGain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.32);
 
-                    bassOsc1.connect(bassFilter);
-                    bassOsc2.connect(bassFilter);
-                    bassFilter.connect(bassGain);
-                    bassGain.connect(masterCompressor);
+                        let o = audioCtx.createOscillator();
+                        o.type = (i % 2 === 0) ? 'sawtooth' : 'triangle';
+                        o.frequency.setValueAtTime(randomFreq, noteTime);
+                        o.detune.setValueAtTime((Math.random() - 0.5) * 16, noteTime);
 
-                    oscs.forEach(o => { o.start(now); o.stop(now + duration); });
-                    bassOsc1.start(now);
-                    bassOsc2.start(now);
-                    bassOsc1.stop(now + bassDuration);
-                    bassOsc2.stop(now + bassDuration);
+                        o.connect(filter);
+                        filter.connect(noteGain);
+                        noteGain.connect(distortion);
 
-                    setTimeout(() => {
-                        try {
-                            oscs.forEach(o => o.disconnect());
-                            bassOsc1.disconnect();
-                            bassOsc2.disconnect();
-                            filter.disconnect();
-                            distortion.disconnect();
-                            cabinet.disconnect();
-                            guitarGain.disconnect();
-                            bassFilter.disconnect();
-                            bassGain.disconnect();
-                            delay.disconnect();
-                        } catch(e){}
-                    }, 650);
+                        o.start(noteTime);
+                        o.stop(noteTime + 0.35);
+
+                        // Aufräumen nach dem Abspielen
+                        setTimeout(() => {
+                            try {
+                                o.disconnect();
+                                filter.disconnect();
+                                noteGain.disconnect();
+                            } catch(e){}
+                        }, (i * stepDuration + 0.4) * 1000);
+                    }
 
                 } catch (e) {}
             }
@@ -898,14 +860,13 @@
                 }
             }, 100);
 
-            // EXTREM SANFTER, LANGSAMER GESCHWINDIGKEITS-ANSTIEG PRO UPGRADE
+            // LANGSAMER, GLEICHMÄSSIGER GESCHWINDIGKEITS-ANSTIEG
             function scheduleNextBackgroundSound() {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
                     playRockStudioSound();
                 }
                 
                 let upgradeScore = rigs + (aiAgents * 3) + (albums * 0.5);
-                // Faktor massiv reduziert (von 180 auf 35), sodass sich das Tempo pro Upgrade fast unmerklich minimal anpasst
                 let dynamicDelay = 1800 - (35 * Math.log(1 + upgradeScore));
                 let nextInterval = Math.max(600, Math.floor(dynamicDelay));
 
