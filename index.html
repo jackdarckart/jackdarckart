@@ -28,7 +28,7 @@
                 <button type="button" id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">☁️ Cloud</button>
                 <button type="button" id="nav-account" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">📝 Account</button>
                 <button type="button" id="nav-admin" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🛠️ Admin</button>
-                <button type="button" id="sound-btn" class="bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🔊</button>
+                <button type="button" id="sound-btn" class="bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700" title="Sound an/aus">🔊</button>
             </div>
         </div>
     </header>
@@ -340,13 +340,9 @@
         </div>
     </footer>
 
-    <!-- HARMONIC PENTATONIC SEQUENTIAL RIFF ENGINE -->
+    <!-- SAUBERE MARIMBA- & CHIME AUDIO ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            localStorage.removeItem('beat_lab_beats');
-            localStorage.removeItem('beat_lab_fans');
-            localStorage.removeItem('beat_lab_bps');
-
             let beats = 0;
             let fans = 0;
             let bps = 0.0;
@@ -541,124 +537,39 @@
                 });
             }
 
-            // 🎸 PERFEKTE ROCK-PENTATONIK AUDIO ENGINE (Töne nacheinander per Zufall, 100% harmonisch)
+            // 🎵 SAUBERE, HARMONISCHE AUDIO ENGINE (Marimba / Glocken-Chime)
             let audioCtx = null;
-            let masterCompressor = null;
+            // C-Dur Pentatonik Skala (garantiert harmonisch bei jeder Zufallsfolge)
+            const chimeScale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
 
-            function makeDistortionCurve(amount) {
-                let k = amount || 200,
-                    n = 44100,
-                    curve = new Float32Array(n),
-                    deg = Math.PI / 180;
-                for (let i = 0; i < n; ++i) {
-                    let x = i * 2 / n - 1;
-                    curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x));
-                }
-                return curve;
-            }
-
-            // Strenge E-Moll Pentatonik / Rock-Skala in Hz (Garantierte Harmonie bei jeder Zufallsauswahl)
-            const rockPentatonicScale = [
-                82.41,   // E2
-                98.00,   // G2
-                110.00,  // A2
-                123.47,  // B2
-                146.83,  // D3
-                164.81,  // E3
-                196.00,  // G3
-                220.00,  // A3
-                246.94,  // B3
-                293.66,  // D4
-                329.63   // E4
-            ];
-
-            function playRockStudioSound() {
+            function playCleanSound() {
                 if (!soundEnabled || currentView === 'home') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
-                    if (!masterCompressor) {
-                        masterCompressor = audioCtx.createDynamicsCompressor();
-                        masterCompressor.threshold.setValueAtTime(-8, audioCtx.currentTime);
-                        masterCompressor.knee.setValueAtTime(4, audioCtx.currentTime);
-                        masterCompressor.ratio.setValueAtTime(15, audioCtx.currentTime);
-                        masterCompressor.attack.setValueAtTime(0.0005, audioCtx.currentTime);
-                        masterCompressor.release.setValueAtTime(0.06, audioCtx.currentTime);
-                        masterCompressor.connect(audioCtx.destination);
-                    }
-
                     const now = audioCtx.currentTime;
+                    const freq = chimeScale[Math.floor(Math.random() * chimeScale.length)];
 
-                    // Master Distortion & Echo Chain
-                    let delay = audioCtx.createDelay();
-                    let delayFeedback = audioCtx.createGain();
-                    let delayWet = audioCtx.createGain();
+                    let osc = audioCtx.createOscillator();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now);
 
-                    delay.delayTime.setValueAtTime(0.12, now);
-                    delayFeedback.gain.setValueAtTime(0.12, now);
-                    delayWet.gain.setValueAtTime(0.08, now);
+                    let gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.linearRampToValueAtTime(0.1, now + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
 
-                    delay.connect(delayFeedback);
-                    delayFeedback.connect(delay);
-                    delay.connect(delayWet);
-                    delayWet.connect(masterCompressor);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
 
-                    let distortion = audioCtx.createWaveShaper();
-                    distortion.curve = makeDistortionCurve(180);
-                    distortion.oversample = '4x';
+                    osc.start(now);
+                    osc.stop(now + 0.4);
 
-                    let cabinet = audioCtx.createBiquadFilter();
-                    cabinet.type = 'peaking';
-                    cabinet.frequency.setValueAtTime(2600, now);
-                    cabinet.gain.setValueAtTime(12, now);
-                    if (cabinet.Q) cabinet.Q.setValueAtTime(3.5, now);
-
-                    distortion.connect(cabinet);
-                    cabinet.connect(masterCompressor);
-                    cabinet.connect(delay);
-
-                    // --- SEQUENZIELLE ZUFALLS-NOTEN (4 Töne nacheinander aus der echten Skala) ---
-                    let noteCount = 4;
-                    let stepDuration = 0.09; // Schneller, flüssiger Riff-Lauf
-
-                    for (let i = 0; i < noteCount; i++) {
-                        let noteTime = now + (i * stepDuration);
-                        // Zufällige Note aus der absolut sauberen Pentatonik-Skala
-                        let randomFreq = rockPentatonicScale[Math.floor(Math.random() * rockPentatonicScale.length)];
-
-                        let filter = audioCtx.createBiquadFilter();
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(randomFreq * 10, noteTime);
-                        filter.frequency.exponentialRampToValueAtTime(randomFreq * 2.5, noteTime + 0.25);
-
-                        let noteGain = audioCtx.createGain();
-                        noteGain.gain.setValueAtTime(0.0001, noteTime);
-                        noteGain.gain.linearRampToValueAtTime(0.16, noteTime + 0.003);
-                        noteGain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.28);
-
-                        let o = audioCtx.createOscillator();
-                        o.type = (i % 2 === 0) ? 'sawtooth' : 'triangle';
-                        o.frequency.setValueAtTime(randomFreq, noteTime);
-                        o.detune.setValueAtTime((Math.random() - 0.5) * 12, noteTime);
-
-                        o.connect(filter);
-                        filter.connect(noteGain);
-                        noteGain.connect(distortion);
-
-                        o.start(noteTime);
-                        o.stop(noteTime + 0.3);
-
-                        setTimeout(() => {
-                            try {
-                                o.disconnect();
-                                filter.disconnect();
-                                noteGain.disconnect();
-                            } catch(e){}
-                        }, (i * stepDuration + 0.35) * 1000);
-                    }
-
-                } catch (e) {}
+                    setTimeout(() => {
+                        try { osc.disconnect(); gain.disconnect(); } catch(e){}
+                    }, 500);
+                } catch(e) {}
             }
 
             function toggleSound() {
@@ -697,7 +608,7 @@
 
             function produceBeat() {
                 beats += 1;
-                playRockStudioSound();
+                playCleanSound();
                 updateDisplay();
                 saveGame();
             }
@@ -865,19 +776,6 @@
                     updateDisplay();
                 }
             }, 100);
-
-            function scheduleNextBackgroundSound() {
-                if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
-                    playRockStudioSound();
-                }
-                
-                let upgradeScore = rigs + (aiAgents * 3) + (albums * 0.5);
-                let dynamicDelay = 1800 - (35 * Math.log(1 + upgradeScore));
-                let nextInterval = Math.max(600, Math.floor(dynamicDelay));
-
-                setTimeout(scheduleNextBackgroundSound, nextInterval);
-            }
-            setTimeout(scheduleNextBackgroundSound, 1800);
 
             setInterval(() => { saveGame(); }, 5000);
 
