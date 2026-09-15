@@ -214,7 +214,7 @@
                             <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 Single / Album Release</h3>
                             <span id="albums-count" class="text-xs text-gray-400">Releases: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Drop einen Track für massiven Fan-Zuwachs (+50 Fans & +2 BPS).</p>
+                        <p class="text-[11px] text-gray-400">Drop einen Track für Fans & passiven Fan-Zuwachs (+50 Fans, +2 BPS, +1 FPS).</p>
                         <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
                             Release droppen (<span id="album-cost">250</span> Beats)
                         </button>
@@ -226,7 +226,7 @@
                             <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 AI-Producer Agent</h3>
                             <span id="ai-count" class="text-xs text-gray-400">Agenten: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Ein KI-Agent, der unermüdlich im Hintergrund Beats produziert (+8 BPS).</p>
+                        <p class="text-[11px] text-gray-400">Ein KI-Agent, der unermüdlich Beats (+8 BPS) & Fans (+2 FPS) generiert.</p>
                         <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
                             Agenten anheuern (<span id="ai-cost">1000</span> Beats)
                         </button>
@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- High-End Studio Synthesizer & Tycoon-Logik (Synchroner BPS-Takt) -->
+    <!-- Harmonische Studio-Engine & Tycoon-Logik -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -350,6 +350,7 @@
             let beats = 0;
             let fans = 0;
             let bps = 0.0;
+            let fps = 0.0; // Fans pro Sekunde
             let hashRate = 0;
             let rigs = 0;
             let albums = 0;
@@ -374,6 +375,7 @@
                         beats = u.beats || 0;
                         fans = u.fans || 0;
                         bps = u.bps || 0.0;
+                        fps = u.fps || 0.0;
                         hashRate = u.hashRate || 0;
                         rigs = u.rigs || 0;
                         albums = u.albums || 0;
@@ -393,7 +395,7 @@
                     if (usersDB[loggedInUser]) {
                         usersDB[loggedInUser] = {
                             ...usersDB[loggedInUser],
-                            beats, fans, bps, hashRate, rigs, albums, aiAgents, stakedBeats, rigCost, albumCost, aiCost
+                            beats, fans, bps, fps, hashRate, rigs, albums, aiAgents, stakedBeats, rigCost, albumCost, aiCost
                         };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     }
@@ -467,7 +469,7 @@
                         return;
                     }
 
-                    usersDB[emailInput] = { pin: pinInput, beats: 0, fans: 0, bps: 0.0, hashRate: 0, rigs: 0, albums: 0, aiAgents: 0, stakedBeats: 0, rigCost: 50, albumCost: 250, aiCost: 1000, created: Date.now() };
+                    usersDB[emailInput] = { pin: pinInput, beats: 0, fans: 0, bps: 0.0, fps: 0.0, hashRate: 0, rigs: 0, albums: 0, aiAgents: 0, stakedBeats: 0, rigCost: 50, albumCost: 250, aiCost: 1000, created: Date.now() };
                     localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
 
                     loggedInUser = emailInput;
@@ -539,65 +541,44 @@
                 });
             }
 
-            // High-End Studio Synthesizer (Identischer Sound für manuelle Klicks & BPS)
+            // HARMONISCHE C-MOLL STUDIO-SYNTHESIZER-ENGINE
             let audioCtx = null;
-            const studioPatches = [
-                { type: 'sawtooth', base: 130.81, detune: -6, cutoff: 1400, decay: 0.28 },
-                { type: 'square', base: 261.63, detune: 5, cutoff: 2800, decay: 0.20 },
-                { type: 'triangle', base: 523.25, detune: 0, cutoff: 4500, decay: 0.32 },
-                { type: 'sawtooth', base: 196.00, detune: 8, cutoff: 2000, decay: 0.22 },
-                { type: 'sine', base: 329.63, detune: 0, cutoff: 3500, decay: 0.40 },
-                { type: 'square', base: 392.00, detune: -8, cutoff: 2400, decay: 0.18 },
-                { type: 'sawtooth', base: 220.00, detune: 12, cutoff: 4000, decay: 0.25 },
-                { type: 'triangle', base: 164.81, detune: -4, cutoff: 1800, decay: 0.30 },
-                { type: 'square', base: 493.88, detune: 6, cutoff: 5000, decay: 0.15 },
-                { type: 'sawtooth', base: 98.00, detune: -12, cutoff: 950, decay: 0.45 },
-                { type: 'triangle', base: 349.23, detune: 4, cutoff: 3000, decay: 0.24 },
-                { type: 'sawtooth', base: 440.00, detune: -5, cutoff: 3800, decay: 0.19 }
-            ];
+            // Reine, perfekt aufeinander abgestimmte Frequenzen der C-Moll Tonleiter über mehrere Oktaven
+            const cMinorScale = [130.81, 155.56, 174.61, 196.00, 233.08, 261.63, 311.13, 349.23, 392.00, 466.16, 523.25];
+            let scaleStep = 0;
 
-            function playBeatSound() {
+            function playHarmonicSound() {
                 if (!soundEnabled || currentView === 'home') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
                     const now = audioCtx.currentTime;
-                    let patch = studioPatches[Math.floor(Math.random() * studioPatches.length)];
-                    let randomSemitone = Math.floor(Math.random() * 25) - 12;
-                    let finalFreq = patch.base * Math.pow(2, randomSemitone / 12);
+                    // Sequenzieller Durchlauf durch die Tonleiter für absolute Harmonie
+                    let freq = cMinorScale[scaleStep];
+                    scaleStep = (scaleStep + 1) % cMinorScale.length;
 
-                    let osc1 = audioCtx.createOscillator();
-                    let osc2 = audioCtx.createOscillator();
+                    let osc = audioCtx.createOscillator();
                     let filter = audioCtx.createBiquadFilter();
                     let gain = audioCtx.createGain();
 
-                    osc1.type = patch.type;
-                    osc2.type = Math.random() > 0.4 ? 'sawtooth' : 'sine';
-
-                    osc1.frequency.setValueAtTime(finalFreq, now);
-                    osc2.frequency.setValueAtTime(finalFreq * 1.5, now);
-
-                    osc1.detune.setValueAtTime(patch.detune, now);
-                    osc2.detune.setValueAtTime(-patch.detune, now);
+                    osc.type = scaleStep % 2 === 0 ? 'sine' : 'triangle'; // Warme, saubere Wellenformen
+                    osc.frequency.setValueAtTime(freq, now);
 
                     filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(patch.cutoff, now);
-                    filter.frequency.exponentialRampToValueAtTime(patch.cutoff * 0.25, now + patch.decay);
+                    filter.frequency.setValueAtTime(1800, now);
+                    filter.frequency.exponentialRampToValueAtTime(400, now + 0.35);
 
                     gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.45, now + 0.015);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + patch.decay);
+                    gain.gain.linearRampToValueAtTime(0.35, now + 0.03);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
 
-                    osc1.connect(filter);
-                    osc2.connect(filter);
+                    osc.connect(filter);
                     filter.connect(gain);
                     gain.connect(audioCtx.destination);
 
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc1.stop(now + patch.decay);
-                    osc2.stop(now + patch.decay);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
                 } catch (e) {}
             }
 
@@ -637,7 +618,7 @@
 
             function produceBeat() {
                 beats += 1;
-                playBeatSound();
+                playHarmonicSound();
                 updateDisplay();
                 saveGame();
             }
@@ -663,6 +644,7 @@
                     albums += 1;
                     fans += 50;
                     bps += 2.0;
+                    fps += 1.0; // Alben generieren nun passiv Fans pro Sekunde
                     albumCost = Math.floor(albumCost * 1.5);
                     updateDisplay();
                     saveGame();
@@ -676,6 +658,7 @@
                     beats -= aiCost;
                     aiAgents += 1;
                     bps += 8.0;
+                    fps += 2.0; // AI-Agents generieren ordentlich Fans
                     aiCost = Math.floor(aiCost * 1.4);
                     updateDisplay();
                     saveGame();
@@ -708,7 +691,6 @@
                 }
             }
 
-            // Leucht- und Pulsier-Effekt für kaufbare Upgrades
             function checkAffordability(elementId, cost) {
                 const el = document.getElementById(elementId);
                 if (!el) return;
@@ -726,7 +708,7 @@
                 let hrEl = document.getElementById('hashrate-count');
                 
                 if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
-                if(fEl) fEl.innerText = fans.toLocaleString('de-DE');
+                if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
                 if(bpsEl) bpsEl.innerText = bps.toFixed(1);
                 if(hrEl) hrEl.innerText = hashRate + " TH/s";
 
@@ -789,7 +771,7 @@
             if(adminResetGameBtn) {
                 adminResetGameBtn.addEventListener('click', () => {
                     if (confirm("⚠️ ACHTUNG: Möchtest du den Spielstand dieses Accounts auf 0 zurücksetzen?")) {
-                        beats = 0; fans = 0; bps = 0.0; hashRate = 0; rigs = 0; albums = 0; aiAgents = 0; stakedBeats = 0;
+                        beats = 0; fans = 0; bps = 0.0; fps = 0.0; hashRate = 0; rigs = 0; albums = 0; aiAgents = 0; stakedBeats = 0;
                         rigCost = 50; albumCost = 250; aiCost = 1000;
                         updateDisplay();
                         saveGame();
@@ -798,20 +780,21 @@
                 });
             }
 
-            // 1. Zähl-Loop (aktualisiert die Beats flüssig alle 100ms)
+            // 1. Zähl-Loop für Beats und passive Fans (FPS)
             setInterval(() => {
-                if (loggedInUser && bps > 0) {
-                    beats += bps / 10;
+                if (loggedInUser) {
+                    if (bps > 0) beats += bps / 10;
+                    if (fps > 0) fans += fps / 10;
                     updateDisplay();
                 }
             }, 100);
 
-            // 2. Synthesizer-Takt-Loop (spielt genau 1 sauberen Studio-Ton pro Sekunde im Hintergrund ab, wenn BPS aktiv ist)
+            // 2. Harmonischer Hintergrund-Takt (genau alle 1,5 Sekunden ein sauberer Ton, wenn BPS aktiv ist)
             setInterval(() => {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
-                    playBeatSound();
+                    playHarmonicSound();
                 }
-            }, 1000);
+            }, 1500);
 
             setInterval(() => { saveGame(); }, 5000);
 
