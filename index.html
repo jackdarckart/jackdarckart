@@ -279,7 +279,7 @@
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
                     <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Klang-Biotop</h2>
-                    <p class="text-gray-300 text-xs">Vollständig animierter Luxusgarten. Je mehr Upgrades du kaufst, desto schneller und lebendiger spielen die harmonischen Ambient-Töne und Wellen im Takt.</p>
+                    <p class="text-gray-300 text-xs">Generatives Klang-Biotop. Die Töne erklingen vollkommen zufällig und organisch; Upgrades erhöhen dezent die Spiel-Häufigkeit im Hintergrund.</p>
                 </div>
 
                 <!-- Großes, detailliertes grafisches Garten-Canvas -->
@@ -382,7 +382,7 @@
         </div>
     </footer>
 
-    <!-- HIGH-END LUSH SYNTH & DYNAMIC UPGRADE-SPEED ENGINE -->
+    <!-- GENERATIVE STOCHASTIC AMBIENT ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -576,16 +576,16 @@
                 });
             }
 
-            // 🎵 LUSH HIGH-END SYNTH ENGINE (Zufällig, harmonisch, strikt nur in 'game' und 'garten')
+            // 🎵 LUSH GENERATIVE SYNTH ENGINE (Strikt nur in 'game' und 'garten')
             let globalAudioCtx = null;
             const studioScale = [
+                130.81, 146.83, 164.81, 196.00, 220.00,
                 261.63, 293.66, 329.63, 392.00, 440.00,
                 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50
             ];
 
             function playSingleTone(customFreq = null) {
                 if (!soundEnabled) return;
-                // STRIKTE PRÜFUNG: Töne laufen AUSSCHLIESSLICH im 'game' oder 'garten'
                 if (currentView !== 'game' && currentView !== 'garten') return;
 
                 try {
@@ -598,7 +598,11 @@
                     }
 
                     const now = globalAudioCtx.currentTime;
+                    // Völlig zufällige Noten- und Oktavwahl für pure Kreativität
                     let freq = customFreq !== null ? customFreq : studioScale[Math.floor(Math.random() * studioScale.length)];
+                    if (customFreq === null && Math.random() > 0.7) {
+                        freq *= (Math.random() > 0.5 ? 2 : 0.5); // Gelegentlicher Oktavsprung
+                    }
 
                     let osc1 = globalAudioCtx.createOscillator();
                     let osc2 = globalAudioCtx.createOscillator();
@@ -608,14 +612,14 @@
                     osc1.type = 'sine';
                     osc2.type = 'triangle';
                     osc1.frequency.setValueAtTime(freq, now);
-                    osc2.frequency.setValueAtTime(freq * 1.003, now);
+                    osc2.frequency.setValueAtTime(freq * 1.004, now);
 
                     filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(1400, now);
+                    filter.frequency.setValueAtTime(1200, now);
 
                     gainNode.gain.setValueAtTime(0.0001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.06, now + 0.02);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+                    gainNode.gain.linearRampToValueAtTime(0.05, now + 0.04);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
 
                     osc1.connect(filter);
                     osc2.connect(filter);
@@ -624,12 +628,12 @@
 
                     osc1.start(now);
                     osc2.start(now);
-                    osc1.stop(now + 0.55);
-                    osc2.stop(now + 0.55);
+                    osc1.stop(now + 0.85);
+                    osc2.stop(now + 0.85);
 
                     setTimeout(() => {
                         try { osc1.disconnect(); osc2.disconnect(); filter.disconnect(); gainNode.disconnect(); } catch(e){}
-                    }, 600);
+                    }, 900);
                 } catch(e) {}
             }
 
@@ -698,7 +702,7 @@
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                let time = Date.now() / 300;
+                let time = Date.now() / 400;
 
                 ctx.fillStyle = '#0f291e';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -730,8 +734,8 @@
                 ctx.stroke();
 
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 2.0;
-                    rip.alpha -= 0.02;
+                    rip.radius += 1.8;
+                    rip.alpha -= 0.015;
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
                     } else {
@@ -953,20 +957,18 @@
                 });
             }
 
-            // AUTO-PRODUKTION & DYNAMISCH BESCHLEUNIGTER AMBIENT-TICK (Startet sehr langsam, wird pro Upgrade feiner & schneller)
-            let ambientTimer = 0;
+            // AUTO-PRODUKTION & GENERATIVE STOCHASTISCHE AMBIENT-LOGIK
             setInterval(() => {
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
-                        ambientTimer++;
                         
-                        // Dynamisches Intervall: Startet bei ca. 3,5 Sekunden (35 Ticks) und wird pro gekauftem Upgrade sehr langsam schneller
+                        // Stochastische Wahrscheinlichkeit pro 100ms: Sehr langsam & zufällig, skaliert sanft mit Upgrades
                         let totalUpgrades = rigs + albums + aiAgents;
-                        let requiredTicks = Math.max(8, 35 - (totalUpgrades * 2));
+                        let triggerChance = 0.008 + (totalUpgrades * 0.002); // Basis ca. 0.8% Chance pro Tick
+                        triggerChance = Math.min(triggerChance, 0.06); // Obergrenze gegen Spam
 
-                        if (ambientTimer >= requiredTicks) {
-                            ambientTimer = 0;
+                        if (Math.random() < triggerChance) {
                             playSingleTone();
                             triggerGardenRipple();
                         }
