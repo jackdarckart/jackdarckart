@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Master-Engine mit minimalem Slapback-Echo, fetter 3-fach Power-Chord Wand & Massivem Sub-Bass -->
+    <!-- ULTRA-STABLE MASTER AUDIO ENGINE WITH DYNAMIC LOGARITHMIC TONE SPEED -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,12 +541,12 @@
                 });
             }
 
-            // ULTIMATIVE ROCK MASTER AUDIO ENGINE (3-Fach Power Chords + Sub-Bass + minimales Slapback-Echo)
+            // ULTRA-STABLE AUDIO ENGINE WITH DYNAMIC LOGARITHMIC SPEED SCALING
             let audioCtx = null;
             let masterCompressor = null;
 
             function makeDistortionCurve(amount) {
-                let k = amount || 120,
+                let k = amount || 130,
                     n = 44100,
                     curve = new Float32Array(n),
                     deg = Math.PI / 180;
@@ -568,91 +568,80 @@
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
-                    // Master High-Gain Limiter / Kompressor
                     if (!masterCompressor) {
                         masterCompressor = audioCtx.createDynamicsCompressor();
-                        masterCompressor.threshold.setValueAtTime(-12, audioCtx.currentTime);
+                        masterCompressor.threshold.setValueAtTime(-10, audioCtx.currentTime);
                         masterCompressor.knee.setValueAtTime(2, audioCtx.currentTime);
-                        masterCompressor.ratio.setValueAtTime(8, audioCtx.currentTime);
+                        masterCompressor.ratio.setValueAtTime(10, audioCtx.currentTime);
                         masterCompressor.attack.setValueAtTime(0.001, audioCtx.currentTime);
-                        masterCompressor.release.setValueAtTime(0.1, audioCtx.currentTime);
+                        masterCompressor.release.setValueAtTime(0.08, audioCtx.currentTime);
                         masterCompressor.connect(audioCtx.destination);
                     }
 
                     const now = audioCtx.currentTime;
                     let rootFreq = rockNotes[Math.floor(Math.random() * rockNotes.length)];
 
-                    // --- DEZENTES SLAPBACK-ECHO (Sehr wenig Echo, kein Hall) ---
+                    // --- DEZENTES SLAPBACK-ECHO ---
                     let delay = audioCtx.createDelay();
                     let delayFeedback = audioCtx.createGain();
                     let delayWet = audioCtx.createGain();
 
-                    delay.delayTime.setValueAtTime(0.15, now); // Sehr kurzes, knackiges Echo
-                    delayFeedback.gain.setValueAtTime(0.15, now); // Fast kein Feedback (stirbt sofort ab)
-                    delayWet.gain.setValueAtTime(0.08, now); // Sehr leiser Anteil
+                    delay.delayTime.setValueAtTime(0.12, now);
+                    delayFeedback.gain.setValueAtTime(0.1, now);
+                    delayWet.gain.setValueAtTime(0.06, now);
 
                     delay.connect(delayFeedback);
                     delayFeedback.connect(delay);
                     delay.connect(delayWet);
                     delayWet.connect(masterCompressor);
 
-                    // --- 1. DREISTIMMIGE POWER-CHORD LEAD-GITARRE ---
-                    let guitarOsc1 = audioCtx.createOscillator();
-                    let guitarOsc2 = audioCtx.createOscillator();
-                    let guitarOsc3 = audioCtx.createOscillator();
+                    // --- 4-FACHE POWER-CHORD & HARMONIE WAND ---
+                    let oscs = [];
+                    let frequencies = [
+                        rootFreq * 2,       
+                        rootFreq * 3,       
+                        rootFreq * 4,       
+                        rootFreq * 5        
+                    ];
+
                     let distortion = audioCtx.createWaveShaper();
-                    let guitarFilter = audioCtx.createBiquadFilter();
-                    let cabinetFilter = audioCtx.createBiquadFilter();
+                    let filter = audioCtx.createBiquadFilter();
+                    let cabinet = audioCtx.createBiquadFilter();
                     let guitarGain = audioCtx.createGain();
 
-                    distortion.curve = makeDistortionCurve(130);
+                    distortion.curve = makeDistortionCurve(140);
                     distortion.oversample = '4x';
 
-                    guitarOsc1.type = 'sawtooth';
-                    guitarOsc2.type = 'square';
-                    guitarOsc3.type = 'sawtooth';
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(4500, now);
+                    filter.frequency.exponentialRampToValueAtTime(800, now + 0.3);
 
-                    guitarOsc1.frequency.setValueAtTime(rootFreq * 2, now);
-                    guitarOsc2.frequency.setValueAtTime(rootFreq * 3, now);
-                    guitarOsc3.frequency.setValueAtTime(rootFreq * 4, now);
+                    cabinet.type = 'peaking';
+                    cabinet.frequency.setValueAtTime(2200, now);
+                    cabinet.gain.setValueAtTime(9, now);
+                    if (cabinet.Q) cabinet.Q.setValueAtTime(2.5, now);
 
-                    guitarOsc1.detune.setValueAtTime(Math.random() * 10 - 5, now);
-                    guitarOsc2.detune.setValueAtTime(Math.random() * 16 - 8, now);
-                    guitarOsc3.detune.setValueAtTime(Math.random() * 6 - 3, now);
-
-                    guitarFilter.type = 'lowpass';
-                    guitarFilter.frequency.setValueAtTime(4000, now);
-                    guitarFilter.frequency.exponentialRampToValueAtTime(700, now + 0.35);
-
-                    cabinetFilter.type = 'peaking';
-                    cabinetFilter.frequency.setValueAtTime(2000, now);
-                    cabinetFilter.gain.setValueAtTime(8, now);
-                    if (cabinetFilter.Q) cabinetFilter.Q.setValueAtTime(2.5, now);
-
-                    let duration = 0.4;
+                    let duration = 0.38;
                     guitarGain.gain.setValueAtTime(0.0001, now);
-                    guitarGain.gain.linearRampToValueAtTime(0.2, now + 0.005);
+                    guitarGain.gain.linearRampToValueAtTime(0.16, now + 0.004);
                     guitarGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-                    guitarOsc1.connect(guitarFilter);
-                    guitarOsc2.connect(guitarFilter);
-                    guitarOsc3.connect(guitarFilter);
-                    guitarFilter.connect(distortion);
-                    distortion.connect(cabinetFilter);
-                    cabinetFilter.connect(guitarGain);
-                    
-                    // Direkt ins Master + ganz leise ins Echo-Netzwerk
+                    frequencies.forEach((freq, idx) => {
+                        let o = audioCtx.createOscillator();
+                        o.type = (idx % 2 === 0) ? 'sawtooth' : 'square';
+                        o.frequency.setValueAtTime(freq, now);
+                        o.detune.setValueAtTime((idx - 1.5) * 8, now);
+                        o.connect(filter);
+                        oscs.push(o);
+                    });
+
+                    filter.connect(distortion);
+                    distortion.connect(cabinet);
+                    cabinet.connect(guitarGain);
                     guitarGain.connect(masterCompressor);
                     guitarGain.connect(delay);
 
-                    guitarOsc1.start(now);
-                    guitarOsc2.start(now);
-                    guitarOsc3.start(now);
-                    guitarOsc1.stop(now + duration);
-                    guitarOsc2.stop(now + duration);
-                    guitarOsc3.stop(now + duration);
-
-                    // --- 2. MASSIVER DUAL-SUB-BASS (Extremer Low-End Druck) ---
+                    // --- MASSIVER DUAL-SUB-BASS ---
                     let bassOsc1 = audioCtx.createOscillator();
                     let bassOsc2 = audioCtx.createOscillator();
                     let bassFilter = audioCtx.createBiquadFilter();
@@ -664,23 +653,39 @@
                     bassOsc2.frequency.setValueAtTime(rootFreq * 0.25, now);
 
                     bassFilter.type = 'lowpass';
-                    bassFilter.frequency.setValueAtTime(800, now);
-                    bassFilter.frequency.exponentialRampToValueAtTime(90, now + 0.45);
+                    bassFilter.frequency.setValueAtTime(900, now);
+                    bassFilter.frequency.exponentialRampToValueAtTime(80, now + 0.4);
 
-                    let bassDuration = 0.45;
+                    let bassDuration = 0.42;
                     bassGain.gain.setValueAtTime(0.0001, now);
-                    bassGain.gain.linearRampToValueAtTime(0.28, now + 0.01);
+                    bassGain.gain.linearRampToValueAtTime(0.25, now + 0.008);
                     bassGain.gain.exponentialRampToValueAtTime(0.0001, now + bassDuration);
 
                     bassOsc1.connect(bassFilter);
                     bassOsc2.connect(bassFilter);
                     bassFilter.connect(bassGain);
-                    bassGain.connect(masterCompressor); // Bass bleibt absolut trocken ohne Echo
+                    bassGain.connect(masterCompressor);
 
+                    oscs.forEach(o => { o.start(now); o.stop(now + duration); });
                     bassOsc1.start(now);
                     bassOsc2.start(now);
                     bassOsc1.stop(now + bassDuration);
                     bassOsc2.stop(now + bassDuration);
+
+                    setTimeout(() => {
+                        try {
+                            oscs.forEach(o => o.disconnect());
+                            bassOsc1.disconnect();
+                            bassOsc2.disconnect();
+                            filter.disconnect();
+                            distortion.disconnect();
+                            cabinet.disconnect();
+                            guitarGain.disconnect();
+                            bassFilter.disconnect();
+                            bassGain.disconnect();
+                            delay.disconnect();
+                        } catch(e){}
+                    }, 600);
 
                 } catch (e) {}
             }
@@ -892,12 +897,22 @@
                 }
             }, 100);
 
-            // 2. Fetter Rock-Hintergrund-Takt (alle 1,5 Sekunden ein massives Power-Chord & Sub-Bass Gewitter)
-            setInterval(() => {
+            // 2. DYNAMISCHE HINTERGRUND-RIFF GESCHWINDIGKEIT (Erhöht sich pro Upgrade extrem langsam & logarithmisch)
+            function scheduleNextBackgroundSound() {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
                     playRockStudioSound();
                 }
-            }, 1500);
+                
+                // Basis-Intervall bei 0 Upgrades = 1800ms. Jedes Upgrade (Rigs, AI, Alben) verkürzt das Intervall logarithmisch.
+                let upgradeScore = rigs + (aiAgents * 3) + (albums * 0.5);
+                let dynamicDelay = 1800 - (350 * Math.log(1 + upgradeScore));
+                
+                // Sicherheitsgrenze: Niemals schneller als alle 450ms, damit es absolut sauber bleibt.
+                let nextInterval = Math.max(450, Math.floor(dynamicDelay));
+
+                setTimeout(scheduleNextBackgroundSound, nextInterval);
+            }
+            setTimeout(scheduleNextBackgroundSound, 1500);
 
             setInterval(() => { saveGame(); }, 5000);
 
