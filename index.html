@@ -82,8 +82,8 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME & UPGRADES) -->
-        <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
+        <!-- 2. STUDIO-LAB (GAME & 8 TELEMETRIE-STATUS-ITEMS) -->
+        <div id="view-game" class="view-page hidden w-full max-w-lg mx-auto text-center space-y-4">
             
             <!-- Auth Gateway -->
             <div id="game-auth-container" class="glass-panel p-6 sm:p-8 rounded-[2rem] text-left space-y-4">
@@ -113,10 +113,10 @@
                     <button type="button" id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] px-3 py-1.5 rounded-xl font-mono cursor-pointer transition">🚪 Abmelden</button>
                 </div>
 
-                <!-- Fixer Klick-Button: Exakt +1 Beat, nicht upgradebar -->
+                <!-- Strikt fixierter Master-Beat Button (+1 Beat fest) -->
                 <button type="button" id="produce-beat-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-black py-5 px-6 rounded-[2rem] shadow-2xl shadow-purple-900/40 text-lg cursor-pointer active:scale-[0.98] border border-white/10 flex flex-col items-center justify-center gap-1">
                     <span class="flex items-center gap-2">🎧 Master-Beat Einspielen</span>
-                    <span class="text-xs font-mono font-normal text-purple-200/80">(+1 Beat pro Klick)</span>
+                    <span class="text-xs font-mono font-normal text-purple-200/80">(Strikt +1 Beat pro Klick)</span>
                 </button>
 
                 <div class="grid grid-cols-2 gap-3 text-left">
@@ -130,25 +130,43 @@
                     </div>
                 </div>
 
-                <!-- Upgrades Terminal -->
-                <div class="glass-panel p-5 rounded-[2rem] text-left space-y-3.5">
+                <!-- 8 Neue System-Telemetrie Status-Items (Kein Upgrade, keine Funktionen, rein informativ) -->
+                <div class="glass-panel p-5 rounded-[2rem] text-left space-y-3">
                     <h3 class="text-xs font-mono uppercase tracking-widest text-purple-400 flex items-center gap-2">
-                        <span>⚡</span> Synthesizer &amp; Automation
+                        <span>📊</span> Nexus System-Telemetrie (8 Status-Metriken)
                     </h3>
-                    <div class="space-y-2.5">
-                        <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800/80 flex justify-between items-center gap-3">
-                            <div>
-                                <p class="text-xs font-bold text-white">🎹 Synth-Bass Modul</p>
-                                <p id="upg1-status" class="text-[10px] text-slate-400 font-mono">Aktiviert Live Sound-Toneffekte</p>
-                            </div>
-                            <button type="button" id="buy-upgrade-1" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">100 B</button>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[9px] text-slate-400 block">01 // KERN-STATUS</span>
+                            <span class="text-emerald-400 font-bold">Online / Stabil</span>
                         </div>
-                        <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800/80 flex justify-between items-center gap-3">
-                            <div>
-                                <p class="text-xs font-semibold text-white">🚀 Auto-Beat Machine</p>
-                                <p id="upg2-status" class="text-[10px] text-slate-400 font-mono">+1 Beat pro Sekunde</p>
-                            </div>
-                            <button type="button" id="buy-upgrade-2" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">500 B</button>
+                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[9px] text-slate-400 block">02 // KLICK-FAKTOR</span>
+                            <span class="text-purple-400 font-bold">Strikt 1:1 (+1)</span>
+                        </div>
+                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[9px] text-slate-400 block">03 // UPGRADE-MODUS</span>
+                            <span class="text-slate-500 font-bold">Permanent Deaktiviert</span>
+                        </div>
+                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[9px] text-slate-400 block">04 // SPEICHER-ENGINE</span>
+                            <span class="text-cyan-400 font-bold">Local-Client (100%)</span>
+                        </div>
+                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[9px] text-slate-400 block">05 // STREAM-SYNC</span>
+                            <span class="text-emerald-400 font-bold">Bio-Garden Active</span>
+                        </div>
+                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[9px] text-slate-400 block">06 // SICHERHEITS-HUB</span>
+                            <span class="text-blue-400 font-bold">PIN Gesichert</span>
+                        </div>
+                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[9px] text-slate-400 block">07 // STANDORT-NODE</span>
+                            <span class="text-amber-400 font-bold">Meckenheim, NRW</span>
+                        </div>
+                        <div class="bg-[#030508]/80 p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[9px] text-slate-400 block">08 // PROTOKOLL</span>
+                            <span class="text-pink-400 font-bold">Standalone v3.5</span>
                         </div>
                     </div>
                 </div>
@@ -235,24 +253,21 @@
         document.addEventListener('DOMContentLoaded', function() {
 
             /* ========================================================
-               MODUL 1: GAME & ECONOMY ENGINE (+1 Beat fest pro Klick)
+               MODUL 1: GAME & ECONOMY ENGINE (Strikt +1 Beat pro Klick)
                ======================================================== */
             const GameEngine = {
                 beats: 3449,
                 fans: 586,
-                soundUnlocked: false,
-                autoBeatsActive: false,
                 loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || 'artur.hamm90@gmail.com',
                 
                 init() {
                     let usersDB = {};
                     try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
                     if (!usersDB[this.loggedInUser]) {
-                        usersDB[this.loggedInUser] = { pin: '1234', beats: 3449, fans: 586, sound: false, auto: false };
+                        usersDB[this.loggedInUser] = { pin: '1234', beats: 3449, fans: 586 };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     }
                     this.load();
-                    this.startAutoBeatInterval();
                 },
 
                 load() {
@@ -262,8 +277,6 @@
                             let u = db[this.loggedInUser];
                             this.beats = Number(u.beats) || 3449;
                             this.fans = Number(u.fans) || 586;
-                            this.soundUnlocked = Boolean(u.sound);
-                            this.autoBeatsActive = Boolean(u.auto);
                         }
                     } catch(e) {}
                 },
@@ -275,39 +288,10 @@
                         db[this.loggedInUser] = { 
                             pin: '1234', 
                             beats: this.beats, 
-                            fans: this.fans, 
-                            sound: this.soundUnlocked, 
-                            auto: this.autoBeatsActive 
+                            fans: this.fans 
                         };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
                     } catch(e) {}
-                },
-
-                playTone() {
-                    if (!this.soundUnlocked) return;
-                    try {
-                        const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
-                        const osc = ctxAudio.createOscillator();
-                        const gain = ctxAudio.createGain();
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(520, ctxAudio.currentTime);
-                        gain.gain.setValueAtTime(0.1, ctxAudio.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.1);
-                        osc.connect(gain);
-                        gain.connect(ctxAudio.destination);
-                        osc.start();
-                        osc.stop(ctxAudio.currentTime + 0.1);
-                    } catch(e) {}
-                },
-
-                startAutoBeatInterval() {
-                    setInterval(() => {
-                        if (this.autoBeatsActive) {
-                            this.beats += 1;
-                            this.updateUI();
-                            this.save();
-                        }
-                    }, 1000);
                 },
 
                 updateUI() {
@@ -315,53 +299,17 @@
                     const fEl = document.getElementById('fans-count');
                     if(bEl) bEl.innerText = Math.floor(this.beats).toLocaleString('de-DE');
                     if(fEl) fEl.innerText = Math.floor(this.fans).toLocaleString('de-DE');
-
-                    if (this.soundUnlocked) {
-                        const st1 = document.getElementById('upg1-status');
-                        if(st1) st1.innerText = "Aktiv! Sound-Töne eingeschaltet";
-                    }
-                    if (this.autoBeatsActive) {
-                        const st2 = document.getElementById('upg2-status');
-                        if(st2) st2.innerText = "Aktiv! +1 Beat pro Sekunde";
-                    }
                 }
             };
 
             GameEngine.init();
 
-            // Fester Klick-Wert: IMMER +1 Beat, unantastbar für Upgrades
+            // Strikt fixierter Klick-Wert: Exakt +1 Beat, absolut unantastbar
             document.getElementById('produce-beat-btn').addEventListener('click', () => {
                 GameEngine.beats += 1;
                 GameEngine.fans += 1;
-                GameEngine.playTone();
                 GameEngine.updateUI();
                 GameEngine.save();
-            });
-
-            document.getElementById('buy-upgrade-1').addEventListener('click', () => {
-                if (GameEngine.beats >= 100 && !GameEngine.soundUnlocked) {
-                    GameEngine.beats -= 100;
-                    GameEngine.soundUnlocked = true;
-                    GameEngine.updateUI();
-                    GameEngine.save();
-                } else if (!GameEngine.soundUnlocked) {
-                    const st = document.getElementById('upg1-status');
-                    st.innerText = "❌ Nicht genug Beats! (100 benötigt)";
-                    setTimeout(() => { st.innerText = "Aktiviert Live Sound-Toneffekte"; }, 2500);
-                }
-            });
-
-            document.getElementById('buy-upgrade-2').addEventListener('click', () => {
-                if (GameEngine.beats >= 500 && !GameEngine.autoBeatsActive) {
-                    GameEngine.beats -= 500;
-                    GameEngine.autoBeatsActive = true;
-                    GameEngine.updateUI();
-                    GameEngine.save();
-                } else if (!GameEngine.autoBeatsActive) {
-                    const st = document.getElementById('upg2-status');
-                    st.innerText = "❌ Nicht genug Beats! (500 benötigt)";
-                    setTimeout(() => { st.innerText = "+1 Beat pro Sekunde"; }, 2500);
-                }
             });
 
             document.getElementById('submit-login-btn').addEventListener('click', () => {
