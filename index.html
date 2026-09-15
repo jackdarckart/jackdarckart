@@ -137,16 +137,9 @@
                 </div>
                 <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- Sauberes, responsives HD-Canvas ohne störende Seitenränder -->
-                <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)] bg-[#d2e8cc]">
+                <!-- Fotorealistisches, responsives HD-Canvas -->
+                <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)] bg-[#b5e48c]">
                     <canvas id="garden-canvas" width="1400" height="900" class="w-full h-auto object-contain cursor-pointer block"></canvas>
-                </div>
-
-                <!-- Pflanzen & Interaktions-Buttons -->
-                <div class="flex justify-center items-center gap-3 pt-2 flex-wrap">
-                    <button type="button" id="plant-1-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌿 Gräser pflanzen (+2)</button>
-                    <button type="button" id="plant-2-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌸 Blumenbeet (+5)</button>
-                    <button type="button" id="plant-3-btn" class="bg-[#080c14] hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer shadow">🌳 Kugelbaum (+10)</button>
                 </div>
 
                 <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">← Dashboard</button>
@@ -358,129 +351,160 @@
                 });
             }
 
-            // --- OPTIMIERTER & HARMONISCH SYNCHRONISIERTER ARCHITEKTUR-GARTEN ---
+            // --- FOTOREALISTISCHES & DETAILLIERTES ARCHITEKTUR-CANVAS ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
-            let customPlants = [];
-
-            function addGardenElement(type) {
-                let rx = 200 + Math.random() * 1000;
-                let ry = 200 + Math.random() * 500;
-                customPlants.push({ x: rx, y: ry, type: type });
-                ripples.push({ x: rx, y: ry, radius: 12, alpha: 1.0 });
-            }
+            let customFlowers = [];
 
             function drawGarden() {
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Präzise Takt-Synchronisation für den aktiven Stream
-                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 125) + 1) / 2 : 0.05;
+                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 120) + 1) / 2 : 0.04;
 
-                // 1. Edler Rasen (Hintergrund)
+                // 1. Luxus-Rasen mit feinen Strukturverläufen und Schatten
                 let lawnGrad = ctx.createLinearGradient(0, 0, 0, 900);
-                lawnGrad.addColorStop(0, '#c2f8cb');
-                lawnGrad.addColorStop(0.5, '#a3e635');
-                lawnGrad.addColorStop(1, '#84cc16');
+                lawnGrad.addColorStop(0, '#9ef01a');
+                lawnGrad.addColorStop(0.5, '#70e000');
+                lawnGrad.addColorStop(1, '#38b000');
                 ctx.fillStyle = lawnGrad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                ctx.fillStyle = 'rgba(74, 222, 128, 0.22)';
-                for (let i = 0; i < canvas.width; i += 60) {
-                    ctx.fillRect(i, 0, 30, canvas.height);
+                // Feine gemähte Rasenstreifen
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                for (let i = 0; i < canvas.width; i += 70) {
+                    ctx.fillRect(i, 0, 35, canvas.height);
                 }
 
-                // 2. Moderner Teich (Rechts unten)
-                ctx.fillStyle = '#0284c7';
-                ctx.fillRect(850, 500, 420, 280);
-                let pondGrad = ctx.createLinearGradient(850, 500, 1270, 780);
-                pondGrad.addColorStop(0, '#38bdf8');
-                pondGrad.addColorStop(0.5, '#0ea5e9');
-                pondGrad.addColorStop(1, '#0369a1');
-                ctx.fillStyle = pondGrad;
-                ctx.fillRect(865, 515, 390, 250);
+                // 2. Moderner Pool mit Tiefeneffekt, blauen Farbverläufen & Reflexionen
+                ctx.fillStyle = '#014f86';
+                ctx.fillRect(840, 480, 450, 300);
+                let poolGrad = ctx.createLinearGradient(840, 480, 1290, 780);
+                poolGrad.addColorStop(0, '#2a6f97');
+                poolGrad.addColorStop(0.5, '#014f86');
+                poolGrad.addColorStop(1, '#012a4a');
+                ctx.fillStyle = poolGrad;
+                ctx.fillRect(855, 495, 420, 270);
 
-                // Uferbepflanzung
-                ctx.fillStyle = '#166534';
-                for(let s=0; s<10; s++) {
-                    ctx.fillRect(850 + s*35, 490, 4, 25);
-                    ctx.fillStyle = '#ca8a04';
-                    ctx.fillRect(850 + s*35, 485, 4, 7);
-                    ctx.fillStyle = '#166534';
-                }
+                // Pool-Randsteine (Coping)
+                ctx.strokeStyle = '#adb5bd';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(852, 492, 426, 276);
 
-                // Fontäne im Teich mit sauberem Takt-Puls
-                ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + pulse * 0.6})`;
+                // Fontäne im Pool mit exaktem Takt-Puls
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + pulse * 0.5})`;
                 ctx.lineWidth = 4 + (pulse * 2);
                 ctx.beginPath();
-                ctx.arc(1060, 640, 20 + (pulse * 16), 0, Math.PI * 2);
+                ctx.arc(1065, 630, 22 + (pulse * 18), 0, Math.PI * 2);
                 ctx.stroke();
 
-                // 3. Kies- & Schotterbereich mit Schiefer-Trittplatten (Zentral)
-                ctx.fillStyle = '#e2e8f0';
-                ctx.fillRect(180, 200, 560, 420);
-                ctx.fillStyle = '#cbd5e1';
-                for(let k=0; k<300; k++) {
-                    let kx = 190 + Math.random() * 540;
-                    let ky = 210 + Math.random() * 400;
-                    ctx.fillRect(kx, ky, 3, 3);
+                // 3. Kiesgarten mit feiner Körnung und Schieferplatten
+                ctx.fillStyle = '#e9ecef';
+                ctx.fillRect(170, 180, 580, 450);
+                ctx.fillStyle = '#ced4da';
+                for(let k=0; k<500; k++) {
+                    ctx.fillRect(180 + Math.random() * 560, 190 + Math.random() * 430, 2.5, 2.5);
                 }
 
-                ctx.fillStyle = '#334155';
+                // Dunkle Schiefer-Trittplatten mit Schattenwurf
+                ctx.fillStyle = '#212529';
                 for (let r = 0; r < 6; r++) {
-                    ctx.fillRect(230 + r * 65, 380 + r * 32, 75, 38);
+                    ctx.fillRect(220 + r * 68, 360 + r * 35, 85, 42);
+                    // Feine Kantenkollision
+                    ctx.strokeStyle = '#343a40';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(220 + r * 68, 360 + r * 35, 85, 42);
                 }
 
-                // 4. Holzterrasse im Vordergrund (Unten)
-                ctx.fillStyle = '#b45309';
-                ctx.fillRect(250, 760, 900, 130);
-                ctx.strokeStyle = '#78350f';
+                // Moderne Skulptur auf dem Kiesplatz
+                ctx.fillStyle = '#4cc9f0';
+                ctx.fillRect(380, 260, 20, 55);
+                ctx.fillStyle = '#3a86ff';
+                ctx.beginPath(); ctx.arc(390, 250, 14, 0, Math.PI*2); ctx.fill();
+
+                // 4. Hochwertige Holzterrasse im Vordergrund mit Maserung & Möbeln
+                let woodGrad = ctx.createLinearGradient(200, 750, 200, 890);
+                woodGrad.addColorStop(0, '#bb7e3d');
+                woodGrad.addColorStop(0.5, '#a0522d');
+                woodGrad.addColorStop(1, '#8b4513');
+                ctx.fillStyle = woodGrad;
+                ctx.fillRect(200, 750, 1000, 140);
+                
+                // Holzplanken-Fugen
+                ctx.strokeStyle = '#5c2c16';
                 ctx.lineWidth = 2;
-                for (let x = 250; x < 1150; x += 35) {
-                    ctx.beginPath(); ctx.moveTo(x, 760); ctx.lineTo(x, 890); ctx.stroke();
+                for (let x = 200; x < 1200; x += 32) {
+                    ctx.beginPath(); ctx.moveTo(x, 750); ctx.lineTo(x, 890); ctx.stroke();
                 }
-                ctx.fillStyle = '#451a03';
-                ctx.fillRect(625, 795, 150, 65);
 
-                // 5. Kugelbäume (Topiary) mit sanftem Puls
+                // Terrassen-Esstisch & Stühle
+                ctx.fillStyle = '#2b1b17';
+                ctx.fillRect(630, 790, 140, 65);
+                ctx.fillStyle = '#4a332a';
+                ctx.fillRect(600, 810, 25, 25);
+                ctx.fillRect(785, 810, 25, 25);
+
+                // 5. Fotorealistische Kugelbäume (Topiary) mit Schattierung
                 function drawTopiary(bx, by) {
-                    ctx.fillStyle = '#3f3f46';
-                    ctx.fillRect(bx - 7, by, 14, 75);
-                    ctx.fillStyle = '#15803d';
-                    ctx.beginPath(); ctx.arc(bx, by - 18, 38 * (1 + pulse * 0.05), 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#4ade80';
-                    ctx.beginPath(); ctx.arc(bx - 8, by - 28, 15, 0, Math.PI * 2); ctx.fill();
+                    // Schatten am Boden
+                    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+                    ctx.beginPath(); ctx.ellipse(bx, by + 10, 25, 10, 0, 0, Math.PI*2); ctx.fill();
+                    
+                    // Stamm
+                    ctx.fillStyle = '#4a3b32';
+                    ctx.fillRect(bx - 7, by - 20, 14, 50);
+
+                    // Mehrschichtige Blattkrone für 3D-Effekt
+                    let crownRadius = 38 * (1 + pulse * 0.04);
+                    let gradDark = ctx.createRadialGradient(bx-10, by-40, 5, bx, by-35, crownRadius);
+                    gradDark.addColorStop(0, '#52b788');
+                    gradDark.addColorStop(0.6, '#2d6a4f');
+                    gradDark.addColorStop(1, '#1b4332');
+                    
+                    ctx.fillStyle = gradDark;
+                    ctx.beginPath(); ctx.arc(bx, by - 35, crownRadius, 0, Math.PI * 2); ctx.fill();
+
+                    // Glanzlicht oben links
+                    ctx.fillStyle = 'rgba(116, 198, 157, 0.4)';
+                    ctx.beginPath(); ctx.arc(bx - 12, by - 45, crownRadius * 0.4, 0, Math.PI * 2); ctx.fill();
                 }
-                drawTopiary(280, 280);
-                drawTopiary(400, 280);
-                drawTopiary(560, 300);
+                drawTopiary(260, 270);
+                drawTopiary(370, 270);
+                drawTopiary(530, 290);
 
-                // 6. Großer Baum oben rechts
-                ctx.fillStyle = '#27272a';
-                ctx.fillRect(1060, 90, 26, 140);
-                ctx.fillStyle = '#14532d';
-                ctx.beginPath(); ctx.arc(1073, 70, 85 * (1 + pulse * 0.03), 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#22c55e';
-                ctx.beginPath(); ctx.arc(1035, 50, 48, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(1110, 55, 48, 0, Math.PI * 2); ctx.fill();
+                // 6. Großer, mächtiger Baum oben rechts
+                function drawBigTree(bx, by) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    ctx.beginPath(); ctx.ellipse(bx, by + 15, 45, 18, 0, 0, Math.PI*2); ctx.fill();
 
-                // 7. Benutzer-Elemente
-                customPlants.forEach(el => {
+                    ctx.fillStyle = '#3a2e2b';
+                    ctx.fillRect(bx - 14, by - 40, 28, 80);
+
+                    let bigGrad = ctx.createRadialGradient(bx-20, by-70, 15, bx, by-60, 95);
+                    bigGrad.addColorStop(0, '#74c69d');
+                    bigGrad.addColorStop(0.5, '#2d6a4f');
+                    bigGrad.addColorStop(1, '#081c15');
+
+                    ctx.fillStyle = bigGrad;
+                    ctx.beginPath(); ctx.arc(bx, by - 65, 90 * (1 + pulse * 0.03), 0, Math.PI * 2); ctx.fill();
+                }
+                drawBigTree(1080, 130);
+
+                // 7. Benutzer-Blumen (durch Klick gepflanzt)
+                customFlowers.forEach(f => {
                     ctx.save();
-                    ctx.translate(el.x, el.y);
-                    let plantScale = 1 + pulse * 0.08;
-                    if (el.type === 'grass') {
-                        ctx.fillStyle = '#166534';
-                        ctx.fillRect(-15, -10, 30 * plantScale, 20 * plantScale);
-                    } else if (el.type === 'flowers') {
-                        ctx.fillStyle = '#f43f5e';
-                        ctx.beginPath(); ctx.arc(0, 0, 20 * plantScale, 0, Math.PI*2); ctx.fill();
-                        ctx.fillStyle = '#fde047';
-                        ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI*2); ctx.fill();
-                    } else if (el.type === 'tree') {
-                        drawTopiary(0, 0);
+                    ctx.translate(f.x, f.y);
+                    let s = 1 + pulse * 0.1;
+                    // Blätterkrone
+                    ctx.fillStyle = '#f72585';
+                    for(let i=0; i<5; i++) {
+                        let angle = (i * Math.PI * 2) / 5;
+                        ctx.beginPath(); ctx.arc(Math.cos(angle)*12, Math.sin(angle)*12, 10 * s, 0, Math.PI*2); ctx.fill();
                     }
+                    // Blütenmitte
+                    ctx.fillStyle = '#ffbe0b';
+                    ctx.beginPath(); ctx.arc(0, 0, 8 * s, 0, Math.PI*2); ctx.fill();
                     ctx.restore();
                 });
 
@@ -491,7 +515,7 @@
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
                     } else {
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${rip.alpha})`;
+                        ctx.strokeStyle = `rgba(144, 224, 239, ${rip.alpha})`;
                         ctx.lineWidth = 2.5;
                         ctx.beginPath();
                         ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
@@ -511,7 +535,7 @@
                     const clickX = (e.clientX - rect.left) * scaleX;
                     const clickY = (e.clientY - rect.top) * scaleY;
 
-                    customPlants.push({ x: clickX, y: clickY, type: 'flowers' });
+                    customFlowers.push({ x: clickX, y: clickY });
                     ripples.push({ x: clickX, y: clickY, radius: 10, alpha: 1.0 });
 
                     beats += 5;
@@ -556,9 +580,6 @@
             bindClick('admin-to-home-btn', () => switchView('home'));
 
             bindClick('produce-beat-btn', () => { beats += 5; updateDisplay(); saveGame(); });
-            bindClick('plant-1-btn', () => { addGardenElement('grass'); beats += 2; updateDisplay(); saveGame(); });
-            bindClick('plant-2-btn', () => { addGardenElement('flowers'); beats += 5; updateDisplay(); saveGame(); });
-            bindClick('plant-3-btn', () => { addGardenElement('tree'); beats += 10; updateDisplay(); saveGame(); });
 
             switchView(currentView);
         });
