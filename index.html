@@ -357,7 +357,8 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">E-Mail-Adresse</label>
-                    <input type="email" id="authEmail" autocomplete="off" placeholder="artur.hamm90@gmail.com" class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    <!-- Neutraler Platzhalter statt fester E-Mail -->
+                    <input type="email" id="authEmail" autocomplete="off" placeholder="name@beispiel.com" class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Master-PIN</label>
@@ -526,10 +527,9 @@
         </div>
     </div>
 
-    <!-- CUSTOM DESIGN MODAL (MIT X-BUTTON & BACKDROP-KLICK ZUM SCHLIESSEN) -->
+    <!-- CUSTOM DESIGN MODAL -->
     <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4" onclick="handleBackdropClick(event)">
         <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 max-w-md w-full mx-auto shadow-2xl text-center space-y-6 relative">
-            <!-- X-Button zum Schließen -->
             <button onclick="closeCustomModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-white w-9 h-9 rounded-full bg-darkbg border border-gray-700 flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
@@ -760,7 +760,6 @@
             document.getElementById('modalText').innerText = text;
             document.getElementById('modalInputContainer').classList.add('hidden');
             
-            // Stelle sicher, dass der Schließen-Button immer sichtbar ist
             const cancelBtn = document.getElementById('modalCancelBtn');
             cancelBtn.style.display = 'block';
             cancelBtn.innerText = 'Schließen';
