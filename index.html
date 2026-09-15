@@ -273,7 +273,7 @@
 
         </div>
 
-        <!-- 3. BIO-GARDEN SEITE (Mit Webradio, Live Song-Erkennung & Takt-Synchronisation) -->
+        <!-- 3. BIO-GARDEN SEITE (Mit Webradio, Live Song-Anzeige & Puls-Synchronisation) -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             
             <!-- Garten Auth Container (falls nicht eingeloggt) -->
@@ -310,7 +310,8 @@
                     </div>
                     <span id="audio-status-text" class="text-gray-400 text-[11px]">Bereit</span>
                 </div>
-                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" crossorigin="anonymous" preload="none"></audio>
+                <!-- Stabiler Audio-Player für laut.fm -->
+                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
                 <!-- Großes, detailliertes grafisches Garten-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-2xl bg-[#06101e]">
@@ -387,7 +388,7 @@
         </div>
     </footer>
 
-    <!-- GENERATIVE AUDIO ENGINE & LIVE VISUALIZER SCRIPT -->
+    <!-- GENERATIVE AUDIO & VISUALIZER SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -591,7 +592,7 @@
                 });
             }
 
-            // --- LAUT.FM LIVE SONG API ---
+            // --- LAUT.FM LIVE SONG API (Song-Erkennung) ---
             async function fetchCurrentSong() {
                 try {
                     let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
@@ -616,7 +617,7 @@
             setInterval(fetchCurrentSong, 15000);
             fetchCurrentSong();
 
-            // 🎵 AUDIO ENGINE & ROBUST STREAM SYNCHRONIZATION
+            // 🎵 AUDIO & ROBUST STREAM SETUP
             let globalAudioCtx = null;
             let analyserNode = null;
             let freqDataArray = null;
@@ -656,7 +657,7 @@
                             isUsingMic = false;
                             toggleRadioBtn.innerText = "⏹️ Stream stoppen";
                             toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
-                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio Stream aktiv (Sync läuft)";
+                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio Stream läuft aktiv";
                         } catch(e) {
                             alert("⚠️ Stream konnte nicht gestartet werden.");
                         }
@@ -795,7 +796,7 @@
                 saveGame();
             }
 
-            // --- ANIMATED GARDEN CANVAS (STREAM & MIC REACTIVE SYNCHRONIZATION) ---
+            // --- ANIMATED GARDEN CANVAS (ROBUST STREAM & RHYTHM SYNC) ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
@@ -822,9 +823,9 @@
                         }
                     } catch(e) {}
                 } else if (isStreamingRadio) {
-                    // Dynamischer Rhythmus-Puls für den aktiven Webradio-Stream
-                    bassEnergy = (Math.sin(Date.now() / 200) + 1) / 2.5;
-                    if (Math.random() < 0.12) {
+                    // Lebendiger Rhythmus-Puls, wenn der Webradio-Stream läuft
+                    bassEnergy = (Math.sin(Date.now() / 220) + 1) / 2.2;
+                    if (Math.random() < 0.1) {
                         triggerGardenRipple();
                     }
                 }
