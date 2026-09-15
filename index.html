@@ -425,20 +425,28 @@
         </div>
 
         <!-- Cloud Sync, PIN Settings & Reset Section -->
-        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div class="text-left w-full sm:w-auto">
+        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
+            <div class="text-left">
                 <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Sicherer Admin-Bereich</h4>
                 <p class="text-xs text-gray-400">Deine Cloud-ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">Lade...</code></p>
             </div>
-            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
-                <button onclick="promptLoadCloudId()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition">
-                    <i class="fa-solid fa-rotate mr-1.5"></i> Auf anderem Gerät laden
+            <!-- Optimierte Grid-Anordnung für Buttons auf dem Handy -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+                <button onclick="promptLoadCloudId()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>Auf anderem Gerät laden</span>
                 </button>
-                <button onclick="changeAdminPin()" class="bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
-                    <i class="fa-solid fa-key mr-1.5"></i> Master-PIN ändern
+                <button onclick="changeAdminPin()" class="w-full bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Master-PIN ändern</span>
                 </button>
-                <button onclick="confirmResetGame()" class="bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
-                    <i class="fa-solid fa-trash-can mr-1.5"></i> Beat-Lab zurücksetzen
+                <button onclick="openForgotPinModalDirect()" class="w-full bg-amber-950/50 hover:bg-amber-900 border border-amber-800/60 text-amber-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>PIN vergessen?</span>
+                </button>
+                <button onclick="confirmResetGame()" class="w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Beat-Lab zurücksetzen</span>
                 </button>
             </div>
         </div>
@@ -451,9 +459,9 @@
         </div>
     </div>
 
-    <!-- CUSTOM DESIGN MODAL (Vollständig mit integrierten Buttons und Links) -->
-    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl text-center space-y-6">
+    <!-- CUSTOM DESIGN MODAL -->
+    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
+        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 max-w-md w-full mx-auto shadow-2xl text-center space-y-6">
             <div id="modalIcon" class="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-2xl mx-auto border border-indigo-500/30">
                 <i class="fa-solid fa-lock"></i>
             </div>
@@ -467,15 +475,15 @@
                 <input type="password" id="modalInput" placeholder="Master-PIN eingeben..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-center text-white text-lg tracking-widest focus:outline-none focus:border-indigo-500">
             </div>
 
-            <!-- Integrierter Button / Link für "PIN vergessen?" -->
+            <!-- Interaktiver Button für "PIN vergessen?" -->
             <div id="modalLinkContainer" class="hidden pt-1">
-                <button onclick="openForgotPinModal()" class="w-full bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 text-xs py-2.5 px-4 rounded-xl font-semibold transition flex items-center justify-center space-x-2">
+                <button onclick="openForgotPinModalFromPrompt()" class="w-full bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 text-xs py-2.5 px-4 rounded-xl font-semibold transition flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-key"></i>
                     <span>PIN vergessen? (Per E-Mail wiederherstellen)</span>
                 </button>
             </div>
 
-            <!-- Zusätzlicher Aktions-Container für Fehler mit Button -->
+            <!-- Zusätzlicher Aktions-Container -->
             <div id="modalActionContainer" class="hidden"></div>
 
             <!-- Buttons -->
@@ -497,8 +505,8 @@
             <div class="flex justify-center space-x-6 mb-8 text-gray-400 text-xl">
                 <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="hover:text-green-400 transition"><i class="fa-brands fa-spotify"></i></a>
                 <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition"><i class="fa-solid fa-radio"></i></a>
-                <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-purple-400 transition"><i class="fa-brands fa-tower-cell"></i></a>
-                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition"><i class="fa-brands fa-mobile"></i></a>
+                <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-purple-400 transition"><i class="fa-solid fa-tower-cell"></i></a>
+                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition"><i class="fa-solid fa-mobile"></i></a>
             </div>
             <p class="text-xs text-gray-500">&copy; 2026 jackdarckart. Alle Rechte vorbehalten. Optimiert für GitHub & Vercel.</p>
         </div>
@@ -648,15 +656,22 @@
             });
         }
 
-        function openForgotPinModal() {
+        function openForgotPinModalDirect() {
+            startForgotPinProcess();
+        }
+
+        function openForgotPinModalFromPrompt() {
             document.getElementById('customModal').classList.add('hidden');
+            startForgotPinProcess();
+        }
+
+        function startForgotPinProcess() {
             showCustomModal('forgot', '📧 PIN Wiederherstellung', 'Gib deine hinterlassene E-Mail-Adresse ein, um einen temporären PIN zu generieren:', 'E-Mail eingeben...');
             modalCallback = function(succ, emailInput) {
                 if (!succ || !emailInput) return;
                 let savedEmail = localStorage.getItem('jackAdminEmail');
 
                 if (!savedEmail || emailInput.trim().toLowerCase() !== savedEmail.toLowerCase()) {
-                    // Schöner integrierter Button statt hässlichem Alert
                     let setupBtnHtml = `<button onclick="checkAndSetupPinOnce()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">⚙️ E-Mail jetzt im Admin-Bereich einrichten</button>`;
                     showInfoModal('❌ E-Mail nicht gefunden', 'Es wurde keine passende E-Mail-Adresse für die Wiederherstellung gefunden. Bitte richten Sie zuerst Ihren Master-PIN und E-Mail im Admin-Bereich ein.', setupBtnHtml);
                     return;
@@ -683,8 +698,10 @@
         }
 
         function saveGame() {
-            localStorage.setItem('jackBeatLab_' + gameData.cloudId, JSON.stringify(gameData));
-            localStorage.setItem('jackBeatLab_lastId', gameData.cloudId);
+            try {
+                localStorage.setItem('jackBeatLab_' + gameData.cloudId, JSON.stringify(gameData));
+                localStorage.setItem('jackBeatLab_lastId', gameData.cloudId);
+            } catch(e) { console.error("Speicherfehler", e); }
         }
 
         function loadGame() {
@@ -767,22 +784,33 @@
         }
 
         function updateGameUI() {
-            document.getElementById('gameBeats').innerText = Math.floor(gameData.beats).toLocaleString();
-            document.getElementById('gameFans').innerText = Math.floor(gameData.fans).toLocaleString();
+            const bElem = document.getElementById('gameBeats');
+            const fElem = document.getElementById('gameFans');
+            const pElem = document.getElementById('gameBps');
+            if (bElem) bElem.innerText = Math.floor(gameData.beats).toLocaleString();
+            if (fElem) fElem.innerText = Math.floor(gameData.fans).toLocaleString();
             let bps = getBps();
-            document.getElementById('gameBps').innerText = bps.toLocaleString();
+            if (pElem) pElem.innerText = bps.toLocaleString();
 
-            document.getElementById('countMic').innerText = gameData.mic;
-            document.getElementById('costMic').innerText = Math.floor(15 * Math.pow(1.15, gameData.mic)).toLocaleString();
+            const cMic = document.getElementById('countMic');
+            const coMic = document.getElementById('costMic');
+            if (cMic) cMic.innerText = gameData.mic;
+            if (coMic) coMic.innerText = Math.floor(15 * Math.pow(1.15, gameData.mic)).toLocaleString();
 
-            document.getElementById('countSynth').innerText = gameData.synth;
-            document.getElementById('costSynth').innerText = Math.floor(100 * Math.pow(1.15, gameData.synth)).toLocaleString();
+            const cSynth = document.getElementById('countSynth');
+            const coSynth = document.getElementById('costSynth');
+            if (cSynth) cSynth.innerText = gameData.synth;
+            if (coSynth) coSynth.innerText = Math.floor(100 * Math.pow(1.15, gameData.synth)).toLocaleString();
 
-            document.getElementById('countDesk').innerText = gameData.desk;
-            document.getElementById('costDesk').innerText = Math.floor(500 * Math.pow(1.15, gameData.desk)).toLocaleString();
+            const cDesk = document.getElementById('countDesk');
+            const coDesk = document.getElementById('costDesk');
+            if (cDesk) cDesk.innerText = gameData.desk;
+            if (coDesk) coDesk.innerText = Math.floor(500 * Math.pow(1.15, gameData.desk)).toLocaleString();
 
-            document.getElementById('countLabel').innerText = gameData.label;
-            document.getElementById('costLabel').innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
+            const cLabel = document.getElementById('countLabel');
+            const coLabel = document.getElementById('costLabel');
+            if (cLabel) cLabel.innerText = gameData.label;
+            if (coLabel) coLabel.innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
         }
 
         setInterval(function() {
@@ -799,7 +827,7 @@
 
         // Audio Persistence & Security Script
         const audio = document.getElementById('radioStream');
-        if ('mediaSession' in navigator) {
+        if (audio && 'mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: 'Live Webradio Stream', artist: 'jackdarckart', album: 'stream-musik.space 24/7',
                 artwork: [{ src: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=512&h=512&fit=crop', sizes: '512x512', type: 'image/jpeg' }]
@@ -807,10 +835,12 @@
             navigator.mediaSession.setActionHandler('play', function() { audio.play(); });
             navigator.mediaSession.setActionHandler('pause', function() { audio.pause(); });
         }
-        audio.addEventListener('play', function() { localStorage.setItem('streamPlaying', 'true'); });
-        audio.addEventListener('pause', function() { localStorage.setItem('streamPlaying', 'false'); });
+        if (audio) {
+            audio.addEventListener('play', function() { localStorage.setItem('streamPlaying', 'true'); });
+            audio.addEventListener('pause', function() { localStorage.setItem('streamPlaying', 'false'); });
+        }
         window.addEventListener('load', function() {
-            if (localStorage.getItem('streamPlaying') === 'true') {
+            if (localStorage.getItem('streamPlaying') === 'true' && audio) {
                 audio.play().catch(function(err) { console.log("Autoplay blockiert:", err); });
             }
         });
