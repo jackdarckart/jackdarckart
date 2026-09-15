@@ -430,7 +430,6 @@
                 <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Sicherer Admin-Bereich</h4>
                 <p class="text-xs text-gray-400">Deine Cloud-ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">Lade...</code></p>
             </div>
-            <!-- Optimierte Grid-Anordnung für Buttons auf dem Handy -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
                 <button onclick="promptLoadCloudId()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-rotate"></i>
@@ -600,27 +599,31 @@
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
-                showCustomModal('setup', '🔒 Beat-Lab Admin-Einrichtung', 'Lege jetzt deinen Master-PIN fest:', 'Neuen PIN eingeben...', false);
-                modalCallback = function(success, pinVal) {
-                    if (success && pinVal) {
-                        localStorage.setItem('jackAdminPin', pinVal);
-                        showCustomModal('setup', '📧 E-Mail Wiederherstellung', 'Gib deine E-Mail-Adresse für die Wiederherstellung ein:', 'Deine E-Mail-Adresse...', false);
-                        modalCallback = function(succ2, emailVal) {
-                            if (succ2 && emailVal) {
-                                localStorage.setItem('jackAdminEmail', emailVal);
-                                showInfoModal('✅ Erfolgreich', 'Master-PIN & E-Mail erfolgreich eingerichtet!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                            } else {
-                                localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                                showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                            }
-                        };
-                    } else {
-                        localStorage.setItem('jackAdminPin', '1234');
-                        localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                        showInfoModal('⚠️ Hinweis', 'Standard-PIN \'1234\' wurde gesetzt.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                    }
-                };
+                runSetupWizard();
             }
+        }
+
+        function runSetupWizard() {
+            showCustomModal('setup', '🔒 Beat-Lab Admin-Einrichtung', 'Lege jetzt deinen Master-PIN fest:', 'Neuen PIN eingeben...', false);
+            modalCallback = function(success, pinVal) {
+                if (success && pinVal) {
+                    localStorage.setItem('jackAdminPin', pinVal);
+                    showCustomModal('setup', '📧 E-Mail Wiederherstellung', 'Gib deine E-Mail-Adresse für die Wiederherstellung ein:', 'Deine E-Mail-Adresse...', false);
+                    modalCallback = function(succ2, emailVal) {
+                        if (succ2 && emailVal) {
+                            localStorage.setItem('jackAdminEmail', emailVal);
+                            showInfoModal('✅ Erfolgreich', 'Master-PIN & E-Mail erfolgreich eingerichtet!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                        } else {
+                            localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
+                            showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                        }
+                    };
+                } else {
+                    localStorage.setItem('jackAdminPin', '1234');
+                    localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
+                    showInfoModal('⚠️ Hinweis', 'Standard-PIN \'1234\' wurde gesetzt.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                }
+            };
         }
 
         function verifyPin(onSuccess) {
@@ -672,7 +675,7 @@
                 let savedEmail = localStorage.getItem('jackAdminEmail');
 
                 if (!savedEmail || emailInput.trim().toLowerCase() !== savedEmail.toLowerCase()) {
-                    let setupBtnHtml = `<button onclick="checkAndSetupPinOnce()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">⚙️ E-Mail jetzt im Admin-Bereich einrichten</button>`;
+                    let setupBtnHtml = `<button onclick="runSetupWizardFromButton()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">⚙️ E-Mail jetzt im Admin-Bereich einrichten</button>`;
                     showInfoModal('❌ E-Mail nicht gefunden', 'Es wurde keine passende E-Mail-Adresse für die Wiederherstellung gefunden. Bitte richten Sie zuerst Ihren Master-PIN und E-Mail im Admin-Bereich ein.', setupBtnHtml);
                     return;
                 }
@@ -682,6 +685,11 @@
 
                 showInfoModal('📨 Temporärer PIN generiert', 'Dein temporärer PIN lautet: ' + tempPin + '\n\nDu kannst dich jetzt damit einloggen.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
             };
+        }
+
+        function runSetupWizardFromButton() {
+            document.getElementById('customModal').classList.add('hidden');
+            runSetupWizard();
         }
 
         // Mini-Game State & Cloud Sync
