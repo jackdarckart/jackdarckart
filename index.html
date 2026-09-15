@@ -836,7 +836,6 @@
                 const audioElem = document.getElementById('radioStream');
                 if (!audioElem) return;
 
-                // Safely try connection, fallback gracefully if CORS taints the external stream
                 const source = audioCtx.createMediaElementSource(audioElem);
                 audioAnalyser = audioCtx.createAnalyser();
                 audioAnalyser.fftSize = 256;
@@ -1171,7 +1170,6 @@
             const scaleY = canvas.height / VIRTUAL_H;
             ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
 
-            // Robust Hybrid Sync: Prüft Webradio-Status & BPS
             let bps = getBps();
             let bpsPulseBoost = Math.min(0.4, bps * 0.002);
             const audioElem = document.getElementById('radioStream');
@@ -1189,7 +1187,6 @@
                 } catch(e) {}
             }
 
-            // Fallback / Live Radio Takt-Synchronisation wenn Stream aktiv
             if (isRadioPlaying) {
                 let radioRhythm = Math.sin(animTime * 7.5) * 0.22 + 0.22;
                 targetPulse = Math.max(targetPulse, radioRhythm + bpsPulseBoost);
@@ -1396,6 +1393,7 @@
             return 'text-white text-xs px-4 py-2.5 rounded-lg font-bold transition';
         }
 
+        // --- GLOBALE PRODUKTIONS- & AUDIO-SCHLEIFE (AKTIV IM SPIEL UND GARTEN) ---
         setInterval(function() {
             let email = localStorage.getItem('jackLoggedInEmail');
             if (!email) return;
@@ -1408,19 +1406,17 @@
                 checkGardenLevel(1);
                 
                 if (gameData.garden[2].level > 1) {
-                    gameData.beats += (gameData.garden2?.level * 0.05 || 0);
+                    gameData.beats += (gameData.garden[2].level * 0.05);
                 }
                 gameData.garden[2].exp += bps / 60;
                 checkGardenLevel(2);
 
                 updateGameUI();
 
-                const gardenView = document.getElementById('gardenView');
-                const isGardenActive = gardenView && !gardenView.classList.contains('hidden');
-                
-                if (isGardenActive && bps > 0) {
+                // Globaler Studio-Sound (Spielt nun sowohl im Spiel als auch im Garten ab, wenn Upgrades aktiv sind)
+                if (gameSoundEnabled && bps > 0) {
                     ambientTimer++;
-                    let triggerThreshold = Math.max(12, 50 - Math.floor(bps / 8));
+                    let triggerThreshold = Math.max(12, 55 - Math.floor(bps / 6));
                     if (ambientTimer >= triggerThreshold) {
                         ambientTimer = 0;
                         playCleanCrispSound();
