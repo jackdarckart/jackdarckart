@@ -168,8 +168,8 @@
                     <p class="text-gray-400 text-xs">Riffs produzieren, Hash-Rate steigern, Charts stürmen & Fans gewinnen!</p>
                 </div>
 
-                <!-- Haupt-Clicker (Ohne jegliches Blinken) -->
-                <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl transition border border-purple-400/30 flex items-center justify-center gap-3">
+                <!-- Haupt-Clicker (Stabil, keinerlei Bewegung beim Klicken) -->
+                <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl border border-purple-400/30 flex items-center justify-center gap-3 cursor-pointer">
                     <span class="text-2xl">🎸</span> Riff einspielen <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+1</span>
                 </button>
 
@@ -193,7 +193,7 @@
                     </div>
                 </div>
 
-                <!-- TYCOON UPGRADE SEKTIONEN (Langsamere Progression) -->
+                <!-- TYCOON UPGRADE SEKTIONEN (Mit angepassten, sauberen Beschriftungen) -->
                 <div class="space-y-4 text-left">
                     
                     <!-- 1. HASH-RATE RIGS (GoMining Stil) -->
@@ -202,21 +202,21 @@
                             <h3 class="font-bold text-xs text-cyan-400 flex items-center gap-1.5">⚡ Hash-Rate Miner (+0.05 BPS)</h3>
                             <span id="rigs-count" class="text-xs text-gray-400">Anzahl: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Tokenisierte Rechenleistung für stetige Riff-Power.</p>
-                        <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">
-                            ⚡ Hash-Rate Miner kaufen (<span id="rig-cost">50</span> Riffs)
+                        <p class="text-[11px] text-gray-400">Tokenisierte Rechenleistung für stetige Riff-Power im GoMining-Stil.</p>
+                        <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">
+                            ⚡ Miner aktivieren (<span id="rig-cost">50</span> Riffs)
                         </button>
                     </div>
 
                     <!-- 2. MUSIK-RELEASES & CHARTS -->
                     <div class="bg-[#131b2e] border border-indigo-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 CloudBeats Album Release (+0.2 BPS)</h3>
+                            <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 CloudBeats Release (+0.2 BPS)</h3>
                             <span id="albums-count" class="text-xs text-gray-400">Releases: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Veröffentliche Songs in der Cloud (+10 Fans, +0.2 BPS).</p>
-                        <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">
-                            💿 CloudBeats Album veröffentlichen (<span id="album-cost">250</span> Riffs)
+                        <p class="text-[11px] text-gray-400">Veröffentliche neue Tracks in der Cloud für treue Fans (+10 Fans).</p>
+                        <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">
+                            💿 Cloud-Release droppen (<span id="album-cost">250</span> Riffs)
                         </button>
                     </div>
 
@@ -226,8 +226,8 @@
                             <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 AI Lyric & Beat Generator (+0.8 BPS)</h3>
                             <span id="ai-count" class="text-xs text-gray-400">Agenten: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Autonomer Producer für kontinuierliche Riff-Generierung.</p>
-                        <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">
+                        <p class="text-[11px] text-gray-400">Autonomer KI-Producer für automatische Riff- & Songproduktion.</p>
+                        <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">
                             🤖 AI-Producer anheuern (<span id="ai-cost">1000</span> Riffs)
                         </button>
                     </div>
@@ -238,10 +238,10 @@
                             <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">💎 $GOMINING & Beat Staking</h3>
                             <span id="staked-count" class="text-xs text-emerald-300">Gesperrt: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Sperre 100 Riffs im Staking-Pool für passive Zinsen (+0.05 BPS).</p>
+                        <p class="text-[11px] text-gray-400">Sperre 100 Riffs im Staking-Pool für passive Zinsen & BPS-Bonus.</p>
                         <div class="flex gap-2">
-                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">💎 100 Riffs staken</button>
-                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow">🔓 Riffs auszahlen</button>
+                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">💎 100 Riffs staken</button>
+                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">🔓 Riffs auszahlen</button>
                         </div>
                     </div>
 
@@ -640,8 +640,8 @@
                     beats -= rigCost;
                     rigs += 1;
                     hashRate += 1;
-                    bps += 0.05; // Langsamerer Zuwachs
-                    rigCost = Math.floor(rigCost * 1.45); // Schnellerer Preisanstieg
+                    bps += 0.05;
+                    rigCost = Math.floor(rigCost * 1.45);
                     updateDisplay();
                     saveGame();
                 } else {
