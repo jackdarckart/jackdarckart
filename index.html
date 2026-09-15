@@ -113,9 +113,10 @@
                     <button type="button" id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] px-3 py-1.5 rounded-xl font-mono cursor-pointer transition">🚪 Abmelden</button>
                 </div>
 
+                <!-- Fixer Klick-Button: Exakt +1 Beat, nicht upgradebar -->
                 <button type="button" id="produce-beat-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-black py-5 px-6 rounded-[2rem] shadow-2xl shadow-purple-900/40 text-lg cursor-pointer active:scale-[0.98] border border-white/10 flex flex-col items-center justify-center gap-1">
                     <span class="flex items-center gap-2">🎧 Master-Beat Einspielen</span>
-                    <span class="text-xs font-mono font-normal text-purple-200/80">(+<span id="click-power-display">5</span> Beats pro Klick)</span>
+                    <span class="text-xs font-mono font-normal text-purple-200/80">(+1 Beat pro Klick)</span>
                 </button>
 
                 <div class="grid grid-cols-2 gap-3 text-left">
@@ -138,7 +139,7 @@
                         <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800/80 flex justify-between items-center gap-3">
                             <div>
                                 <p class="text-xs font-bold text-white">🎹 Synth-Bass Modul</p>
-                                <p id="upg1-status" class="text-[10px] text-slate-400 font-mono">+2 Power &amp; Live Sound-Ton</p>
+                                <p id="upg1-status" class="text-[10px] text-slate-400 font-mono">Aktiviert Live Sound-Toneffekte</p>
                             </div>
                             <button type="button" id="buy-upgrade-1" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">100 B</button>
                         </div>
@@ -229,17 +230,17 @@
         </div>
     </footer>
 
-    <!-- MODULAR SYSTEM SCRIPTS (PERFORMANCE OPTIMIERT) -->
+    <!-- MODULAR SYSTEM SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             /* ========================================================
-               MODUL 1: GAME & ECONOMY ENGINE
+               MODUL 1: GAME & ECONOMY ENGINE (+1 Beat fest pro Klick)
                ======================================================== */
             const GameEngine = {
                 beats: 3449,
                 fans: 586,
-                clickPower: 5,
+                soundUnlocked: false,
                 autoBeatsActive: false,
                 loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || 'artur.hamm90@gmail.com',
                 
@@ -247,7 +248,7 @@
                     let usersDB = {};
                     try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
                     if (!usersDB[this.loggedInUser]) {
-                        usersDB[this.loggedInUser] = { pin: '1234', beats: 3449, fans: 586, power: 5, auto: false };
+                        usersDB[this.loggedInUser] = { pin: '1234', beats: 3449, fans: 586, sound: false, auto: false };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     }
                     this.load();
@@ -261,7 +262,7 @@
                             let u = db[this.loggedInUser];
                             this.beats = Number(u.beats) || 3449;
                             this.fans = Number(u.fans) || 586;
-                            this.clickPower = Number(u.power) || 5;
+                            this.soundUnlocked = Boolean(u.sound);
                             this.autoBeatsActive = Boolean(u.auto);
                         }
                     } catch(e) {}
@@ -275,7 +276,7 @@
                             pin: '1234', 
                             beats: this.beats, 
                             fans: this.fans, 
-                            power: this.clickPower, 
+                            sound: this.soundUnlocked, 
                             auto: this.autoBeatsActive 
                         };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
@@ -283,18 +284,19 @@
                 },
 
                 playTone() {
+                    if (!this.soundUnlocked) return;
                     try {
                         const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
                         const osc = ctxAudio.createOscillator();
                         const gain = ctxAudio.createGain();
                         osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(440 + (this.clickPower * 15), ctxAudio.currentTime);
-                        gain.gain.setValueAtTime(0.12, ctxAudio.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.12);
+                        osc.frequency.setValueAtTime(520, ctxAudio.currentTime);
+                        gain.gain.setValueAtTime(0.1, ctxAudio.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.1);
                         osc.connect(gain);
                         gain.connect(ctxAudio.destination);
                         osc.start();
-                        osc.stop(ctxAudio.currentTime + 0.12);
+                        osc.stop(ctxAudio.currentTime + 0.1);
                     } catch(e) {}
                 },
 
@@ -311,22 +313,25 @@
                 updateUI() {
                     const bEl = document.getElementById('beats-count');
                     const fEl = document.getElementById('fans-count');
-                    const pEl = document.getElementById('click-power-display');
                     if(bEl) bEl.innerText = Math.floor(this.beats).toLocaleString('de-DE');
                     if(fEl) fEl.innerText = Math.floor(this.fans).toLocaleString('de-DE');
-                    if(pEl) pEl.innerText = this.clickPower;
 
+                    if (this.soundUnlocked) {
+                        const st1 = document.getElementById('upg1-status');
+                        if(st1) st1.innerText = "Aktiv! Sound-Töne eingeschaltet";
+                    }
                     if (this.autoBeatsActive) {
-                        const status = document.getElementById('upg2-status');
-                        if(status) status.innerText = "Aktiv! +1 Beat pro Sekunde";
+                        const st2 = document.getElementById('upg2-status');
+                        if(st2) st2.innerText = "Aktiv! +1 Beat pro Sekunde";
                     }
                 }
             };
 
             GameEngine.init();
 
+            // Fester Klick-Wert: IMMER +1 Beat, unantastbar für Upgrades
             document.getElementById('produce-beat-btn').addEventListener('click', () => {
-                GameEngine.beats += GameEngine.clickPower;
+                GameEngine.beats += 1;
                 GameEngine.fans += 1;
                 GameEngine.playTone();
                 GameEngine.updateUI();
@@ -334,17 +339,15 @@
             });
 
             document.getElementById('buy-upgrade-1').addEventListener('click', () => {
-                if (GameEngine.beats >= 100) {
+                if (GameEngine.beats >= 100 && !GameEngine.soundUnlocked) {
                     GameEngine.beats -= 100;
-                    GameEngine.clickPower += 2;
-                    GameEngine.playTone();
+                    GameEngine.soundUnlocked = true;
                     GameEngine.updateUI();
                     GameEngine.save();
-                    document.getElementById('upg1-status').innerText = "Aktiv! +2 Power (Level " + ((GameEngine.clickPower - 5)/2 + 1) + ")";
-                } else {
+                } else if (!GameEngine.soundUnlocked) {
                     const st = document.getElementById('upg1-status');
                     st.innerText = "❌ Nicht genug Beats! (100 benötigt)";
-                    setTimeout(() => { st.innerText = "+2 Beats pro Klick & Sound-Ton"; }, 2500);
+                    setTimeout(() => { st.innerText = "Aktiviert Live Sound-Toneffekte"; }, 2500);
                 }
             });
 
@@ -352,11 +355,9 @@
                 if (GameEngine.beats >= 500 && !GameEngine.autoBeatsActive) {
                     GameEngine.beats -= 500;
                     GameEngine.autoBeatsActive = true;
-                    GameEngine.playTone();
                     GameEngine.updateUI();
                     GameEngine.save();
-                    document.getElementById('upg2-status').innerText = "Aktiv! +1 Beat pro Sekunde";
-                } else if (GameEngine.beats < 500 && !GameEngine.autoBeatsActive) {
+                } else if (!GameEngine.autoBeatsActive) {
                     const st = document.getElementById('upg2-status');
                     st.innerText = "❌ Nicht genug Beats! (500 benötigt)";
                     setTimeout(() => { st.innerText = "+1 Beat pro Sekunde"; }, 2500);
@@ -485,7 +486,6 @@
                     ctx.fillStyle = lawnGrad;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    // Neon-Bio Raster
                     ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
                     for (let i = 0; i < canvas.width; i += 60) {
                         ctx.fillRect(i, 0, 30, canvas.height);
@@ -512,7 +512,7 @@
                     ctx.arc(920, 500, fountainRadius, 0, Math.PI * 2);
                     ctx.stroke();
 
-                    // Kiesgarten & Architektur-Platten
+                    // Kiesgarten & Architektur
                     ctx.fillStyle = '#adb5bd';
                     ctx.fillRect(120, 120, 500, 360);
                     ctx.fillStyle = '#6c757d';
