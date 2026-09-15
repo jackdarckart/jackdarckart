@@ -520,7 +520,7 @@
         </div>
     </div>
 
-    <!-- SEPARATE HARMONISCHE HD-GARTEN ANSICHT (REINE VISUELLE ANIMATION OHNE KLICKS & OHNE TÖNE) -->
+    <!-- SEPARATE HARMONISCHE HD-GARTEN ANSICHT (VOLL SYNCHRONISIERT & REIN VISUELL) -->
     <div id="gardenView" class="hidden py-4 px-2 sm:px-6 max-w-7xl mx-auto space-y-4 text-center">
         <div class="flex items-center justify-between px-2">
             <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg">
@@ -529,7 +529,7 @@
             </button>
             <div class="hidden sm:inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Harmonischer HD-Garten</span>
+                <span>Synchronisierter HD-Garten</span>
             </div>
         </div>
 
@@ -552,23 +552,6 @@
         <!-- VOLLSTÄNDIG RESPONSIVES HD CANVAS-FENSTER -->
         <div class="relative w-full flex justify-center items-center bg-darkbg rounded-3xl p-2 border-2 border-emerald-500/50 shadow-2xl overflow-hidden">
             <canvas id="gardenCanvas" class="rounded-2xl shadow-2xl block mx-auto"></canvas>
-        </div>
-
-        <!-- Dünger & Audio Mute Steuerung -->
-        <div class="flex flex-wrap justify-center gap-2 pt-1">
-            <button id="btnGarden0" onclick="feedPlant(0)" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md">
-                Stauden düngen (<span id="gardenCost0">50</span> B)
-            </button>
-            <button id="btnGarden1" onclick="feedPlant(1)" class="bg-purple-600/30 hover:bg-purple-600 border border-purple-500 text-purple-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md">
-                Bäume düngen (<span id="gardenCost1">200</span> B)
-            </button>
-            <button id="btnGarden2" onclick="feedPlant(2)" class="bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md">
-                Teich düngen (<span id="gardenCost2">1000</span> B)
-            </button>
-            <button id="soundToggleBtn" onclick="toggleGameSound()" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5">
-                <i class="fa-solid fa-volume-high"></i>
-                <span>Sound: An</span>
-            </button>
         </div>
     </div>
 
@@ -643,7 +626,7 @@
             } else if (view === 'garden') {
                 garden.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                setTimeout(resizeCanvas, 50);
+                setTimeout(resizeCanvas, 60);
             } else {
                 home.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -656,14 +639,11 @@
 
         function toggleGameSound() {
             gameSoundEnabled = !gameSoundEnabled;
-            const btn1 = document.getElementById('soundToggleBtn');
             const btn2 = document.getElementById('soundToggleBtnGame');
             
             if (gameSoundEnabled) {
-                if (btn1) { btn1.innerHTML = '<i class="fa-solid fa-volume-high"></i><span>Sound: An</span>'; btn1.className = 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5'; }
                 if (btn2) { btn2.innerHTML = '<i class="fa-solid fa-volume-high"></i><span>Sound: An</span>'; btn2.className = 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-5 py-3 rounded-2xl text-sm font-semibold transition shadow-md inline-flex items-center space-x-2'; }
             } else {
-                if (btn1) { btn1.innerHTML = '<i class="fa-solid fa-volume-mute"></i><span>Sound: Aus</span>'; btn1.className = 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5'; }
                 if (btn2) { btn2.innerHTML = '<i class="fa-solid fa-volume-mute"></i><span>Sound: Aus</span>'; btn2.className = 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 px-5 py-3 rounded-2xl text-sm font-semibold transition shadow-md inline-flex items-center space-x-2'; }
             }
         }
@@ -1008,22 +988,6 @@
             saveGame();
         }
 
-        function feedPlant(index) {
-            let costs = [50 * gameData.garden[0].level, 200 * gameData.garden[1].level, 1000 * gameData.garden[2].level];
-            let cost = costs[index];
-
-            if (gameData.beats >= cost) {
-                gameData.beats -= cost;
-                gameData.garden[index].exp += Math.floor(gameData.garden[index].maxExp * 0.4);
-                checkGardenLevel(index);
-                playCleanCrispSound();
-                updateGameUI();
-                saveGame();
-            } else {
-                showInfoModal('⚠️ Nicht genug Beats', 'Du benötigst mehr produzierte Beats, um diesen Bereich zu düngen!');
-            }
-        }
-
         function checkGardenLevel(index) {
             while (gameData.garden[index].exp >= gameData.garden[index].maxExp) {
                 gameData.garden[index].exp -= gameData.garden[index].maxExp;
@@ -1057,7 +1021,7 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- VOLLSTÄNDIG RESPONSIVE HD-GARTEN RENDER ENGINE (REIN VISUELL) ---
+        // --- VOLLSTÄNDIG SYNCHRONISIERTE & RESPONSIVE HD-GARTEN RENDER ENGINE ---
         const VIRTUAL_W = 1200;
         const VIRTUAL_H = 720;
         let animTime = 0;
@@ -1080,8 +1044,8 @@
             const container = canvas.parentElement;
             if (!container) return;
 
-            const maxW = container.clientWidth - 16;
-            const maxH = window.innerHeight * 0.58;
+            const maxW = container.clientWidth > 0 ? container.clientWidth - 16 : window.innerWidth - 32;
+            const maxH = window.innerHeight * 0.72;
 
             let w = Math.min(maxW, 1150);
             let h = w * (VIRTUAL_H / VIRTUAL_W);
@@ -1288,25 +1252,10 @@
             if (gLvl1) gLvl1.innerText = gameData.garden[1].level;
             if (gLvl2) gLvl2.innerText = gameData.garden[2].level;
 
-            let costG0 = 50 * gameData.garden[0].level;
-            let costG1 = 200 * gameData.garden[1].level;
-            let costG2 = 1000 * gameData.garden[2].level;
-
-            const gCost0 = document.getElementById('gardenCost0');
-            const gCost1 = document.getElementById('gardenCost1');
-            const gCost2 = document.getElementById('gardenCost2');
-            if (gCost0) gCost0.innerText = costG0.toLocaleString();
-            if (gCost1) gCost1.innerText = costG1.toLocaleString();
-            if (gCost2) gCost2.innerText = costG2.toLocaleString();
-
             setAffordability('btnMic', gameData.beats >= costMic, 'bg-indigo-600 hover:bg-indigo-500', 'bg-indigo-500 ring-2 ring-indigo-300 animate-pulse shadow-lg shadow-indigo-500/50');
             setAffordability('btnSynth', gameData.beats >= costSynth, 'bg-purple-600 hover:bg-purple-500', 'bg-purple-500 ring-2 ring-purple-300 animate-pulse shadow-lg shadow-purple-500/50');
             setAffordability('btnDesk', gameData.beats >= costDesk, 'bg-pink-600 hover:bg-pink-500', 'bg-pink-500 ring-2 ring-pink-300 animate-pulse shadow-lg shadow-pink-500/50');
             setAffordability('btnLabel', gameData.beats >= costLabel, 'bg-emerald-600 hover:bg-emerald-500', 'bg-emerald-500 ring-2 ring-emerald-300 animate-pulse shadow-lg shadow-emerald-500/50');
-
-            setAffordability('btnGarden0', gameData.beats >= costG0, 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200', 'bg-emerald-600 border-2 border-emerald-300 text-white ring-2 ring-emerald-400 animate-pulse shadow-lg shadow-emerald-500/50');
-            setAffordability('btnGarden1', gameData.beats >= costG1, 'bg-purple-600/30 hover:bg-purple-600 border border-purple-500 text-purple-200', 'bg-purple-600 border-2 border-purple-300 text-white ring-2 ring-purple-400 animate-pulse shadow-lg shadow-purple-500/50');
-            setAffordability('btnGarden2', gameData.beats >= costG2, 'bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200', 'bg-pink-600 border-2 border-pink-300 text-white ring-2 ring-pink-400 animate-pulse shadow-lg shadow-pink-500/50');
         }
 
         function setAffordability(btnId, canAfford, normalClass, affordClass) {
@@ -1320,11 +1269,7 @@
         }
 
         function getBaseButtonClasses(btnId) {
-            if (btnId.startsWith('btnGarden')) {
-                return 'px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md';
-            } else {
-                return 'text-white text-xs px-4 py-2.5 rounded-lg font-bold transition';
-            }
+            return 'text-white text-xs px-4 py-2.5 rounded-lg font-bold transition';
         }
 
         setInterval(function() {
@@ -1346,7 +1291,6 @@
 
                 updateGameUI();
 
-                // Töne werden NUR im aktiven Spiel (Beat-Lab) abgespielt, NICHT im Garten
                 const isGameActive = !document.getElementById('gameView').classList.contains('hidden') && !document.getElementById('gameMainContent').classList.contains('hidden');
                 
                 if (isGameActive) {
