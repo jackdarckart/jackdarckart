@@ -341,7 +341,7 @@
                 <span>Exklusives Studio-Minigame (PIN-Geschützt)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Genieße professionelle, warme Ambient-Akkorde im Studio-Sound!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße hochklassige, warme Studio-Akkorde beim Klicken & Upgraden!</p>
         </div>
 
         <!-- GESPERRTER ZUSTAND (WENN ABGEMELDET) -->
@@ -562,63 +562,64 @@
         let pendingNewEmail = '';
         let pendingVerificationCode = '';
 
-        // --- HOCHWERTIGER LUSH AMBIENT SYNTHESIZER (HI-FI PAD & CHORDS) ---
+        // --- ROBUUSTER & HOCHWERTIGER HI-FI AMBIENT SYNTHESIZER ---
         let audioCtx = null;
         let ambientTimer = 0;
 
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioCtxClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
         function playLushAmbientChord() {
             try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
+                const ctx = getAudioContext();
+                if (!ctx) return;
 
-                // Wunderschöne, beruhigende Akkord-Progressionen (Cmaj7, Am7, Fmaj7, Gadd9)
+                const now = ctx.currentTime;
+
+                // Wunderschöne Studio-Akkordfolgen (Cmaj7, Am7, Fmaj7, Gadd9)
                 const chordSets = [
-                    [261.63, 329.63, 392.00, 493.88], // Cmaj7 (C4, E4, G4, B4)
-                    [220.00, 261.63, 329.63, 392.00], // Am7 (A3, C4, E4, G4)
-                    [349.23, 440.00, 523.25, 659.25], // Fmaj7 (F4, A4, C5, E5)
-                    [392.00, 493.88, 587.33, 659.25]  // Gadd9 (G4, B4, D5, E5)
+                    [261.63, 329.63, 392.00, 523.25], // C Major 7
+                    [220.00, 261.63, 329.63, 440.00], // A minor 7
+                    [349.23, 440.00, 523.25, 698.46], // F Major 7
+                    [392.00, 493.88, 587.33, 783.99]  // G Major add9
                 ];
 
                 const chord = chordSets[Math.floor(Math.random() * chordSets.length)];
 
-                // Master Gain & Raumfilter
-                const masterGain = audioCtx.createGain();
-                masterGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                // Master Gain & Warmer Lowpass Filter für den analogen Klang
+                const masterGain = ctx.createGain();
+                masterGain.gain.setValueAtTime(0.15, now);
 
-                const filter = audioCtx.createBiquadFilter();
+                const filter = ctx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(1400, audioCtx.currentTime);
-                filter.Q.setValueAtTime(1.5, audioCtx.currentTime);
-
-                // Delay für sanftes Echo im Hintergrund
-                const delay = audioCtx.createDelay();
-                delay.delayTime.setValueAtTime(0.35, audioCtx.currentTime);
-                const delayFeedback = audioCtx.createGain();
-                delayFeedback.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                filter.frequency.setValueAtTime(1400, now);
+                filter.Q.setValueAtTime(1.5, now);
 
                 masterGain.connect(filter);
-                filter.connect(audioCtx.destination);
-                filter.connect(delay);
-                delay.connect(delayFeedback);
-                delayFeedback.connect(delay);
-                delayFeedback.connect(audioCtx.destination);
+                filter.connect(ctx.destination);
 
                 chord.forEach((freq, idx) => {
-                    // Jeder Ton wird doppelt erzeugt mit leichtem Detune (Chorus-Effekt für Fülle)
-                    [0, 1.2].forEach((detuneVal, dIdx) => {
-                        const osc = audioCtx.createOscillator();
-                        const noteGain = audioCtx.createGain();
+                    // Dualer Oszillator pro Ton mit feinem Detune (Chorus-Effekt)
+                    [0, 3.2].forEach((detuneCents, dIdx) => {
+                        const osc = ctx.createOscillator();
+                        const noteGain = ctx.createGain();
 
                         osc.type = dIdx === 0 ? 'sine' : 'triangle';
-                        osc.frequency.setValueAtTime(freq + (dIdx === 0 ? 0 : detuneVal), audioCtx.currentTime);
+                        
+                        const detunedFreq = freq * Math.pow(2, detuneCents / 1200);
+                        osc.frequency.setValueAtTime(detunedFreq, now);
 
-                        // Seidige Hüllkurve: Sanftes Einschwingen (Attack) und langes Ausklingen (Release)
-                        const startTime = audioCtx.currentTime + (idx * 0.06);
-                        const duration = 2.2;
+                        // Seidige Hüllkurve: Sanftes Einschwingen & langes, wohltuendes Ausklingen (2.5 Sekunden)
+                        const startTime = now + (idx * 0.07);
+                        const duration = 2.5;
 
                         noteGain.gain.setValueAtTime(0.0001, startTime);
                         noteGain.gain.linearRampToValueAtTime(0.05 / chord.length, startTime + 0.15);
@@ -631,7 +632,9 @@
                         osc.stop(startTime + duration);
                     });
                 });
-            } catch(e) {}
+            } catch(e) {
+                console.error("Audio Playback Error:", e);
+            }
         }
 
         function showCustomModal(mode, title, text, placeholder, showCancel = true) {
@@ -680,7 +683,7 @@
                 actionContainer.classList.add('hidden');
             }
 
-            document.getElementById('customModal').classList.remove('hidden');
+            document.getElementById('customModal').classList.add('hidden');
             modalCallback = null;
         }
 
@@ -932,7 +935,7 @@
             if (!isAdminLoggedIn) return;
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
-            playLushAmbientChord(); // Spielt einen wunderschönen Hi-Fi Akkord
+            playLushAmbientChord(); // Spielt sofort einen hochwertigen Studio-Akkord ab
             updateGameUI();
             saveGame();
         }
@@ -951,7 +954,7 @@
                 if (type === 'synth') gameData.synth++;
                 if (type === 'desk') gameData.desk++;
                 if (type === 'label') gameData.label++;
-                playLushAmbientChord(); // Feierlicher Hi-Fi Akkord beim Kauf
+                playLushAmbientChord(); // Feierlicher Studio-Akkord beim Kauf
                 updateGameUI();
                 saveGame();
             }
@@ -991,7 +994,7 @@
             if (coLabel) coLabel.innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
         }
 
-        // Passives Einkommen & dezente Hi-Fi Studio-Klänge im Hintergrund
+        // Passives Einkommen & dezente Hintergrund-Akkorde im Studio
         setInterval(function() {
             if (!isAdminLoggedIn) return;
             let bps = getBps();
