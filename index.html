@@ -290,8 +290,8 @@
 
         let audioCtx = null;
         let gameSoundEnabled = true;
+        let ambientTimer = 0;
 
-        // Robuste Audio-Entsperrung für Mobile & Desktop
         function unlockAudioOnce() {
             try {
                 if (!audioCtx) {
@@ -512,7 +512,7 @@
             }
         });
 
-        // Global Passive Production Loop
+        // Global Passive Production & BPS Audio Loop
         setInterval(function() {
             let email = localStorage.getItem('jackLoggedInEmail');
             if (!email) return;
@@ -521,6 +521,16 @@
                 gameData.beats += bps / 10;
                 gameData.fans += (bps / 50);
                 updateGameUI();
+
+                // BPS Sound-Trigger (spielt Töne passend zur Produktionsrate)
+                if (gameSoundEnabled) {
+                    ambientTimer++;
+                    let threshold = Math.max(8, 45 - Math.floor(bps / 4));
+                    if (ambientTimer >= threshold) {
+                        ambientTimer = 0;
+                        playCleanCrispSound();
+                    }
+                }
             }
         }, 100);
 
