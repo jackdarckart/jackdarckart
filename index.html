@@ -290,8 +290,8 @@
 
         let audioCtx = null;
         let gameSoundEnabled = true;
-        let ambientTimer = 0;
 
+        // Robuste Audio-Entsperrung für Mobile & Desktop
         function unlockAudioOnce() {
             try {
                 if (!audioCtx) {
@@ -429,6 +429,7 @@
         }
 
         function clickBeat() {
+            unlockAudioOnce();
             gameData.beats += gameData.clickPower;
             gameData.garden[0].exp += 1;
             playCleanCrispSound();
@@ -437,6 +438,7 @@
         }
 
         function buyUpgrade(type) {
+            unlockAudioOnce();
             let cost = type === 'mic' ? Math.floor(20 * Math.pow(1.22, gameData.mic)) : type === 'synth' ? Math.floor(150 * Math.pow(1.22, gameData.synth)) : type === 'desk' ? Math.floor(800 * Math.pow(1.22, gameData.desk)) : Math.floor(4000 * Math.pow(1.22, gameData.label));
             if (gameData.beats >= cost) {
                 gameData.beats -= cost;
@@ -510,7 +512,7 @@
             }
         });
 
-        // Global Passive Production & Audio Loop (Aktiv im Spiel & Garten)
+        // Global Passive Production Loop
         setInterval(function() {
             let email = localStorage.getItem('jackLoggedInEmail');
             if (!email) return;
@@ -519,15 +521,6 @@
                 gameData.beats += bps / 10;
                 gameData.fans += (bps / 50);
                 updateGameUI();
-
-                if (gameSoundEnabled) {
-                    ambientTimer++;
-                    let threshold = Math.max(10, 50 - Math.floor(bps / 5));
-                    if (ambientTimer >= threshold) {
-                        ambientTimer = 0;
-                        playCleanCrispSound();
-                    }
-                }
             }
         }, 100);
 
