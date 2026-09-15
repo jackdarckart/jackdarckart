@@ -273,20 +273,20 @@
 
         </div>
 
-        <!-- 3. BIO-GARDEN SEITE (Grafisch animiertes Klang-Biotop) -->
+        <!-- 3. BIO-GARDEN SEITE (Grafisch animiertes & synchronisiertes Klang-Biotop) -->
         <div id="view-garten" class="view-page hidden w-full max-w-md mx-auto py-4 text-center space-y-4">
             <div class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
                     <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Klang-Biotop</h2>
-                    <p class="text-gray-300 text-xs">Interaktiver, grafisch animierter Garten mit Teich und Klangpflanzen. Klicke auf die Pflanzen oder den Garten, um synchrone Bio-Töne zu erzeugen und $BEATS zu ernten.</p>
+                    <p class="text-gray-300 text-xs">Aktives Klang-Biotop. Die passive Produktion pro Sekunde spielt synchrone, harmonische Ambient-Töne und lässt den Garten im Takt pulsieren.</p>
                 </div>
 
                 <!-- Grafisch animiertes Garten-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-xl bg-[#06101e]">
                     <canvas id="garden-canvas" width="400" height="220" class="w-full h-auto cursor-pointer block"></canvas>
                     <div class="absolute bottom-2 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-xl text-[10px] text-emerald-300 border border-emerald-500/30 pointer-events-none">
-                        ✨ Klicke direkt in den Garten zur Ernte &amp; Ton-Welle
+                        ✨ Harmonische Ton-Synchronisation aktiv
                     </div>
                 </div>
 
@@ -385,7 +385,7 @@
         </div>
     </footer>
 
-    <!-- ROBUST AUDIO & ANIMATED GARDEN ENGINE -->
+    <!-- SYNCHRONIZED HARMONIC AUDIO & GARDEN ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -579,52 +579,51 @@
                 });
             }
 
-            // 🎵 ROBUST AUDIO ENGINE (Auto-Resume für Browser Autoplay Policy)
-            let audioCtx = null;
+            // 🎵 HARMONISCHE AUDIO ENGINE & AMBIENT ARPEGGIATOR
+            let globalAudioCtx = null;
             const studioScale = [
                 261.63, 293.66, 329.63, 392.00, 440.00,
                 523.25, 587.33, 659.25, 783.99, 880.00
             ];
-
-            function getAudioContext() {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                return audioCtx;
-            }
+            let scaleIndex = 0;
 
             function playSingleTone(customFreq = null) {
                 if (!soundEnabled) return;
 
                 try {
-                    const ctx = getAudioContext();
-                    if (ctx.state !== 'running') return;
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (!globalAudioCtx) {
+                        globalAudioCtx = new window.AudioContext();
+                    }
+                    if (globalAudioCtx.state === 'suspended') {
+                        globalAudioCtx.resume();
+                    }
 
-                    const now = ctx.currentTime;
-                    let freq = customFreq !== null ? customFreq : studioScale[Math.floor(Math.random() * studioScale.length)];
+                    const now = globalAudioCtx.currentTime;
+                    let freq = customFreq !== null ? customFreq : studioScale[scaleIndex];
+                    if (customFreq === null) {
+                        scaleIndex = (scaleIndex + 1) % studioScale.length;
+                    }
 
-                    let osc = ctx.createOscillator();
-                    let gainNode = ctx.createGain();
+                    let osc = globalAudioCtx.createOscillator();
+                    let gainNode = globalAudioCtx.createGain();
 
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(freq, now);
 
                     gainNode.gain.setValueAtTime(0.0001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.07, now + 0.01);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+                    gainNode.gain.linearRampToValueAtTime(0.06, now + 0.015);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
 
                     osc.connect(gainNode);
-                    gainNode.connect(ctx.destination);
+                    gainNode.connect(globalAudioCtx.destination);
 
                     osc.start(now);
-                    osc.stop(now + 0.22);
+                    osc.stop(now + 0.35);
 
                     setTimeout(() => {
                         try { osc.disconnect(); gainNode.disconnect(); } catch(e){}
-                    }, 250);
+                    }, 400);
                 } catch(e) {}
             }
 
@@ -665,6 +664,7 @@
             function produceBeat() {
                 beats += 5;
                 playSingleTone();
+                triggerGardenRipple();
                 updateDisplay();
                 saveGame();
             }
@@ -733,7 +733,7 @@
                     ctx.fillRect(70 + p*24, 100 + p*16, 28, 16);
                 }
 
-                // Pulsierende Bäume & Pflanzen bei Klick
+                // Pulsierende Bäume & Pflanzen bei Ton-Trigger
                 let pScale = 1 + (plantPulse * 0.15);
                 if (plantPulse > 0) plantPulse -= 0.04;
 
@@ -757,7 +757,6 @@
             if(canvas) {
                 requestAnimationFrame(drawGarden);
                 canvas.addEventListener('click', (e) => {
-                    // Direkter Klick in den Garten löst Ton & Teichwelle aus
                     harvestPlant(5, 329.63);
                 });
             }
@@ -888,6 +887,7 @@
             bindClick('buy-album-btn', buyAlbum);
             bindClick('buy-ai-btn', buyAI);
             bindClick('stake-btn', stakeBeats);
+            bindGridUnstake = document.getElementById('unstake-btn');
             bindClick('unstake-btn', unstakeBeats);
             bindClick('game-to-home-btn', () => switchView('home'));
             bindClick('garten-to-home-btn', () => switchView('home'));
@@ -895,7 +895,7 @@
             bindClick('account-to-home-btn', () => switchView('home'));
             bindClick('admin-to-home-btn', () => switchView('home'));
 
-            // Bio-Garden Plant & Canvas Bindings
+            // Bio-Garden Bindings
             bindClick('plant-1-btn', () => harvestPlant(2, 261.63));
             bindClick('plant-2-btn', () => harvestPlant(5, 329.63));
             bindClick('plant-3-btn', () => harvestPlant(10, 196.00));
@@ -927,10 +927,20 @@
                 });
             }
 
-            // AUTO-PRODUKTION
+            // AUTO-PRODUKTION & HARMONISCHER AMBIENT-TICK (1x pro Sekunde im Takt, wenn bps > 0)
+            let ambientTimer = 0;
             setInterval(() => {
                 if (loggedInUser) {
-                    if (bps > 0) beats += bps / 10;
+                    if (bps > 0) {
+                        beats += bps / 10;
+                        ambientTimer++;
+                        // Jede Sekunde (10 Ticks à 100ms) ein harmonischer Arpeggio-Ton & Garten-Welle
+                        if (ambientTimer >= 10) {
+                            ambientTimer = 0;
+                            playSingleTone();
+                            triggerGardenRipple();
+                        }
+                    }
                     if (fps > 0) fans += fps / 10;
                     updateDisplay();
                 }
