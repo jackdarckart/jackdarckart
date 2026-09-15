@@ -4,52 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jack's Beat-Lab</title>
-    <!-- Tailwind CSS für modernes Styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#0b0f19] text-white min-h-screen font-sans selection:bg-purple-500 selection:text-white">
 
     <!-- Header -->
-    <header class="flex justify-between items-center p-2 sm:p-4 border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/90">
+    <header class="flex justify-between items-center p-2 sm:p-4 border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/95">
         <div class="flex items-center space-x-1.5 overflow-hidden">
             <span class="text-xl sm:text-2xl p-1.5 bg-purple-600/20 rounded-xl">🎧</span>
             <span id="user-display" class="font-bold text-xs sm:text-base tracking-wide bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent truncate max-w-[80px] sm:max-w-none">jackdarckart</span>
         </div>
         <div class="flex flex-wrap justify-end gap-1">
-            <button onclick="switchView('home')" class="bg-purple-700 hover:bg-purple-600 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">
-                🏠 Start
-            </button>
-            <button onclick="switchView('garten')" class="bg-emerald-600/80 hover:bg-emerald-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">
-                🌱 Garten
-            </button>
-            <button onclick="switchView('lab')" class="bg-indigo-600/80 hover:bg-indigo-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">
-                💼 Lab
-            </button>
-            <button onclick="toggleSound()" id="sound-btn" class="bg-gray-700 hover:bg-gray-600 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">
-                🔊 Sound: An
-            </button>
-            <button onclick="openCloudModal()" class="bg-cyan-600/80 hover:bg-cyan-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">
-                ☁️ Cloud
-            </button>
-            <button onclick="openRegister()" class="bg-blue-600/80 hover:bg-blue-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">
-                📝 Register
-            </button>
-            <button onclick="openResetPassword()" class="bg-rose-600/80 hover:bg-rose-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">
-                🔑 Pwd
-            </button>
-            <button onclick="openAdmin()" class="bg-amber-600/80 hover:bg-amber-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">
-                🛠️ Admin
-            </button>
+            <button onclick="switchView('home')" class="bg-purple-700 hover:bg-purple-600 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🏠 Start</button>
+            <button onclick="switchView('garten')" class="bg-emerald-600/80 hover:bg-emerald-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🌱 Garten</button>
+            <button onclick="switchView('lab')" class="bg-indigo-600/80 hover:bg-indigo-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">💼 Lab</button>
+            <button onclick="toggleSound()" id="sound-btn" class="bg-gray-700 hover:bg-gray-600 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🔊 Sound: An</button>
+            <button onclick="openModal('cloud-modal')" class="bg-cyan-600/80 hover:bg-cyan-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">☁️ Cloud</button>
+            <button onclick="openRegister()" class="bg-blue-600/80 hover:bg-blue-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">📝 Reg</button>
+            <button onclick="openResetPassword()" class="bg-rose-600/80 hover:bg-rose-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🔑 Pwd</button>
+            <button onclick="openAdmin()" class="bg-amber-600/80 hover:bg-amber-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🛠️ Admin</button>
         </div>
     </header>
 
-    <!-- VIEWS CONTAINER -->
+    <!-- Main Views Container -->
     <main class="max-w-md mx-auto p-4 text-center mt-2">
 
-        <!-- 1. STARTSEITE (Hier stoppen die Töne automatisch!) -->
+        <!-- 1. STARTSEITE (Hier sind Game-Töne garantiert stumm!) -->
         <div id="view-home" class="view-section">
             <h1 class="text-3xl font-black tracking-tight mb-1 text-white">Jack's Beat-Lab</h1>
-            <p class="text-gray-400 text-xs sm:text-sm mb-6">Startseite: Hier ist es ruhig – Game-Töne sind auf dieser Seite stummgeschaltet.</p>
+            <p class="text-gray-400 text-xs sm:text-sm mb-6">Produziere Beats und verwalte deinen Fortschritt.</p>
 
             <!-- Big Action Button -->
             <button onclick="produceBeat()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 text-white font-bold py-4 px-6 rounded-2xl shadow-xl shadow-purple-900/30 text-lg mb-8 transition transform flex items-center justify-center gap-2 border border-purple-400/20">
@@ -58,38 +42,38 @@
 
             <!-- Stats Grid -->
             <div class="space-y-4">
-                <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg backdrop-blur-sm">
+                <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
                     <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Produzierte Beats</p>
                     <p id="beats-count" class="text-3xl sm:text-4xl font-black text-purple-400">0</p>
                 </div>
 
-                <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg backdrop-blur-sm">
+                <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
                     <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Fans / Hörerschaft</p>
                     <p id="fans-count" class="text-3xl sm:text-4xl font-black text-pink-400">0</p>
                 </div>
 
-                <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg backdrop-blur-sm">
+                <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
                     <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Beats pro Sekunde</p>
                     <p id="bps-count" class="text-3xl sm:text-4xl font-black text-emerald-400">0.0</p>
                 </div>
             </div>
         </div>
 
-        <!-- 2. GARTEN SEITE (Töne aktivierbar) -->
+        <!-- 2. GARTEN SEITE -->
         <div id="view-garten" class="view-section hidden">
             <h2 class="text-2xl font-black text-emerald-400 mb-2">🌱 HD-Garten</h2>
-            <p class="text-gray-400 text-xs mb-6">Hier wachsen deine musikalischen Ideen. Game-Sounds und Ambient-Töne sind hier aktiv (falls eingeschaltet).</p>
-            <div class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-2xl">
-                <p class="text-sm text-gray-300">Garten-Modus läuft...</p>
+            <p class="text-gray-400 text-xs mb-6">Hier wachsen deine musikalischen Ideen. (Sounds sind hier aktiv).</p>
+            <div class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-2xl shadow-lg">
+                <p class="text-sm text-gray-300">Garten-Modus ist bereit.</p>
             </div>
         </div>
 
-        <!-- 3. LAB SEITE (Töne aktivierbar) -->
+        <!-- 3. LAB SEITE -->
         <div id="view-lab" class="view-section hidden">
             <h2 class="text-2xl font-black text-indigo-400 mb-2">💼 Studio Lab</h2>
-            <p class="text-gray-400 text-xs mb-6">Verwalte hier deine Studio-Upgrades und Sound-Synthesizer.</p>
-            <div class="bg-[#131b2e] border border-indigo-500/30 p-6 rounded-2xl">
-                <p class="text-sm text-gray-300">Lab-Steuerungen aktiv...</p>
+            <p class="text-gray-400 text-xs mb-6">Verwalte deine Studio-Upgrades.</p>
+            <div class="bg-[#131b2e] border border-indigo-500/30 p-6 rounded-2xl shadow-lg">
+                <p class="text-sm text-gray-300">Studio-Steuerungen aktiv.</p>
             </div>
         </div>
 
@@ -100,7 +84,7 @@
         </div>
     </main>
 
-    <!-- Modals (Cloud, Register, Pwd, Admin) unverändert -->
+    <!-- MODALS -->
     <div id="cloud-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#131b2e] border border-cyan-500/30 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-left">
             <div class="flex justify-between items-center mb-4">
@@ -124,7 +108,7 @@
                 <input type="text" id="reg-username" placeholder="Künstlername" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 <input type="email" id="reg-email" placeholder="E-Mail" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 <input type="password" id="reg-password" placeholder="Passwort" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
-                <button onclick="submitRegister()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm">Speichern</button>
+                <button onclick="submitRegister()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">Speichern</button>
             </div>
         </div>
     </div>
@@ -138,7 +122,7 @@
             <div class="space-y-3">
                 <input type="email" id="reset-email-input" placeholder="Deine E-Mail" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 <input type="password" id="reset-new-pass" placeholder="Neues Passwort" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
-                <button onclick="submitResetPassword()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-semibold py-2.5 rounded-xl text-sm">Ändern</button>
+                <button onclick="submitResetPassword()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">Ändern</button>
             </div>
         </div>
     </div>
@@ -151,23 +135,23 @@
             </div>
             <div class="space-y-3">
                 <div>
-                    <label class="text-xs text-gray-400">Beats:</label>
+                    <label class="text-xs text-gray-400 block mb-1">Beats:</label>
                     <input type="number" id="admin-beats-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
                 <div>
-                    <label class="text-xs text-gray-400">Fans:</label>
+                    <label class="text-xs text-gray-400 block mb-1">Fans:</label>
                     <input type="number" id="admin-fans-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
                 <div>
-                    <label class="text-xs text-gray-400">BPS:</label>
+                    <label class="text-xs text-gray-400 block mb-1">BPS:</label>
                     <input type="number" step="0.1" id="admin-bps-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
-                <button onclick="applyAdminStats()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-sm">Speichern</button>
+                <button onclick="applyAdminStats()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">Speichern</button>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Logik mit Sound- & Ansichten-Steuerung -->
+    <!-- JavaScript Logik -->
     <script>
         let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 40430;
         let fans = parseInt(localStorage.getItem('beat_lab_fans')) || 14603;
@@ -178,10 +162,10 @@
 
         document.getElementById('user-display').innerText = username;
 
-        // Web Audio API Sound Generator
         let audioCtx = null;
         function playBeatSound() {
-            if (!soundEnabled || currentView === 'home') return; // Stoppt sofort auf der Startseite!
+            // Spielt KEINEN Ton, wenn soundEnabled aus ist ODER wir uns auf der Startseite befinden!
+            if (!soundEnabled || currentView === 'home') return;
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -200,9 +184,7 @@
 
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.1);
-            } catch (e) {
-                // Audio Kontext blockiert ohne User Interaction
-            }
+            } catch (e) {}
         }
 
         function toggleSound() {
@@ -219,23 +201,25 @@
 
         function switchView(view) {
             currentView = view;
-            // Alle Sektionen verstecken
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            // Gewählte Sektion anzeigen
-            document.getElementById('view-' + view).classList.remove('hidden');
+            let target = document.getElementById('view-' + view);
+            if (target) target.classList.remove('hidden');
         }
 
         function produceBeat() {
             beats += 1;
-            playBeatSound(); // Spielt nur Ton, wenn NICHT auf der Startseite
+            playBeatSound();
             updateDisplay();
             saveGame();
         }
 
         function updateDisplay() {
-            document.getElementById('beats-count').innerText = Math.floor(beats).toLocaleString('de-DE');
-            document.getElementById('fans-count').innerText = Math.floor(fans).toLocaleString('de-DE');
-            document.getElementById('bps-count').innerText = bps.toFixed(1);
+            let bEl = document.getElementById('beats-count');
+            let fEl = document.getElementById('fans-count');
+            let bpsEl = document.getElementById('bps-count');
+            if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
+            if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
+            if(bpsEl) bpsEl.innerText = bps.toFixed(1);
         }
 
         function saveGame() {
@@ -245,23 +229,32 @@
             localStorage.setItem('beat_lab_user', username);
         }
 
-        // Modals steuern
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function openCloudModal() { document.getElementById('cloud-modal').classList.remove('hidden'); }
+        function openModal(id) {
+            let m = document.getElementById(id);
+            if(m) m.classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            let m = document.getElementById(id);
+            if(m) m.classList.add('hidden');
+        }
+
         function openRegister() {
             document.getElementById('reg-username').value = username;
             document.getElementById('reg-email').value = localStorage.getItem('beat_lab_email') || '';
-            document.getElementById('register-modal').classList.remove('hidden');
+            openModal('register-modal');
         }
+
         function openResetPassword() {
             document.getElementById('reset-email-input').value = localStorage.getItem('beat_lab_email') || '';
-            document.getElementById('reset-pwd-modal').classList.remove('hidden');
+            openModal('reset-pwd-modal');
         }
+
         function openAdmin() {
             document.getElementById('admin-beats-input').value = Math.floor(beats);
             document.getElementById('admin-fans-input').value = fans;
             document.getElementById('admin-bps-input').value = bps.toFixed(1);
-            document.getElementById('admin-modal').classList.remove('hidden');
+            openModal('admin-modal');
         }
 
         function submitRegister() {
