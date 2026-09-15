@@ -341,7 +341,7 @@
                 <span>Exklusives Studio-Minigame (Admin-Geschützt)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Dein Spielstand ist durch deinen einmalig erstellten Master-PIN sicher geschützt.</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Dein Spielstand ist durch deinen Master-PIN geschützt.</p>
         </div>
 
         <!-- Game Dashboard -->
@@ -437,6 +437,9 @@
                 <button onclick="changeAdminPin()" class="bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
                     <i class="fa-solid fa-key mr-1.5"></i> Master-PIN ändern
                 </button>
+                <button onclick="forgotPin()" class="bg-amber-950/50 hover:bg-amber-900 border border-amber-800/60 text-amber-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
+                    <i class="fa-solid fa-envelope mr-1.5"></i> PIN vergessen?
+                </button>
                 <button onclick="confirmResetGame()" class="bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
                     <i class="fa-solid fa-trash-can mr-1.5"></i> Beat-Lab zurücksetzen
                 </button>
@@ -457,7 +460,7 @@
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <i class="fa-solid fa-headphones-simple text-white text-xl"></i>
             </div>
-                <h3 class="text-2xl font-black mb-2">stream-musik.space</h3>
+            <h3 class="text-2xl font-black mb-2">stream-musik.space</h3>
             <p class="text-gray-400 text-sm mb-8">Das offizielle Portfolio & Webradio von jackdarckart.</p>
             <div class="flex justify-center space-x-6 mb-8 text-gray-400 text-xl">
                 <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="hover:text-green-400 transition"><i class="fa-brands fa-spotify"></i></a>
@@ -469,9 +472,8 @@
         </div>
     </footer>
 
-    <!-- Advanced Script, Robust PIN Setup & Game Logic -->
+    <!-- Script mit E-Mail-Wiederherstellung & temporärem PIN -->
     <script>
-        // --- 1. SPA View Switcher ---
         function switchView(view) {
             const home = document.getElementById('homeView');
             const game = document.getElementById('gameView');
@@ -480,7 +482,7 @@
                 home.classList.add('hidden');
                 game.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                checkAndSetupPinOnce(); // Beim Öffnen des Spiels PIN prüfen/einrichten
+                checkAndSetupPinOnce();
             } else {
                 game.classList.add('hidden');
                 home.classList.remove('hidden');
@@ -489,29 +491,37 @@
             }
         }
 
-        // --- 2. Robuste PIN-Verwaltung (Einmalige Erstellung & Änderung) ---
+        // Einmalige PIN & E-Mail Einrichtung
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
-                let newPin = prompt("🔒 BEAT-LAB ADMIN-EINRICHTUNG:\n\nDu öffnest das Beat-Lab zum ersten Mal. Bitte lege jetzt einmalig deinen geheimen Master-PIN fest (wichtig zum Schutz vor Fremden):");
+                let newPin = prompt("🔒 BEAT-LAB ADMIN-EINRICHTUNG:\n\nLege deinen geheimen Master-PIN fest:");
                 if (newPin && newPin.trim() !== '') {
                     localStorage.setItem('jackAdminPin', newPin.trim());
-                    alert("✅ Master-PIN erfolgreich erstellt und gespeichert! Merke dir diesen PIN gut.");
+                    let email = prompt("📧 Bitte gib deine E-Mail-Adresse für die Wiederherstellung ein (falls du den PIN vergisst):");
+                    if (email && email.trim() !== '') {
+                        localStorage.setItem('jackAdminEmail', email.trim());
+                    }
+                    alert("✅ Master-PIN & E-Mail erfolgreich eingerichtet!");
                 } else {
-                    alert("⚠️ Es wurde kein PIN eingegeben. Standard-PIN '1234' wurde gesetzt. Du kannst ihn jederzeit über den Button ändern.");
                     localStorage.setItem('jackAdminPin', '1234');
+                    localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
+                    alert("⚠️ Standard-PIN '1234' wurde gesetzt. Du kannst ihn im Spiel jederzeit ändern.");
                 }
             }
         }
 
         function getVerifiedPin() {
             let pin = localStorage.getItem('jackAdminPin');
-            if (!pin) {
-                checkAndSetupPinOnce();
-                pin = localStorage.getItem('jackAdminPin');
-            }
+            let tempPin = localStorage.getItem('jackTempPin');
+
             let input = prompt("🔑 PIN erforderlich:\nGib deinen geheimen Master-PIN ein:");
-            if (input === pin) {
+            if (input === pin || (tempPin && input === tempPin)) {
+                // Wenn temporärer PIN genutzt wurde, wieder löschen nach erfolgreichem Login
+                if (tempPin && input === tempPin) {
+                    localStorage.removeItem('jackTempPin');
+                    alert("ℹ️ Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN nach dem Login zu ändern.");
+                }
                 return true;
             } else {
                 alert("❌ Falscher PIN! Zugriff verweigert.");
@@ -520,22 +530,34 @@
         }
 
         function changeAdminPin() {
-            let currentPin = localStorage.getItem('jackAdminPin');
-            let input = prompt("🔑 Aktuellen Master-PIN eingeben:");
-            if (input === currentPin) {
-                let newPin = prompt("🔒 Gib deinen neuen geheimen Master-PIN ein:");
-                if (newPin && newPin.trim() !== '') {
-                    localStorage.setItem('jackAdminPin', newPin.trim());
-                    alert("✅ Master-PIN erfolgreich geändert!");
-                } else {
-                    alert("Abgebrochen. Neuer PIN war leer.");
-                }
+            if (!getVerifiedPin()) return;
+            let newPin = prompt("🔒 Gib deinen neuen geheimen Master-PIN ein:");
+            if (newPin && newPin.trim() !== '') {
+                localStorage.setItem('jackAdminPin', newPin.trim());
+                alert("✅ Master-PIN erfolgreich geändert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.");
             } else {
-                alert("❌ Falscher aktueller PIN!");
+                alert("Abgebrochen. Neuer PIN war leer.");
             }
         }
 
-        // --- 3. Mini-Game State & Cloud Sync ---
+        // PIN vergessen / Wiederherstellung via E-Mail
+        function forgotPin() {
+            let savedEmail = localStorage.getItem('jackAdminEmail');
+            let inputEmail = prompt("📧 Wiederherstellung via E-Mail:\nGib deine hinterlassene E-Mail-Adresse ein:");
+
+            if (!inputEmail || inputEmail.trim().toLowerCase() !== (savedEmail ? savedEmail.toLowerCase() : '')) {
+                alert("❌ Diese E-Mail-Adresse ist im System nicht hinterlegt!");
+                return;
+            }
+
+            // Temporären PIN generieren (z.B. TMP-XXXX)
+            let tempPin = 'TMP-' + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('jackTempPin', tempPin);
+
+            alert("📨 Ein temporärer PIN wurde an '" + inputEmail + "' gesendet!\n\nDein temporärer PIN lautet: " + tempPin + "\n\n(Du kannst dich jetzt mit diesem PIN einloggen).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN nach dem Login zu ändern.");
+        }
+
+        // Mini-Game State & Cloud Sync
         let gameData = {
             beats: 0,
             fans: 0,
@@ -579,8 +601,7 @@
 
         function promptLoadCloudId() {
             if (!getVerifiedPin()) return;
-
-            let enteredId = prompt("Gib deine Cloud-ID ein, um den Spielstand zu laden:", gameData.cloudId);
+            let enteredId = prompt("Gib deine Cloud-ID ein:", gameData.cloudId);
             if (enteredId && enteredId.trim() !== '') {
                 enteredId = enteredId.trim().toUpperCase();
                 let saved = localStorage.getItem('jackBeatLab_' + enteredId);
@@ -589,16 +610,14 @@
                     loadGame();
                     alert("✅ Spielstand erfolgreich geladen!");
                 } else {
-                    alert("❌ Kein Spielstand unter dieser Cloud-ID gefunden.");
+                    alert("❌ Kein Spielstand gefunden.");
                 }
             }
         }
 
         function confirmResetGame() {
             if (!getVerifiedPin()) return;
-
-            let confirmMsg = "⚠️ SICHERHEITSABFRAGE:\n\nMöchtest du dein 'Beat-Lab' wirklich komplett zurücksetzen?\nAlle Beats und Upgrades gehen dabei verloren!";
-            if (confirm(confirmMsg)) {
+            if (confirm("⚠️ Möchtest du dein 'Beat-Lab' wirklich komplett zurücksetzen?")) {
                 localStorage.removeItem('jackBeatLab_' + gameData.cloudId);
                 gameData.beats = 0;
                 gameData.fans = 0;
@@ -670,55 +689,32 @@
             }
         }, 100);
 
-        setInterval(function() {
-            saveGame();
-        }, 5000);
+        setInterval(function() { saveGame(); }, 5000);
+        window.addEventListener('load', function() { loadGame(); });
 
-        window.addEventListener('load', function() {
-            loadGame();
-        });
-
-
-        // --- 4. Audio Persistence & Security Script ---
+        // Audio Persistence & Security Script
         const audio = document.getElementById('radioStream');
-
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
-                title: 'Live Webradio Stream',
-                artist: 'jackdarckart',
-                album: 'stream-musik.space 24/7',
-                artwork: [
-                    { src: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=512&h=512&fit=crop', sizes: '512x512', type: 'image/jpeg' }
-                ]
+                title: 'Live Webradio Stream', artist: 'jackdarckart', album: 'stream-musik.space 24/7',
+                artwork: [{ src: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=512&h=512&fit=crop', sizes: '512x512', type: 'image/jpeg' }]
             });
             navigator.mediaSession.setActionHandler('play', function() { audio.play(); });
             navigator.mediaSession.setActionHandler('pause', function() { audio.pause(); });
         }
-
-        audio.addEventListener('play', function() {
-            localStorage.setItem('streamPlaying', 'true');
-        });
-
-        audio.addEventListener('pause', function() {
-            localStorage.setItem('streamPlaying', 'false');
-        });
-
+        audio.addEventListener('play', function() { localStorage.setItem('streamPlaying', 'true'); });
+        audio.addEventListener('pause', function() { localStorage.setItem('streamPlaying', 'false'); });
         window.addEventListener('load', function() {
             if (localStorage.getItem('streamPlaying') === 'true') {
-                audio.play().catch(function(error) {
-                    console.log("Browser blockiert automatisches Abspielen:", error);
-                });
+                audio.play().catch(function(err) { console.log("Autoplay blockiert:", err); });
             }
         });
 
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12') { e.preventDefault(); return false; }
-            if (e.ctrlKey && e.key.toLowerCase() === 'u') { e.preventDefault(); return false; }
-            if (e.ctrlKey && e.key.toLowerCase() === 's') { e.preventDefault(); return false; }
-            if (e.ctrlKey && e.key.toLowerCase() === 'p') { e.preventDefault(); return false; }
-            if (e.ctrlKey && (e.key.toLowerCase() === 'c' || e.key.toLowerCase() === 'x' || e.key.toLowerCase() === 'a')) { e.preventDefault(); return false; }
-            if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j' || e.key.toLowerCase() === 'c')) { e.preventDefault(); return false; }
+            if (e.key === 'F12' || (e.ctrlKey && ['u','s','p','c','x','a'].includes(e.key.toLowerCase())) || (e.ctrlKey && e.shiftKey)) {
+                e.preventDefault(); return false;
+            }
         });
         document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
     </script>
