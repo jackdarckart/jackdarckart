@@ -273,55 +273,42 @@
 
         </div>
 
-        <!-- 3. BIO-GARDEN SEITE (Riesiges, hochdetailliertes, animiertes Klang-Biotop) -->
+        <!-- 3. BIO-GARDEN SEITE (Eingeschränkt auf angemeldete Benutzer) -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
-            <div class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
+            
+            <!-- Garten Auth Container (falls nicht eingeloggt) -->
+            <div id="garten-auth-container" class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4 max-w-md mx-auto text-left">
+                <div class="text-center">
+                    <span class="text-3xl mb-2 block">🔒</span>
+                    <h2 class="text-xl font-bold text-emerald-400">Bio-Garden Access Gateway</h2>
+                    <p class="text-xs text-gray-400 mt-1">Bitte melde dich im Studio-Lab an, um das exklusive Klang-Biotop zu betreten.</p>
+                </div>
+                <button type="button" id="garten-to-game-login-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔑 Zum Studio-Login</button>
+            </div>
+
+            <!-- Garten Main Container (nur für eingeloggte User) -->
+            <div id="garten-main-container" class="hidden bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
                     <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden & Klang-Biotop</h2>
-                    <p class="text-gray-300 text-xs">Generatives Klang-Biotop. Die Töne erklingen vollkommen zufällig und organisch; Upgrades erhöhen dezent die Spiel-Häufigkeit im Hintergrund.</p>
+                    <p class="text-gray-300 text-xs">Generatives Klang-Biotop. Töne erklingen vollkommen zufällig, entspannt und wachsen extrem langsam und behutsam mit deinen Upgrades.</p>
                 </div>
 
-                <!-- Großes, detailliertes grafisches Garten-Canvas -->
+                <!-- Großes, detailliertes grafisches Garten-Canvas (Ohne Overlay-Text) -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-2xl bg-[#06101e]">
                     <canvas id="garden-canvas" width="600" height="380" class="w-full h-auto cursor-pointer block"></canvas>
-                    <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs text-emerald-300 border border-emerald-500/30 pointer-events-none flex items-center gap-2">
-                        <span>✨</span> Klicke in den Garten, um Töne auszulösen &amp; Wellen zu erzeugen
-                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                    <!-- Pflanze 1 -->
-                    <button type="button" id="plant-1-btn" class="bg-[#0b0f19]/80 hover:bg-[#0b0f19] border border-emerald-500/40 p-3.5 rounded-2xl transition flex items-center justify-between text-left group cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl p-2 bg-emerald-600/20 rounded-xl border border-emerald-500/30">🌿</span>
-                            <div>
-                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Harmonie-Farn</h3>
-                                <p class="text-[10px] text-gray-400">C-Ton • +2 Beats</p>
-                            </div>
-                        </div>
+                <!-- Wiederhergestellte, kleine & unauffällige Pflanzen-Buttons -->
+                <div class="flex justify-center items-center gap-2 pt-1 flex-wrap">
+                    <button type="button" id="plant-1-btn" class="bg-[#0b0f19] hover:bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] transition cursor-pointer shadow">
+                        🌿 Farn (+2)
                     </button>
-
-                    <!-- Pflanze 2 -->
-                    <button type="button" id="plant-2-btn" class="bg-[#0b0f19]/80 hover:bg-[#0b0f19] border border-emerald-500/40 p-3.5 rounded-2xl transition flex items-center justify-between text-left group cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl p-2 bg-emerald-600/20 rounded-xl border border-emerald-500/30">🌸</span>
-                            <div>
-                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Melodie-Blüte</h3>
-                                <p class="text-[10px] text-gray-400">E-Ton • +5 Beats</p>
-                            </div>
-                        </div>
+                    <button type="button" id="plant-2-btn" class="bg-[#0b0f19] hover:bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] transition cursor-pointer shadow">
+                        🌸 Blüte (+5)
                     </button>
-
-                    <!-- Pflanze 3 -->
-                    <button type="button" id="plant-3-btn" class="bg-[#0b0f19]/80 hover:bg-[#0b0f19] border border-emerald-500/40 p-3.5 rounded-2xl transition flex items-center justify-between text-left group cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl p-2 bg-emerald-600/20 rounded-xl border border-emerald-500/30">🌳</span>
-                            <div>
-                                <h3 class="font-bold text-xs text-emerald-300 group-hover:text-emerald-200">Bass-Wurzel</h3>
-                                <p class="text-[10px] text-gray-400">G-Ton • +10 Beats</p>
-                            </div>
-                        </div>
+                    <button type="button" id="plant-3-btn" class="bg-[#0b0f19] hover:bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] transition cursor-pointer shadow">
+                        🌳 Wurzel (+10)
                     </button>
                 </div>
 
@@ -452,15 +439,25 @@
                 const mainContainer = document.getElementById('game-main-container');
                 const loggedEmailDisplay = document.getElementById('logged-user-email');
 
+                const gartenAuthContainer = document.getElementById('garten-auth-container');
+                const gartenMainContainer = document.getElementById('garten-main-container');
+
                 if (loggedInUser) {
                     loadUserData();
                     if(authContainer) authContainer.classList.add('hidden');
                     if(mainContainer) mainContainer.classList.remove('hidden');
                     if(loggedEmailDisplay) loggedEmailDisplay.innerText = "👤 " + loggedInUser;
+
+                    if(gartenAuthContainer) gartenAuthContainer.classList.add('hidden');
+                    if(gartenMainContainer) gartenMainContainer.classList.remove('hidden');
+
                     updateDisplay();
                 } else {
                     if(authContainer) authContainer.classList.remove('hidden');
                     if(mainContainer) mainContainer.classList.add('hidden');
+
+                    if(gartenAuthContainer) gartenAuthContainer.classList.remove('hidden');
+                    if(gartenMainContainer) gartenMainContainer.classList.add('hidden');
                 }
             }
 
@@ -598,10 +595,9 @@
                     }
 
                     const now = globalAudioCtx.currentTime;
-                    // Völlig zufällige Noten- und Oktavwahl für pure Kreativität
                     let freq = customFreq !== null ? customFreq : studioScale[Math.floor(Math.random() * studioScale.length)];
                     if (customFreq === null && Math.random() > 0.7) {
-                        freq *= (Math.random() > 0.5 ? 2 : 0.5); // Gelegentlicher Oktavsprung
+                        freq *= (Math.random() > 0.5 ? 2 : 0.5);
                     }
 
                     let osc1 = globalAudioCtx.createOscillator();
@@ -655,7 +651,7 @@
                 let target = document.getElementById('view-' + view);
                 if (target) target.classList.remove('hidden');
 
-                if (view === 'game') updateGameViewState();
+                if (view === 'game' || view === 'garten') updateGameViewState();
                 if (view === 'account') {
                     let rUser = document.getElementById('reg-username');
                     if(rUser) rUser.value = username;
@@ -788,7 +784,11 @@
             if(canvas) {
                 requestAnimationFrame(drawGarden);
                 canvas.addEventListener('click', (e) => {
-                    harvestPlant(5, 329.63);
+                    playSingleTone(329.63);
+                    triggerGardenRipple();
+                    beats += 5;
+                    updateDisplay();
+                    saveGame();
                 });
             }
 
@@ -921,11 +921,12 @@
             bindClick('unstake-btn', unstakeBeats);
             bindClick('game-to-home-btn', () => switchView('home'));
             bindClick('garten-to-home-btn', () => switchView('home'));
+            bindClick('garten-to-game-login-btn', () => switchView('game'));
             bindClick('cloud-to-home-btn', () => switchView('home'));
             bindClick('account-to-home-btn', () => switchView('home'));
             bindClick('admin-to-home-btn', () => switchView('home'));
 
-            // Bio-Garden Bindings
+            // Bio-Garden Pflanzen-Button Bindings
             bindClick('plant-1-btn', () => harvestPlant(2, 261.63));
             bindClick('plant-2-btn', () => harvestPlant(5, 329.63));
             bindClick('plant-3-btn', () => harvestPlant(10, 196.00));
@@ -957,16 +958,15 @@
                 });
             }
 
-            // AUTO-PRODUKTION & GENERATIVE STOCHASTISCHE AMBIENT-LOGIK
+            // AUTO-PRODUKTION & SANFTE LOGARITHMISCHE STOCHASTISCHE AMBIENT-LOGIK
             setInterval(() => {
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
                         
-                        // Stochastische Wahrscheinlichkeit pro 100ms: Sehr langsam & zufällig, skaliert sanft mit Upgrades
                         let totalUpgrades = rigs + albums + aiAgents;
-                        let triggerChance = 0.008 + (totalUpgrades * 0.002); // Basis ca. 0.8% Chance pro Tick
-                        triggerChance = Math.min(triggerChance, 0.06); // Obergrenze gegen Spam
+                        let triggerChance = 0.004 + (Math.log(1 + totalUpgrades) * 0.0012); 
+                        triggerChance = Math.min(triggerChance, 0.025);
 
                         if (Math.random() < triggerChance) {
                             playSingleTone();
