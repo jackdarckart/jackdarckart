@@ -50,7 +50,7 @@
                 <a href="#platforms" onclick="switchView('home')" class="hover:text-accent transition">Plattformen</a>
                 <button onclick="switchView('game')" class="bg-indigo-600/20 border border-indigo-500/50 hover:bg-indigo-600 text-indigo-300 hover:text-white px-4 py-2 rounded-xl transition flex items-center space-x-2">
                     <i class="fa-solid fa-gamepad"></i>
-                    <span>🎮 Beat-Lab</span>
+                    <span>🎮 Beat-Lab & Garten</span>
                 </button>
             </nav>
             <div>
@@ -79,7 +79,7 @@
                     <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
                 </h1>
                 <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
-                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame!
+                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit digitalem Garten!
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
@@ -333,15 +333,15 @@
         </section>
     </div>
 
-    <!-- MINI GAME VIEW ("🎮 Beat-Lab") -->
+    <!-- MINI GAME VIEW ("🎮 Beat-Lab & Digitaler Garten") -->
     <div id="gameView" class="hidden py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (Knackiger, sauberer Sound für schnelles Spielen)</span>
+                <span>Beat-Lab & Digitaler Studio-Garten (Härteres Gameplay)</span>
             </div>
-            <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße kristallklare, präzise Studio-Klänge!</p>
+            <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab & Garden 🎧🌿</h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, füttere deine Pflanzen mit Sound und lass den digitalen Garten gedeihen!</p>
         </div>
 
         <!-- AUTH SCREEN -->
@@ -401,7 +401,7 @@
             <!-- Main Clicker Area & Upgrades -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
-                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & saubere Töne:</p>
+                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & Klangenergie:</p>
                     <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
                         <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
                         <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
@@ -409,11 +409,11 @@
                     <span id="clickPowerText" class="text-xs text-gray-400 mt-6">+1 Beat pro Klick</span>
                 </div>
 
-                <!-- Upgrades Shop -->
+                <!-- Upgrades Shop (Harder Scaling 1.22) -->
                 <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 shadow-2xl space-y-4">
                     <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
                         <i class="fa-solid fa-store text-indigo-400"></i>
-                        <span>Studio Equipment Upgrades</span>
+                        <span>Studio Equipment Upgrades (Erweitert)</span>
                     </h3>
 
                     <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
@@ -423,7 +423,7 @@
                             <span class="text-xs text-indigo-300 font-semibold">Besitz: <span id="countMic">0</span></span>
                         </div>
                         <button onclick="buyUpgrade('mic')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
-                            <span id="costMic">15</span> Beats
+                            <span id="costMic">20</span> Beats
                         </button>
                     </div>
 
@@ -434,7 +434,7 @@
                             <span class="text-xs text-purple-300 font-semibold">Besitz: <span id="countSynth">0</span></span>
                         </div>
                         <button onclick="buyUpgrade('synth')" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
-                            <span id="costSynth">100</span> Beats
+                            <span id="costSynth">150</span> Beats
                         </button>
                     </div>
 
@@ -445,7 +445,7 @@
                             <span class="text-xs text-pink-300 font-semibold">Besitz: <span id="countDesk">0</span></span>
                         </div>
                         <button onclick="buyUpgrade('desk')" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
-                            <span id="costDesk">500</span> Beats
+                            <span id="costDesk">800</span> Beats
                         </button>
                     </div>
 
@@ -456,7 +456,79 @@
                             <span class="text-xs text-emerald-300 font-semibold">Besitz: <span id="countLabel">0</span></span>
                         </div>
                         <button onclick="buyUpgrade('label')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
-                            <span id="costLabel">2500</span> Beats
+                            <span id="costLabel">4000</span> Beats
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIGITALER STUDIO-GARTEN SECTION -->
+            <div class="bg-cardbg border border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/30">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">Digitaler Studio-Garten 🌿</h3>
+                            <p class="text-xs text-gray-400">Pflanzen genießen deine Beats & Klänge und bringen dir passive Multiplikatoren!</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800 px-3 py-1.5 rounded-full">Garten-Energie aktiv</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Plant 1 -->
+                    <div class="bg-darkbg border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-sm text-emerald-300"><i class="fa-solid fa-spa mr-1.5"></i> Melodie-Blume</span>
+                                <span id="plant1Level" class="text-xs font-bold bg-gray-800 px-2 py-0.5 rounded text-gray-300">Stufe 1</span>
+                            </div>
+                            <p id="plant1Desc" class="text-xs text-gray-400 mb-3">Genießt Klicks und bringt extra Fans.</p>
+                            <div class="w-full bg-gray-800 rounded-full h-2 mb-1">
+                                <div id="plant1Bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <span id="plant1Exp" class="text-[10px] text-gray-500">Fortschritt: 0 / 50</span>
+                        </div>
+                        <button onclick="feedPlant(0)" class="w-full bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-300 text-xs py-2 rounded-xl font-semibold transition">
+                            Düngen (Kostet <span id="plant1Cost">50</span> Beats)
+                        </button>
+                    </div>
+
+                    <!-- Plant 2 -->
+                    <div class="bg-darkbg border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-sm text-purple-300"><i class="fa-solid fa-tree mr-1.5"></i> Synth-Bäumchen</span>
+                                <span id="plant2Level" class="text-xs font-bold bg-gray-800 px-2 py-0.5 rounded text-gray-300">Stufe 1</span>
+                            </div>
+                            <p id="plant2Desc" class="text-xs text-gray-400 mb-3">Wächst durch BPS und boostet Beats.</p>
+                            <div class="w-full bg-gray-800 rounded-full h-2 mb-1">
+                                <div id="plant2Bar" class="bg-purple-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <span id="plant2Exp" class="text-[10px] text-gray-500">Fortschritt: 0 / 200</span>
+                        </div>
+                        <button onclick="feedPlant(1)" class="w-full bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/40 text-purple-300 text-xs py-2 rounded-xl font-semibold transition">
+                            Düngen (Kostet <span id="plant2Cost">200</span> Beats)
+                        </button>
+                    </div>
+
+                    <!-- Plant 3 -->
+                    <div class="bg-darkbg border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-sm text-pink-300"><i class="fa-solid fa-seedling mr-1.5"></i> Bass-Kaktus</span>
+                                <span id="plant3Level" class="text-xs font-bold bg-gray-800 px-2 py-0.5 rounded text-gray-300">Stufe 1</span>
+                            </div>
+                            <p id="plant3Desc" class="text-xs text-gray-400 mb-3">Erzeugt automatische Spezial-Beats.</p>
+                            <div class="w-full bg-gray-800 rounded-full h-2 mb-1">
+                                <div id="plant3Bar" class="bg-pink-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <span id="plant3Exp" class="text-[10px] text-gray-500">Fortschritt: 0 / 1000</span>
+                        </div>
+                        <button onclick="feedPlant(2)" class="w-full bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/40 text-pink-300 text-xs py-2 rounded-xl font-semibold transition">
+                            Düngen (Kostet <span id="plant3Cost">1000</span> Beats)
                         </button>
                     </div>
                 </div>
@@ -488,7 +560,7 @@
                     </label>
                     <button onclick="confirmResetGame()" class="w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-trash-can"></i>
-                        <span>Beat-Lab zurücksetzen</span>
+                        <span>Beat-Lab & Garten zurücksetzen</span>
                     </button>
                 </div>
             </div>
@@ -667,7 +739,7 @@
             }
         }
 
-        // --- OPTIMIERTES AUDIO-SYSTEM (TROCKEN, SAUBER & SCHNELL) ---
+        // --- HOCHWERTIGES, SAUBERES AUDIO-SYSTEM (OHNE HALL) ---
         let audioCtx = null;
         let ambientTimer = 0;
 
@@ -697,17 +769,14 @@
                 if (!audioCtx) return;
 
                 const now = audioCtx.currentTime;
-                // Harmonie-Noten (C-Dur Pentatonik)
                 const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66];
                 const freq = notes[Math.floor(Math.random() * notes.length)];
 
-                // Kurzer, knackiger Gain ohne Hall/Echo, perfekt für schnelle Klicks
                 const gainNode = audioCtx.createGain();
                 gainNode.gain.setValueAtTime(0.0001, now);
-                gainNode.gain.linearRampToValueAtTime(0.12, now + 0.01);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.22); // Sehr kurzer Ausklang
+                gainNode.gain.linearRampToValueAtTime(0.1, now + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.2); // Knackig & kurz
 
-                // Sauberer Filter gegen Störgeräusche
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
                 filter.frequency.setValueAtTime(4500, now);
@@ -715,15 +784,13 @@
                 gainNode.connect(filter);
                 filter.connect(audioCtx.destination);
 
-                // Dreiecks-Welle für vollen, sauberen Instrumenten-Ton
                 const osc = audioCtx.createOscillator();
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(freq, now);
-
                 osc.connect(gainNode);
 
                 osc.start(now);
-                osc.stop(now + 0.22);
+                osc.stop(now + 0.2);
             } catch(e) {
                 console.error("Audio Playback Error:", e);
             }
@@ -755,20 +822,50 @@
             }
         }
 
-        // --- SPIELSTAND & SICHERUNG ---
-        let gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, cloudId: '' };
+        // --- SPIELSTAND & GARTEN DATENSTRUKTUR ---
+        let gameData = { 
+            beats: 0, 
+            fans: 0, 
+            clickPower: 1, 
+            mic: 0, 
+            synth: 0, 
+            desk: 0, 
+            label: 0, 
+            cloudId: '',
+            garden: [
+                { level: 1, exp: 0, maxExp: 50 },
+                { level: 1, exp: 0, maxExp: 250 },
+                { level: 1, exp: 0, maxExp: 1200 }
+            ]
+        };
 
         function loadGameForUser(email) {
             let safeKey = 'jackBeatLabUserSave_' + email.replace(/[^a-z0-9]/g, '_');
             let saved = localStorage.getItem(safeKey);
 
             if (!saved) {
-                gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, cloudId: 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase() };
+                gameData = { 
+                    beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, 
+                    cloudId: 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    garden: [
+                        { level: 1, exp: 0, maxExp: 50 },
+                        { level: 1, exp: 0, maxExp: 250 },
+                        { level: 1, exp: 0, maxExp: 1200 }
+                    ]
+                };
             } else {
                 try {
-                    gameData = JSON.parse(saved);
+                    let parsed = JSON.parse(saved);
+                    gameData = { ...gameData, ...parsed };
                     if (!gameData.cloudId) {
                         gameData.cloudId = 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    }
+                    if (!gameData.garden) {
+                        gameData.garden = [
+                            { level: 1, exp: 0, maxExp: 50 },
+                            { level: 1, exp: 0, maxExp: 250 },
+                            { level: 1, exp: 0, maxExp: 1200 }
+                        ];
                     }
                 } catch(e) { console.error("Ladefehler", e); }
             }
@@ -820,8 +917,8 @@
         }
 
         function confirmResetGame() {
-            let resetBtnHtml = `<button onclick="executeReset()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🗑️ Ja, Beat-Lab wirklich zurücksetzen</button>`;
-            showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du dein "Beat-Lab" wirklich komplett zurücksetzen? (Dein Account bleibt erhalten)', resetBtnHtml);
+            let resetBtnHtml = `<button onclick="executeReset()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🗑️ Ja, Beat-Lab & Garten wirklich zurücksetzen</button>`;
+            showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du das "Beat-Lab" und den Garten wirklich komplett zurücksetzen? (Dein Account bleibt erhalten)', resetBtnHtml);
         }
 
         function executeReset() {
@@ -832,25 +929,63 @@
             gameData.synth = 0; 
             gameData.desk = 0; 
             gameData.label = 0;
+            gameData.garden = [
+                { level: 1, exp: 0, maxExp: 50 },
+                { level: 1, exp: 0, maxExp: 250 },
+                { level: 1, exp: 0, maxExp: 1200 }
+            ];
             saveGame();
             updateGameUI();
-            showInfoModal('✅ Zurückgesetzt', 'Das Beat-Lab wurde erfolgreich zurückgesetzt. Du bist weiterhin angemeldet.');
+            showInfoModal('✅ Zurückgesetzt', 'Das Beat-Lab & der Garten wurden erfolgreich zurückgesetzt. Du bist weiterhin angemeldet.');
         }
 
         function clickBeat() {
+            // Melodie-Blume Buff (Plant index 0) gives bonus fans per click
+            let bonusFans = 1 + Math.floor((gameData.garden[0].level - 1) * 0.5);
             gameData.beats += gameData.clickPower;
-            gameData.fans += Math.floor(Math.random() * 2);
+            gameData.fans += Math.floor(Math.random() * bonusFans);
+            
+            // Gain garden exp passively via action
+            gameData.garden[0].exp += 1;
+            checkGardenLevel(0);
+
             playCleanCrispSound(); 
             updateGameUI();
             saveGame();
         }
 
+        function feedPlant(index) {
+            let costs = [50 * gameData.garden[0].level, 200 * gameData.garden[1].level, 1000 * gameData.garden[2].level];
+            let cost = costs[index];
+
+            if (gameData.beats >= cost) {
+                gameData.beats -= cost;
+                gameData.garden[index].exp += Math.floor(gameData.garden[index].maxExp * 0.4);
+                checkGardenLevel(index);
+                playCleanCrispSound();
+                updateGameUI();
+                saveGame();
+            } else {
+                showInfoModal('⚠️ Nicht genug Beats', 'Du benötigst mehr produzierte Beats, um diese Pflanze zu düngen!');
+            }
+        }
+
+        function checkGardenLevel(index) {
+            if (gameData.garden[index].exp >= gameData.garden[index].maxExp) {
+                gameData.garden[index].exp -= gameData.garden[index].maxExp;
+                gameData.garden[index].level++;
+                gameData.garden[index].maxExp = Math.floor(gameData.garden[index].maxExp * 1.5);
+                showInfoModal('🌿 Pflanzen-Wachstum!', 'Deine Pflanze ist auf Stufe ' + gameData.garden[index].level + ' aufgestiegen und entfaltet stärkere Boni!');
+            }
+        }
+
         function buyUpgrade(type) {
             let cost = 0;
-            if (type === 'mic') cost = Math.floor(15 * Math.pow(1.15, gameData.mic));
-            if (type === 'synth') cost = Math.floor(100 * Math.pow(1.15, gameData.synth));
-            if (type === 'desk') cost = Math.floor(500 * Math.pow(1.15, gameData.desk));
-            if (type === 'label') cost = Math.floor(2500 * Math.pow(1.15, gameData.label));
+            // Schwereres Balancing: Faktor 1.22
+            if (type === 'mic') cost = Math.floor(20 * Math.pow(1.22, gameData.mic));
+            if (type === 'synth') cost = Math.floor(150 * Math.pow(1.22, gameData.synth));
+            if (type === 'desk') cost = Math.floor(800 * Math.pow(1.22, gameData.desk));
+            if (type === 'label') cost = Math.floor(4000 * Math.pow(1.22, gameData.label));
 
             if (gameData.beats >= cost) {
                 gameData.beats -= cost;
@@ -865,7 +1000,10 @@
         }
 
         function getBps() {
-            return (gameData.mic * 1) + (gameData.synth * 5) + (gameData.desk * 25) + (gameData.label * 100);
+            let baseBps = (gameData.mic * 1) + (gameData.synth * 5) + (gameData.desk * 25) + (gameData.label * 100);
+            // Synth-Bäumchen (Plant index 1) gives a multiplier boost to BPS (+5% per level)
+            let synthMultiplier = 1 + ((gameData.garden[1].level - 1) * 0.08);
+            return baseBps * synthMultiplier;
         }
 
         function updateGameUI() {
@@ -875,29 +1013,43 @@
             if (bElem) bElem.innerText = Math.floor(gameData.beats).toLocaleString();
             if (fElem) fElem.innerText = Math.floor(gameData.fans).toLocaleString();
             let bps = getBps();
-            if (pElem) pElem.innerText = bps.toLocaleString();
+            if (pElem) pElem.innerText = bps.toFixed(1);
 
+            // Upgrades (Faktor 1.22 Skalierung)
             const cMic = document.getElementById('countMic');
             const coMic = document.getElementById('costMic');
             if (cMic) cMic.innerText = gameData.mic;
-            if (coMic) coMic.innerText = Math.floor(15 * Math.pow(1.15, gameData.mic)).toLocaleString();
+            if (coMic) coMic.innerText = Math.floor(20 * Math.pow(1.22, gameData.mic)).toLocaleString();
 
             const cSynth = document.getElementById('countSynth');
             const coSynth = document.getElementById('costSynth');
             if (cSynth) cSynth.innerText = gameData.synth;
-            if (coSynth) coSynth.innerText = Math.floor(100 * Math.pow(1.15, gameData.synth)).toLocaleString();
+            if (coSynth) coSynth.innerText = Math.floor(150 * Math.pow(1.22, gameData.synth)).toLocaleString();
 
             const cDesk = document.getElementById('countDesk');
             const coDesk = document.getElementById('costDesk');
             if (cDesk) cDesk.innerText = gameData.desk;
-            if (coDesk) coDesk.innerText = Math.floor(500 * Math.pow(1.15, gameData.desk)).toLocaleString();
+            if (coDesk) coDesk.innerText = Math.floor(800 * Math.pow(1.22, gameData.desk)).toLocaleString();
 
             const cLabel = document.getElementById('countLabel');
             const coLabel = document.getElementById('costLabel');
             if (cLabel) cLabel.innerText = gameData.label;
-            if (coLabel) coLabel.innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
+            if (coLabel) coLabel.innerText = Math.floor(4000 * Math.pow(1.22, gameData.label)).toLocaleString();
+
+            // Garden UI Updates
+            for (let i = 0; i < 3; i++) {
+                let p = gameData.garden[i];
+                document.getElementById(`plant${i+1}Level`).innerText = 'Stufe ' + p.level;
+                let pct = Math.min(100, Math.floor((p.exp / p.maxExp) * 100));
+                document.getElementById(`plant${i+1}Bar`).style.width = pct + '%';
+                document.getElementById(`plant${i+1}Exp`).innerText = `Fortschritt: ${Math.floor(p.exp)} / ${p.maxExp}`;
+                
+                let costs = [50 * p.level, 200 * p.level, 1000 * p.level];
+                document.getElementById(`plant${i+1}Cost`).innerText = costs[i].toLocaleString();
+            }
         }
 
+        // Haupt-Takt (10 Updates pro Sekunde)
         setInterval(function() {
             let email = localStorage.getItem('jackLoggedInEmail');
             if (!email) return;
@@ -905,12 +1057,23 @@
             if (bps > 0) {
                 gameData.beats += bps / 10;
                 gameData.fans += (bps / 50);
+                
+                // Pflanzen wachsen passiv mit
+                gameData.garden[1].exp += bps / 40;
+                checkGardenLevel(1);
+                
+                // Bass-Kaktus (Plant 2) erzeugt ab und zu Spezial-Beats
+                if (gameData.garden[2].level > 1) {
+                    gameData.beats += (gameData.garden[2].level * 0.05);
+                }
+                gameData.garden[2].exp += bps / 60;
+                checkGardenLevel(2);
+
                 updateGameUI();
 
                 const isGameActive = !document.getElementById('gameView').classList.contains('hidden') && !document.getElementById('gameMainContent').classList.contains('hidden');
                 if (isGameActive) {
                     ambientTimer++;
-                    // Bei hoher BPS begrenzen wir die Töne, damit es nicht übersteuert
                     let triggerThreshold = Math.max(15, 60 - Math.floor(bps / 10));
                     if (ambientTimer >= triggerThreshold) {
                         ambientTimer = 0;
