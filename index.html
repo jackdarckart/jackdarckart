@@ -225,7 +225,7 @@
                         <button type="button" id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN aktualisieren</button>
                     </div>
 
-                    <!-- GEFAHRENZONE: SPIELSTAND ZURÜCKSETZEN (Nur hier im Admin-Bereich) -->
+                    <!-- GEFAHRENZONE: SPIELSTAND ZURÜCKSETZEN -->
                     <div class="border-t border-red-900/50 pt-3 space-y-2">
                         <h4 class="font-bold text-xs text-red-400">⚠️ Gefahrenzone</h4>
                         <button type="button" id="admin-reset-game-btn" class="w-full bg-red-900/60 hover:bg-red-900 text-red-200 font-semibold py-2 rounded-xl text-xs transition shadow border border-red-700/50">Gesamten Spielstand zurücksetzen</button>
@@ -289,7 +289,7 @@
 
     </main>
 
-    <!-- Footer (Ohne Reset-Button, absolut sauber & sicher) -->
+    <!-- Footer -->
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Automatisch gespeichert</span>
@@ -297,7 +297,7 @@
         </div>
     </footer>
 
-    <!-- JavaScript Logik -->
+    <!-- Robuste JavaScript Logik mit Fallbacks -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 40430;
@@ -328,13 +328,13 @@
                 }
             }
 
-            // Tabs Umschalten
+            // Tabs Umschalten (Login / Registrieren)
             const tabLoginBtn = document.getElementById('tab-login-btn');
             const tabRegisterBtn = document.getElementById('tab-register-btn');
             const formLogin = document.getElementById('form-login');
             const formRegister = document.getElementById('form-register');
 
-            if(tabLoginBtn && tabRegisterBtn) {
+            if(tabLoginBtn && tabRegisterBtn && formLogin && formRegister) {
                 tabLoginBtn.addEventListener('click', () => {
                     tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition";
                     tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition";
@@ -350,7 +350,7 @@
                 });
             }
 
-            // Registrierung (Mit Einzigartigkeitsprüfung)
+            // Registrierung mit Einzigartigkeitsprüfung & Schutz vor Fehlern
             const submitRegisterBtn = document.getElementById('submit-register-btn');
             if(submitRegisterBtn) {
                 submitRegisterBtn.addEventListener('click', () => {
@@ -366,7 +366,12 @@
                         return;
                     }
 
-                    let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    let usersDB = {};
+                    try {
+                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    } catch(e) {
+                        usersDB = {};
+                    }
 
                     if (usersDB[emailInput]) {
                         alert("⚠️ Diese E-Mail-Adresse ist bereits registriert! Wähle eine andere oder logge dich ein.");
@@ -384,14 +389,19 @@
                 });
             }
 
-            // Login
+            // Login System
             const submitLoginBtn = document.getElementById('submit-login-btn');
             if(submitLoginBtn) {
                 submitLoginBtn.addEventListener('click', () => {
                     const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
                     const pinInput = document.getElementById('login-pin').value.trim();
 
-                    let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    let usersDB = {};
+                    try {
+                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    } catch(e) {
+                        usersDB = {};
+                    }
 
                     if (!usersDB[emailInput] || usersDB[emailInput].pin !== pinInput) {
                         alert("❌ Falsche E-Mail-Adresse oder falscher PIN!");
@@ -406,7 +416,7 @@
                 });
             }
 
-            // Logout
+            // Logout System
             const logoutBtn = document.getElementById('logout-btn');
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
@@ -417,7 +427,7 @@
                 });
             }
 
-            // Admin PIN ändern
+            // Admin: PIN ändern
             const adminChangePinBtn = document.getElementById('admin-change-pin-btn');
             if(adminChangePinBtn) {
                 adminChangePinBtn.addEventListener('click', () => {
@@ -427,7 +437,13 @@
                         return;
                     }
 
-                    let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    let usersDB = {};
+                    try {
+                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    } catch(e) {
+                        usersDB = {};
+                    }
+
                     if (loggedInUser && usersDB[loggedInUser]) {
                         usersDB[loggedInUser].pin = newPin;
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
@@ -572,7 +588,7 @@
                 }
             }
 
-            // Exklusiver Administrator-Reset (Nur im geschützten Admin-Bereich des Games auslösbar)
+            // Exklusiver Administrator-Reset (Nur im geschützten Admin-Bereich des Games)
             const adminResetGameBtn = document.getElementById('admin-reset-game-btn');
             if(adminResetGameBtn) {
                 adminResetGameBtn.addEventListener('click', () => {
@@ -590,23 +606,29 @@
                 });
             }
 
-            // Event Listener Bindungen
-            document.getElementById('nav-home').addEventListener('click', () => switchView('home'));
-            document.getElementById('nav-game').addEventListener('click', () => switchView('game'));
-            document.getElementById('nav-garten').addEventListener('click', () => switchView('garten'));
-            document.getElementById('nav-cloud').addEventListener('click', () => switchView('cloud'));
-            document.getElementById('nav-account').addEventListener('click', () => switchView('account'));
-            document.getElementById('nav-admin').addEventListener('click', () => switchView('admin'));
-            document.getElementById('sound-btn').addEventListener('click', toggleSound);
+            // Sicherer Event-Listener Helper
+            function bindClick(id, handler) {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', handler);
+            }
 
-            document.getElementById('home-to-game-btn').addEventListener('click', () => switchView('game'));
-            document.getElementById('auth-to-home-btn').addEventListener('click', () => switchView('home'));
-            document.getElementById('produce-beat-btn').addEventListener('click', produceBeat);
-            document.getElementById('game-to-home-btn').addEventListener('click', () => switchView('home'));
-            document.getElementById('garten-to-home-btn').addEventListener('click', () => switchView('home'));
-            document.getElementById('export-btn').addEventListener('click', exportSave);
-            document.getElementById('import-btn').addEventListener('click', importSave);
-            document.getElementById('cloud-to-home-btn').addEventListener('click', () => switchView('home'));
+            // Event Listener Bindungen
+            bindClick('nav-home', () => switchView('home'));
+            bindClick('nav-game', () => switchView('game'));
+            bindClick('nav-garten', () => switchView('garten'));
+            bindClick('nav-cloud', () => switchView('cloud'));
+            bindClick('nav-account', () => switchView('account'));
+            bindClick('nav-admin', () => switchView('admin'));
+            bindClick('sound-btn', toggleSound);
+
+            bindClick('home-to-game-btn', () => switchView('game'));
+            bindClick('auth-to-home-btn', () => switchView('home'));
+            bindClick('produce-beat-btn', produceBeat);
+            bindClick('game-to-home-btn', () => switchView('home'));
+            bindClick('garten-to-home-btn', () => switchView('home'));
+            bindClick('export-btn', exportSave);
+            bindClick('import-btn', importSave);
+            bindClick('cloud-to-home-btn', () => switchView('home'));
             
             const saveAccountBtn = document.getElementById('save-account-btn');
             if(saveAccountBtn) {
@@ -622,8 +644,8 @@
                 });
             }
 
-            document.getElementById('account-to-home-btn').addEventListener('click', () => switchView('home'));
-            document.getElementById('admin-to-home-btn').addEventListener('click', () => switchView('home'));
+            bindClick('account-to-home-btn', () => switchView('home'));
+            bindClick('admin-to-home-btn', () => switchView('home'));
 
             // Auto-production
             setInterval(() => {
