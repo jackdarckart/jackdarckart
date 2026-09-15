@@ -1,695 +1,188 @@
 <!DOCTYPE html>
-<html lang="de" class="dark">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | Offizielles Portfolio, Webradio & Beat-Lab</title>
+    <title>Jack's Beat-Lab</title>
+    <!-- Tailwind CSS für modernes Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkbg: '#0a0b10',
-                        cardbg: '#13151f',
-                        accent: '#6366f1',
-                        accentglow: '#818cf8',
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-        }
-    </style>
 </head>
-<body class="bg-darkbg text-gray-100 font-sans antialiased selection:bg-accent selection:text-white" oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" onclick="unlockAudioOnce()">
+<body class="bg-[#0b0f19] text-white min-h-screen font-sans selection:bg-purple-500 selection:text-white">
 
-    <!-- Globaler Persistenter Audio Player -->
-    <div class="hidden">
-        <audio id="radioStream" crossorigin="anonymous" preload="auto">
-            <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
-        </audio>
-    </div>
-
-    <!-- Header / Navigation -->
-    <header class="sticky top-0 z-50 backdrop-blur-md bg-darkbg/80 border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <i class="fa-solid fa-headphones-simple text-white text-lg"></i>
-                </div>
-                <span class="text-xl font-black tracking-wider bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">jackdarckart</span>
-            </div>
-            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-300">
-                <button onclick="switchView('home')" class="hover:text-accent transition">Startseite</button>
-                <a href="#about" onclick="switchView('home')" class="hover:text-accent transition">Über mich</a>
-                <a href="#radio" onclick="switchView('home')" class="hover:text-accent transition">Webradio</a>
-                <a href="#music" onclick="switchView('home')" class="hover:text-accent transition">Diskographie</a>
-                <button onclick="switchView('game')" class="bg-indigo-600/20 border border-indigo-500/50 hover:bg-indigo-600 text-indigo-300 hover:text-white px-4 py-2 rounded-xl transition flex items-center space-x-2">
-                    <i class="fa-solid fa-gamepad"></i>
-                    <span>🎮 Beat-Lab</span>
-                </button>
-                <button onclick="switchView('garden')" class="bg-emerald-600/20 border border-emerald-500/50 hover:bg-emerald-600 text-emerald-300 hover:text-white px-4 py-2 rounded-xl transition flex items-center space-x-2">
-                    <i class="fa-solid fa-seedling"></i>
-                    <span>🌿 HD-Garten</span>
-                </button>
-            </nav>
-            <div class="flex items-center space-x-2">
-                <button onclick="switchView('garden')" class="md:hidden bg-emerald-600 text-white px-3 py-2 rounded-xl font-semibold text-xs transition flex items-center space-x-1">
-                    <i class="fa-solid fa-seedling"></i>
-                    <span>Garten</span>
-                </button>
-                <button onclick="switchView('game')" class="md:hidden bg-indigo-600 text-white px-3 py-2 rounded-xl font-semibold text-xs transition flex items-center space-x-1">
-                    <i class="fa-solid fa-gamepad"></i>
-                    <span>Lab</span>
-                </button>
-            </div>
+    <!-- Header -->
+    <header class="flex justify-between items-center p-4 border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/90">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl p-2 bg-purple-600/20 rounded-xl">🎧</span>
+            <span id="user-display" class="font-bold text-lg tracking-wide bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">jackdarckart</span>
+        </div>
+        <div class="flex space-x-1.5 sm:space-x-2">
+            <button onclick="openModal('Garten')" class="bg-emerald-600/80 hover:bg-emerald-500 px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shadow-lg shadow-emerald-900/20 flex items-center gap-1">
+                🌱 Garten
+            </button>
+            <button onclick="changeUsername()" class="bg-purple-600/80 hover:bg-purple-500 px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shadow-lg shadow-purple-900/20 flex items-center gap-1">
+                👤 Profil
+            </button>
+            <button onclick="openAdmin()" class="bg-amber-600/80 hover:bg-amber-500 px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shadow-lg shadow-amber-900/20 flex items-center gap-1">
+                🛠️ Admin
+            </button>
         </div>
     </header>
 
-    <!-- MAIN HOME VIEW -->
-    <div id="homeView" class="block">
-        <section class="relative overflow-hidden pt-20 pb-28 lg:pt-32 lg:pb-40">
-            <div class="absolute inset-0 opacity-20 pointer-events-none">
-                <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/30 rounded-full blur-[120px]"></div>
-            </div>
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-2 rounded-full text-indigo-300 text-sm font-medium mb-8">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Offizielles Portal • stream-musik.space</span>
-                </div>
-                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-6">
-                    Musik, Webradio & <br>
-                    <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
-                </h1>
-                <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
-                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit harmonischem HD-Garten!
-                </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
-                        <i class="fa-solid fa-radio"></i>
-                        <span>Webradio Live starten</span>
-                    </a>
-                    <button onclick="switchView('game')" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/50 text-indigo-200 px-8 py-4 rounded-2xl font-bold transition">
-                        <i class="fa-solid fa-gamepad"></i>
-                        <span>🎮 Beat-Lab spielen</span>
-                    </button>
-                </div>
-            </div>
-        </section>
+    <!-- Main Content -->
+    <main class="max-w-md mx-auto p-4 text-center mt-2">
+        <h1 class="text-3xl font-black tracking-tight mb-1 text-white">Jack's Beat-Lab</h1>
+        <p class="text-gray-400 text-xs sm:text-sm mb-6">Produziere Beats, erweitere dein Studio und verwalte deinen Fortschritt!</p>
 
-        <!-- About Section -->
-        <section id="about" class="py-24 bg-cardbg/50 border-y border-gray-800/60">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 tracking-tight">Über jackdarckart</h2>
-                        <p class="text-gray-300 text-lg leading-relaxed mb-6">
-                            <strong>jackdarckart</strong> ist ein vielseitiger Musikproduzent, Songwriter und Webradio-Betreiber mit Wurzeln in Meckenheim, Nordrhein-Westfalen.
-                        </p>
-                    </div>
-                    <div class="bg-darkbg border border-gray-800 p-8 rounded-3xl relative shadow-2xl">
-                        <h3 class="text-xl font-bold mb-4 flex items-center space-x-3">
-                            <i class="fa-solid fa-bullseye text-indigo-400"></i>
-                            <span>Station Info & Standort</span>
-                        </h3>
-                        <ul class="space-y-4 text-gray-300 text-sm">
-                            <li><strong>Standort:</strong> Meckenheim, NRW, Deutschland</li>
-                            <li><strong>Domain & Web:</strong> stream-musik.space</li>
-                        </ul>
-                    </div>
+        <!-- Big Action Button -->
+        <button onclick="produceBeat()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 text-white font-bold py-4 px-6 rounded-2xl shadow-xl shadow-purple-900/30 text-lg mb-8 transition transform flex items-center justify-center gap-2 border border-purple-400/20">
+            <span>🎵</span> Beat produzieren <span class="text-xs bg-black/30 px-2 py-0.5 rounded-lg text-purple-200">+1</span>
+        </button>
+
+        <!-- Stats Grid -->
+        <div class="space-y-4">
+            <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg backdrop-blur-sm">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Produzierte Beats</p>
+                <p id="beats-count" class="text-3xl sm:text-4xl font-black text-purple-400">0</p>
+            </div>
+
+            <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg backdrop-blur-sm">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Fans / Hörerschaft</p>
+                <p id="fans-count" class="text-3xl sm:text-4xl font-black text-pink-400">0</p>
+            </div>
+
+            <div class="bg-[#131b2e]/80 border border-gray-800/80 p-4 rounded-2xl shadow-lg backdrop-blur-sm">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Beats pro Sekunde</p>
+                <p id="bps-count" class="text-3xl sm:text-4xl font-black text-emerald-400">0.0</p>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="mt-8 flex justify-between items-center text-xs text-gray-500 px-2">
+            <span id="save-status">💾 Automatisch gespeichert</span>
+            <button onclick="resetGame()" class="text-red-400 hover:underline">Zurücksetzen</button>
+        </div>
+    </main>
+
+    <!-- Admin Modal (Standardmäßig versteckt) -->
+    <div id="admin-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#131b2e] border border-amber-500/30 w-full max-w-sm rounded-2xl p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">🛠️ Admin-Steuerung</h3>
+                <button onclick="closeAdmin()" class="text-gray-400 hover:text-white text-lg font-bold">&times;</button>
+            </div>
+            
+            <div class="space-y-3 text-left">
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Beats anpassen:</label>
+                    <input type="number" id="admin-beats-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Fans anpassen:</label>
+                    <input type="number" id="admin-fans-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Beats pro Sekunde (BPS):</label>
+                    <input type="number" step="0.1" id="admin-bps-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
                 </div>
             </div>
-        </section>
 
-        <!-- Radio Section -->
-        <section id="radio" class="py-24">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl sm:text-5xl font-black mb-6">laut.fm / jackdarckart Webradio</h2>
-                <div class="max-w-3xl mx-auto bg-cardbg border border-gray-800 rounded-3xl p-8 shadow-2xl">
-                    <button onclick="toggleMainRadio()" id="mainRadioToggleBtn" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3.5 rounded-xl font-bold text-sm transition inline-flex items-center space-x-3">
-                        <i id="mainRadioIcon" class="fa-solid fa-play"></i>
-                        <span id="mainRadioText">Stream abspielen</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Music Section -->
-        <section id="music" class="py-24 bg-cardbg/50 border-y border-gray-800/60">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl sm:text-5xl font-black mb-12">Ausgewählte Songs & Alben</h2>
-                <div class="max-w-4xl mx-auto bg-darkbg border border-gray-800 rounded-3xl p-6 shadow-2xl">
-                    <iframe style="border-radius:16px" src="https://open.spotify.com/embed/artist/52TdHUi4gScGBSvgFNFG80?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- MINI GAME VIEW -->
-    <div id="gameView" class="hidden py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-        <div class="text-center mb-10">
-            <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 text-sm">Produziere Beats, erweitere dein Studio und öffne deinen HD-Garten!</p>
-            <div class="mt-6 flex flex-wrap justify-center gap-3">
-                <button onclick="switchView('garden')" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-lg transition">
-                    <i class="fa-solid fa-seedling"></i> 🌿 HD-Garten öffnen
+            <div class="mt-6 flex space-x-2">
+                <button onclick="applyAdminStats()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-amber-900/20">
+                    Änderungen speichern
                 </button>
-                <button id="soundToggleBtnGame" onclick="toggleGameSound()" class="bg-emerald-600/30 border border-emerald-500 text-emerald-200 px-5 py-3 rounded-2xl text-sm font-semibold transition">
-                    <i class="fa-solid fa-volume-high"></i> <span>Sound: An</span>
+                <button onclick="closeAdmin()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2.5 rounded-xl text-sm transition">
+                    Schließen
                 </button>
             </div>
         </div>
-
-        <!-- AUTH SCREEN -->
-        <div id="gameAuthScreen" class="bg-cardbg border border-indigo-500/40 rounded-3xl p-8 max-w-lg mx-auto shadow-2xl space-y-6">
-            <h3 id="authTitle" class="text-2xl font-bold text-center">Beat-Lab Anmelden</h3>
-            <div class="space-y-4">
-                <input type="email" id="authEmail" placeholder="E-Mail-Adresse..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
-                <input type="password" id="authPin" placeholder="Master-PIN..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
-            </div>
-            <button onclick="handleAuthSubmit()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold text-sm transition">Anmelden / Registrieren</button>
-        </div>
-
-        <!-- GAME CONTENT -->
-        <div id="gameMainContent" class="hidden space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
-                    <span class="text-xs text-gray-400 uppercase block mb-1">Produzierte Beats</span>
-                    <span id="gameBeats" class="text-3xl font-black text-indigo-400">0</span>
-                </div>
-                <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
-                    <span class="text-xs text-gray-400 uppercase block mb-1">Fans / Hörerschaft</span>
-                    <span id="gameFans" class="text-3xl font-black text-pink-400">0</span>
-                </div>
-                <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
-                    <span class="text-xs text-gray-400 uppercase block mb-1">Beats pro Sekunde</span>
-                    <span id="gameBps" class="text-3xl font-black text-emerald-400">0</span>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
-                    <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl text-white font-black cursor-pointer border-4 border-indigo-400/30">
-                        <i class="fa-solid fa-compact-disc text-4xl mb-2"></i>
-                        <span class="text-lg uppercase">REC</span>
-                    </button>
-                </div>
-
-                <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 shadow-2xl space-y-4">
-                    <h3 class="text-xl font-bold mb-4"><i class="fa-solid fa-store text-indigo-400"></i> Upgrades</h3>
-                    <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-                        <div><h4 class="font-bold text-sm">USB-Mikrofon</h4><p class="text-xs text-gray-400">+1 BPS</p><span class="text-xs text-indigo-300">Besitz: <span id="countMic">0</span></span></div>
-                        <button onclick="buyUpgrade('mic')" class="bg-indigo-600 text-white text-xs px-4 py-2 rounded-lg font-bold"><span id="costMic">20</span> Beats</button>
-                    </div>
-                    <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-                        <div><h4 class="font-bold text-sm">Synthesizer</h4><p class="text-xs text-gray-400">+5 BPS</p><span class="text-xs text-purple-300">Besitz: <span id="countSynth">0</span></span></div>
-                        <button onclick="buyUpgrade('synth')" class="bg-purple-600 text-white text-xs px-4 py-2 rounded-lg font-bold"><span id="costSynth">150</span> Beats</button>
-                    </div>
-                    <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-                        <div><h4 class="font-bold text-sm">Pro Mixing Desk</h4><p class="text-xs text-gray-400">+25 BPS</p><span class="text-xs text-pink-300">Besitz: <span id="countDesk">0</span></span></div>
-                        <button onclick="buyUpgrade('desk')" class="bg-pink-600 text-white text-xs px-4 py-2 rounded-lg font-bold"><span id="costDesk">800</span> Beats</button>
-                    </div>
-                    <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-                        <div><h4 class="font-bold text-sm">Record Label</h4><p class="text-xs text-gray-400">+100 BPS</p><span class="text-xs text-emerald-300">Besitz: <span id="countLabel">0</span></span></div>
-                        <button onclick="buyUpgrade('label')" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-bold"><span id="costLabel">4000</span> Beats</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BACKUP & ACCOUNT SEKTION -->
-            <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 space-y-4">
-                <div class="flex items-center justify-between text-sm">
-                    <div>Angemeldet als: <span id="loggedInEmailDisplay" class="text-indigo-300 font-mono">...</span></div>
-                    <button onclick="logoutUser()" class="bg-red-950/50 border border-red-800 text-red-300 px-4 py-2 rounded-xl">Abmelden</button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-800">
-                    <button onclick="exportSaveGame()" class="bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-download"></i> <span>Backup herunterladen (.json)</span>
-                    </button>
-                    <label class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2 cursor-pointer">
-                        <i class="fa-solid fa-upload"></i> <span>Backup wiederherstellen</span>
-                        <input type="file" id="importFile" accept=".json" onchange="importSaveGame(event)" class="hidden">
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="text-center mt-8">
-            <button onclick="switchView('home')" class="text-sm text-indigo-400 font-semibold"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
-        </div>
     </div>
 
-    <!-- GARDEN VIEW -->
-    <div id="gardenView" class="hidden py-2 px-2 max-w-7xl mx-auto space-y-3 text-center">
-        <div class="flex items-center justify-between px-3">
-            <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2">
-                <i class="fa-solid fa-arrow-left"></i> <span>Zum Beat-Lab</span>
-            </button>
-            <div class="text-emerald-400 text-xs font-extrabold uppercase tracking-widest bg-emerald-950/60 border border-emerald-500/30 px-3 py-1.5 rounded-full">
-                🌿 HD Musik-Garten
-            </div>
-        </div>
-        <div class="relative w-full flex justify-center items-center bg-darkbg rounded-3xl p-1 border-2 border-emerald-500/40 shadow-2xl overflow-hidden cursor-pointer">
-            <canvas id="gardenCanvas" class="rounded-2xl shadow-2xl block w-full h-auto"></canvas>
-        </div>
-    </div>
-
-    <!-- MODAL -->
-    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
-        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 max-w-md w-full text-center space-y-4">
-            <h3 id="modalTitle" class="text-xl font-bold">Hinweis</h3>
-            <p id="modalText" class="text-sm text-gray-400"></p>
-            <button onclick="closeCustomModal()" class="w-full bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-semibold">Schließen</button>
-        </div>
-    </div>
-
-    <!-- SCRIPT -->
+    <!-- JavaScript Logik -->
     <script>
-        function switchView(view) {
-            const home = document.getElementById('homeView');
-            const game = document.getElementById('gameView');
-            const garden = document.getElementById('gardenView');
+        let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 40430;
+        let fans = parseInt(localStorage.getItem('beat_lab_fans')) || 14603;
+        let bps = parseFloat(localStorage.getItem('beat_lab_bps')) || 161.0;
+        let username = localStorage.getItem('beat_lab_user') || 'jackdarckart';
 
-            if (view === 'garden' && !localStorage.getItem('jackLoggedInEmail')) {
-                showInfoModal('🔒 Anmeldung erforderlich', 'Bitte melde dich zuerst im Beat-Lab an.');
-                view = 'game';
-            }
+        document.getElementById('user-display').innerText = username;
 
-            localStorage.setItem('jackCurrentView', view);
-            if (home) home.classList.add('hidden');
-            if (game) game.classList.add('hidden');
-            if (garden) garden.classList.add('hidden');
-
-            if (view === 'game') {
-                if (game) game.classList.remove('hidden');
-                checkLoginState();
-            } else if (view === 'garden') {
-                if (garden) garden.classList.remove('hidden');
-                setTimeout(resizeCanvas, 60);
-                unlockAudioOnce();
-            } else {
-                if (home) home.classList.remove('hidden');
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function produceBeat() {
+            beats += 1;
+            updateDisplay();
+            saveGame();
         }
 
-        let audioCtx = null;
-        let gameSoundEnabled = true;
-        let ambientTimer = 0;
-        let particleEffects = [];
-
-        function unlockAudioOnce() {
-            try {
-                if (!audioCtx) {
-                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                    audioCtx = new AudioContextClass();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-            } catch(e) {}
-        }
-
-        function toggleMainRadio() {
-            unlockAudioOnce();
-            const audio = document.getElementById('radioStream');
-            const icon = document.getElementById('mainRadioIcon');
-            const text = document.getElementById('mainRadioText');
-            if (!audio) return;
-            if (audio.paused) {
-                audio.play().then(() => {
-                    if (icon) icon.className = 'fa-solid fa-pause';
-                    if (text) text.innerText = 'Stream pausieren';
-                }).catch(e => {});
-            } else {
-                audio.pause();
-                if (icon) icon.className = 'fa-solid fa-play';
-                if (text) text.innerText = 'Stream abspielen';
-            }
-        }
-
-        function toggleGameSound() {
-            gameSoundEnabled = !gameSoundEnabled;
-            const btn = document.getElementById('soundToggleBtnGame');
-            if (btn) {
-                btn.innerHTML = gameSoundEnabled ? '<i class="fa-solid fa-volume-high"></i><span>Sound: An</span>' : '<i class="fa-solid fa-volume-mute"></i><span>Sound: Aus</span>';
-            }
-        }
-
-        function playCleanCrispSound() {
-            if (!gameSoundEnabled) return;
-            try {
-                unlockAudioOnce();
-                if (!audioCtx) return;
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume().then(() => executeTone());
-                } else {
-                    executeTone();
-                }
-            } catch(e) {}
-        }
-
-        function executeTone() {
-            try {
-                const now = audioCtx.currentTime;
-                const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
-                const freq = notes[Math.floor(Math.random() * notes.length)];
-
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.0001, now);
-                gain.gain.linearRampToValueAtTime(0.1, now + 0.02);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-                gain.connect(audioCtx.destination);
-
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, now);
-                osc.connect(gain);
-
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } catch(e) {}
-        }
-
-        function showInfoModal(title, text) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalText').innerText = text;
-            document.getElementById('customModal').classList.remove('hidden');
-        }
-
-        function closeCustomModal() {
-            document.getElementById('customModal').classList.add('hidden');
-        }
-
-        let gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, garden: [{ level: 1, exp: 0, maxExp: 50 }, { level: 1, exp: 0, maxExp: 250 }, { level: 1, exp: 0, maxExp: 1200 }] };
-
-        function loadGameForUser(email) {
-            let save = localStorage.getItem('jackBeatLabUserSave_' + email.replace(/[^a-z0-9]/g, '_'));
-            if (save) {
-                try { gameData = { ...gameData, ...JSON.parse(save) }; } catch(e) {}
-            }
-            updateGameUI();
+        function updateDisplay() {
+            document.getElementById('beats-count').innerText = Math.floor(beats).toLocaleString('de-DE');
+            document.getElementById('fans-count').innerText = Math.floor(fans).toLocaleString('de-DE');
+            document.getElementById('bps-count').innerText = bps.toFixed(1);
         }
 
         function saveGame() {
-            let email = localStorage.getItem('jackLoggedInEmail');
-            if (!email) return;
-            localStorage.setItem('jackBeatLabUserSave_' + email.replace(/[^a-z0-9]/g, '_'), JSON.stringify(gameData));
+            localStorage.setItem('beat_lab_beats', beats);
+            localStorage.setItem('beat_lab_fans', fans);
+            localStorage.setItem('beat_lab_bps', bps);
+            localStorage.setItem('beat_lab_user', username);
         }
 
-        function exportSaveGame() {
-            saveGame();
-            let email = localStorage.getItem('jackLoggedInEmail') || 'player';
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gameData));
-            let downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "beat_lab_backup_" + email.replace(/[^a-z0-9]/g, '_') + ".json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importSaveGame(event) {
-            let file = event.target.files[0];
-            if (!file) return;
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    let parsed = JSON.parse(e.target.result);
-                    if (parsed && typeof parsed.beats === 'number') {
-                        gameData = { ...gameData, ...parsed };
-                        saveGame();
-                        updateGameUI();
-                        showInfoModal('✅ Erfolg', 'Dein Spielstand wurde erfolgreich wiederhergestellt!');
-                    } else {
-                        showInfoModal('❌ Fehler', 'Die Datei ist keine gültige Backup-Datei.');
-                    }
-                } catch(err) {
-                    showInfoModal('❌ Fehler', 'Fehler beim Lesen der Datei.');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function checkLoginState() {
-            let email = localStorage.getItem('jackLoggedInEmail');
-            if (email) {
-                document.getElementById('gameAuthScreen').classList.add('hidden');
-                document.getElementById('gameMainContent').classList.remove('hidden');
-                document.getElementById('loggedInEmailDisplay').innerText = email;
-                loadGameForUser(email);
-            } else {
-                document.getElementById('gameAuthScreen').classList.remove('hidden');
-                document.getElementById('gameMainContent').classList.add('hidden');
-            }
-        }
-
-        function handleAuthSubmit() {
-            unlockAudioOnce();
-            let email = document.getElementById('authEmail').value.trim().toLowerCase();
-            let pin = document.getElementById('authPin').value.trim();
-            if (!email || !pin) { showInfoModal('⚠️ Fehler', 'Bitte alle Felder ausfüllen.'); return; }
-            
-            let users = JSON.parse(localStorage.getItem('jackBeatLabUsers') || '{}');
-            if (!users[email]) {
-                users[email] = pin;
-                localStorage.setItem('jackBeatLabUsers', JSON.stringify(users));
-            } else if (users[email] !== pin) {
-                showInfoModal('❌ Fehler', 'Falscher PIN.');
-                return;
-            }
-            localStorage.setItem('jackLoggedInEmail', email);
-            checkLoginState();
-        }
-
-        function logoutUser() {
-            saveGame();
-            localStorage.removeItem('jackLoggedInEmail');
-            checkLoginState();
-        }
-
-        function clickBeat() {
-            unlockAudioOnce();
-            gameData.beats += gameData.clickPower;
-            gameData.garden[0].exp += 1;
-            playCleanCrispSound();
-            updateGameUI();
-            saveGame();
-        }
-
-        function buyUpgrade(type) {
-            unlockAudioOnce();
-            let cost = type === 'mic' ? Math.floor(20 * Math.pow(1.22, gameData.mic)) : type === 'synth' ? Math.floor(150 * Math.pow(1.22, gameData.synth)) : type === 'desk' ? Math.floor(800 * Math.pow(1.22, gameData.desk)) : Math.floor(4000 * Math.pow(1.22, gameData.label));
-            if (gameData.beats >= cost) {
-                gameData.beats -= cost;
-                gameData[type]++;
-                playCleanCrispSound();
-                updateGameUI();
+        function changeUsername() {
+            let newName = prompt("Gib deinen Künstlernamen ein:", username);
+            if (newName && newName.trim() !== "") {
+                username = newName.trim();
+                document.getElementById('user-display').innerText = username;
                 saveGame();
             }
         }
 
-        function getBps() {
-            return (gameData.mic * 1) + (gameData.synth * 5) + (gameData.desk * 25) + (gameData.label * 100);
+        function openAdmin() {
+            document.getElementById('admin-beats-input').value = Math.floor(beats);
+            document.getElementById('admin-fans-input').value = fans;
+            document.getElementById('admin-bps-input').value = bps.toFixed(1);
+            document.getElementById('admin-modal').classList.remove('hidden');
         }
 
-        function updateGameUI() {
-            document.getElementById('gameBeats').innerText = Math.floor(gameData.beats).toLocaleString();
-            document.getElementById('gameFans').innerText = Math.floor(gameData.fans).toLocaleString();
-            let bps = getBps();
-            document.getElementById('gameBps').innerText = bps.toFixed(1);
-            document.getElementById('countMic').innerText = gameData.mic;
-            document.getElementById('countSynth').innerText = gameData.synth;
-            document.getElementById('countDesk').innerText = gameData.desk;
-            document.getElementById('countLabel').innerText = gameData.label;
-            
-            document.getElementById('costMic').innerText = Math.floor(20 * Math.pow(1.22, gameData.mic)).toLocaleString();
-            document.getElementById('costSynth').innerText = Math.floor(150 * Math.pow(1.22, gameData.synth)).toLocaleString();
-            document.getElementById('costDesk').innerText = Math.floor(800 * Math.pow(1.22, gameData.desk)).toLocaleString();
-            document.getElementById('costLabel').innerText = Math.floor(4000 * Math.pow(1.22, gameData.label)).toLocaleString();
+        function closeAdmin() {
+            document.getElementById('admin-modal').classList.add('hidden');
         }
 
-        // Canvas / Stunning HD Garden Render
-        const VIRTUAL_W = 1200; const VIRTUAL_H = 700;
-        function resizeCanvas() {
-            const canvas = document.getElementById('gardenCanvas');
-            if (!canvas) return;
-            canvas.width = VIRTUAL_W; canvas.height = VIRTUAL_H;
+        function applyAdminStats() {
+            beats = parseFloat(document.getElementById('admin-beats-input').value) || beats;
+            fans = parseInt(document.getElementById('admin-fans-input').value) || fans;
+            bps = parseFloat(document.getElementById('admin-bps-input').value) || bps;
+            updateDisplay();
+            saveGame();
+            closeAdmin();
         }
 
-        let timeTick = 0;
-        function drawGarden() {
-            const canvas = document.getElementById('gardenCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            timeTick += 0.03;
-
-            // 1. Hintergrund-Farbverlauf
-            let bgGrad = ctx.createLinearGradient(0, 0, 0, VIRTUAL_H);
-            bgGrad.addColorStop(0, '#061a12');
-            bgGrad.addColorStop(0.5, '#0b2e1f');
-            bgGrad.addColorStop(1, '#04160e');
-            ctx.fillStyle = bgGrad;
-            ctx.fillRect(0, 0, VIRTUAL_W, VIRTUAL_H);
-
-            // 2. Seerosenteich
-            let pondGrad = ctx.createRadialGradient(900, 420, 20, 900, 420, 180);
-            pondGrad.addColorStop(0, '#38bdf8');
-            pondGrad.addColorStop(0.7, '#0284c7');
-            pondGrad.addColorStop(1, '#0369a1');
-            ctx.fillStyle = pondGrad;
-            ctx.beginPath();
-            ctx.ellipse(900, 420, 210, 110, Math.sin(timeTick * 0.5) * 0.05, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = '#7dd3fc';
-            ctx.beginPath(); ctx.arc(850, 390, 15, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#4ade80';
-            ctx.beginPath(); ctx.arc(830, 440, 18, 0, Math.PI*2); ctx.fill();
-
-            // 3. Büsche
-            for (let i = 0; i < 6; i++) {
-                let bx = 150 + i * 180;
-                let by = 220 + Math.sin(i) * 30;
-                let bushGrad = ctx.createRadialGradient(bx, by, 10, bx, by, 90);
-                bushGrad.addColorStop(0, '#10b981');
-                bushGrad.addColorStop(1, '#065f46');
-                ctx.fillStyle = bushGrad;
-                ctx.beginPath(); ctx.arc(bx, by, 75, 0, Math.PI * 2); ctx.fill();
-            }
-
-            // 4. Blumen
-            let flowerColors = ['#f43f5e', '#a855f7', '#fbbf24', '#ec4899', '#38bdf8'];
-            for (let i = 0; i < 12; i++) {
-                let fx = 100 + i * 95;
-                let fy = 580 + Math.sin(i + timeTick) * 15;
-                ctx.strokeStyle = '#059669'; ctx.lineWidth = 4;
-                ctx.beginPath(); ctx.moveTo(fx, fy + 40); ctx.lineTo(fx, fy); ctx.stroke();
-                ctx.fillStyle = flowerColors[i % flowerColors.length];
-                for (let p = 0; p < 5; p++) {
-                    let angle = (p * Math.PI * 2) / 5;
-                    let px = fx + Math.cos(angle) * 12;
-                    let py = fy + Math.sin(angle) * 12;
-                    ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fill();
-                }
-                ctx.fillStyle = '#fef08a';
-                ctx.beginPath(); ctx.arc(fx, fy, 7, 0, Math.PI * 2); ctx.fill();
-            }
-
-            // 5. Partikel / Musiknoten
-            for (let i = particleEffects.length - 1; i >= 0; i--) {
-                let part = particleEffects[i];
-                part.y -= part.vy;
-                part.alpha -= 0.02;
-                if (part.alpha <= 0) {
-                    particleEffects.splice(i, 1);
-                    continue;
-                }
-                ctx.fillStyle = `rgba(56, 189, 248, ${part.alpha})`;
-                ctx.font = 'bold 24px sans-serif';
-                ctx.fillText('🎵', part.x, part.y);
-            }
-
-            // 6. HUD / Garten UI im Canvas
-            ctx.fillStyle = 'rgba(10, 11, 16, 0.85)';
-            ctx.roundRect(30, 25, 450, 90, 20);
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            let gLvl = gameData.garden[0].level;
-            let gExp = gameData.garden[0].exp;
-            let gMax = gameData.garden[0].maxExp;
-            let percent = Math.min(100, Math.floor((gExp / gMax) * 100));
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 18px sans-serif';
-            ctx.fillText(`🌿 HD-Garten (Level ${gLvl})`, 55, 58);
-
-            ctx.fillStyle = '#9ca3af';
-            ctx.font = '14px sans-serif';
-            ctx.fillText(`Erfahrung (EXP): ${gExp} / ${gMax} (${percent}%)`, 55, 88);
-
-            ctx.fillStyle = '#1f2937';
-            ctx.roundRect(280, 72, 180, 10, 5);
-            ctx.fill();
-            ctx.fillStyle = '#10b981';
-            ctx.roundRect(280, 72, Math.max(10, (180 * percent) / 100), 10, 5);
-            ctx.fill();
+        function openModal(section) {
+            alert(section === 'Garten' ? '🌱 HD-Garten wird geladen...' : '💼 Lab-Steuerung wird geöffnet...');
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            resizeCanvas();
-            function loop() {
-                drawGarden();
-                requestAnimationFrame(loop);
+        function resetGame() {
+            if (confirm("Möchtest du wirklich deinen gesamten Fortschritt zurücksetzen?")) {
+                localStorage.clear();
+                beats = 40430;
+                fans = 14603;
+                bps = 161.0;
+                username = 'jackdarckart';
+                document.getElementById('user-display').innerText = username;
+                updateDisplay();
+                saveGame();
             }
-            requestAnimationFrame(loop);
+        }
 
-            const cElem = document.getElementById('gardenCanvas');
-            if (cElem) {
-                cElem.addEventListener('click', function(e) {
-                    unlockAudioOnce();
-                    playCleanCrispSound();
-                    gameData.beats += Math.max(1, Math.floor(getBps() * 0.2));
-                    gameData.garden[0].exp += 5;
-                    
-                    if (gameData.garden[0].exp >= gameData.garden[0].maxExp) {
-                        gameData.garden[0].level++;
-                        gameData.garden[0].exp = 0;
-                        gameData.garden[0].maxExp = Math.floor(gameData.garden[0].maxExp * 1.5);
-                    }
-
-                    const rect = cElem.getBoundingClientRect();
-                    let clickX = (e.clientX - rect.left) * (VIRTUAL_W / rect.width);
-                    let clickY = (e.clientY - rect.top) * (VIRTUAL_H / rect.height);
-                    particleEffects.push({ x: clickX, y: clickY, vy: 2.5, alpha: 1.0 });
-
-                    updateGameUI();
-                    saveGame();
-                });
-            }
-        });
-
-        setInterval(function() {
-            let email = localStorage.getItem('jackLoggedInEmail');
-            if (!email) return;
-            let bps = getBps();
-            if (bps > 0) {
-                gameData.beats += bps / 10;
-                gameData.fans += (bps / 50);
-                updateGameUI();
-
-                if (gameSoundEnabled) {
-                    ambientTimer++;
-                    let threshold = Math.max(8, 45 - Math.floor(bps / 4));
-                    if (ambientTimer >= threshold) {
-                        ambientTimer = 0;
-                        playCleanCrispSound();
-                    }
-                }
-            }
+        // Auto-production Loop
+        setInterval(() => {
+            beats += bps / 10;
+            updateDisplay();
         }, 100);
 
-        setInterval(function() { if (localStorage.getItem('jackLoggedInEmail')) saveGame(); }, 5000);
+        // Auto-save Loop
+        setInterval(() => {
+            saveGame();
+        }, 5000);
 
-        window.onload = function() {
-            let view = localStorage.getItem('jackCurrentTestView') || localStorage.getItem('jackCurrentView') || 'home';
-            switchView(view);
-            resizeCanvas();
-        };
-        window.onresize = resizeCanvas;
+        updateDisplay();
     </script>
 </body>
 </html>
