@@ -123,28 +123,28 @@
                     <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition">Registrieren</button>
                 </div>
 
-                <!-- LOGIN FORM -->
+                <!-- LOGIN FORM (Streng gesichert gegen Autocomplete & Caching) -->
                 <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
-                        <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
+                        <input type="email" id="login-email" autocomplete="off" spellcheck="false" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Sicherheits-PIN:</label>
-                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Dein PIN">
+                        <input type="password" id="login-pin" autocomplete="new-password" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Dein PIN">
                     </div>
                     <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔒 Einloggen & Studio öffnen</button>
                 </div>
 
-                <!-- REGISTRATION FORM -->
+                <!-- REGISTRATION FORM (Streng gesichert gegen Autocomplete & Caching) -->
                 <div id="form-register" class="space-y-3 hidden">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse (Einzigartig):</label>
-                        <input type="email" id="reg-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
+                        <input type="email" id="reg-email" autocomplete="off" spellcheck="false" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Sicherheits-PIN erstellen:</label>
-                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Zahl oder Code">
+                        <input type="password" id="reg-pin" autocomplete="new-password" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Zahl oder Code">
                     </div>
                     <button type="button" id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">✨ Account registrieren & sichern</button>
                 </div>
@@ -191,7 +191,7 @@
                     ← Zurück zur Startseite
                 </button>
 
-                <!-- 🛠️ ADMINISTRATOR-BEREICH (Ohne Cheats - Nur PIN & Reset) -->
+                <!-- 🛠️ ADMINISTRATOR-BEREICH -->
                 <div class="bg-[#131b2e] border border-amber-500/40 p-5 rounded-3xl shadow-2xl space-y-4 text-left mt-8">
                     <div class="flex items-center gap-2 border-b border-gray-800 pb-2">
                         <span class="text-xl">🛠️</span>
@@ -203,7 +203,7 @@
                         <h4 class="font-bold text-xs text-yellow-400">🔑 Sicherheits-PIN ändern</h4>
                         <div>
                             <label class="text-[11px] text-gray-400 block mb-1">Neuen PIN eingeben:</label>
-                            <input type="password" id="admin-new-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs" placeholder="Neuer PIN">
+                            <input type="password" id="admin-new-pin" autocomplete="new-password" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs" placeholder="Neuer PIN">
                         </div>
                         <button type="button" id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN aktualisieren</button>
                     </div>
@@ -276,11 +276,11 @@
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Automatisch gespeichert</span>
-            <span class="text-gray-500">Fair Play Hub</span>
+            <span class="text-gray-500">Secure Fair Play Hub</span>
         </div>
     </footer>
 
-    <!-- Account-Isolierte JavaScript Logik ohne Beispielwerte -->
+    <!-- Sichere JavaScript Logik mit Feldbereinigung -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Bereinige alte globale Speicherreste
@@ -370,7 +370,7 @@
                 });
             }
 
-            // Registrierung mit sauberen 0er-Startwerten
+            // Registrierung
             const submitRegisterBtn = document.getElementById('submit-register-btn');
             if(submitRegisterBtn) {
                 submitRegisterBtn.addEventListener('click', () => {
@@ -410,6 +410,10 @@
                     loggedInUser = emailInput;
                     localStorage.setItem('beat_lab_logged_in_user', emailInput);
 
+                    // Eingabefelder sofort leeren
+                    document.getElementById('reg-email').value = '';
+                    document.getElementById('reg-pin').value = '';
+
                     alert("🎉 Erfolgreich registriert und eingeloggt!");
                     updateGameViewState();
                 });
@@ -437,20 +441,31 @@
                     loggedInUser = emailInput;
                     localStorage.setItem('beat_lab_logged_in_user', emailInput);
 
+                    // Eingabefelder sofort leeren
+                    document.getElementById('login-email').value = '';
+                    document.getElementById('login-pin').value = '';
+
                     alert("🚀 Erfolgreich eingeloggt!");
                     updateGameViewState();
                 });
             }
 
-            // Logout
+            // Logout (Sicherheits-Bereinigung aller Felder & Sitzungen)
             const logoutBtn = document.getElementById('logout-btn');
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
                     saveGame();
                     loggedInUser = null;
                     localStorage.removeItem('beat_lab_logged_in_user');
+                    
+                    // Eingabefelder restlos leeren
+                    if(document.getElementById('login-email')) document.getElementById('login-email').value = '';
+                    if(document.getElementById('login-pin')) document.getElementById('login-pin').value = '';
+                    if(document.getElementById('reg-email')) document.getElementById('reg-email').value = '';
+                    if(document.getElementById('reg-pin')) document.getElementById('reg-pin').value = '';
+
                     updateGameViewState();
-                    alert("🔒 Erfolgreich abgemeldet.");
+                    alert("🔒 Sicher abgemeldet. Alle Daten wurden bereinigt.");
                 });
             }
 
@@ -590,7 +605,7 @@
                 }
             }
 
-            // Sicheres Zurücksetzen nur des Spielstands auf 0
+            // Zurücksetzen des Spielstands auf 0 für den aktuellen Account
             const adminResetGameBtn = document.getElementById('admin-reset-game-btn');
             if(adminResetGameBtn) {
                 adminResetGameBtn.addEventListener('click', () => {
