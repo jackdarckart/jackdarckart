@@ -556,7 +556,9 @@
 
         let modalCallback = null;
         let modalMode = 'pin';
-        let isAdminLoggedIn = false; // Standardmäßig abgemeldet zum Schutz vor Manipulation
+        
+        // Admin-Status aus dem lokalen Speicher laden (bleibt beim Neuladen erhalten)
+        let isAdminLoggedIn = localStorage.getItem('jackAdminLoggedIn') === 'true';
         
         let pendingNewPin = '';
         let pendingNewEmail = '';
@@ -638,7 +640,7 @@
                 actionContainer.classList.add('hidden');
             }
 
-            document.getElementById('customModal').classList.remove('hidden');
+            document.getElementById('customModal').classList.add('hidden');
             modalCallback = null;
         }
 
@@ -659,6 +661,7 @@
         function toggleAdminAuth() {
             if (isAdminLoggedIn) {
                 isAdminLoggedIn = false;
+                localStorage.setItem('jackAdminLoggedIn', 'false');
                 updateAdminAuthUI();
                 showInfoModal('🔒 Abgemeldet', 'Du hast dich erfolgreich abgemeldet. Das Beat-Lab ist nun gesperrt.');
             } else {
@@ -673,6 +676,7 @@
                             localStorage.removeItem('jackTempPin');
                         }
                         isAdminLoggedIn = true;
+                        localStorage.setItem('jackAdminLoggedIn', 'true');
                         updateAdminAuthUI();
                         showInfoModal('✅ Angemeldet', 'Spiel erfolgreich entsperrt!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                     } else {
@@ -732,6 +736,7 @@
                     localStorage.setItem('jackAdminPin', '1234');
                     localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
                     isAdminLoggedIn = true;
+                    localStorage.setItem('jackAdminLoggedIn', 'true');
                     updateAdminAuthUI();
                     showInfoModal('⚠️ Hinweis', 'Standard-PIN \'1234\' wurde gesetzt.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                     return;
@@ -745,6 +750,7 @@
                             localStorage.setItem('jackAdminPin', pendingNewPin);
                             localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
                             isAdminLoggedIn = true;
+                            localStorage.setItem('jackAdminLoggedIn', 'true');
                             updateAdminAuthUI();
                             showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                             return;
@@ -760,6 +766,7 @@
                                     localStorage.setItem('jackAdminPin', pendingNewPin);
                                     localStorage.setItem('jackAdminEmail', pendingNewEmail);
                                     isAdminLoggedIn = true;
+                                    localStorage.setItem('jackAdminLoggedIn', 'true');
                                     updateAdminAuthUI();
                                     showInfoModal('✅ Erfolgreich', 'Master-PIN und E-Mail wurden erfolgreich verifiziert und gespeichert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                                 } else {
@@ -882,7 +889,7 @@
         }
 
         function clickBeat() {
-            if (!isAdminLoggedIn) return; // Strenger Manipulationsschutz bei Abmeldung
+            if (!isAdminLoggedIn) return;
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
             playPleasantTone();
@@ -891,7 +898,7 @@
         }
 
         function buyUpgrade(type) {
-            if (!isAdminLoggedIn) return; // Strenger Manipulationsschutz bei Abmeldung
+            if (!isAdminLoggedIn) return;
             let cost = 0;
             if (type === 'mic') cost = Math.floor(15 * Math.pow(1.15, gameData.mic));
             if (type === 'synth') cost = Math.floor(100 * Math.pow(1.15, gameData.synth));
@@ -945,7 +952,7 @@
         }
 
         setInterval(function() {
-            if (!isAdminLoggedIn) return; // Passives Einkommen stoppen, wenn abgemeldet
+            if (!isAdminLoggedIn) return;
             let bps = getBps();
             if (bps > 0) {
                 gameData.beats += bps / 10;
