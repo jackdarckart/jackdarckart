@@ -516,6 +516,8 @@
         function switchView(view) {
             const home = document.getElementById('homeView');
             const game = document.getElementById('gameView');
+            localStorage.setItem('jackCurrentView', view); // Ansicht dauerhaft speichern
+            
             if (view === 'game') {
                 home.classList.remove('block');
                 home.classList.add('hidden');
@@ -550,25 +552,21 @@
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
                 
-                // Pentatonische Wohlfühl-Frequenzen (Harmonisch, kein schriller Ton)
-                // C5, D5, E5, G5, A5, C6
                 const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
                 const randomNote = notes[Math.floor(Math.random() * notes.length)];
                 
-                osc.type = 'sine'; // Weicher Sinuston
+                osc.type = 'sine';
                 osc.frequency.setValueAtTime(randomNote, audioCtx.currentTime);
                 
-                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime); // Sanfte Lautstärke
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35); // Sanftes Ausklingen
+                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
                 
                 osc.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
                 
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.35);
-            } catch(e) {
-                // Browser-Sicherheitsrichtlinien für Audio im Hintergrund ignorieren
-            }
+            } catch(e) {}
         }
 
         function showCustomModal(mode, title, text, placeholder, showCancel = true) {
@@ -634,7 +632,6 @@
             closeCustomModal(true, val);
         }
 
-        // --- 3-SCHRITT SETUP WIZARD ---
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
@@ -816,7 +813,7 @@
         function clickBeat() {
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
-            playPleasantTone(); // Spiele einen harmonischen, angenehmen Ton ab
+            playPleasantTone();
             updateGameUI();
             saveGame();
         }
@@ -884,7 +881,16 @@
         }, 100);
 
         setInterval(function() { saveGame(); }, 5000);
-        window.addEventListener('load', function() { loadGame(); });
+
+        // Beim Laden Ansicht und Spielstand wiederherstellen
+        window.addEventListener('load', function() {
+            loadGame();
+            let savedView = localStorage.getItem('jackCurrentView') || 'home';
+            switchView(savedView);
+            if (localStorage.getItem('streamPlaying') === 'true' && audio) {
+                audio.play().catch(function(err) { console.log("Autoplay blockiert:", err); });
+            }
+        });
 
         // Audio Persistence & Security Script
         const audio = document.getElementById('radioStream');
@@ -900,12 +906,6 @@
             audio.addEventListener('play', function() { localStorage.setItem('streamPlaying', 'true'); });
             audio.addEventListener('pause', function() { localStorage.setItem('streamPlaying', 'false'); });
         }
-        window.ensureAudioPlayback = function() {
-            if (localStorage.getItem('streamPlaying') === 'true' && audio) {
-                audio.play().catch(function(err) { console.log("Autoplay blockiert:", err); });
-            }
-        };
-        window.addEventListener('load', function() { window.ensureAudioPlayback(); });
 
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
