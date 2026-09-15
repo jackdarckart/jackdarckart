@@ -22,13 +22,13 @@
 
             <!-- Seiten-Navigation -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <button id="nav-home" class="bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow">🏠 Start</button>
-                <button id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🎵 Game</button>
-                <button id="nav-garten" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🌱 Garten</button>
-                <button id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">☁️ Cloud</button>
-                <button id="nav-account" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">📝 Account</button>
-                <button id="nav-admin" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🛠️ Admin</button>
-                <button id="sound-btn" class="bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🔊</button>
+                <button type="button" id="nav-home" class="bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow">🏠 Start</button>
+                <button type="button" id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🎵 Game</button>
+                <button type="button" id="nav-garten" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🌱 Garten</button>
+                <button type="button" id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">☁️ Cloud</button>
+                <button type="button" id="nav-account" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">📝 Account</button>
+                <button type="button" id="nav-admin" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🛠️ Admin</button>
+                <button type="button" id="sound-btn" class="bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🔊</button>
             </div>
         </div>
     </header>
@@ -48,7 +48,7 @@
                     Willkommen im kreativen Universum von jackdarckart. Entdecke professionelle Audioproduktionen, immersive Soundwelten und interaktive Web-Projekte.
                 </p>
                 <div class="mt-6 flex flex-wrap justify-center gap-3">
-                    <button id="home-to-game-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
+                    <button type="button" id="home-to-game-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
                         <span>🎵</span> Zum Beat-Lab Studio
                     </button>
                     <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-500/30 font-semibold py-3 px-6 rounded-2xl text-xs sm:text-sm transition flex items-center gap-2">
@@ -106,61 +106,61 @@
 
         </div>
 
-        <!-- 2. GAME-SEITE (Beat-Lab mit geschütztem Login / Reg & Admin unten) -->
+        <!-- 2. GAME-SEITE (Login/Reg Tor + Spielbereich + Admin unten) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center">
             
-            <!-- AUTH CONTAINER (Wird angezeigt, wenn nicht eingeloggt) -->
+            <!-- AUTH CONTAINER (Sichtbar wenn nicht eingeloggt) -->
             <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
                     <h2 class="text-xl font-bold text-purple-400">Beat-Lab Sicherheitstor</h2>
-                    <p class="text-xs text-gray-400 mt-1">Bitte registriere dich oder logge dich ein, um das Spiel und den Admin-Bereich freizuschalten.</p>
+                    <p class="text-xs text-gray-400 mt-1">Registriere dich mit einer E-Mail und einem PIN oder logge dich ein, um das Studio und den Admin-Bereich zu entsperren.</p>
                 </div>
 
                 <!-- Tabs für Login / Registrierung -->
                 <div class="flex border-b border-gray-800 mb-2">
-                    <button id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition">Einloggen</button>
-                    <button id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition">Registrieren</button>
+                    <button type="button" id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition">Einloggen</button>
+                    <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition">Registrieren</button>
                 </div>
 
                 <!-- LOGIN FORM -->
                 <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
-                        <input type="email5" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
+                        <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">Sicherheits-PIN:</label>
                         <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Dein PIN">
                     </div>
-                    <button id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔒 Einloggen & Spiel starten</button>
+                    <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔒 Einloggen & Studio öffnen</button>
                 </div>
 
-                <!-- REGISTRATION FORM (Versteckt bis Klick) -->
+                <!-- REGISTRATION FORM -->
                 <div id="form-register" class="space-y-3 hidden">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse (Einzigartig):</label>
                         <input type="email" id="reg-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">Neuen Sicherheits-PIN erstellen:</label>
+                        <label class="text-xs text-gray-400 block mb-1">Sicherheits-PIN erstellen:</label>
                         <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Zahl oder Code">
                     </div>
-                    <button id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">✨ Account erstellen & sichern</button>
+                    <button type="button" id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">✨ Account registrieren & sichern</button>
                 </div>
 
                 <div class="pt-2 text-center">
-                    <button id="auth-to-home-btn" class="text-gray-400 hover:text-white text-xs underline">← Zurück zur Startseite</button>
+                    <button type="button" id="auth-to-home-btn" class="text-gray-400 hover:text-white text-xs underline">← Zurück zur Startseite</button>
                 </div>
             </div>
 
-            <!-- GAME & ADMIN CONTAINER (Wird erst NACH Login sichtbar) -->
+            <!-- GAME & ADMIN CONTAINER (Wird erst NACH erfolgreichem Login sichtbar) -->
             <div id="game-main-container" class="hidden space-y-6">
                 
-                <!-- Game Header -->
+                <!-- Game Header / User Bar -->
                 <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
                     <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
-                    <button id="logout-btn" class="bg-red-900/40 hover:bg-red-900 text-red-300 text-[10px] px-2.5 py-1 rounded-xl border border-red-700/50 transition">🚪 Abmelden</button>
+                    <button type="button" id="logout-btn" class="bg-red-900/40 hover:bg-red-900 text-red-300 text-[10px] px-2.5 py-1 rounded-xl border border-red-700/50 transition">🚪 Abmelden</button>
                 </div>
 
                 <div>
@@ -168,7 +168,7 @@
                     <p class="text-gray-400 text-xs">Produziere Beats und verwalte dein Studio!</p>
                 </div>
 
-                <button id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl transition border border-purple-400/30 flex items-center justify-center gap-3">
+                <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl transition border border-purple-400/30 flex items-center justify-center gap-3">
                     <span class="text-2xl">🎵</span> Beat produzieren <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+1</span>
                 </button>
 
@@ -187,7 +187,7 @@
                     </div>
                 </div>
 
-                <button id="game-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
+                <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
                     ← Zurück zur Startseite
                 </button>
 
@@ -212,17 +212,17 @@
                             <label class="text-[11px] text-gray-400 block mb-1">BPS anpassen:</label>
                             <input type="number" step="0.1" id="admin-bps-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs">
                         </div>
-                        <button id="apply-admin-btn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">Werte übernehmen</button>
+                        <button type="button" id="apply-admin-btn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">Werte übernehmen</button>
                     </div>
 
-                    <!-- PIN ÄNDERN IM ADMIN-BEREICH -->
+                    <!-- PIN ÄNDERN -->
                     <div class="border-t border-gray-800 pt-3 space-y-3">
                         <h4 class="font-bold text-xs text-yellow-400">🔑 Sicherheits-PIN ändern</h4>
                         <div>
                             <label class="text-[11px] text-gray-400 block mb-1">Neuen PIN eingeben:</label>
                             <input type="password" id="admin-new-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs" placeholder="Neuer PIN">
                         </div>
-                        <button id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN aktualisieren</button>
+                        <button type="button" id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN aktualisieren</button>
                     </div>
                 </div>
 
@@ -236,7 +236,7 @@
                 <span class="text-4xl mb-3 block">🌱</span>
                 <h2 class="text-2xl font-black text-emerald-400 mb-2">Dein HD-Garten</h2>
                 <p class="text-gray-300 text-xs mb-6">Hier wachsen deine musikalischen Ideen im Einklang mit der Natur. Töne sind hier aktiv.</p>
-                <button id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
+                <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
                     ← Zurück zur Startseite
                 </button>
             </div>
@@ -247,9 +247,9 @@
             <div class="bg-[#131b2e] border border-cyan-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
                 <h2 class="text-xl font-bold text-cyan-400">☁️ Cloud-Sync</h2>
                 <p class="text-xs text-gray-400">Exportiere deinen Spielstand als Code oder importiere ihn auf einem anderen Gerät.</p>
-                <button id="export-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📤 Code kopieren (Export)</button>
-                <button id="import-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📥 Code einfügen (Import)</button>
-                <button id="cloud-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
+                <button type="button" id="export-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📤 Code kopieren (Export)</button>
+                <button type="button" id="import-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📥 Code einfügen (Import)</button>
+                <button type="button" id="cloud-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
             </div>
@@ -263,12 +263,8 @@
                     <label class="text-xs text-gray-400 block mb-1">Künstlername:</label>
                     <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">E-Mail:</label>
-                    <input type="email" id="reg-email-main" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
-                </div>
-                <button id="save-account-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Account speichern</button>
-                <button id="account-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
+                <button type="button" id="save-account-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Account speichern</button>
+                <button type="button" id="account-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
             </div>
@@ -279,7 +275,7 @@
             <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
                 <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ System Hub</h2>
                 <p class="text-xs text-gray-400">Nutze den spezifischen Admin-Bereich direkt im Game-Modul (nach erfolgreichem Login), um deine Spiel-Metriken und PINs zu verwalten.</p>
-                <button id="admin-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
+                <button type="button" id="admin-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
             </div>
@@ -291,14 +287,13 @@
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Automatisch gespeichert</span>
-            <button id="reset-game-btn" class="text-red-400 hover:underline">Gesamten Spielstand zurücksetzen</button>
+            <button type="button" id="reset-game-btn" class="text-red-400 hover:underline">Gesamten Spielstand zurücksetzen</button>
         </div>
     </footer>
 
-    <!-- JavaScript Logik & Sicheres Auth + Admin System -->
+    <!-- JavaScript Logik -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Spielstand-Variablen mit absolutem Fortschritts-Schutz
             let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 40430;
             let fans = parseInt(localStorage.getItem('beat_lab_fans')) || 14603;
             let bps = parseFloat(localStorage.getItem('beat_lab_bps')) || 161.0;
@@ -306,13 +301,11 @@
             let soundEnabled = true;
             let currentView = 'home';
 
-            // Auth-Zustand prüfen
             let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
 
             const userDisplay = document.getElementById('user-display');
             if (userDisplay) userDisplay.innerText = username;
 
-            // UI Ansichten umschalten (Auth vs. Game)
             function updateGameViewState() {
                 const authContainer = document.getElementById('game-auth-container');
                 const mainContainer = document.getElementById('game-main-container');
@@ -329,7 +322,7 @@
                 }
             }
 
-            // Tabs Umschalten (Login <-> Registrieren)
+            // Tabs Umschalten
             const tabLoginBtn = document.getElementById('tab-login-btn');
             const tabRegisterBtn = document.getElementById('tab-register-btn');
             const formLogin = document.getElementById('form-login');
@@ -351,7 +344,7 @@
                 });
             }
 
-            // REGISTRIERUNG (Mit strengem Schutz vor doppelten E-Mails / Info-Diebstahl)
+            // Registrierung (Mit Einzigartigkeitsprüfung)
             const submitRegisterBtn = document.getElementById('submit-register-btn');
             if(submitRegisterBtn) {
                 submitRegisterBtn.addEventListener('click', () => {
@@ -367,30 +360,25 @@
                         return;
                     }
 
-                    // Benutzerdatenbank laden
                     let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
 
-                    // Schutz: Prüfen ob E-Mail bereits existiert (Niemand kann die gleichen Anmeldeinfos verwenden)
                     if (usersDB[emailInput]) {
                         alert("⚠️ Diese E-Mail-Adresse ist bereits registriert! Wähle eine andere oder logge dich ein.");
                         return;
                     }
 
-                    // Account anlegen
                     usersDB[emailInput] = { pin: pinInput, created: Date.now() };
                     localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
 
-                    // Direkt einloggen, Fortschritt bleibt zu 100% erhalten
                     loggedInUser = emailInput;
                     localStorage.setItem('beat_lab_logged_in_user', emailInput);
-                    localStorage.setItem('beat_lab_email', emailInput);
 
-                    alert("🎉 Erfolgreich registriert und sicher eingeloggt!");
+                    alert("🎉 Erfolgreich registriert und eingeloggt!");
                     updateGameViewState();
                 });
             }
 
-            // LOGIN
+            // Login
             const submitLoginBtn = document.getElementById('submit-login-btn');
             if(submitLoginBtn) {
                 submitLoginBtn.addEventListener('click', () => {
@@ -406,14 +394,13 @@
 
                     loggedInUser = emailInput;
                     localStorage.setItem('beat_lab_logged_in_user', emailInput);
-                    localStorage.setItem('beat_lab_email', emailInput);
 
-                    alert("🚀 Erfolgreich eingeloggt! Willkommen zurück im Beat-Lab.");
+                    alert("🚀 Erfolgreich eingeloggt!");
                     updateGameViewState();
                 });
             }
 
-            // LOGOUT
+            // Logout
             const logoutBtn = document.getElementById('logout-btn');
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
@@ -424,13 +411,13 @@
                 });
             }
 
-            // ADMIN: PIN ÄNDERN IM GAME-BEREICH (Ganz unten)
+            // Admin PIN ändern
             const adminChangePinBtn = document.getElementById('admin-change-pin-btn');
             if(adminChangePinBtn) {
                 adminChangePinBtn.addEventListener('click', () => {
                     const newPin = document.getElementById('admin-new-pin').value.trim();
                     if (!newPin || newPin.length < 3) {
-                        alert("❌ Bitte gib einen gültigen neuen PIN (mind. 3 Zeichen) ein.");
+                        alert("❌ Bitte gib einen neuen PIN (mind. 3 Zeichen) ein.");
                         return;
                     }
 
@@ -438,7 +425,7 @@
                     if (loggedInUser && usersDB[loggedInUser]) {
                         usersDB[loggedInUser].pin = newPin;
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-                        alert("✅ Dein Sicherheits-PIN wurde erfolgreich im Admin-Bereich aktualisiert!");
+                        alert("✅ Sicherheits-PIN erfolgreich aktualisiert!");
                         document.getElementById('admin-new-pin').value = '';
                     } else {
                         alert("❌ Fehler: Kein aktiver Benutzer gefunden.");
@@ -498,9 +485,7 @@
                 }
                 if (view === 'account') {
                     let rUser = document.getElementById('reg-username');
-                    let rEmailMain = document.getElementById('reg-email-main');
                     if(rUser) rUser.value = username;
-                    if(rEmailMain) rEmailMain.value = localStorage.getItem('beat_lab_email') || '';
                 }
 
                 ['home', 'game', 'garten', 'cloud', 'account', 'admin'].forEach(v => {
@@ -539,7 +524,6 @@
                 localStorage.setItem('beat_lab_user', username);
             }
 
-            // Admin Werte Übernehmen
             const applyAdminBtn = document.getElementById('apply-admin-btn');
             if(applyAdminBtn) {
                 applyAdminBtn.addEventListener('click', () => {
@@ -548,13 +532,13 @@
                     bps = parseFloat(document.getElementById('admin-bps-input').value) || bps;
                     updateDisplay();
                     saveGame();
-                    alert("🛠️ Admin-Werte im Spiel erfolgreich übernommen!");
+                    alert("🛠️ Admin-Werte übernommen!");
                 });
             }
 
             function exportSave() {
                 try {
-                    const saveData = { beats, fans, bps, username, email: loggedInUser || '' };
+                    const saveData = { beats, fans, bps, username };
                     const code = btoa(JSON.stringify(saveData));
                     navigator.clipboard.writeText(code).then(() => {
                         alert("📋 Cloud-Code in die Zwischenablage kopiert!");
@@ -575,7 +559,7 @@
                         username = data.username || 'jackdarckart';
                         saveGame();
                         updateDisplay();
-                        alert("🚀 Spielstand erfolgreich geladen!");
+                        alert("🚀 Spielstand geladen!");
                     } catch (e) {
                         alert("❌ Ungültiger Code!");
                     }
@@ -583,7 +567,7 @@
             }
 
             function resetGame() {
-                if (confirm("Wirklich den gesamten Spielstand zurücksetzen?")) {
+                if (confirm("Wirklich alles zurücksetzen?")) {
                     localStorage.clear();
                     beats = 40430; fans = 14603; bps = 161.0; username = 'jackdarckart';
                     loggedInUser = null;
@@ -592,11 +576,11 @@
                     updateGameViewState();
                     updateDisplay();
                     saveGame();
-                    alert("🔄 Spielstand wurde komplett zurückgesetzt.");
+                    alert("🔄 Zurückgesetzt.");
                 }
             }
 
-            // Event-Listener Bindungen für alle Navigationen & Buttons
+            // Event Listener Bindungen
             document.getElementById('nav-home').addEventListener('click', () => switchView('home'));
             document.getElementById('nav-game').addEventListener('click', () => switchView('game'));
             document.getElementById('nav-garten').addEventListener('click', () => switchView('garten'));
@@ -623,7 +607,7 @@
                         let ud = document.getElementById('user-display');
                         if(ud) ud.innerText = username;
                         saveGame();
-                        alert("🎉 Account-Profil gespeichert!");
+                        alert("🎉 Profil gespeichert!");
                     }
                 });
             }
@@ -632,13 +616,13 @@
             document.getElementById('admin-to-home-btn').addEventListener('click', () => switchView('home'));
             document.getElementById('reset-game-btn').addEventListener('click', resetGame);
 
-            // Automatische Produktion (BPS)
+            // Auto-production
             setInterval(() => {
                 beats += bps / 10;
                 if (loggedInUser) updateDisplay();
             }, 100);
 
-            // Automatisches Speichern
+            // Auto-save
             setInterval(() => { saveGame(); }, 5000);
 
             updateDisplay();
