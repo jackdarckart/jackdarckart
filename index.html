@@ -3,202 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | CloudBeats & Rock-Lab Hub</title>
+    <title>jackdarckart | CloudBeats & Rock-Lab Nexus</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(19, 27, 46, 0.75) 0%, rgba(10, 15, 28, 0.85) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .neon-glow-purple { box-shadow: 0 0 25px -5px rgba(168, 85, 247, 0.25); }
+        .neon-glow-emerald { box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25); }
+        .cyber-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cyber-button::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: 0.5s;
+        }
+        .cyber-button:hover::after { left: 100%; }
+    </style>
 </head>
-<body class="bg-[#080c14] text-white min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+<body class="bg-[#05070c] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
-    <!-- Header / Navigation -->
-    <header class="w-full border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#080c14]/95 px-4 py-3">
-        <div class="max-w-6xl mx-auto flex justify-between items-center overflow-x-auto">
-            <div class="flex items-center space-x-2 shrink-0">
-                <span class="text-xl p-1.5 bg-purple-600/20 rounded-xl border border-purple-500/30">☁️</span>
-                <span id="user-display" class="font-extrabold text-sm tracking-wide bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">jackdarckart</span>
+    <!-- Cyber-Glass Header / Navigation -->
+    <header class="w-full border-b border-purple-500/10 backdrop-blur-xl sticky top-0 z-50 bg-[#05070c]/85 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex justify-between items-center overflow-x-auto gap-4">
+            <div class="flex items-center space-x-3 shrink-0">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-500 p-0.5 shadow-lg shadow-purple-500/20">
+                    <div class="w-full h-full bg-[#080c14] rounded-[10px] flex items-center justify-center text-base">🎛️</div>
+                </div>
+                <div>
+                    <span id="user-display" class="font-black text-sm tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">jackdarckart</span>
+                    <span class="block text-[9px] text-purple-400/70 font-mono tracking-widest uppercase">Nexus-OS v3.5</span>
+                </div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-                <button type="button" id="nav-home" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">🏠 Dashboard</button>
-                <button type="button" id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">🎸 Studio-Lab</button>
-                <button type="button" id="nav-garten" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">🌱 Bio-Garden</button>
-                <button type="button" id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">☁️ Cloud-Sync</button>
-                <button type="button" id="nav-account" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">📝 Profil</button>
-                <button type="button" id="nav-admin" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">🛠️ Nexus-Admin</button>
+                <button type="button" id="nav-home" class="cyber-button bg-slate-900/60 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 hover:border-purple-500/40 cursor-pointer">🏠 Home</button>
+                <button type="button" id="nav-game" class="cyber-button bg-slate-900/60 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 hover:border-purple-500/40 cursor-pointer">🎸 Studio-Lab</button>
+                <button type="button" id="nav-garten" class="cyber-button bg-slate-900/60 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 hover:border-emerald-500/40 cursor-pointer">🌱 Bio-Garden</button>
+                <button type="button" id="nav-cloud" class="cyber-button bg-slate-900/60 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 hover:border-cyan-500/40 cursor-pointer">☁️ Cloud</button>
+                <button type="button" id="nav-account" class="cyber-button bg-slate-900/60 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 hover:border-blue-500/40 cursor-pointer">📝 Profil</button>
+                <button type="button" id="nav-admin" class="cyber-button bg-slate-900/60 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 hover:border-amber-500/40 cursor-pointer">🛠️ Admin</button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-6xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
+    <!-- Main Content Matrix -->
+    <main class="max-w-5xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         
         <!-- 1. DASHBOARD -->
-        <div id="view-home" class="view-page hidden w-full py-4 space-y-6 text-left">
-            <div class="bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-purple-500/30 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
-                <span class="inline-block text-4xl p-3 bg-purple-600/20 rounded-2xl mb-3 border border-purple-500/30">🤘</span>
-                <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">CloudBeats &amp; Rock-Lab Hub</h1>
-                <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">CloudBeats Audio Ökosystem • Meckenheim, NRW</p>
-                <p class="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto">
-                    Das offizielle Web-Ökosystem von jackdarckart. Hier verschmelzen High-End Audio-Mediathek, tokenisierte Hash-Rate-Economy und kraftvolle Musik-Produktionen.
+        <div id="view-home" class="view-page hidden w-full py-6 space-y-6 text-left">
+            <div class="glass-panel neon-glow-purple p-8 sm:p-10 rounded-[2.5rem] relative overflow-hidden text-center">
+                <div class="absolute -right-20 -top-20 w-60 h-60 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-20 -bottom-20 w-60 h-60 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/20 shadow-inner">⚡</span>
+                <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats &amp; Rock-Lab Hub</h1>
+                <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">High-End Audio-Mediathek • Meckenheim, NRW</p>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light">
+                    Willkommen im Nexus. Eine nahtlose Verschmelzung aus künstlicher Audio-Synthese, tokenisierter Hash-Rate-Economy und organischer Architektur.
                 </p>
-                <div class="mt-6 flex flex-wrap justify-center gap-3">
-                    <button type="button" id="home-to-game-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2 cursor-pointer">
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                    <button type="button" id="home-to-game-btn" class="cyber-button bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 px-7 rounded-2xl shadow-xl shadow-purple-900/30 text-xs sm:text-sm flex items-center gap-2.5 cursor-pointer">
                         <span>🎸</span> Studio betreten
                     </button>
-                    <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-500/30 font-semibold py-3 px-6 rounded-2xl text-xs sm:text-sm transition flex items-center gap-2">
+                    <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="cyber-button bg-slate-900/80 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-semibold py-3.5 px-7 rounded-2xl text-xs sm:text-sm transition flex items-center gap-2.5 shadow-lg">
                         <span>📻</span> laut.fm Webradio ↗
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME & UPGRADES MODUL) -->
+        <!-- 2. STUDIO-LAB (GAME & UPGRADES) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
             
             <!-- Auth Gateway -->
-            <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left">
+            <div id="game-auth-container" class="glass-panel p-6 sm:p-8 rounded-[2rem] text-left space-y-4">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
-                    <h2 class="text-xl font-bold text-purple-400">CloudBeats Access Gateway</h2>
+                    <h2 class="text-lg font-bold text-purple-300">Access Gateway</h2>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Sichere Session-Authentifizierung</p>
                 </div>
-                <div id="auth-msg" class="text-xs text-center font-medium text-amber-400 min-h-[16px]"></div>
+                <div id="auth-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
                 <div class="space-y-3">
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
-                        <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" value="artur.hamm90@gmail.com">
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
+                        <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 focus:border-purple-500 rounded-xl px-3.5 py-2.5 text-white text-sm outline-none transition" value="artur.hamm90@gmail.com">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">PIN-Code:</label>
-                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" value="1234">
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN-CODE:</label>
+                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 focus:border-purple-500 rounded-xl px-3.5 py-2.5 text-white text-sm outline-none transition" value="1234">
                     </div>
-                    <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 cursor-pointer">🔒 Studio entsperren</button>
+                    <button type="button" id="submit-login-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition mt-2 cursor-pointer shadow-lg shadow-purple-900/20">🔓 Studio entsperren</button>
                 </div>
             </div>
 
-            <!-- Main Studio Container -->
+            <!-- Main Studio Panel -->
             <div id="game-main-container" class="space-y-4 hidden">
-                <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
-                    <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
-                    <button type="button" id="logout-btn" class="bg-red-900/40 text-red-300 text-[10px] px-2.5 py-1 rounded-xl cursor-pointer">🚪 Abmelden</button>
+                <div class="glass-panel p-3.5 rounded-2xl flex justify-between items-center text-xs">
+                    <span id="logged-user-email" class="text-purple-300 font-mono truncate max-w-[210px]">Session Aktiv</span>
+                    <button type="button" id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] px-3 py-1.5 rounded-xl font-mono cursor-pointer transition">🚪 Abmelden</button>
                 </div>
 
-                <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl cursor-pointer active:scale-95 transition">
-                    🎧 Master-Beat Live einspielen (+<span id="click-power-display">5</span>)
+                <button type="button" id="produce-beat-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-black py-5 px-6 rounded-[2rem] shadow-2xl shadow-purple-900/40 text-lg cursor-pointer active:scale-[0.98] border border-white/10 flex flex-col items-center justify-center gap-1">
+                    <span class="flex items-center gap-2">🎧 Master-Beat Einspielen</span>
+                    <span class="text-xs font-mono font-normal text-purple-200/80">(+<span id="click-power-display">5</span> Beats pro Klick)</span>
                 </button>
 
                 <div class="grid grid-cols-2 gap-3 text-left">
-                    <div class="bg-[#131b2e] p-3.5 rounded-2xl border border-gray-800">
-                        <p class="text-[10px] text-gray-400 uppercase">Beats</p>
-                        <p id="beats-count" class="text-xl font-black text-purple-400">3.449</p>
+                    <div class="glass-panel p-4 rounded-2xl border-purple-500/20">
+                        <p class="text-[10px] font-mono text-purple-300 uppercase tracking-widest">Gesamt Beats</p>
+                        <p id="beats-count" class="text-2xl font-black text-white font-mono mt-0.5">3.449</p>
                     </div>
-                    <div class="bg-[#131b2e] p-3.5 rounded-2xl border border-gray-800">
-                        <p class="text-[10px] text-gray-400 uppercase">Fans</p>
-                        <p id="fans-count" class="text-xl font-black text-pink-400">586</p>
+                    <div class="glass-panel p-4 rounded-2xl border-pink-500/20">
+                        <p class="text-[10px] font-mono text-pink-300 uppercase tracking-widest">Aktive Fans</p>
+                        <p id="fans-count" class="text-2xl font-black text-white font-mono mt-0.5">586</p>
                     </div>
                 </div>
 
-                <!-- Upgrades Shop -->
-                <div class="bg-[#131b2e] border border-purple-500/30 p-4 rounded-3xl text-left space-y-3">
-                    <h3 class="text-sm font-bold text-purple-300">⚡ Studio Upgrades &amp; Sound-Töne</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center bg-[#0b0f19] p-2.5 rounded-xl border border-gray-800">
+                <!-- Upgrades Terminal -->
+                <div class="glass-panel p-5 rounded-[2rem] text-left space-y-3.5">
+                    <h3 class="text-xs font-mono uppercase tracking-widest text-purple-400 flex items-center gap-2">
+                        <span>⚡</span> Synthesizer &amp; Automation
+                    </h3>
+                    <div class="space-y-2.5">
+                        <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800/80 flex justify-between items-center gap-3">
                             <div>
-                                <p class="text-xs font-semibold text-white">🎹 Synth-Bass Modul</p>
-                                <p id="upg1-status" class="text-[10px] text-gray-400">+2 Beats pro Klick &amp; Sound-Ton</p>
+                                <p class="text-xs font-bold text-white">🎹 Synth-Bass Modul</p>
+                                <p id="upg1-status" class="text-[10px] text-slate-400 font-mono">+2 Power &amp; Live Sound-Ton</p>
                             </div>
-                            <button type="button" id="buy-upgrade-1" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold cursor-pointer">100 Beats</button>
+                            <button type="button" id="buy-upgrade-1" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">100 B</button>
                         </div>
-                        <div class="flex justify-between items-center bg-[#0b0f19] p-2.5 rounded-xl border border-gray-800">
+                        <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800/80 flex justify-between items-center gap-3">
                             <div>
                                 <p class="text-xs font-semibold text-white">🚀 Auto-Beat Machine</p>
-                                <p id="upg2-status" class="text-[10px] text-gray-400">+1 Beat pro Sekunde</p>
+                                <p id="upg2-status" class="text-[10px] text-slate-400 font-mono">+1 Beat pro Sekunde</p>
                             </div>
-                            <button type="button" id="buy-upgrade-2" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold cursor-pointer">500 Beats</button>
+                            <button type="button" id="buy-upgrade-2" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">500 B</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
+            <button type="button" id="game-to-home-btn" class="cyber-button w-full bg-slate-900/60 hover:bg-slate-800 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Zurück zum Dashboard</button>
         </div>
 
-        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO (GARTEN RENDER MODUL) -->
+        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
-            <div class="bg-[#101722] border border-emerald-500/40 p-4 sm:p-6 rounded-3xl shadow-2xl space-y-4">
+            <div class="glass-panel neon-glow-emerald p-4 sm:p-6 rounded-[2.5rem] shadow-2xl space-y-4">
                 <div>
                     <span class="text-3xl mb-1 block">🏡</span>
-                    <h2 class="text-xl sm:text-2xl font-black text-emerald-400 mb-1">Architektur-Landschaftsgarten &amp; Takt-Sync</h2>
-                    <div id="current-song-display" class="text-xs sm:text-sm text-emerald-300 bg-[#080c14] border border-emerald-500/30 py-1.5 px-4 rounded-xl mt-1 inline-block shadow-inner">
+                    <h2 class="text-xl sm:text-2xl font-black text-emerald-400 mb-1">Architektur-Landschaftsgarten</h2>
+                    <div id="current-song-display" class="text-xs sm:text-sm text-emerald-300 bg-[#030508] border border-emerald-500/20 py-1.5 px-4 rounded-xl mt-1 inline-block font-mono shadow-inner">
                         🎶 Lade Song...
                     </div>
                 </div>
 
-                <!-- Webradio Steuerung -->
-                <div class="bg-[#080c14] border border-emerald-500/30 p-3 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
-                    <div class="flex items-center gap-2">
-                        <span class="text-emerald-400 font-bold">🎵 Stream:</span>
-                        <button type="button" id="toggle-radio-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow">
+                <!-- Stream Controller -->
+                <div class="bg-[#030508] border border-emerald-500/20 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-emerald-400 font-mono font-bold">🎵 Stream:</span>
+                        <button type="button" id="toggle-radio-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow">
                             📻 Stream starten
                         </button>
                     </div>
-                    <span id="audio-status-text" class="text-gray-400 text-xs">Bereit</span>
+                    <span id="audio-status-text" class="text-slate-400 font-mono text-[11px]">Bereit</span>
                 </div>
                 
                 <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- HD-Canvas mit optimierter Renderer-Engine -->
-                <div class="relative w-full overflow-hidden rounded-2xl border-2 border-emerald-500/40 shadow-xl bg-[#b5e48c]">
+                <!-- Biophilic HD-Canvas -->
+                <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/30 shadow-2xl bg-[#1b4332]">
                     <canvas id="garden-canvas" width="1200" height="750" class="w-full h-auto object-contain block"></canvas>
                 </div>
-                <p class="text-[11px] text-emerald-400/80 italic">💡 Der Architektur-Garten pulsiert harmonisch im Takt deines Webradios.</p>
+                <p class="text-[11px] text-emerald-400/70 font-mono italic">✨ Reagiert live auf den Rhythmus deines Webradio-Streams.</p>
 
-                <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 cursor-pointer">← Dashboard</button>
+                <button type="button" id="garten-to-home-btn" class="cyber-button w-full bg-slate-900/60 hover:bg-slate-800 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
         <!-- 4. CLOUD-SYNC -->
         <div id="view-cloud" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
-            <div class="bg-[#131b2e] border border-cyan-500/30 p-6 rounded-3xl space-y-4">
-                <h2 class="text-xl font-bold text-cyan-400">☁️ Cloud-Nexus Sync</h2>
-                <p class="text-xs text-gray-400">Verwaltung der Cloud-Speicherstände.</p>
-                <button type="button" id="cloud-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
+            <div class="glass-panel p-6 rounded-[2rem] space-y-4 border-cyan-500/20">
+                <h2 class="text-lg font-bold text-cyan-400 font-mono">☁️ Cloud-Nexus Sync</h2>
+                <p class="text-xs text-slate-400">Verwaltung und Sicherung des lokalen Telemetrie-Speichers.</p>
+                <button type="button" id="cloud-to-home-btn" class="cyber-button w-full bg-slate-900 hover:bg-slate-800 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
         <!-- 5. PROFIL -->
         <div id="view-account" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
-            <div class="bg-[#131b2e] border border-blue-500/30 p-6 rounded-3xl space-y-3">
-                <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Künstler-Profil</h2>
-                <label class="text-xs text-gray-400 block">Künstlername:</label>
-                <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm" value="jackdarckart">
-                <button type="button" id="save-account-btn" class="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold cursor-pointer">Änderungen speichern</button>
-                <button type="button" id="account-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs mt-2 cursor-pointer">← Dashboard</button>
+            <div class="glass-panel p-6 rounded-[2rem] space-y-3.5 border-blue-500/20">
+                <h2 class="text-lg font-bold text-blue-400 font-mono mb-2">📝 Künstler-Profil</h2>
+                <label class="text-[11px] font-mono text-slate-400 block">KÜNSTLERNAME:</label>
+                <input type="text" id="reg-username" class="w-full bg-[#030508] border border-slate-800 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-white text-sm outline-none transition font-mono" value="jackdarckart">
+                <button type="button" id="save-account-btn" class="cyber-button w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-xs font-mono uppercase font-bold tracking-wider cursor-pointer shadow-lg shadow-blue-900/20">Änderungen speichern</button>
+                <button type="button" id="account-to-home-btn" class="cyber-button w-full bg-slate-900 hover:bg-slate-800 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer mt-2">← Dashboard</button>
             </div>
         </div>
 
         <!-- 6. ADMIN -->
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
-            <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl space-y-3">
-                <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ Nexus System Hub</h2>
-                <p class="text-xs text-gray-400">Systemdiagnose und Konfiguration.</p>
-                <button type="button" id="admin-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
+            <div class="glass-panel p-6 rounded-[2rem] space-y-3.5 border-amber-500/20">
+                <h2 class="text-lg font-bold text-amber-400 font-mono mb-2">🛠️ Nexus System Hub</h2>
+                <p class="text-xs text-slate-400">Systemdiagnose und Ressourcen-Telemetrie.</p>
+                <button type="button" id="admin-to-home-btn" class="cyber-button w-full bg-slate-900 hover:bg-slate-800 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#080c14]">
-        <div class="max-w-4xl mx-auto flex justify-between items-center text-xs text-gray-400">
-            <span id="save-status">💾 Automatisch gesichert</span>
-            <span class="text-gray-500">CloudBeats Ökosystem</span>
+    <!-- Cyber-Footer -->
+    <footer class="w-full border-t border-purple-500/10 py-3 px-4 bg-[#05070c]">
+        <div class="max-w-5xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
+            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Auto-Sync Aktiv</span>
+            <span class="text-purple-400/60">jackdarckart • CloudBeats</span>
         </div>
     </footer>
 
-    <!-- MODULAR SYSTEM SCRIPTS (OPTIMIERT & RESSSOURCENSPAREND) -->
+    <!-- MODULAR SYSTEM SCRIPTS (PERFORMANCE OPTIMIERT) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             /* ========================================================
-               MODUL 1: GAME & ECONOMY ENGINE (Studio-Lab & Upgrades)
+               MODUL 1: GAME & ECONOMY ENGINE
                ======================================================== */
             const GameEngine = {
                 beats: 3449,
@@ -289,7 +325,6 @@
 
             GameEngine.init();
 
-            // Studio Events
             document.getElementById('produce-beat-btn').addEventListener('click', () => {
                 GameEngine.beats += GameEngine.clickPower;
                 GameEngine.fans += 1;
@@ -355,7 +390,7 @@
                 if (GameEngine.loggedInUser) {
                     authC.classList.add('hidden');
                     mainC.classList.remove('hidden');
-                    document.getElementById('logged-user-email').innerText = "Eingeloggt: " + GameEngine.loggedInUser;
+                    document.getElementById('logged-user-email').innerText = "Session: " + GameEngine.loggedInUser;
                     GameEngine.updateUI();
                 } else {
                     authC.classList.remove('hidden');
@@ -366,7 +401,7 @@
 
 
             /* ========================================================
-               MODUL 2: GARDEN & AUDIO-SYNC RENDERER (Bio-Garden & Canvas)
+               MODUL 2: GARDEN & AUDIO-SYNC RENDERER
                ======================================================== */
             const GardenEngine = {
                 canvas: document.getElementById('garden-canvas'),
@@ -393,14 +428,14 @@
                                 await this.audioEl.play();
                                 this.isStreaming = true;
                                 this.toggleBtn.innerText = "⏹️ Stream stoppen";
-                                this.toggleBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
-                                this.statusText.innerText = "🟢 Webradio aktiv & synchronisiert";
+                                this.toggleBtn.className = "cyber-button bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
+                                this.statusText.innerText = "🟢 Takt-Sync aktiv";
                             } catch(e) {}
                         } else {
                             this.audioEl.pause();
                             this.isStreaming = false;
                             this.toggleBtn.innerText = "📻 Stream starten";
-                            this.toggleBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
+                            this.toggleBtn.className = "cyber-button bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
                             this.statusText.innerText = "Bereit";
                         }
                     });
@@ -434,29 +469,29 @@
                     const canvas = this.canvas;
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                    // Takt-Puls Berechnung
                     let pulse = 0.02;
                     if (this.isStreaming && !this.audioEl.paused) {
                         let time = Date.now() / 250;
-                        pulse = (Math.sin(time) * 0.5 + 0.5) * 0.035;
+                        pulse = (Math.sin(time) * 0.5 + 0.5) * 0.04;
                     } else {
                         pulse = (Math.sin(Date.now() / 800) + 1) * 0.015;
                     }
 
-                    // Rasen Hintergrund
+                    // Biophiler Hintergrund
                     let lawnGrad = ctx.createLinearGradient(0, 0, 0, 750);
-                    lawnGrad.addColorStop(0, '#9ef01a');
-                    lawnGrad.addColorStop(0.5, '#70e000');
-                    lawnGrad.addColorStop(1, '#38b000');
+                    lawnGrad.addColorStop(0, '#52b788');
+                    lawnGrad.addColorStop(0.5, '#2d6a4f');
+                    lawnGrad.addColorStop(1, '#1b4332');
                     ctx.fillStyle = lawnGrad;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+                    // Neon-Bio Raster
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
                     for (let i = 0; i < canvas.width; i += 60) {
                         ctx.fillRect(i, 0, 30, canvas.height);
                     }
 
-                    // Pool
+                    // Pool & Fontäne
                     ctx.fillStyle = '#014f86';
                     ctx.fillRect(720, 380, 400, 240);
                     let poolGrad = ctx.createLinearGradient(720, 380, 1120, 620);
@@ -466,21 +501,21 @@
                     ctx.fillStyle = poolGrad;
                     ctx.fillRect(732, 392, 376, 216);
 
-                    ctx.strokeStyle = '#adb5bd';
+                    ctx.strokeStyle = '#48cae4';
                     ctx.lineWidth = 5;
                     ctx.strokeRect(730, 390, 380, 220);
 
-                    let fountainRadius = 15 + (pulse * 20);
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + pulse * 2})`;
-                    ctx.lineWidth = 3;
+                    let fountainRadius = 15 + (pulse * 25);
+                    ctx.strokeStyle = `rgba(72, 202, 228, ${0.5 + pulse * 3})`;
+                    ctx.lineWidth = 3.5;
                     ctx.beginPath();
                     ctx.arc(920, 500, fountainRadius, 0, Math.PI * 2);
                     ctx.stroke();
 
-                    // Kiesgarten & Details
-                    ctx.fillStyle = '#e9ecef';
+                    // Kiesgarten & Architektur-Platten
+                    ctx.fillStyle = '#adb5bd';
                     ctx.fillRect(120, 120, 500, 360);
-                    ctx.fillStyle = '#ced4da';
+                    ctx.fillStyle = '#6c757d';
                     for(let k=0; k<150; k++) {
                         ctx.fillRect(130 + (k * 13) % 480, 130 + (k * 7) % 340, 2, 2);
                     }
@@ -488,7 +523,7 @@
                     ctx.fillStyle = '#212529';
                     for (let r = 0; r < 5; r++) {
                         ctx.fillRect(160 + r * 58, 280 + r * 30, 70, 35);
-                        ctx.strokeStyle = '#343a40';
+                        ctx.strokeStyle = '#495057';
                         ctx.lineWidth = 1.5;
                         ctx.strokeRect(160 + r * 58, 280 + r * 30, 70, 35);
                     }
@@ -501,18 +536,18 @@
                     ctx.fillStyle = woodGrad;
                     ctx.fillRect(150, 630, 900, 120);
 
-                    // Kugelbäume (Pulsieren im Takt)
+                    // Topiary Bäume mit Takt-Puls
                     const drawTopiary = (bx, by) => {
-                        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                        ctx.fillStyle = 'rgba(0,0,0,0.3)';
                         ctx.beginPath(); ctx.ellipse(bx, by + 8, 20, 8, 0, 0, Math.PI*2); ctx.fill();
-                        ctx.fillStyle = '#4a3b32';
+                        ctx.fillStyle = '#3a2e2b';
                         ctx.fillRect(bx - 6, by - 15, 12, 40);
 
-                        let crownRadius = 32 * (1 + pulse * 0.5);
+                        let crownRadius = 32 * (1 + pulse * 0.6);
                         let gradDark = ctx.createRadialGradient(bx-8, by-30, 4, bx, by-25, crownRadius);
-                        gradDark.addColorStop(0, '#52b788');
+                        gradDark.addColorStop(0, '#74c69d');
                         gradDark.addColorStop(0.6, '#2d6a4f');
-                        gradDark.addColorStop(1, '#1b4332');
+                        gradDark.addColorStop(1, '#081c15');
                         ctx.fillStyle = gradDark;
                         ctx.beginPath(); ctx.arc(bx, by - 25, crownRadius, 0, Math.PI * 2); ctx.fill();
                     };
@@ -526,7 +561,7 @@
 
 
             /* ========================================================
-               GLOBAL NAVIGATION & ROUTER
+               ROUTER & NAVIGATION CONTROLLER
                ======================================================== */
             let currentView = localStorage.getItem('cb_view') || 'home';
             function switchView(view) {
