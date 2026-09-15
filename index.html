@@ -338,20 +338,20 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (Mit Dauerspeicher-Garantie)</span>
+                <span>Exklusives Studio-Minigame (Überall zugreifbar)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
             <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße druckvolle, rockige Synth-Riffs und Power-Chords!</p>
         </div>
 
-        <!-- AUTH SCREEN (LOGIN & REGISTRIERUNG) -->
+        <!-- AUTH SCREEN -->
         <div id="gameAuthScreen" class="bg-cardbg border border-indigo-500/40 rounded-3xl p-8 sm:p-10 max-w-lg mx-auto shadow-2xl space-y-6">
             <div class="w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-3xl mx-auto border border-indigo-500/30">
                 <i class="fa-solid fa-user-lock"></i>
             </div>
             <div class="text-center">
                 <h3 id="authTitle" class="text-2xl font-bold mb-2">Beat-Lab Anmelden</h3>
-                <p id="authSubtitle" class="text-sm text-gray-400">Melde dich mit deiner E-Mail und deinem PIN an oder registriere ein neues Konto.</p>
+                <p id="authSubtitle" class="text-sm text-gray-400">Melde dich mit deiner E-Mail und deinem PIN an, um deinen Spielstand überall abzurufen.</p>
             </div>
 
             <div class="space-y-4">
@@ -462,12 +462,12 @@
                 </div>
             </div>
 
-            <!-- Absolute Sicherheits- & Backup Sektion -->
+            <!-- Account, Backup & Reset Sektion -->
             <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="text-left">
-                        <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Sicherer Account: <span id="loggedInEmailDisplay" class="text-white font-mono">...</span></h4>
-                        <p class="text-xs text-gray-400">Fortschritt wird in Echtzeit geschützt.</p>
+                        <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Angemeldet als: <span id="loggedInEmailDisplay" class="text-white font-mono">...</span></h4>
+                        <p class="text-xs text-gray-400">Cloud-Code / ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">...</code></p>
                     </div>
                     <div>
                         <button onclick="logoutUser()" class="bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-2.5 rounded-xl font-semibold transition flex items-center space-x-2">
@@ -578,7 +578,7 @@
 
             if (isRegisterMode) {
                 title.innerText = 'Beat-Lab Konto erstellen';
-                sub.innerText = 'Registriere dich mit deiner E-Mail und einem PIN, um deinen Fortschritt absolut sicher zu speichern.';
+                sub.innerText = 'Registriere dich, um deinen Spielstand dauerhaft zu sichern und überall abzurufen.';
                 btn.innerText = 'Konto registrieren';
                 switchBtn.innerText = 'Bereits ein Konto? Hier anmelden';
             } else {
@@ -766,20 +766,24 @@
             }
         }
 
-        // --- SPIELSTAND & 100% SICHERE BACKUP-SYSTEME ---
-        let gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0 };
+        // --- SPIELSTAND & SICHERUNG ---
+        let gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, cloudId: '' };
 
         function loadGameForUser(email) {
             let safeKey = 'jackBeatLabUserSave_' + email.replace(/[^a-z0-9]/g, '_');
             let saved = localStorage.getItem(safeKey);
 
             if (!saved) {
-                gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0 };
+                gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, cloudId: 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase() };
             } else {
                 try {
                     gameData = JSON.parse(saved);
+                    if (!gameData.cloudId) {
+                        gameData.cloudId = 'JB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    }
                 } catch(e) { console.error("Ladefehler", e); }
             }
+            document.getElementById('cloudIdDisplay').innerText = gameData.cloudId;
             updateGameUI();
         }
 
@@ -792,7 +796,6 @@
             } catch(e) { console.error("Speicherfehler", e); }
         }
 
-        // Backup als Datei herunterladen
         function exportSaveGame() {
             saveGame();
             let email = localStorage.getItem('jackLoggedInEmail') || 'player';
@@ -805,7 +808,6 @@
             downloadAnchor.remove();
         }
 
-        // Backup aus Datei wiederherstellen
         function importSaveGame(event) {
             let file = event.target.files[0];
             if (!file) return;
@@ -828,17 +830,23 @@
             reader.readAsText(file);
         }
 
+        // --- NUR DAS SPIEL ZURÜCKSETZEN (ACCOUNT BLEIBT ERHALTEN) ---
         function confirmResetGame() {
             let resetBtnHtml = `<button onclick="executeReset()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🗑️ Ja, Beat-Lab wirklich zurücksetzen</button>`;
-            showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du dein "Beat-Lab" wirklich komplett zurücksetzen?', resetBtnHtml);
+            showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du dein "Beat-Lab" wirklich komplett zurücksetzen? (Dein Account bleibt erhalten)', resetBtnHtml);
         }
 
         function executeReset() {
-            gameData.beats = 0; gameData.fans = 0; gameData.clickPower = 1;
-            gameData.mic = 0; gameData.synth = 0; gameData.desk = 0; gameData.label = 0;
+            gameData.beats = 0; 
+            gameData.fans = 0; 
+            gameData.clickPower = 1;
+            gameData.mic = 0; 
+            gameData.synth = 0; 
+            gameData.desk = 0; 
+            gameData.label = 0;
             saveGame();
             updateGameUI();
-            showInfoModal('✅ Zurückgesetzt', 'Das Beat-Lab wurde erfolgreich zurückgesetzt.');
+            showInfoModal('✅ Zurückgesetzt', 'Das Beat-Lab wurde erfolgreich zurückgesetzt. Du bist weiterhin angemeldet.');
         }
 
         function clickBeat() {
@@ -922,7 +930,6 @@
             }
         }, 100);
 
-        // Automatisches Speichern alle 5 Sekunden und beim Verlassen der Seite
         setInterval(function() { 
             if (localStorage.getItem('jackLoggedInEmail')) saveGame(); 
         }, 5000);
