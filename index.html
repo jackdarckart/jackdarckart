@@ -338,10 +338,10 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (PIN-gesichert)</span>
+                <span>Exklusives Studio-Minigame (Admin-Geschützt)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Dein Fortschritt ist durch deinen Geheim-PIN absolut sicher vor unbefugtem Zugriff!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Dein Spielstand ist durch deinen einmalig erstellten Master-PIN sicher geschützt.</p>
         </div>
 
         <!-- Game Dashboard -->
@@ -424,18 +424,21 @@
             </div>
         </div>
 
-        <!-- Cloud Sync & Reset Section -->
+        <!-- Cloud Sync, PIN Settings & Reset Section -->
         <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div class="text-left w-full sm:w-auto">
-                <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>PIN-gesicherte Cloud</h4>
+                <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Sicherer Admin-Bereich</h4>
                 <p class="text-xs text-gray-400">Deine Cloud-ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">Lade...</code></p>
             </div>
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
                 <button onclick="promptLoadCloudId()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition">
                     <i class="fa-solid fa-rotate mr-1.5"></i> Auf anderem Gerät laden
                 </button>
+                <button onclick="changeAdminPin()" class="bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
+                    <i class="fa-solid fa-key mr-1.5"></i> Master-PIN ändern
+                </button>
                 <button onclick="confirmResetGame()" class="bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition">
-                    <i class="fa-solid fa-lock mr-1.5"></i> Beat-Lab zurücksetzen (PIN)
+                    <i class="fa-solid fa-trash-can mr-1.5"></i> Beat-Lab zurücksetzen
                 </button>
             </div>
         </div>
@@ -454,7 +457,7 @@
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <i class="fa-solid fa-headphones-simple text-white text-xl"></i>
             </div>
-            <h3 class="text-2xl font-black mb-2">stream-musik.space</h3>
+                <h3 class="text-2xl font-black mb-2">stream-musik.space</h3>
             <p class="text-gray-400 text-sm mb-8">Das offizielle Portfolio & Webradio von jackdarckart.</p>
             <div class="flex justify-center space-x-6 mb-8 text-gray-400 text-xl">
                 <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="hover:text-green-400 transition"><i class="fa-brands fa-spotify"></i></a>
@@ -466,7 +469,7 @@
         </div>
     </footer>
 
-    <!-- Advanced Script, PIN Security & Game Logic -->
+    <!-- Advanced Script, Robust PIN Setup & Game Logic -->
     <script>
         // --- 1. SPA View Switcher ---
         function switchView(view) {
@@ -477,6 +480,7 @@
                 home.classList.add('hidden');
                 game.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                checkAndSetupPinOnce(); // Beim Öffnen des Spiels PIN prüfen/einrichten
             } else {
                 game.classList.add('hidden');
                 home.classList.remove('hidden');
@@ -485,7 +489,53 @@
             }
         }
 
-        // --- 2. Mini-Game State, Cloud Sync & PIN Security ---
+        // --- 2. Robuste PIN-Verwaltung (Einmalige Erstellung & Änderung) ---
+        function checkAndSetupPinOnce() {
+            let pin = localStorage.getItem('jackAdminPin');
+            if (!pin || pin.trim() === '') {
+                let newPin = prompt("🔒 BEAT-LAB ADMIN-EINRICHTUNG:\n\nDu öffnest das Beat-Lab zum ersten Mal. Bitte lege jetzt einmalig deinen geheimen Master-PIN fest (wichtig zum Schutz vor Fremden):");
+                if (newPin && newPin.trim() !== '') {
+                    localStorage.setItem('jackAdminPin', newPin.trim());
+                    alert("✅ Master-PIN erfolgreich erstellt und gespeichert! Merke dir diesen PIN gut.");
+                } else {
+                    alert("⚠️ Es wurde kein PIN eingegeben. Standard-PIN '1234' wurde gesetzt. Du kannst ihn jederzeit über den Button ändern.");
+                    localStorage.setItem('jackAdminPin', '1234');
+                }
+            }
+        }
+
+        function getVerifiedPin() {
+            let pin = localStorage.getItem('jackAdminPin');
+            if (!pin) {
+                checkAndSetupPinOnce();
+                pin = localStorage.getItem('jackAdminPin');
+            }
+            let input = prompt("🔑 PIN erforderlich:\nGib deinen geheimen Master-PIN ein:");
+            if (input === pin) {
+                return true;
+            } else {
+                alert("❌ Falscher PIN! Zugriff verweigert.");
+                return false;
+            }
+        }
+
+        function changeAdminPin() {
+            let currentPin = localStorage.getItem('jackAdminPin');
+            let input = prompt("🔑 Aktuellen Master-PIN eingeben:");
+            if (input === currentPin) {
+                let newPin = prompt("🔒 Gib deinen neuen geheimen Master-PIN ein:");
+                if (newPin && newPin.trim() !== '') {
+                    localStorage.setItem('jackAdminPin', newPin.trim());
+                    alert("✅ Master-PIN erfolgreich geändert!");
+                } else {
+                    alert("Abgebrochen. Neuer PIN war leer.");
+                }
+            } else {
+                alert("❌ Falscher aktueller PIN!");
+            }
+        }
+
+        // --- 3. Mini-Game State & Cloud Sync ---
         let gameData = {
             beats: 0,
             fans: 0,
@@ -497,21 +547,6 @@
             cloudId: ''
         };
 
-        // PIN-Verwaltung (Admin-Sicherheit)
-        function getAdminPin() {
-            let pin = localStorage.getItem('jackAdminPin');
-            if (!pin) {
-                pin = prompt("🔒 SICHERHEITSEINRICHTUNG:\n\nLege deinen geheimen Master-PIN fest, um dein Beat-Lab vor unbefugtem Zurücksetzen durch Fremde zu schützen:");
-                if (!pin || pin.trim() === '') {
-                    pin = '1234'; // Fallback falls abgebrochen wird
-                }
-                localStorage.setItem('jackAdminPin', pin.trim());
-                alert("Geheimer PIN erfolgreich gespeichert! Merke dir diesen PIN.");
-            }
-            return localStorage.getItem('jackAdminPin');
-        }
-
-        // Cloud-ID initialisieren
         function initCloudId() {
             let savedId = localStorage.getItem('jackCloudId');
             if (!savedId) {
@@ -542,37 +577,27 @@
             updateGameUI();
         }
 
-        // Spielstand auf anderem Gerät laden (PIN-geschützt)
         function promptLoadCloudId() {
-            let pinInput = prompt("🔑 PIN erforderlich:\nGib deinen geheimen Master-PIN ein, um einen Spielstand zu laden:");
-            if (pinInput !== getAdminPin()) {
-                alert("❌ Falscher PIN! Zugriff verweigert.");
-                return;
-            }
+            if (!getVerifiedPin()) return;
 
-            let enteredId = prompt("Gib deine Cloud-ID ein:", gameData.cloudId);
+            let enteredId = prompt("Gib deine Cloud-ID ein, um den Spielstand zu laden:", gameData.cloudId);
             if (enteredId && enteredId.trim() !== '') {
                 enteredId = enteredId.trim().toUpperCase();
                 let saved = localStorage.getItem('jackBeatLab_' + enteredId);
                 if (saved) {
                     localStorage.setItem('jackBeatLab_lastId', enteredId);
                     loadGame();
-                    alert("Spielstand erfolgreich geladen!");
+                    alert("✅ Spielstand erfolgreich geladen!");
                 } else {
-                    alert("Kein Spielstand unter dieser Cloud-ID gefunden.");
+                    alert("❌ Kein Spielstand unter dieser Cloud-ID gefunden.");
                 }
             }
         }
 
-        // Beat-Lab zurücksetzen (Streng PIN-geschützt)
         function confirmResetGame() {
-            let pinInput = prompt("🔒 SICHERHEITSAFRAGE:\n\nUm das Beat-Lab zurückzusetzen, musst du deinen geheimen Master-PIN eingeben:");
-            if (pinInput !== getAdminPin()) {
-                alert("❌ Falscher PIN! Das Zurücksetzen wurde verweigert.");
-                return;
-            }
+            if (!getVerifiedPin()) return;
 
-            let confirmMsg = "⚠️ Bist du absolut sicher, dass du nur das Beat-Lab zurücksetzen möchtest?";
+            let confirmMsg = "⚠️ SICHERHEITSABFRAGE:\n\nMöchtest du dein 'Beat-Lab' wirklich komplett zurücksetzen?\nAlle Beats und Upgrades gehen dabei verloren!";
             if (confirm(confirmMsg)) {
                 localStorage.removeItem('jackBeatLab_' + gameData.cloudId);
                 gameData.beats = 0;
@@ -584,7 +609,7 @@
                 gameData.label = 0;
                 saveGame();
                 updateGameUI();
-                alert("Das Beat-Lab wurde erfolgreich zurückgesetzt.");
+                alert("✅ Das Beat-Lab wurde erfolgreich zurückgesetzt.");
             }
         }
 
@@ -654,7 +679,7 @@
         });
 
 
-        // --- 3. Audio Persistence & Security Script ---
+        // --- 4. Audio Persistence & Security Script ---
         const audio = document.getElementById('radioStream');
 
         if ('mediaSession' in navigator) {
