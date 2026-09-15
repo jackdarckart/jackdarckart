@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- High-End Studio Synthesizer & Tycoon-Logik -->
+    <!-- High-End Studio Synthesizer & Tycoon-Logik (mit aktivem BPS-Sound) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -539,21 +539,21 @@
                 });
             }
 
-            // HIGH-END WEB AUDIO API SYNTHESIZER (Studio-Qualität mit Lowpass-Filter & unendlicher Vielfalt)
+            // High-End Studio Synthesizer für manuelle Klicks
             let audioCtx = null;
             const studioPatches = [
-                { type: 'sawtooth', base: 130.81, detune: -6, cutoff: 1400, decay: 0.28 }, // Sub Bass
-                { type: 'square', base: 261.63, detune: 5, cutoff: 2800, decay: 0.20 },   // Lead Synth
-                { type: 'triangle', base: 523.25, detune: 0, cutoff: 4500, decay: 0.32 }, // Crystal Bell
-                { type: 'sawtooth', base: 196.00, detune: 8, cutoff: 2000, decay: 0.22 }, // Pluck
-                { type: 'sine', base: 329.63, detune: 0, cutoff: 3500, decay: 0.40 },      // Soft Atmosphere Pad
-                { type: 'square', base: 392.00, detune: -8, cutoff: 2400, decay: 0.18 }, // Punchy Chord
-                { type: 'sawtooth', base: 220.00, detune: 12, cutoff: 4000, decay: 0.25 },// Modern Synth
-                { type: 'triangle', base: 164.81, detune: -4, cutoff: 1800, decay: 0.30 },// Warm Chord
-                { type: 'square', base: 493.88, detune: 6, cutoff: 5000, decay: 0.15 },  // High Sparkle
-                { type: 'sawtooth', base: 98.00, detune: -12, cutoff: 950, decay: 0.45 }, // Deep Sub-Hit
-                { type: 'triangle', base: 349.23, detune: 4, cutoff: 3000, decay: 0.24 }, // Melodic Fave
-                { type: 'sawtooth', base: 440.00, detune: -5, cutoff: 3800, decay: 0.19 }  // Bright Lead
+                { type: 'sawtooth', base: 130.81, detune: -6, cutoff: 1400, decay: 0.28 },
+                { type: 'square', base: 261.63, detune: 5, cutoff: 2800, decay: 0.20 },
+                { type: 'triangle', base: 523.25, detune: 0, cutoff: 4500, decay: 0.32 },
+                { type: 'sawtooth', base: 196.00, detune: 8, cutoff: 2000, decay: 0.22 },
+                { type: 'sine', base: 329.63, detune: 0, cutoff: 3500, decay: 0.40 },
+                { type: 'square', base: 392.00, detune: -8, cutoff: 2400, decay: 0.18 },
+                { type: 'sawtooth', base: 220.00, detune: 12, cutoff: 4000, decay: 0.25 },
+                { type: 'triangle', base: 164.81, detune: -4, cutoff: 1800, decay: 0.30 },
+                { type: 'square', base: 493.88, detune: 6, cutoff: 5000, decay: 0.15 },
+                { type: 'sawtooth', base: 98.00, detune: -12, cutoff: 950, decay: 0.45 },
+                { type: 'triangle', base: 349.23, detune: 4, cutoff: 3000, decay: 0.24 },
+                { type: 'sawtooth', base: 440.00, detune: -5, cutoff: 3800, decay: 0.19 }
             ];
 
             function playBeatSound() {
@@ -563,7 +563,6 @@
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
                     const now = audioCtx.currentTime;
-                    // Völlig freier Zufall aus dem Patch-Katalog + zufällige Halbton-Transposition (-12 bis +12)
                     let patch = studioPatches[Math.floor(Math.random() * studioPatches.length)];
                     let randomSemitone = Math.floor(Math.random() * 25) - 12;
                     let finalFreq = patch.base * Math.pow(2, randomSemitone / 12);
@@ -577,17 +576,15 @@
                     osc2.type = Math.random() > 0.4 ? 'sawtooth' : 'sine';
 
                     osc1.frequency.setValueAtTime(finalFreq, now);
-                    osc2.frequency.setValueAtTime(finalFreq * 1.5, now); // Akkord-Intervalle
+                    osc2.frequency.setValueAtTime(finalFreq * 1.5, now);
 
                     osc1.detune.setValueAtTime(patch.detune, now);
                     osc2.detune.setValueAtTime(-patch.detune, now);
 
-                    // Lowpass-Filter für warmen, professionellen Studio-Klang ohne digitalen Schmerz
                     filter.type = 'lowpass';
                     filter.frequency.setValueAtTime(patch.cutoff, now);
                     filter.frequency.exponentialRampToValueAtTime(patch.cutoff * 0.25, now + patch.decay);
 
-                    // Dynamische Lautstärke-Enveloppe (Attack + Decay)
                     gain.gain.setValueAtTime(0.0001, now);
                     gain.gain.linearRampToValueAtTime(0.45, now + 0.015);
                     gain.gain.exponentialRampToValueAtTime(0.0001, now + patch.decay);
@@ -601,6 +598,37 @@
                     osc2.start(now);
                     osc1.stop(now + patch.decay);
                     osc2.stop(now + patch.decay);
+                } catch (e) {}
+            }
+
+            // Sanfter Hintergrund-Sound für aktive BPS (läuft im Takt mit)
+            function playBpsBackgroundSound() {
+                if (!soundEnabled || currentView === 'home') return;
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                    const now = audioCtx.currentTime;
+                    let osc = audioCtx.createOscillator();
+                    let filter = audioCtx.createBiquadFilter();
+                    let gain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(220, now); // warmer Grundton
+
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(1200, now);
+
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.linearRampToValueAtTime(0.15, now + 0.05); // dezent leiser als manuelle Klicks
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + 0.4);
                 } catch (e) {}
             }
 
@@ -801,10 +829,19 @@
                 });
             }
 
+            // Hintergrund-Loop für BPS (produziert Beats & spielt rhythmischen Studio-Sound ab)
+            let bpsSoundCounter = 0;
             setInterval(() => {
                 if (loggedInUser && bps > 0) {
                     beats += bps / 10;
                     updateDisplay();
+
+                    // Spiele etwa einmal pro Sekunde (alle 10 Ticks) einen dezenten Hintergrundton ab
+                    bpsSoundCounter += 1;
+                    if (bpsSoundCounter >= 10) {
+                        bpsSoundCounter = 0;
+                        playBpsBackgroundSound();
+                    }
                 }
             }, 100);
 
