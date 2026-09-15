@@ -338,10 +338,10 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Beat-Lab & Digitaler Studio-Garten (Härteres Gameplay)</span>
+                <span>Beat-Lab & Digitaler Studio-Garten (Stilles Wachstum)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab & Garden 🎧🌿</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, füttere deine Pflanzen mit Sound und lass den digitalen Garten gedeihen!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, füttere deine Pflanzen mit Sound und lass den digitalen Garten ungestört gedeihen!</p>
         </div>
 
         <!-- AUTH SCREEN -->
@@ -409,7 +409,7 @@
                     <span id="clickPowerText" class="text-xs text-gray-400 mt-6">+1 Beat pro Klick</span>
                 </div>
 
-                <!-- Upgrades Shop (Harder Scaling 1.22) -->
+                <!-- Upgrades Shop -->
                 <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 shadow-2xl space-y-4">
                     <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
                         <i class="fa-solid fa-store text-indigo-400"></i>
@@ -462,7 +462,7 @@
                 </div>
             </div>
 
-            <!-- DIGITALER STUDIO-GARTEN SECTION -->
+            <!-- DIGITALER STUDIO-GARTEN SECTION (STILLES WACHSTUM) -->
             <div class="bg-cardbg border border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
                 <div class="flex items-center justify-between border-b border-gray-800 pb-4">
                     <div class="flex items-center space-x-3">
@@ -471,7 +471,7 @@
                         </div>
                         <div>
                             <h3 class="text-xl font-bold text-white">Digitaler Studio-Garten 🌿</h3>
-                            <p class="text-xs text-gray-400">Pflanzen genießen deine Beats & Klänge und bringen dir passive Multiplikatoren!</p>
+                            <p class="text-xs text-gray-400">Pflanzen genießen deine Beats & Klänge und bringen dir passive Multiplikatoren (Wächst ganz ohne Pop-ups!)</p>
                         </div>
                     </div>
                     <span class="text-xs font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800 px-3 py-1.5 rounded-full">Garten-Energie aktiv</span>
@@ -940,12 +940,10 @@
         }
 
         function clickBeat() {
-            // Melodie-Blume Buff (Plant index 0) gives bonus fans per click
             let bonusFans = 1 + Math.floor((gameData.garden[0].level - 1) * 0.5);
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * bonusFans);
             
-            // Gain garden exp passively via action
             gameData.garden[0].exp += 1;
             checkGardenLevel(0);
 
@@ -971,17 +969,16 @@
         }
 
         function checkGardenLevel(index) {
-            if (gameData.garden[index].exp >= gameData.garden[index].maxExp) {
+            // Wächst im Hintergrund still weiter ohne Pop-up
+            while (gameData.garden[index].exp >= gameData.garden[index].maxExp) {
                 gameData.garden[index].exp -= gameData.garden[index].maxExp;
                 gameData.garden[index].level++;
                 gameData.garden[index].maxExp = Math.floor(gameData.garden[index].maxExp * 1.5);
-                showInfoModal('🌿 Pflanzen-Wachstum!', 'Deine Pflanze ist auf Stufe ' + gameData.garden[index].level + ' aufgestiegen und entfaltet stärkere Boni!');
             }
         }
 
         function buyUpgrade(type) {
             let cost = 0;
-            // Schwereres Balancing: Faktor 1.22
             if (type === 'mic') cost = Math.floor(20 * Math.pow(1.22, gameData.mic));
             if (type === 'synth') cost = Math.floor(150 * Math.pow(1.22, gameData.synth));
             if (type === 'desk') cost = Math.floor(800 * Math.pow(1.22, gameData.desk));
@@ -1001,7 +998,6 @@
 
         function getBps() {
             let baseBps = (gameData.mic * 1) + (gameData.synth * 5) + (gameData.desk * 25) + (gameData.label * 100);
-            // Synth-Bäumchen (Plant index 1) gives a multiplier boost to BPS (+5% per level)
             let synthMultiplier = 1 + ((gameData.garden[1].level - 1) * 0.08);
             return baseBps * synthMultiplier;
         }
@@ -1015,7 +1011,6 @@
             let bps = getBps();
             if (pElem) pElem.innerText = bps.toFixed(1);
 
-            // Upgrades (Faktor 1.22 Skalierung)
             const cMic = document.getElementById('countMic');
             const coMic = document.getElementById('costMic');
             if (cMic) cMic.innerText = gameData.mic;
@@ -1036,7 +1031,6 @@
             if (cLabel) cLabel.innerText = gameData.label;
             if (coLabel) coLabel.innerText = Math.floor(4000 * Math.pow(1.22, gameData.label)).toLocaleString();
 
-            // Garden UI Updates
             for (let i = 0; i < 3; i++) {
                 let p = gameData.garden[i];
                 document.getElementById(`plant${i+1}Level`).innerText = 'Stufe ' + p.level;
@@ -1049,7 +1043,6 @@
             }
         }
 
-        // Haupt-Takt (10 Updates pro Sekunde)
         setInterval(function() {
             let email = localStorage.getItem('jackLoggedInEmail');
             if (!email) return;
@@ -1058,11 +1051,9 @@
                 gameData.beats += bps / 10;
                 gameData.fans += (bps / 50);
                 
-                // Pflanzen wachsen passiv mit
                 gameData.garden[1].exp += bps / 40;
                 checkGardenLevel(1);
                 
-                // Bass-Kaktus (Plant 2) erzeugt ab und zu Spezial-Beats
                 if (gameData.garden[2].level > 1) {
                     gameData.beats += (gameData.garden[2].level * 0.05);
                 }
