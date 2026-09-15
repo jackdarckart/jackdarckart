@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Tycoon-Logik mit dynamischen Leucht- und Pulsier-Effekten -->
+    <!-- Tycoon-Logik mit lauten Tönen & Leuchteffekten -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -539,6 +539,7 @@
                 });
             }
 
+            // Deutlich lauterer & knackiger Sound-Generator
             let audioCtx = null;
             function playBeatSound() {
                 if (!soundEnabled || currentView === 'home') return;
@@ -547,15 +548,18 @@
                     if (audioCtx.state === 'suspended') audioCtx.resume();
                     let osc = audioCtx.createOscillator();
                     let gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1);
-                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(146.83, audioCtx.currentTime + 0.12);
+                    
+                    // Lautstärke auf sattes Level (0.4) erhöht
+                    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                    
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     osc.start();
-                    osc.stop(audioCtx.currentTime + 0.1);
+                    osc.stop(audioCtx.currentTime + 0.12);
                 } catch (e) {}
             }
 
@@ -666,7 +670,7 @@
                 }
             }
 
-            // Helper zum Verwalten der Leucht- und Pulsier-Effekte
+            // Leucht- und Pulsier-Effekt für kaufbare Upgrades
             function checkAffordability(elementId, cost) {
                 const el = document.getElementById(elementId);
                 if (!el) return;
@@ -688,7 +692,6 @@
                 if(bpsEl) bpsEl.innerText = bps.toFixed(1);
                 if(hrEl) hrEl.innerText = hashRate + " TH/s";
 
-                // Update UI Labels
                 if(document.getElementById('rigs-count')) document.getElementById('rigs-count').innerText = "Anzahl: " + rigs;
                 if(document.getElementById('rig-cost')) document.getElementById('rig-cost').innerText = rigCost;
                 if(document.getElementById('albums-count')) document.getElementById('albums-count').innerText = "Releases: " + albums;
@@ -697,14 +700,12 @@
                 if(document.getElementById('ai-cost')) document.getElementById('ai-cost').innerText = aiCost;
                 if(document.getElementById('staked-count')) document.getElementById('staked-count').innerText = "Gesperrt: " + stakedBeats;
 
-                // Dynamisches Leuchten prüfen, wenn genug Guthaben da ist
                 checkAffordability('buy-rig-btn', rigCost);
                 checkAffordability('buy-album-btn', albumCost);
                 checkAffordability('buy-ai-btn', aiCost);
                 checkAffordability('stake-btn', 100);
             }
 
-            // Event Bindings
             function bindClick(id, handler) {
                 const el = document.getElementById(id);
                 if (el) el.addEventListener('click', handler);
@@ -746,7 +747,6 @@
                 });
             }
 
-            // Admin Reset
             const adminResetGameBtn = document.getElementById('admin-reset-game-btn');
             if(adminResetGameBtn) {
                 adminResetGameBtn.addEventListener('click', () => {
@@ -760,7 +760,6 @@
                 });
             }
 
-            // Ressourcensparende Hintergrund-Schleife (10x pro Sekunde)
             setInterval(() => {
                 if (loggedInUser && bps > 0) {
                     beats += bps / 10;
@@ -768,7 +767,6 @@
                 }
             }, 100);
 
-            // Automatisches Speichern alle 5 Sekunden
             setInterval(() => { saveGame(); }, 5000);
 
             updateDisplay();
