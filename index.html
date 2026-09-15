@@ -87,7 +87,7 @@
                     <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
                 </h1>
                 <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
-                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit eigenständigem HD-Garten!
+                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit cineastischem HD-Garten!
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
@@ -353,7 +353,7 @@
             <div class="mt-6">
                 <button onclick="switchView('garden')" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-xl shadow-emerald-600/30 transition inline-flex items-center space-x-2">
                     <i class="fa-solid fa-seedling"></i>
-                    <span>🌿 HD-Garten öffnen</span>
+                    <span>🌿 Cineastischen HD-Garten öffnen</span>
                 </button>
             </div>
         </div>
@@ -516,7 +516,7 @@
         </div>
     </div>
 
-    <!-- SEPARATE HD-GARTEN ANSICHT (NUR DER GARTEN & HARMONISCHES HUD) -->
+    <!-- SEPARATE CINEASTISCHE HD-GARTEN ANSICHT -->
     <div id="gardenView" class="hidden py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-6 text-center">
         <div class="flex items-center justify-between px-2">
             <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg">
@@ -525,11 +525,11 @@
             </button>
             <div class="inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Live HD-Garten Ansicht</span>
+                <span>Cineastischer HD-Garten</span>
             </div>
         </div>
 
-        <!-- Sleek Garden HUD / Status -->
+        <!-- Minimalistisches HUD -->
         <div class="grid grid-cols-3 gap-3 bg-cardbg/80 backdrop-blur-md border border-emerald-500/30 rounded-2xl p-4 text-xs shadow-xl">
             <div>
                 <span class="text-gray-400 block mb-1">Stauden Level</span>
@@ -545,8 +545,8 @@
             </div>
         </div>
 
-        <!-- REINES CANVAS-FENSTER (OHNE KLICK-BEATS) -->
-        <div class="relative w-full flex justify-center bg-darkbg rounded-3xl p-3 border-2 border-emerald-500/40 shadow-2xl">
+        <!-- CINEASTISCHES CANVAS-FENSTER (REINE ANIMATION) -->
+        <div class="relative w-full flex justify-center bg-darkbg rounded-3xl p-3 border-2 border-emerald-500/50 shadow-2xl overflow-hidden">
             <canvas id="gardenCanvas" width="800" height="650" class="w-full max-w-3xl rounded-2xl shadow-2xl"></canvas>
         </div>
 
@@ -1034,144 +1034,174 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- HD 60-FPS GARTEN RENDER ENGINE ---
+        // --- HOCHWERTIGE CINEASTISCHE HD GARTEN RENDER ENGINE ---
         let animTime = 0;
         let particles = [];
 
-        for(let i=0; i<15; i++) {
+        for(let i=0; i<25; i++) {
             particles.push({
                 x: Math.random() * 800,
                 y: Math.random() * 650,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5,
-                size: Math.random() * 2.5 + 1
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: -Math.random() * 0.5 - 0.2, // Steigen leicht auf (Magie-Effekt)
+                size: Math.random() * 2.8 + 0.8,
+                alpha: Math.random() * 0.6 + 0.2
             });
         }
 
-        function drawGardenPlan() {
+        function drawCineastichGarden() {
             const canvas = document.getElementById('gardenCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             const w = canvas.width;
             const h = canvas.height;
 
-            animTime += 0.025 + (getBps() * 0.0004);
+            animTime += 0.02 + (getBps() * 0.0003);
 
             currentPulse += (targetPulse - currentPulse) * 0.1;
             targetPulse += (0 - targetPulse) * 0.08;
 
-            let bgGrad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w);
-            bgGrad.addColorStop(0, '#163824');
-            bgGrad.addColorStop(1, '#0c1f14');
+            // 1. Tiefen-Rasen mit feinem Vignettierungs-Gradient
+            let bgGrad = ctx.createRadialGradient(w/2, h/2, 80, w/2, h/2, w * 0.8);
+            bgGrad.addColorStop(0, '#0f3822');
+            bgGrad.addColorStop(0.6, '#092415');
+            bgGrad.addColorStop(1, '#040d07');
             ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, w, h);
 
-            ctx.fillStyle = '#0f2918';
-            ctx.fillRect(0, 0, w, 22);
-            ctx.fillRect(0, 0, 22, h);
-            ctx.fillRect(w - 22, 0, 22, h);
-            ctx.fillRect(0, h - 22, w, 22);
+            // 2. Umgebende Natur-Hecke mit plastischer Schattierung
+            ctx.fillStyle = '#061c0e';
+            ctx.fillRect(0, 0, w, 28);
+            ctx.fillRect(0, 0, 28, h);
+            ctx.fillRect(w - 28, 0, 28, h);
+            ctx.fillRect(0, h - 28, w, 28);
 
-            ctx.fillStyle = '#784c25';
-            ctx.fillRect(150, 480, 500, 150);
-            ctx.strokeStyle = '#523318';
-            ctx.lineWidth = 2;
-            for(let x = 150; x <= 650; x += 25) {
-                ctx.beginPath(); ctx.moveTo(x, 480); ctx.lineTo(x, 630); ctx.stroke();
+            // 3. Edle Holzterrasse mit Maserung & Glanz
+            ctx.fillStyle = '#613d20';
+            ctx.fillRect(140, 470, 520, 160);
+            ctx.strokeStyle = '#3d2512';
+            ctx.lineWidth = 2.5;
+            for(let x = 140; x <= 660; x += 30) {
+                ctx.beginPath(); ctx.moveTo(x, 470); ctx.lineTo(x, 630); ctx.stroke();
             }
+            // Terassen-Lichtschein
+            ctx.fillStyle = 'rgba(255,255,255,0.04)';
+            ctx.fillRect(140, 470, 520, 45);
 
-            let terraceBounce = Math.sin(animTime * 2.5) * (1.5 + currentPulse * 3);
-            ctx.fillStyle = '#f1f5f9'; 
-            ctx.fillRect(360, 530 + terraceBounce, 80, 50);
+            // Lounge-Möbel sanft im Wind
+            let terraceSway = Math.sin(animTime * 2) * (1.2 + currentPulse * 2.5);
             ctx.fillStyle = '#cbd5e1'; 
-            ctx.fillRect(330, 540 + terraceBounce, 20, 30); 
-            ctx.fillRect(450, 540 + terraceBounce, 20, 30);
+            ctx.fillRect(350, 520 + terraceSway, 100, 55);
+            ctx.fillStyle = '#94a3b8'; 
+            ctx.fillRect(315, 532 + terraceSway, 22, 32); 
+            ctx.fillRect(463, 532 + terraceSway, 22, 32);
 
-            let pondGrad = ctx.createRadialGradient(500, 340, 20, 500, 340, 110);
-            pondGrad.addColorStop(0, '#0ea5e9');
-            pondGrad.addColorStop(0.7, '#0284c7');
+            // 4. Cineastischer Klang-Teich mit lebendigen Reflexionen
+            let pondGrad = ctx.createRadialGradient(500, 330, 15, 500, 330, 120);
+            pondGrad.addColorStop(0, '#38bdf8');
+            pondGrad.addColorStop(0.6, '#0284c7');
             pondGrad.addColorStop(1, '#0369a1');
-            ctx.fillStyle = '#1e293b'; ctx.fillRect(386, 226, 228, 228);
-            ctx.fillStyle = pondGrad; ctx.fillRect(392, 232, 216, 216);
+            ctx.fillStyle = '#0c4a6e'; ctx.fillRect(376, 212, 248, 238);
+            ctx.fillStyle = pondGrad; ctx.fillRect(382, 218, 236, 226);
 
-            ctx.strokeStyle = 'rgba(255,255,255,0.45)';
-            ctx.lineWidth = 2 + (currentPulse * 1.5);
-            let r1 = (Math.sin(animTime * 1.2) * 12 + 35 + currentPulse * 8);
-            let r2 = (Math.cos(animTime * 1.0) * 16 + 55 + currentPulse * 12);
-            ctx.beginPath(); ctx.arc(500, 340, Math.abs(r1), 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath(); ctx.arc(500, 340, Math.abs(r2), 0, Math.PI * 2); ctx.stroke();
+            // Organische Wasser-Ripples
+            ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+            ctx.lineWidth = 1.5 + (currentPulse * 1.5);
+            let r1 = (Math.sin(animTime * 1.4) * 14 + 40 + currentPulse * 7);
+            let r2 = (Math.cos(animTime * 1.1) * 18 + 65 + currentPulse * 12);
+            let r3 = (Math.sin(animTime * 0.9) * 22 + 90 + currentPulse * 16);
+            ctx.beginPath(); ctx.arc(500, 330, Math.abs(r1), 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(500, 330, Math.abs(r2), 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(500, 330, Math.abs(r3), 0, Math.PI * 2); ctx.stroke();
 
-            ctx.fillStyle = '#475569';
-            ctx.fillRect(160, 260, 200, 180);
+            // 5. Steinplatten-Weg
             ctx.fillStyle = '#334155';
-            for(let y = 280; y < 420; y += 30) {
-                for(let x = 180; x < 340; x += 50) {
-                    ctx.fillRect(x, y, 35, 18);
+            ctx.fillRect(150, 250, 210, 190);
+            ctx.fillStyle = '#1e293b';
+            for(let y = 270; y < 420; y += 32) {
+                for(let x = 170; x < 340; x += 55) {
+                    ctx.fillRect(x, y, 38, 20);
                 }
             }
 
+            // 6. Organisch biegende Kugelbäume (Zone B) mit multi-schichtiger Krone
             let treeLvl = gameData.garden[1].level;
-            let treeRadius = (32 + Math.min(treeLvl * 2, 14) + Math.sin(animTime * 1.5) * 2.5) * (1 + currentPulse * 0.12);
-            let treePositions = [[120, 100], [220, 100], [120, 180], [220, 180]];
-            treePositions.forEach(pos => {
-                let tGrad = ctx.createRadialGradient(pos[0]-5, pos[1]-5, 4, pos[0], pos[1], treeRadius);
+            let windSway = Math.sin(animTime * 1.8) * 4; // Windbiegung
+            let baseRadius = (30 + Math.min(treeLvl * 2, 16)) * (1 + currentPulse * 0.1);
+            let treePositions = [[110, 100], [210, 100], [110, 180], [210, 180]];
+            
+            treePositions.forEach((pos, idx) => {
+                let sW = windSway * (idx % 2 === 0 ? 1 : 0.8);
+                // Baumstamm
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(pos[0] - 5 + sW*0.5, pos[1], 10, 35);
+                
+                // Mehrschichtige Krone für plastischen Look
+                let tGrad = ctx.createRadialGradient(pos[0]-8 + sW, pos[1]-15, 5, pos[0] + sW, pos[1]-10, baseRadius);
                 tGrad.addColorStop(0, '#4ade80');
-                tGrad.addColorStop(1, '#15803d');
+                tGrad.addColorStop(0.7, '#16a34a');
+                tGrad.addColorStop(1, '#14532d');
                 ctx.fillStyle = tGrad;
-                ctx.strokeStyle = '#052e16';
-                ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.arc(pos[0], pos[1], Math.max(12, treeRadius), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.arc(pos[0] + sW, pos[1] - 5, baseRadius, 0, Math.PI * 2); ctx.fill();
             });
 
-            let bigTreeRadius = (58 + Math.cos(animTime * 1.3) * 3.5) * (1 + currentPulse * 0.15);
-            let bigGrad = ctx.createRadialGradient(620-8, 100-8, 8, 620, 100, bigTreeRadius);
-            bigGrad.addColorStop(0, '#22c55e');
-            bigGrad.addColorStop(1, '#14532d');
-            ctx.fillStyle = bigGrad;
-            ctx.strokeStyle = '#052e16';
-            ctx.lineWidth = 4;
-            ctx.beginPath(); ctx.arc(620, 100, Math.max(20, bigTreeRadius), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            // 7. Großer Solitärbaum (Oasen-Baum Oben Rechts)
+            let bigTreeSway = Math.sin(animTime * 1.5) * 5;
+            let bigRadius = (60 + Math.cos(animTime * 1.2) * 4) * (1 + currentPulse * 0.12);
+            ctx.fillStyle = '#451a03';
+            ctx.fillRect(620 - 7 + bigTreeSway*0.5, 90, 14, 50);
 
+            let bigGrad = ctx.createRadialGradient(610 + bigTreeSway, 75, 12, 620 + bigTreeSway, 90, bigRadius);
+            bigGrad.addColorStop(0, '#22c55e');
+            bigGrad.addColorStop(0.7, '#15803d');
+            bigGrad.addColorStop(1, '#052e16');
+            ctx.fillStyle = bigGrad;
+            ctx.beginPath(); ctx.arc(620 + bigTreeSway, 85, bigRadius, 0, Math.PI * 2); ctx.fill();
+
+            // 8. Lebendige Blumenrabatten (Zone A) mit feinen Blütenkelchen
             let flowerLvl = gameData.garden[0].level;
-            let colors = ['#f472b6', '#c084fc', '#38bdf8', '#facc15', '#fb7185'];
-            for(let i = 0; i < 28 + flowerLvl * 6; i++) {
-                ctx.fillStyle = colors[i % colors.length];
+            let flowerColors = ['#f472b6', '#e879f9', '#38bdf8', '#facc15', '#fb7185', '#34d399'];
+            for(let i = 0; i < 35 + flowerLvl * 8; i++) {
+                ctx.fillStyle = flowerColors[i % flowerColors.length];
                 ctx.beginPath();
-                let fSize = (5 + Math.sin(animTime * 3 + i) * 0.8) * (1 + currentPulse * 0.2);
-                ctx.arc(640 + ((i % 3) * 16), 220 + (i * 7.5), Math.max(2, fSize), 0, Math.PI * 2);
+                let fS = (4.5 + Math.sin(animTime * 3 + i) * 1.2) * (1 + currentPulse * 0.2);
+                ctx.arc(635 + ((i % 3) * 18), 210 + (i * 7.2), Math.max(1.8, fS), 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            ctx.fillStyle = 'rgba(250, 204, 21, 0.6)';
+            // 9. Magische Glühwürmchen & Staubpartikel im Wind
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.7)';
             particles.forEach(p => {
-                p.x += p.vx;
+                p.x += p.vx + (Math.sin(animTime) * 0.3);
                 p.y += p.vy;
-                if(p.x < 30 || p.x > w-30) p.vx *= -1;
-                if(p.y < 30 || p.y > h-30) p.vy *= -1;
+                if(p.y < 10) p.y = h - 10;
+                if(p.x < 10 || p.x > w-10) p.vx *= -1;
 
+                ctx.globalAlpha = p.alpha;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.globalAlpha = 1.0;
             });
 
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 12px sans-serif';
-            ctx.shadowBlur = 4;
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.fillText('Holzterrasse & Lounge', 330, 615);
-            ctx.fillText('Klang-Teich (Zone C)', 440, 345);
-            ctx.fillText('Stauden-Weg (Zone A)', 200, 350);
-            ctx.fillText('Kugelbäume (Zone B)', 130, 140);
+            // Edle, dezente Bereichsbeschriftung im Glas-Stil
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.fillText('Lounge & Terrasse', 335, 610);
+            ctx.fillText('Klang-Teich', 465, 335);
+            ctx.fillText('Stauden-Garten', 195, 345);
+            ctx.fillText('Baumhain', 130, 135);
             ctx.shadowBlur = 0;
         }
 
         function animationLoop() {
-            drawGardenPlan();
+            drawCineastichGarden();
             requestAnimationFrame(animationLoop);
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Klick-Listener auf den Garten-Canvas bewusst entfernt, damit reiner Animationsgenuss ohne Sound/Tippen entsteht.
             requestAnimationFrame(animationLoop);
         });
 
@@ -1204,7 +1234,6 @@
             if (cLabel) cLabel.innerText = gameData.label;
             if (coLabel) coLabel.innerText = Math.floor(4000 * Math.pow(1.22, gameData.label)).toLocaleString();
 
-            // Garden HUD Levels & Costs
             const gLvl0 = document.getElementById('gardenLvl0');
             const gLvl1 = document.getElementById('gardenLvl1');
             const gLvl2 = document.getElementById('gardenLvl2');
