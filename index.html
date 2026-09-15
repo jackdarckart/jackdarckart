@@ -10,20 +10,17 @@
 <body class="bg-[#0b0f19] text-white min-h-screen font-sans selection:bg-purple-500 selection:text-white">
 
     <!-- Header -->
-    <header class="flex justify-between items-center p-2 sm:p-4 border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/95">
+    <header class="flex justify-between items-center px-3 py-3 border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/95">
         <div class="flex items-center space-x-1.5 overflow-hidden">
-            <span class="text-xl sm:text-2xl p-1.5 bg-purple-600/20 rounded-xl">🎧</span>
-            <span id="user-display" class="font-bold text-xs sm:text-base tracking-wide bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent truncate max-w-[80px] sm:max-w-none">jackdarckart</span>
+            <span class="text-xl p-1 bg-purple-600/20 rounded-xl">🎧</span>
+            <span id="user-display" class="font-bold text-xs tracking-wide bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent truncate max-w-[90px]">jackdarckart</span>
         </div>
-        <div class="flex flex-wrap justify-end gap-1">
-            <button onclick="switchView('home')" class="bg-purple-700 hover:bg-purple-600 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🏠 Start</button>
-            <button onclick="switchView('garten')" class="bg-emerald-600/80 hover:bg-emerald-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🌱 Garten</button>
-            <button onclick="switchView('lab')" class="bg-indigo-600/80 hover:bg-indigo-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">💼 Lab</button>
-            <button onclick="toggleSound()" id="sound-btn" class="bg-gray-700 hover:bg-gray-600 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🔊 Sound: An</button>
-            <button onclick="openModal('cloud-modal')" class="bg-cyan-600/80 hover:bg-cyan-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">☁️ Cloud</button>
-            <button onclick="openRegister()" class="bg-blue-600/80 hover:bg-blue-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">📝 Reg</button>
-            <button onclick="openResetPassword()" class="bg-rose-600/80 hover:bg-rose-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🔑 Pwd</button>
-            <button onclick="openAdmin()" class="bg-amber-600/80 hover:bg-amber-500 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg">🛠️ Admin</button>
+        <div class="flex items-center gap-1">
+            <button onclick="switchView('home')" class="bg-purple-700 hover:bg-purple-600 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition shadow">🏠 Start</button>
+            <button onclick="switchView('garten')" class="bg-emerald-600 hover:bg-emerald-500 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition shadow">🌱 Garten</button>
+            <button onclick="switchView('lab')" class="bg-indigo-600 hover:bg-indigo-500 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition shadow">💼 Lab</button>
+            <button onclick="toggleSound()" id="sound-btn" class="bg-gray-700 hover:bg-gray-600 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition shadow">🔊</button>
+            <button onclick="openModal('menu-modal')" class="bg-amber-600 hover:bg-amber-500 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition shadow">⚙️ Menü</button>
         </div>
     </header>
 
@@ -32,8 +29,8 @@
 
         <!-- 1. STARTSEITE (Hier sind Game-Töne garantiert stumm!) -->
         <div id="view-home" class="view-section">
-            <h1 class="text-3xl font-black tracking-tight mb-1 text-white">Jack's Beat-Lab</h1>
-            <p class="text-gray-400 text-xs sm:text-sm mb-6">Produziere Beats und verwalte deinen Fortschritt.</p>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight mb-1 text-white">Jack's Beat-Lab</h1>
+            <p class="text-gray-400 text-xs mb-6">Produziere Beats und verwalte deinen Fortschritt.</p>
 
             <!-- Big Action Button -->
             <button onclick="produceBeat()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 text-white font-bold py-4 px-6 rounded-2xl shadow-xl shadow-purple-900/30 text-lg mb-8 transition transform flex items-center justify-center gap-2 border border-purple-400/20">
@@ -84,8 +81,27 @@
         </div>
     </main>
 
-    <!-- MODALS -->
-    <div id="cloud-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- HAUPTMENÜ MODAL (Schließt sich beim Klick außerhalb) -->
+    <div id="menu-modal" onclick="checkBackdrop(event, 'menu-modal')" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#131b2e] border border-amber-500/30 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-left">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-amber-400">⚙️ Steuerungs-Menü</h3>
+                <button onclick="closeModal('menu-modal')" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            <div class="space-y-2.5">
+                <button onclick="closeModal('menu-modal'); openModal('cloud-modal');" class="w-full bg-cyan-600/80 hover:bg-cyan-600 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition flex items-center gap-2">☁️ Cloud-Sync (Überall mitnehmen)</button>
+                <button onclick="closeModal('menu-modal'); openRegister();" class="w-full bg-blue-600/80 hover:bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition flex items-center gap-2">📝 Account / Registrieren</button>
+                <button onclick="closeModal('menu-modal'); openResetPassword();" class="w-full bg-rose-600/80 hover:bg-rose-600 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition flex items-center gap-2">🔑 Passwort zurücksetzen</button>
+                <button onclick="closeModal('menu-modal'); openAdmin();" class="w-full bg-amber-600/80 hover:bg-amber-600 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition flex items-center gap-2">🛠️ Admin-Bereich</button>
+            </div>
+            <div class="mt-5 text-center">
+                <button onclick="closeModal('menu-modal')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-xl text-xs transition">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLOUD MODAL -->
+    <div id="cloud-modal" onclick="checkBackdrop(event, 'cloud-modal')" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#131b2e] border border-cyan-500/30 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-left">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-bold text-lg text-cyan-400">☁️ Cloud-Sync</h3>
@@ -95,10 +111,14 @@
                 <button onclick="exportSave()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">📤 Code kopieren (Export)</button>
                 <button onclick="importSave()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition">📥 Code einfügen (Import)</button>
             </div>
+            <div class="mt-4 text-center">
+                <button onclick="openModal('menu-modal'); closeModal('cloud-modal');" class="text-xs text-gray-400 hover:underline">← Zurück zum Menü</button>
+            </div>
         </div>
     </div>
 
-    <div id="register-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- REGISTER MODAL -->
+    <div id="register-modal" onclick="checkBackdrop(event, 'register-modal')" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#131b2e] border border-blue-500/30 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-left">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-bold text-lg text-blue-400">📝 Registrieren</h3>
@@ -113,7 +133,8 @@
         </div>
     </div>
 
-    <div id="reset-pwd-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- RESET PASSWORD MODAL -->
+    <div id="reset-pwd-modal" onclick="checkBackdrop(event, 'reset-pwd-modal')" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#131b2e] border border-rose-500/30 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-left">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-bold text-lg text-rose-400">🔑 Passwort zurücksetzen</h3>
@@ -127,7 +148,8 @@
         </div>
     </div>
 
-    <div id="admin-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- ADMIN MODAL -->
+    <div id="admin-modal" onclick="checkBackdrop(event, 'admin-modal')" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#131b2e] border border-amber-500/30 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-left">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-bold text-lg text-amber-400">🛠️ Admin</h3>
@@ -164,7 +186,6 @@
 
         let audioCtx = null;
         function playBeatSound() {
-            // Spielt KEINEN Ton, wenn soundEnabled aus ist ODER wir uns auf der Startseite befinden!
             if (!soundEnabled || currentView === 'home') return;
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -191,11 +212,11 @@
             soundEnabled = !soundEnabled;
             let btn = document.getElementById('sound-btn');
             if (soundEnabled) {
-                btn.innerText = "🔊 Sound: An";
-                btn.className = "bg-gray-700 hover:bg-gray-600 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg";
+                btn.innerText = "🔊";
+                btn.className = "bg-gray-700 hover:bg-gray-600 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition shadow";
             } else {
-                btn.innerText = "🔇 Sound: Aus";
-                btn.className = "bg-red-900/80 hover:bg-red-800 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition shadow-lg";
+                btn.innerText = "🔇";
+                btn.className = "bg-red-900 hover:bg-red-800 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition shadow";
             }
         }
 
@@ -237,6 +258,13 @@
         function closeModal(id) {
             let m = document.getElementById(id);
             if(m) m.classList.add('hidden');
+        }
+
+        // Schließt Modal, wenn man außerhalb klickt
+        function checkBackdrop(event, id) {
+            if (event.target.id === id) {
+                closeModal(id);
+            }
         }
 
         function openRegister() {
