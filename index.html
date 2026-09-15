@@ -451,7 +451,7 @@
         </div>
     </div>
 
-    <!-- CUSTOM DESIGN MODAL (Ersetzt hässliche Browser-Popups mit interaktivem Button/Link) -->
+    <!-- CUSTOM DESIGN MODAL (Vollständig mit integrierten Buttons und Links) -->
     <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
         <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl text-center space-y-6">
             <div id="modalIcon" class="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-2xl mx-auto border border-indigo-500/30">
@@ -462,21 +462,25 @@
                 <p id="modalText" class="text-sm text-gray-400 leading-relaxed">Bitte gib deinen Master-PIN ein.</p>
             </div>
             
-            <!-- Input-Feld für PIN oder E-Mail -->
+            <!-- Input-Feld -->
             <div id="modalInputContainer">
                 <input type="password" id="modalInput" placeholder="Master-PIN eingeben..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-center text-white text-lg tracking-widest focus:outline-none focus:border-indigo-500">
             </div>
 
-            <!-- Anklickbarer Button/Link für PIN vergessen -->
-            <div id="modalLinkContainer" class="hidden">
-                <button onclick="openForgotPinModal()" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold underline transition">
-                    🔑 PIN vergessen? (Per E-Mail wiederherstellen)
+            <!-- Integrierter Button / Link für "PIN vergessen?" -->
+            <div id="modalLinkContainer" class="hidden pt-1">
+                <button onclick="openForgotPinModal()" class="w-full bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 text-xs py-2.5 px-4 rounded-xl font-semibold transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-key"></i>
+                    <span>PIN vergessen? (Per E-Mail wiederherstellen)</span>
                 </button>
             </div>
 
+            <!-- Zusätzlicher Aktions-Container für Fehler mit Button -->
+            <div id="modalActionContainer" class="hidden"></div>
+
             <!-- Buttons -->
             <div class="flex items-center justify-center gap-3 pt-2">
-                <button onclick="closeCustomModal(false)" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 py-3 rounded-xl font-semibold text-sm transition">Abbrechen</button>
+                <button id="modalCancelBtn" onclick="closeCustomModal(false)" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 py-3 rounded-xl font-semibold text-sm transition">Abbrechen</button>
                 <button id="modalConfirmBtn" onclick="handleModalConfirm()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-semibold text-sm transition shadow-lg shadow-indigo-600/30">Bestätigen</button>
             </div>
         </div>
@@ -493,14 +497,14 @@
             <div class="flex justify-center space-x-6 mb-8 text-gray-400 text-xl">
                 <a href="https://open.spotify.com/artist/52TdHUi4gScGBSvgFNFG80" target="_blank" rel="noopener noreferrer" class="hover:text-green-400 transition"><i class="fa-brands fa-spotify"></i></a>
                 <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition"><i class="fa-solid fa-radio"></i></a>
-                <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-purple-400 transition"><i class="fa-solid fa-tower-cell"></i></a>
-                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition"><i class="fa-solid fa-mobile"></i></a>
+                <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-purple-400 transition"><i class="fa-brands fa-tower-cell"></i></a>
+                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition"><i class="fa-brands fa-mobile"></i></a>
             </div>
             <p class="text-xs text-gray-500">&copy; 2026 jackdarckart. Alle Rechte vorbehalten. Optimiert für GitHub & Vercel.</p>
         </div>
     </footer>
 
-    <!-- Script mit Custom Modal, E-Mail-Wiederherstellung & Empfehlungs-Hinweis -->
+    <!-- Script -->
     <script>
         function switchView(view) {
             const home = document.getElementById('homeView');
@@ -519,30 +523,57 @@
             }
         }
 
-        // --- CUSTOM MODAL STEUERUNG ---
         let modalCallback = null;
-        let modalMode = 'pin'; // 'pin', 'setup', 'forgot'
+        let modalMode = 'pin';
 
-        function showCustomModal(mode, title, text, placeholder) {
+        function showCustomModal(mode, title, text, placeholder, showCancel = true) {
             modalMode = mode;
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalText').innerText = text;
             const input = document.getElementById('modalInput');
+            const inputContainer = document.getElementById('modalInputContainer');
+            const linkContainer = document.getElementById('modalLinkContainer');
+            const actionContainer = document.getElementById('modalActionContainer');
+            const cancelBtn = document.getElementById('modalCancelBtn');
+
             input.value = '';
             input.placeholder = placeholder || '';
-            
-            if (mode === 'setup') {
-                input.type = 'text';
-                document.getElementById('modalLinkContainer').classList.add('hidden');
+            linkContainer.classList.add('hidden');
+            actionContainer.classList.add('hidden');
+            actionContainer.innerHTML = '';
+            inputContainer.classList.remove('hidden');
+            cancelBtn.style.display = showCancel ? 'block' : 'none';
+
+            if (mode === 'setup' || mode === 'forgot') {
+                input.type = mode === 'forgot' ? 'email' : 'text';
             } else if (mode === 'pin') {
                 input.type = 'password';
-                document.getElementById('modalLinkContainer').classList.remove('hidden');
-            } else if (mode === 'forgot') {
-                input.type = 'email';
-                document.getElementById('modalLinkContainer').classList.add('hidden');
+                linkContainer.classList.remove('hidden');
+            } else if (mode === 'info') {
+                inputContainer.classList.add('hidden');
             }
 
             document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function showInfoModal(title, text, htmlButton = null) {
+            modalMode = 'info';
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalText').innerText = text;
+            document.getElementById('modalInputContainer').classList.add('hidden');
+            document.getElementById('modalLinkContainer').classList.add('hidden');
+            document.getElementById('modalCancelBtn').style.display = 'none';
+            
+            const actionContainer = document.getElementById('modalActionContainer');
+            if (htmlButton) {
+                actionContainer.innerHTML = htmlButton;
+                actionContainer.classList.remove('hidden');
+            } else {
+                actionContainer.classList.add('hidden');
+            }
+
+            document.getElementById('customModal').classList.remove('hidden');
+            modalCallback = null;
         }
 
         function closeCustomModal(result, value) {
@@ -558,28 +589,27 @@
             closeCustomModal(true, val);
         }
 
-        // --- PIN & SETUP LOGIK ---
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
-                showCustomModal('setup', '🔒 Beat-Lab Admin-Einrichtung', 'Lege jetzt deinen Master-PIN fest:', 'Neuen PIN eingeben...');
+                showCustomModal('setup', '🔒 Beat-Lab Admin-Einrichtung', 'Lege jetzt deinen Master-PIN fest:', 'Neuen PIN eingeben...', false);
                 modalCallback = function(success, pinVal) {
                     if (success && pinVal) {
                         localStorage.setItem('jackAdminPin', pinVal);
-                        showCustomModal('setup', '📧 E-Mail Wiederherstellung', 'Gib deine E-Mail-Adresse für die Wiederherstellung ein:', 'Deine E-Mail-Adresse...');
+                        showCustomModal('setup', '📧 E-Mail Wiederherstellung', 'Gib deine E-Mail-Adresse für die Wiederherstellung ein:', 'Deine E-Mail-Adresse...', false);
                         modalCallback = function(succ2, emailVal) {
                             if (succ2 && emailVal) {
                                 localStorage.setItem('jackAdminEmail', emailVal);
-                                alert("✅ Master-PIN & E-Mail erfolgreich eingerichtet!");
+                                showInfoModal('✅ Erfolgreich', 'Master-PIN & E-Mail erfolgreich eingerichtet!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                             } else {
                                 localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                                alert("✅ PIN gespeichert (Standard-E-Mail hinterlegt).");
+                                showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                             }
                         };
                     } else {
                         localStorage.setItem('jackAdminPin', '1234');
                         localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                        alert("⚠️ Standard-PIN '1234' wurde gesetzt.");
+                        showInfoModal('⚠️ Hinweis', 'Standard-PIN \'1234\' wurde gesetzt.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                     }
                 };
             }
@@ -595,22 +625,24 @@
                 if (enteredPin === pin || (tempPin && enteredPin === tempPin)) {
                     if (tempPin && enteredPin === tempPin) {
                         localStorage.removeItem('jackTempPin');
-                        alert("ℹ️ Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.");
+                        showInfoModal('ℹ️ Hinweis', 'Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                        setTimeout(onSuccess, 1500);
+                        return;
                     }
                     onSuccess();
                 } else {
-                    alert("❌ Falscher PIN! Zugriff verweigert.");
+                    showInfoModal('❌ Zugriff verweigert', 'Falscher PIN! Zugriff verweigert.');
                 }
             };
         }
 
         function changeAdminPin() {
             verifyPin(function() {
-                showCustomModal('setup', '🔒 Master-PIN ändern', 'Gib deinen neuen geheimen PIN ein:\n\n(Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.)', 'Neuer PIN...');
+                showCustomModal('setup', '🔒 Master-PIN ändern', 'Gib deinen neuen geheimen PIN ein:', 'Neuer PIN...');
                 modalCallback = function(succ, newPin) {
                     if (succ && newPin) {
                         localStorage.setItem('jackAdminPin', newPin);
-                        alert("✅ Master-PIN erfolgreich geändert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.");
+                        showInfoModal('✅ Erfolg', 'Master-PIN erfolgreich geändert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                     }
                 };
             });
@@ -623,15 +655,17 @@
                 if (!succ || !emailInput) return;
                 let savedEmail = localStorage.getItem('jackAdminEmail');
 
-                if (emailInput.trim().toLowerCase() !== (savedEmail ? savedEmail.toLowerCase() : '')) {
-                    alert("❌ Diese E-Mail-Adresse ist im System nicht hinterlegt!\n\n(Hinweis: Wenn noch keine hinterlegt wurde, richte sie bitte im Admin-Bereich ein.)");
+                if (!savedEmail || emailInput.trim().toLowerCase() !== savedEmail.toLowerCase()) {
+                    // Schöner integrierter Button statt hässlichem Alert
+                    let setupBtnHtml = `<button onclick="checkAndSetupPinOnce()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">⚙️ E-Mail jetzt im Admin-Bereich einrichten</button>`;
+                    showInfoModal('❌ E-Mail nicht gefunden', 'Es wurde keine passende E-Mail-Adresse für die Wiederherstellung gefunden. Bitte richten Sie zuerst Ihren Master-PIN und E-Mail im Admin-Bereich ein.', setupBtnHtml);
                     return;
                 }
 
                 let tempPin = 'TMP-' + Math.floor(1000 + Math.random() * 9000);
                 localStorage.setItem('jackTempPin', tempPin);
 
-                alert("📨 Ein temporärer PIN wurde generiert!\n\nDein temporärer PIN lautet: " + tempPin + "\n\nDu kannst dich jetzt damit einloggen.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN nach dem Login zu ändern.");
+                showInfoModal('📨 Temporärer PIN generiert', 'Dein temporärer PIN lautet: ' + tempPin + '\n\nDu kannst dich jetzt damit einloggen.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
             };
         }
 
@@ -678,9 +712,9 @@
                         if (saved) {
                             localStorage.setItem('jackBeatLab_lastId', enteredId);
                             loadGame();
-                            alert("✅ Spielstand erfolgreich geladen!");
+                            showInfoModal('✅ Erfolg', 'Spielstand erfolgreich geladen!');
                         } else {
-                            alert("❌ Kein Spielstand unter dieser Cloud-ID gefunden.");
+                            showInfoModal('❌ Fehler', 'Kein Spielstand unter dieser Cloud-ID gefunden.');
                         }
                     }
                 };
@@ -689,15 +723,18 @@
 
         function confirmResetGame() {
             verifyPin(function() {
-                if (confirm("⚠️ Möchtest du dein 'Beat-Lab' wirklich komplett zurücksetzen?\n\n(Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.)")) {
-                    localStorage.removeItem('jackBeatLab_' + gameData.cloudId);
-                    gameData.beats = 0; gameData.fans = 0; gameData.clickPower = 1;
-                    gameData.mic = 0; gameData.synth = 0; gameData.desk = 0; gameData.label = 0;
-                    saveGame();
-                    updateGameUI();
-                    alert("✅ Das Beat-Lab wurde erfolgreich zurückgesetzt.");
-                }
+                let resetBtnHtml = `<button onclick="executeReset()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🗑️ Ja, Beat-Lab wirklich zurücksetzen</button>`;
+                showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du dein "Beat-Lab" wirklich komplett zurücksetzen?\n\n(Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.)', resetBtnHtml);
             });
+        }
+
+        function executeReset() {
+            localStorage.removeItem('jackBeatLab_' + gameData.cloudId);
+            gameData.beats = 0; gameData.fans = 0; gameData.clickPower = 1;
+            gameData.mic = 0; gameData.synth = 0; gameData.desk = 0; gameData.label = 0;
+            saveGame();
+            updateGameUI();
+            showInfoModal('✅ Zurückgesetzt', 'Das Beat-Lab wurde erfolgreich zurückgesetzt.');
         }
 
         function clickBeat() {
