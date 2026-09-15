@@ -87,7 +87,7 @@
                     <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
                 </h1>
                 <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
-                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit musik-reaktivem HD-Garten!
+                    Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm, Spotify und spiele unser exklusives Studio-Minigame mit harmonischem HD-Garten!
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
@@ -183,9 +183,9 @@
                         </a>
                     </div>
 
-                    <!-- Persistent Audio Player mit CORS für Visualizer -->
+                    <!-- Persistent Audio Player -->
                     <div class="bg-darkbg p-6 rounded-2xl border border-gray-800 text-center space-y-4">
-                        <p class="text-gray-300 text-sm">Starte den Audiostream (der Garten reagiert live im Takt zur Musik):</p>
+                        <p class="text-gray-300 text-sm">Starte den Audiostream (der Garten reagiert sanft im Takt zur Musik):</p>
                         <audio id="radioStream" controls crossorigin="anonymous" preload="auto" class="w-full mx-auto max-w-md accent-indigo-600">
                             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
                             Dein Browser unterstützt kein Audio-Element.
@@ -350,10 +350,14 @@
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
             <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, erweitere dein Studio und öffne deinen HD-Garten!</p>
-            <div class="mt-6">
+            <div class="mt-6 flex flex-wrap justify-center gap-3">
                 <button onclick="switchView('garden')" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-xl shadow-emerald-600/30 transition inline-flex items-center space-x-2">
                     <i class="fa-solid fa-seedling"></i>
-                    <span>🌿 Musik-reaktiven HD-Garten öffnen</span>
+                    <span>🌿 HD-Garten öffnen</span>
+                </button>
+                <button id="soundToggleBtnGame" onclick="toggleGameSound()" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-5 py-3 rounded-2xl text-sm font-semibold transition shadow-md inline-flex items-center space-x-2">
+                    <i class="fa-solid fa-volume-high"></i>
+                    <span>Sound: An</span>
                 </button>
             </div>
         </div>
@@ -516,7 +520,7 @@
         </div>
     </div>
 
-    <!-- SEPARATE MUSIK-REAKTIVE HD-GARTEN ANSICHT -->
+    <!-- SEPARATE HARMONISCHE HD-GARTEN ANSICHT -->
     <div id="gardenView" class="hidden py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-6 text-center">
         <div class="flex items-center justify-between px-2">
             <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg">
@@ -525,7 +529,7 @@
             </button>
             <div class="inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Musik-reaktiver HD-Garten</span>
+                <span>Harmonischer HD-Garten</span>
             </div>
         </div>
 
@@ -545,12 +549,12 @@
             </div>
         </div>
 
-        <!-- AUDIO-REAKTIVES CANVAS-FENSTER -->
+        <!-- CANVAS-FENSTER -->
         <div class="relative w-full flex justify-center bg-darkbg rounded-3xl p-3 border-2 border-emerald-500/50 shadow-2xl overflow-hidden">
             <canvas id="gardenCanvas" width="800" height="650" class="w-full max-w-3xl rounded-2xl shadow-2xl"></canvas>
         </div>
 
-        <!-- Dünger / Upgrade Steuerung -->
+        <!-- Dünger & Audio Mute Steuerung -->
         <div class="flex flex-wrap justify-center gap-3 pt-2">
             <button onclick="feedPlant(0)" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
                 Stauden düngen (<span id="gardenCost0">50</span> B)
@@ -560,6 +564,10 @@
             </button>
             <button onclick="feedPlant(2)" class="bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
                 Teich düngen (<span id="gardenCost2">1000</span> B)
+            </button>
+            <button id="soundToggleBtn" onclick="toggleGameSound()" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>Sound: An</span>
             </button>
         </div>
     </div>
@@ -643,6 +651,22 @@
 
         let modalCallback = null;
         let isRegisterMode = false;
+        let gameSoundEnabled = true;
+
+        // --- AUDIO MUTE / UNMUTE STEUERUNG ---
+        function toggleGameSound() {
+            gameSoundEnabled = !gameSoundEnabled;
+            const btn1 = document.getElementById('soundToggleBtn');
+            const btn2 = document.getElementById('soundToggleBtnGame');
+            
+            if (gameSoundEnabled) {
+                if (btn1) { btn1.innerHTML = '<i class="fa-solid fa-volume-high"></i><span>Sound: An</span>'; btn1.className = 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5'; }
+                if (btn2) { btn2.innerHTML = '<i class="fa-solid fa-volume-high"></i><span>Sound: An</span>'; btn2.className = 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-5 py-3 rounded-2xl text-sm font-semibold transition shadow-md inline-flex items-center space-x-2'; }
+            } else {
+                if (btn1) { btn1.innerHTML = '<i class="fa-solid fa-volume-mute"></i><span>Sound: Aus</span>'; btn1.className = 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5'; }
+                if (btn2) { btn2.innerHTML = '<i class="fa-solid fa-volume-mute"></i><span>Sound: Aus</span>'; btn2.className = 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 px-5 py-3 rounded-2xl text-sm font-semibold transition shadow-md inline-flex items-center space-x-2'; }
+            }
+        }
 
         // --- AUTH SYSTEM ---
         function toggleAuthMode() {
@@ -756,7 +780,7 @@
             }
         }
 
-        // --- AUDIO & MUSIC-REACTIVITY SYSTEM (WEB AUDIO API) ---
+        // --- AUDIO & SANFTES REAKTIVITÄTS-SYSTEM ---
         let audioCtx = null;
         let audioAnalyser = null;
         let audioDataArray = null;
@@ -775,7 +799,6 @@
                     audioCtx.resume();
                 }
 
-                // Webradio Stream an den Visualizer / Analyser anbinden
                 const audioEl = document.getElementById('radioStream');
                 if (audioEl && !audioSourceConnected) {
                     try {
@@ -802,11 +825,12 @@
         });
 
         function playCleanCrispSound() {
+            if (!gameSoundEnabled) return; // Stoppt alle In-Game Töne, wenn Sound ausgeschaltet ist
             try {
                 unlockAudio();
                 if (!audioCtx) return;
 
-                targetPulse = 1.2; 
+                targetPulse = 0.5; 
 
                 const now = audioCtx.currentTime;
                 const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66];
@@ -814,7 +838,7 @@
 
                 const gainNode = audioCtx.createGain();
                 gainNode.gain.setValueAtTime(0.0001, now);
-                gainNode.gain.linearRampToValueAtTime(0.1, now + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0.08, now + 0.01);
                 gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
 
                 const filter = audioCtx.createBiquadFilter();
@@ -1055,18 +1079,18 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- MUSIK-REAKTIVE CINEASTISCHE HD GARTEN RENDER ENGINE ---
+        // --- RUHIGE, HARMONISCHE GARTEN RENDER ENGINE ---
         let animTime = 0;
         let particles = [];
 
-        for(let i=0; i<25; i++) {
+        for(let i=0; i<20; i++) {
             particles.push({
                 x: Math.random() * 800,
                 y: Math.random() * 650,
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: -Math.random() * 0.5 - 0.2,
-                size: Math.random() * 2.8 + 0.8,
-                alpha: Math.random() * 0.6 + 0.2
+                vx: (Math.random() - 0.5) * 0.2,
+                vy: -Math.random() * 0.3 - 0.1,
+                size: Math.random() * 2.5 + 1,
+                alpha: Math.random() * 0.5 + 0.2
             });
         }
 
@@ -1077,23 +1101,20 @@
             const w = canvas.width;
             const h = canvas.height;
 
-            // Musik-Bass & Frequenzanalyse auslesen (falls Musik läuft)
             let audioBass = 0;
             if (audioAnalyser && audioDataArray) {
                 audioAnalyser.getByteFrequencyData(audioDataArray);
-                // Niedrige Frequenzen (Bass) für den Beat nutzen (Durchschnitt der ersten 8 Bins)
                 let bassSum = 0;
-                for (let i = 0; i < 8; i++) bassSum += audioDataArray[i];
-                audioBass = (bassSum / 8) / 255.0; // Wert zwischen 0.0 und 1.0
+                for (let i = 0; i < 6; i++) bassSum += audioDataArray[i];
+                audioBass = (bassSum / 6) / 255.0; 
             }
 
-            animTime += 0.02 + (getBps() * 0.0003) + (audioBass * 0.03);
+            animTime += 0.007 + (audioBass * 0.004);
 
-            currentPulse += (targetPulse - currentPulse) * 0.15;
-            targetPulse += (0 - targetPulse) * 0.1;
+            currentPulse += (targetPulse - currentPulse) * 0.08;
+            targetPulse += (0 - targetPulse) * 0.05;
 
-            // Musik-Reaktivitätsfaktor kombinieren
-            let reactFactor = currentPulse + (audioBass * 0.8);
+            let reactFactor = currentPulse + (audioBass * 0.25);
 
             let bgGrad = ctx.createRadialGradient(w/2, h/2, 80, w/2, h/2, w * 0.8);
             bgGrad.addColorStop(0, '#0f3822');
@@ -1118,27 +1139,25 @@
             ctx.fillStyle = 'rgba(255,255,255,0.04)';
             ctx.fillRect(140, 470, 520, 45);
 
-            let terraceSway = Math.sin(animTime * 2) * (1.2 + reactFactor * 4);
+            let terraceSway = Math.sin(animTime * 1.2) * (0.6 + reactFactor * 1.2);
             ctx.fillStyle = '#cbd5e1'; 
             ctx.fillRect(350, 520 + terraceSway, 100, 55);
             ctx.fillStyle = '#94a3b8'; 
             ctx.fillRect(315, 532 + terraceSway, 22, 32); 
             ctx.fillRect(463, 532 + terraceSway, 22, 32);
 
-            // Klang-Teich reagiert stark auf Bass!
-            let pondGrad = ctx.createRadialGradient(500, 330, 15 + audioBass*10, 500, 330, 120 + audioBass*30);
+            let pondGrad = ctx.createRadialGradient(500, 330, 15 + audioBass*4, 500, 330, 120 + audioBass*10);
             pondGrad.addColorStop(0, '#38bdf8');
             pondGrad.addColorStop(0.6, '#0284c7');
             pondGrad.addColorStop(1, '#0369a1');
             ctx.fillStyle = '#0c4a6e'; ctx.fillRect(376, 212, 248, 238);
             ctx.fillStyle = pondGrad; ctx.fillRect(382, 218, 236, 226);
 
-            // Dynamische Wellenringe im Musik-Takt
-            ctx.strokeStyle = 'rgba(255,255,255,0.65)';
-            ctx.lineWidth = 1.5 + (reactFactor * 2.5);
-            let r1 = (Math.sin(animTime * 1.4) * 14 + 40 + reactFactor * 15);
-            let r2 = (Math.cos(animTime * 1.1) * 18 + 65 + reactFactor * 22);
-            let r3 = (Math.sin(animTime * 0.9) * 22 + 90 + reactFactor * 30);
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            ctx.lineWidth = 1.2 + (reactFactor * 1.0);
+            let r1 = (Math.sin(animTime * 0.8) * 10 + 40 + reactFactor * 6);
+            let r2 = (Math.cos(animTime * 0.6) * 12 + 65 + reactFactor * 9);
+            let r3 = (Math.sin(animTime * 0.5) * 15 + 90 + reactFactor * 12);
             ctx.beginPath(); ctx.arc(500, 330, Math.abs(r1), 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath(); ctx.arc(500, 330, Math.abs(r2), 0, Math.PI * 2); ctx.stroke();
             ctx.beginPath(); ctx.arc(500, 330, Math.abs(r3), 0, Math.PI * 2); ctx.stroke();
@@ -1153,14 +1172,14 @@
             }
 
             let treeLvl = gameData.garden[1].level;
-            let windSway = Math.sin(animTime * 1.8) * (4 + audioBass * 8);
-            let baseRadius = (30 + Math.min(treeLvl * 2, 16)) * (1 + reactFactor * 0.15);
+            let windSway = Math.sin(animTime * 1.0) * (2 + audioBass * 2.5);
+            let baseRadius = (30 + Math.min(treeLvl * 2, 16)) * (1 + reactFactor * 0.05);
             let treePositions = [[110, 100], [210, 100], [110, 180], [210, 180]];
             
             treePositions.forEach((pos, idx) => {
                 let sW = windSway * (idx % 2 === 0 ? 1 : 0.8);
                 ctx.fillStyle = '#451a03';
-                ctx.fillRect(pos[0] - 5 + sW*0.5, pos[1], 10, 35);
+                ctx.fillRect(pos[0] - 5 + sW*0.3, pos[1], 10, 35);
                 
                 let tGrad = ctx.createRadialGradient(pos[0]-8 + sW, pos[1]-15, 5, pos[0] + sW, pos[1]-10, baseRadius);
                 tGrad.addColorStop(0, '#4ade80');
@@ -1170,10 +1189,10 @@
                 ctx.beginPath(); ctx.arc(pos[0] + sW, pos[1] - 5, baseRadius, 0, Math.PI * 2); ctx.fill();
             });
 
-            let bigTreeSway = Math.sin(animTime * 1.5) * (5 + audioBass * 10);
-            let bigRadius = (60 + Math.cos(animTime * 1.2) * 4) * (1 + reactFactor * 0.18);
+            let bigTreeSway = Math.sin(animTime * 0.9) * (2.5 + audioBass * 3);
+            let bigRadius = (60 + Math.cos(animTime * 0.7) * 3) * (1 + reactFactor * 0.06);
             ctx.fillStyle = '#451a03';
-            ctx.fillRect(620 - 7 + bigTreeSway*0.5, 90, 14, 50);
+            ctx.fillRect(620 - 7 + bigTreeSway*0.3, 90, 14, 50);
 
             let bigGrad = ctx.createRadialGradient(610 + bigTreeSway, 75, 12, 620 + bigTreeSway, 90, bigRadius);
             bigGrad.addColorStop(0, '#22c55e');
@@ -1187,22 +1206,21 @@
             for(let i = 0; i < 35 + flowerLvl * 8; i++) {
                 ctx.fillStyle = flowerColors[i % flowerColors.length];
                 ctx.beginPath();
-                let fS = (4.5 + Math.sin(animTime * 3 + i) * 1.2) * (1 + reactFactor * 0.3);
+                let fS = (4.5 + Math.sin(animTime * 1.5 + i) * 0.6) * (1 + reactFactor * 0.1);
                 ctx.arc(635 + ((i % 3) * 18), 210 + (i * 7.2), Math.max(1.8, fS), 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Partikel tanzen schneller bei lautem Bass
-            ctx.fillStyle = 'rgba(250, 204, 21, 0.8)';
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.7)';
             particles.forEach(p => {
-                p.x += p.vx + (Math.sin(animTime) * (0.3 + audioBass * 1.5));
-                p.y += p.vy - (audioBass * 0.8);
+                p.x += p.vx + (Math.sin(animTime * 0.5) * 0.15);
+                p.y += p.vy - (audioBass * 0.2);
                 if(p.y < 10) p.y = h - 10;
                 if(p.x < 10 || p.x > w-10) p.vx *= -1;
 
-                ctx.globalAlpha = p.alpha + (audioBass * 0.3);
+                ctx.globalAlpha = p.alpha;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size + (audioBass * 1.5), 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.globalAlpha = 1.0;
             });
@@ -1337,7 +1355,7 @@
             audio.addEventListener('pause', function() { localStorage.setItem('streamPlaying', 'false'); });
         }
 
-        document.addEventListener('contextcommon', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'F12' || (e.ctrlKey && ['u','s','p','c','x','a'].includes(e.key.toLowerCase())) || (e.ctrlKey && e.shiftKey)) {
                 e.preventDefault(); return false;
