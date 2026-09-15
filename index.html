@@ -50,31 +50,38 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME & AUTH & UPGRADES) -->
+        <!-- 2. STUDIO-LAB (LOGIN & GAME) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
             
-            <!-- Auth Container (Falls nicht eingeloggt) -->
-            <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left hidden">
+            <!-- Auth Gateway (Login / Register) -->
+            <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
                     <h2 class="text-xl font-bold text-purple-400">CloudBeats Access Gateway</h2>
-                    <p class="text-xs text-gray-400 mt-1">Authentifiziere dich per E-Mail und PIN.</p>
+                    <p class="text-xs text-gray-400 mt-1">Bitte mit E-Mail und PIN anmelden.</p>
                 </div>
+
                 <div class="flex border-b border-gray-800 mb-2">
                     <button type="button" id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer">Anmelden</button>
                     <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer">Registrieren</button>
                 </div>
+
+                <div id="auth-msg" class="text-xs text-center font-medium text-amber-400 min-h-[16px]"></div>
+
+                <!-- Login Form -->
                 <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
-                        <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="name@domain.de" value="artur.hamm90@gmail.com">
+                        <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" value="artur.hamm90@gmail.com">
                     </div>
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">PIN-Code:</label>
-                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="PIN">
+                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" value="1234">
                     </div>
                     <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 cursor-pointer">🔒 Studio entsperren</button>
                 </div>
+
+                <!-- Register Form -->
                 <div id="form-register" class="space-y-3 hidden">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
@@ -88,15 +95,15 @@
                 </div>
             </div>
 
-            <!-- Main Studio Container (Wenn eingeloggt) -->
-            <div id="game-main-container" class="space-y-4">
+            <!-- Main Studio Container (Eingeloggt) -->
+            <div id="game-main-container" class="space-y-4 hidden">
                 <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
                     <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
                     <button type="button" id="logout-btn" class="bg-red-900/40 text-red-300 text-[10px] px-2.5 py-1 rounded-xl cursor-pointer">🚪 Abmelden</button>
                 </div>
 
                 <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl cursor-pointer active:scale-95 transition">
-                    🎧 Master-Beat Live einspielen (+5)
+                    🎧 Master-Beat Live einspielen (+<span id="click-power-display">5</span>)
                 </button>
 
                 <div class="grid grid-cols-2 gap-3 text-left">
@@ -117,14 +124,14 @@
                         <div class="flex justify-between items-center bg-[#0b0f19] p-2.5 rounded-xl border border-gray-800">
                             <div>
                                 <p class="text-xs font-semibold text-white">🎹 Synth-Bass Modul</p>
-                                <p class="text-[10px] text-gray-400">+2 Beats pro Klick &amp; Sound-Ton</p>
+                                <p id="upg1-status" class="text-[10px] text-gray-400">+2 Beats pro Klick &amp; Sound-Ton</p>
                             </div>
                             <button type="button" id="buy-upgrade-1" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold cursor-pointer">100 Beats</button>
                         </div>
                         <div class="flex justify-between items-center bg-[#0b0f19] p-2.5 rounded-xl border border-gray-800">
                             <div>
                                 <p class="text-xs font-semibold text-white">🚀 Auto-Beat Machine</p>
-                                <p class="text-[10px] text-gray-400">Generiert automatisch alle 5 Sek. Beats</p>
+                                <p id="upg2-status" class="text-[10px] text-gray-400">Generiert automatisch alle 5 Sek. Beats</p>
                             </div>
                             <button type="button" id="buy-upgrade-2" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold cursor-pointer">500 Beats</button>
                         </div>
@@ -137,7 +144,7 @@
 
         <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
-            <div id="garten-main-container" class="bg-[#101722] border border-emerald-500/40 p-4 sm:p-6 rounded-3xl shadow-2xl space-y-4">
+            <div class="bg-[#101722] border border-emerald-500/40 p-4 sm:p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
                     <span class="text-3xl mb-1 block">🏡</span>
                     <h2 class="text-xl sm:text-2xl font-black text-emerald-400 mb-1">Architektur-Landschaftsgarten &amp; Takt-Sync</h2>
@@ -215,59 +222,51 @@
             let fans = 0;
             let clickPower = 5;
             let autoBeatsActive = false;
-            let username = localStorage.getItem('beat_lab_user') || 'jackdarckart';
+            let username = localStorage.getItem('cb_user') || 'jackdarckart';
             let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
-            let currentView = localStorage.getItem('beat_lab_current_view') || 'home';
+            let currentView = localStorage.getItem('cb_view') || 'home';
 
-            // Automatische Wiederherstellung oder Initialisierung der Multi-User-Datenbank
+            // Multi-User Datenbank initialisieren
             let usersDB = {};
             try {
                 usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
             } catch(e) { usersDB = {}; }
 
-            // Standard-User Artur Hamm einrichten falls nicht vorhanden mit deinen Werten
+            // Standard-Account mit deinen Werten sicher einrichten
             if (!usersDB['artur.hamm90@gmail.com']) {
                 usersDB['artur.hamm90@gmail.com'] = { pin: '1234', beats: 3449, fans: 586, power: 5, auto: false };
                 localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
             }
 
-            // Wenn noch niemand eingeloggt ist, direkt Artur als Standard laden oder einloggen
-            if (!loggedInUser) {
-                loggedInUser = 'artur.hamm90@gmail.com';
-                localStorage.setItem('beat_lab_logged_in_user', loggedInUser);
-            }
-
             function loadUserData() {
-                if (!loggedInUser) return;
-                try {
-                    let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    if (db[loggedInUser]) {
-                        let u = db[loggedInUser];
-                        beats = u.beats || 0;
-                        fans = u.fans || 0;
-                        clickPower = u.power || 5;
-                        autoBeatsActive = u.auto || false;
-                    }
-                } catch(e) {}
+                if (!loggedInUser || !usersDB[loggedInUser]) return;
+                let u = usersDB[loggedInUser];
+                beats = u.beats || 0;
+                fans = u.fans || 0;
+                clickPower = u.power || 5;
+                autoBeatsActive = u.auto || false;
             }
 
             function saveGame() {
                 if (!loggedInUser) return;
                 try {
-                    let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    if (db[loggedInUser]) {
-                        db[loggedInUser] = { ...db[loggedInUser], beats, fans, power: clickPower, auto: autoBeatsActive };
-                        localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
+                    usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    if (usersDB[loggedInUser]) {
+                        usersDB[loggedInUser] = { ...usersDB[loggedInUser], beats, fans, power: clickPower, auto: autoBeatsActive };
+                        localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     }
                 } catch(e) {}
             }
 
-            loadUserData();
+            if (loggedInUser) {
+                loadUserData();
+            }
 
             const userDisplay = document.getElementById('user-display');
-            if (userDisplay) userDisplay.innerText = username;
-
             const usernameInput = document.getElementById('reg-username');
+            const clickPowerDisplay = document.getElementById('click-power-display');
+
+            if (userDisplay) userDisplay.innerText = username;
             if (usernameInput) usernameInput.value = username;
 
             function updateGameViewState() {
@@ -287,7 +286,89 @@
                 }
             }
 
-            // Audio-Effekt (Töne beim Klicken)
+            // Tabs Login / Register Switch
+            const tabLoginBtn = document.getElementById('tab-login-btn');
+            const tabRegisterBtn = document.getElementById('tab-register-btn');
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+            const authMsg = document.getElementById('auth-msg');
+
+            if(tabLoginBtn && tabRegisterBtn) {
+                tabLoginBtn.addEventListener('click', () => {
+                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer";
+                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
+                    formLogin.classList.remove('hidden');
+                    formRegister.classList.add('hidden');
+                    if(authMsg) authMsg.innerText = "";
+                });
+                tabRegisterBtn.addEventListener('click', () => {
+                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 border-b-2 border-emerald-500 transition cursor-pointer";
+                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
+                    formRegister.classList.remove('hidden');
+                    formLogin.classList.add('hidden');
+                    if(authMsg) authMsg.innerText = "";
+                });
+            }
+
+            // Login Button Logik
+            const submitLoginBtn = document.getElementById('submit-login-btn');
+            if(submitLoginBtn) {
+                submitLoginBtn.addEventListener('click', () => {
+                    const email = document.getElementById('login-email').value.trim().toLowerCase();
+                    const pin = document.getElementById('login-pin').value.trim();
+                    usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+
+                    if (usersDB[email] && usersDB[email].pin === pin) {
+                        loggedInUser = email;
+                        localStorage.setItem('beat_lab_logged_in_user', email);
+                        updateGameViewState();
+                    } else {
+                        if(authMsg) authMsg.innerText = "❌ Falsche E-Mail-Adresse oder PIN!";
+                    }
+                });
+            }
+
+            // Register Button Logik
+            const submitRegisterBtn = document.getElementById('submit-register-btn');
+            if(submitRegisterBtn) {
+                submitRegisterBtn.addEventListener('click', () => {
+                    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+                    const pin = document.getElementById('reg-pin').value.trim();
+                    if (!email || !email.includes('@')) {
+                        if(authMsg) authMsg.innerText = "❌ Bitte gültige E-Mail eingeben!";
+                        return;
+                    }
+                    if (!pin || pin.length < 3) {
+                        if(authMsg) authMsg.innerText = "❌ PIN muss min. 3 Zeichen haben!";
+                        return;
+                    }
+
+                    usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    if (usersDB[email]) {
+                        if(authMsg) authMsg.innerText = "❌ E-Mail bereits registriert!";
+                        return;
+                    }
+
+                    usersDB[email] = { pin, beats: 0, fans: 0, power: 5, auto: false };
+                    localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
+                    loggedInUser = email;
+                    localStorage.setItem('beat_lab_logged_in_user', email);
+                    updateGameViewState();
+                });
+            }
+
+            // Logout Button Logik
+            const logoutBtn = document.getElementById('logout-btn');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    saveGame();
+                    loggedInUser = null;
+                    localStorage.removeItem('beat_lab_logged_in_user');
+                    updateGameViewState();
+                });
+            }
+
+            // Audio-Synthesizer (Töne beim Klicken)
             function playClickTone() {
                 try {
                     const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
@@ -306,7 +387,7 @@
 
             // Auto-Beat Generator
             setInterval(() => {
-                if (autoBeatsActive) {
+                if (autoBeatsActive && loggedInUser) {
                     beats += 1;
                     updateDisplay();
                     saveGame();
@@ -318,8 +399,13 @@
                 let fEl = document.getElementById('fans-count');
                 if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
                 if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
+                if(clickPowerDisplay) clickPowerDisplay.innerText = clickPower;
+
+                if (autoBeatsActive) {
+                    const upg2Status = document.getElementById('upg2-status');
+                    if (upg2Status) upg2Status.innerText = "Aktiv! Läuft im Hintergrund";
+                }
             }
-            updateDisplay();
 
             // Upgrades Kaufen
             const buyUpg1 = document.getElementById('buy-upgrade-1');
@@ -331,9 +417,8 @@
                         playClickTone();
                         updateDisplay();
                         saveGame();
-                        alert("Synth-Bass Modul aktiviert! +2 Klick-Power.");
-                    } else {
-                        alert("Nicht genug Beats! (Benötigt 100 Beats)");
+                        const upg1Status = document.getElementById('upg1-status');
+                        if (upg1Status) upg1Status.innerText = "Aktiv! +2 Power (Level " + ((clickPower - 5)/2 + 1) + ")";
                     }
                 });
             }
@@ -341,69 +426,20 @@
             const buyUpg2 = document.getElementById('buy-upgrade-2');
             if(buyUpg2) {
                 buyUpg2.addEventListener('click', () => {
-                    if (beats >= 500) {
+                    if (beats >= 500 && !autoBeatsActive) {
                         beats -= 500;
                         autoBeatsActive = true;
                         playClickTone();
                         updateDisplay();
                         saveGame();
-                        alert("Auto-Beat Machine erfolgreich gestartet!");
-                    } else {
-                        alert("Nicht genug Beats! (Benötigt 500 Beats)");
                     }
-                });
-            }
-
-            // Tabs Login/Register
-            const tabLoginBtn = document.getElementById('tab-login-btn');
-            const tabRegisterBtn = document.getElementById('tab-register-btn');
-            const formLogin = document.getElementById('form-login');
-            const formRegister = document.getElementById('form-register');
-
-            if(tabLoginBtn && tabRegisterBtn) {
-                tabLoginBtn.addEventListener('click', () => {
-                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer";
-                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
-                    formLogin.classList.remove('hidden');
-                    formRegister.classList.add('hidden');
-                });
-                tabRegisterBtn.addEventListener('click', () => {
-                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 border-b-2 border-emerald-500 transition cursor-pointer";
-                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
-                    formRegister.classList.remove('hidden');
-                    formLogin.classList.add('hidden');
-                });
-            }
-
-            const submitLoginBtn = document.getElementById('submit-login-btn');
-            if(submitLoginBtn) {
-                submitLoginBtn.addEventListener('click', () => {
-                    const email = document.getElementById('login-email').value.trim().toLowerCase();
-                    const pin = document.getElementById('login-pin').value.trim();
-                    let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    if (!db[email] || db[email].pin !== pin) { alert("Falsche E-Mail-Adresse oder PIN!"); return; }
-
-                    loggedInUser = email;
-                    localStorage.setItem('beat_lab_logged_in_user', email);
-                    updateGameViewState();
-                    alert("Erfolgreich angemeldet!");
-                });
-            }
-
-            const logoutBtn = document.getElementById('logout-btn');
-            if(logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    saveGame();
-                    loggedInUser = null;
-                    localStorage.removeItem('beat_lab_logged_in_user');
-                    updateGameViewState();
                 });
             }
 
             // Ansichten Umschalten
             function switchView(view) {
                 currentView = view;
-                localStorage.setItem('beat_lab_current_view', view);
+                localStorage.setItem('cb_view', view);
                 document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
                 let target = document.getElementById('view-' + view);
                 if (target) target.classList.remove('hidden');
@@ -440,16 +476,17 @@
             const saveAccountBtn = document.getElementById('save-account-btn');
             if(saveAccountBtn) {
                 saveAccountBtn.addEventListener('click', () => {
-                    const newName = document.getElementById('reg-username').value.trim();
+                    const newName = usernameInput ? usernameInput.value.trim() : '';
                     if (newName) {
                         username = newName;
-                        localStorage.setItem('beat_lab_user', username);
+                        localStorage.setItem('cb_user', username);
                         if (userDisplay) userDisplay.innerText = username;
-                        alert("Profil aktualisiert!");
+                        saveGame();
                     }
                 });
             }
 
+            // Webradio Song Info
             async function fetchCurrentSong() {
                 try {
                     let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
@@ -482,9 +519,7 @@
                             toggleRadioBtn.innerText = "⏹️ Stream stoppen";
                             toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
                             if(audioStatusText) audioStatusText.innerText = "🟢 Webradio aktiv & synchronisiert";
-                        } catch(e) {
-                            alert("Stream konnte nicht gestartet werden.");
-                        }
+                        } catch(e) {}
                     } else {
                         radioStreamEl.pause();
                         isStreamingRadio = false;
@@ -678,6 +713,7 @@
                 });
             }
 
+            updateGameViewState();
             switchView(currentView);
         });
     </script>
