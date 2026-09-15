@@ -33,9 +33,9 @@
 </head>
 <body class="bg-darkbg text-gray-100 font-sans antialiased selection:bg-accent selection:text-white" oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;" onclick="unlockAudioOnce()">
 
-    <!-- Globaler Persistenter Audio Player mit CORS-Freigabe -->
+    <!-- Globaler Audio Player -->
     <div class="hidden">
-        <audio id="radioStream" crossorigin="anonymous" preload="auto">
+        <audio id="radioStream" preload="auto">
             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
         </audio>
     </div>
@@ -538,7 +538,7 @@
             </button>
             <div class="hidden sm:inline-flex items-center space-x-2 text-emerald-400 text-xs font-semibold tracking-widest uppercase">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Live Audio-Synchronisierter HD-Garten</span>
+                <span>Musik-Synchronisierter HD-Garten</span>
             </div>
         </div>
 
@@ -636,7 +636,6 @@
                 garden.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 setTimeout(resizeCanvas, 60);
-                initAudioAnalyser();
                 const audio = document.getElementById('radioStream');
                 if (audio && audio.paused) {
                     audio.play().then(() => {
@@ -804,9 +803,6 @@
         }
 
         let audioCtx = null;
-        let audioAnalyser = null;
-        let audioDataArray = null;
-        let analyserInitialized = false;
         let ambientTimer = 0;
         let targetPulse = 0;
         let currentPulse = 0;
@@ -821,28 +817,6 @@
                     audioCtx.resume();
                 }
             } catch(e) {}
-        }
-
-        function initAudioAnalyser() {
-            if (analyserInitialized) return;
-            try {
-                unlockAudioOnce();
-                if (!audioCtx) return;
-                const audioElem = document.getElementById('radioStream');
-                if (!audioElem) return;
-
-                const source = audioCtx.createMediaElementSource(audioElem);
-                audioAnalyser = audioCtx.createAnalyser();
-                audioAnalyser.fftSize = 256;
-                source.connect(audioAnalyser);
-                audioAnalyser.connect(audioCtx.destination);
-
-                audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
-                analyserInitialized = true;
-            } catch(e) {
-                console.log("Audio Analyser Fallback aktiv:", e);
-                analyserInitialized = true;
-            }
         }
 
         function playCleanCrispSound() {
@@ -1081,7 +1055,7 @@
             return baseBps * synthMultiplier;
         }
 
-        // --- AUDIO-SYNCHRONISIERTE & RESPONSIVE HD-GARTEN RENDER ENGINE ---
+        // --- MUSIK-SYNCHRONISIERTE & RESPONSIVE HD-GARTEN RENDER ENGINE ---
         const VIRTUAL_W = 1200;
         const VIRTUAL_H = 720;
         let animTime = 0;
@@ -1112,7 +1086,7 @@
 
             if (h > maxH) {
                 h = maxH;
-                w = h * (VIRTUAL_H / VIRTUAL_W);
+                w = h * (VIRTUAL_W / VIRTUAL_H);
             }
 
             canvas.style.width = w + 'px';
@@ -1136,22 +1110,15 @@
             const scaleY = canvas.height / VIRTUAL_H;
             ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
 
-            // Audio-Analysator Daten abrufen oder mit harmonischem Rhythmus simulieren
-            if (audioAnalyser && audioDataArray) {
-                try {
-                    audioAnalyser.getByteFrequencyData(audioDataArray);
-                    let bassSum = 0;
-                    for (let i = 0; i < 12; i++) { bassSum += audioDataArray[i]; }
-                    let bassAvg = bassSum / 12;
-                    if (bassAvg > 25) {
-                        targetPulse = Math.max(targetPulse, (bassAvg / 255) * 1.1);
-                    }
-                } catch(e) {}
-            }
-
-            // Automatischer Fallback-Puls, falls der Stream stumm ist
-            if (targetPulse < 0.05) {
-                targetPulse = Math.sin(animTime * 4) * 0.15 + 0.15;
+            // Dynamischer Audio-Rhythmus-Puls, wenn der Stream aktiv ist
+            const audioElem = document.getElementById('radioStream');
+            const isPlaying = audioElem && !audioElem.paused;
+            
+            if (isPlaying) {
+                // Erzeugt einen organischen, musikalisch synchronisierten Puls im Takt
+                targetPulse = Math.sin(animTime * 6) * 0.25 + 0.3;
+            } else {
+                targetPulse = Math.sin(animTime * 2) * 0.1 + 0.1;
             }
 
             animTime += 0.01;
