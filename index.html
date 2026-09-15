@@ -643,9 +643,8 @@
             } else if (view === 'garden') {
                 garden.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                setTimeout(resizeCanvas, 50); // Canvas auf Bildschirmgröße anpassen
+                setTimeout(resizeCanvas, 50);
             } else {
-                home.classList.add('block');
                 home.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -748,8 +747,7 @@
             localStorage.removeItem('jackLoggedInEmail');
             document.getElementById('authEmail').value = '';
             document.getElementById('authPin').value = '';
-            checkLoginState();
-            switchView('game');
+            checkLoginState(); // Bleibt exakt an derselben Scroll-Position!
         }
 
         function checkLoginState() {
@@ -1064,7 +1062,7 @@
         const VIRTUAL_H = 750;
         let animTime = 0;
         let particles = [];
-        let floatingNotes = []; // Interaktive Noten, die bei Klicks aufsteigen
+        let floatingNotes = [];
 
         for(let i=0; i<35; i++) {
             particles.push({
@@ -1090,7 +1088,6 @@
 
         window.addEventListener('resize', resizeCanvas);
 
-        // --- INTERAKTIVITÄT IM GARTEN ---
         function setupGardenInteraction() {
             const canvas = document.getElementById('gardenCanvas');
             if (!canvas) return;
@@ -1102,12 +1099,10 @@
                 const x = (e.clientX - rect.left) * scaleX;
                 const y = (e.clientY - rect.top) * scaleY;
 
-                // Klick-Effekt: Musiknote / Bonus erzeugen
                 playCleanCrispSound();
                 gameData.beats += 1;
                 updateGameUI();
 
-                // Interaktive schwebende Note hinzufügen
                 floatingNotes.push({
                     x: x,
                     y: y,
@@ -1116,7 +1111,6 @@
                     text: ['♪', '♫', '♥', '+1 Beat'][Math.floor(Math.random() * 4)]
                 });
 
-                // Teich-Welle verstärken
                 targetPulse = 1.2;
             });
         }
@@ -1131,7 +1125,6 @@
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             
-            // Automatische Skalierung für gestochen scharfe Grafik auf jedem Bildschirm
             const scaleX = canvas.width / VIRTUAL_W;
             const scaleY = canvas.height / VIRTUAL_H;
             ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
@@ -1142,7 +1135,6 @@
 
             let reactFactor = currentPulse;
 
-            // Cineastischer High-End Hintergrund-Gradient
             let bgGrad = ctx.createRadialGradient(VIRTUAL_W/2, VIRTUAL_H/2, 100, VIRTUAL_W/2, VIRTUAL_H/2, VIRTUAL_W * 0.8);
             bgGrad.addColorStop(0, '#0f4c2e');
             bgGrad.addColorStop(0.5, '#072b1a');
@@ -1150,12 +1142,10 @@
             ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, VIRTUAL_W, VIRTUAL_H);
 
-            // Zier-Rahmen
             ctx.strokeStyle = 'rgba(52, 211, 153, 0.2)';
             ctx.lineWidth = 4;
             ctx.strokeRect(15, 15, VIRTUAL_W - 30, VIRTUAL_H - 30);
 
-            // Holz-Lounge & Terrasse (Mitte unten)
             ctx.fillStyle = '#4a2e18';
             ctx.fillRect(VIRTUAL_W/2 - 280, 530, 560, 180);
             ctx.strokeStyle = '#2d1b0e';
@@ -1166,7 +1156,6 @@
             ctx.fillStyle = 'rgba(255,255,255,0.05)';
             ctx.fillRect(VIRTUAL_W/2 - 280, 530, 560, 50);
 
-            // Lounge Tisch & Hocker
             let terraceSway = Math.sin(animTime * 1.5) * (0.8 + reactFactor * 1.5);
             ctx.fillStyle = '#94a3b8'; 
             ctx.fillRect(VIRTUAL_W/2 - 60, 580 + terraceSway, 120, 65);
@@ -1174,7 +1163,6 @@
             ctx.fillRect(VIRTUAL_W/2 - 100, 595 + terraceSway, 28, 38); 
             ctx.fillRect(VIRTUAL_W/2 + 72, 595 + terraceSway, 28, 38);
 
-            // Hochwertiger Klang-Teich (Mitte rechts)
             let pondX = 850, pondY = 380, pondW = 280, pondH = 220;
             let pondGrad = ctx.createRadialGradient(pondX, pondY, 20, pondX, pondY, 140);
             pondGrad.addColorStop(0, '#38bdf8');
@@ -1186,7 +1174,6 @@
             ctx.fillStyle = pondGrad; 
             ctx.beginPath(); ctx.ellipse(pondX, pondY, pondW/2, pondH/2, 0, 0, Math.PI*2); ctx.fill();
 
-            // Re జరిగende Wasserwellen im Teich
             ctx.strokeStyle = 'rgba(255,255,255,0.6)';
             ctx.lineWidth = 1.8 + (reactFactor * 2.0);
             let w1 = (Math.sin(animTime * 1.2) * 12 + 45 + reactFactor * 15);
@@ -1194,7 +1181,6 @@
             ctx.beginPath(); ctx.ellipse(pondX, pondY, w1*1.3, w1, 0, 0, Math.PI*2); ctx.stroke();
             ctx.beginPath(); ctx.ellipse(pondX, pondY, w2*1.3, w2, 0, 0, Math.PI*2); ctx.stroke();
 
-            // Architektur / Studio-Gebäude (Links)
             ctx.fillStyle = '#1e293b';
             ctx.fillRect(80, 250, 260, 240);
             ctx.strokeStyle = '#334155';
@@ -1207,7 +1193,6 @@
                 }
             }
 
-            // Bäume & Baumhain (Links oben)
             let treeLvl = gameData.garden[1].level;
             let windSway = Math.sin(animTime * 1.0) * (2.5 + reactFactor * 3);
             let baseRadius = (45 + Math.min(treeLvl * 3, 22)) * (1 + reactFactor * 0.08);
@@ -1226,7 +1211,6 @@
                 ctx.beginPath(); ctx.arc(pos[0] + sW, pos[1] - 10, baseRadius, 0, Math.PI * 2); ctx.fill();
             });
 
-            // Großartiger Zentraler Mega-Baum (Rechts oben)
             let bigTreeSway = Math.sin(animTime * 0.8) * (3.5 + reactFactor * 4);
             let bigRadius = (90 + Math.cos(animTime * 0.6) * 5) * (1 + reactFactor * 0.1);
             ctx.fillStyle = '#3d2314';
@@ -1239,7 +1223,6 @@
             ctx.fillStyle = bigGrad;
             ctx.beginPath(); ctx.arc(950 + bigTreeSway, 100, bigRadius, 0, Math.PI * 2); ctx.fill();
 
-            // Stauden-Garten & Blumenmeer (Rechts oben Bereich)
             let flowerLvl = gameData.garden[0].level;
             let flowerColors = ['#f472b6', '#e879f9', '#38bdf8', '#facc15', '#fb7185', '#34d399', '#c084fc'];
             for(let i = 0; i < 50 + flowerLvl * 12; i++) {
@@ -1252,7 +1235,6 @@
                 ctx.fill();
             }
 
-            // Magische Glühwürmchen & Partikel
             ctx.fillStyle = 'rgba(250, 204, 21, 0.85)';
             particles.forEach(p => {
                 p.x += p.vx + (Math.sin(animTime * 0.5) * 0.2);
@@ -1267,7 +1249,6 @@
                 ctx.globalAlpha = 1.0;
             });
 
-            // Interaktive Schwebende Noten (wenn in den Garten geklickt wird)
             for (let i = floatingNotes.length - 1; i >= 0; i--) {
                 let note = floatingNotes[i];
                 note.y += note.vy;
@@ -1287,7 +1268,6 @@
                 }
             }
 
-            // Beschriftungen im Garten
             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             ctx.font = 'bold 14px sans-serif';
             ctx.shadowBlur = 8;
@@ -1355,7 +1335,6 @@
             if (gCost1) gCost1.innerText = costG1.toLocaleString();
             if (gCost2) gCost2.innerText = costG2.toLocaleString();
 
-            // --- LEUCHT- & PULSIER-LOGIK ---
             setAffordability('btnMic', gameData.beats >= costMic, 'bg-indigo-600 hover:bg-indigo-500', 'bg-indigo-500 ring-2 ring-indigo-300 animate-pulse shadow-lg shadow-indigo-500/50');
             setAffordability('btnSynth', gameData.beats >= costSynth, 'bg-purple-600 hover:bg-purple-500', 'bg-purple-500 ring-2 ring-purple-300 animate-pulse shadow-lg shadow-purple-500/50');
             setAffordability('btnDesk', gameData.beats >= costDesk, 'bg-pink-600 hover:bg-pink-500', 'bg-pink-500 ring-2 ring-pink-300 animate-pulse shadow-lg shadow-pink-500/50');
