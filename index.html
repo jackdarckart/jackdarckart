@@ -29,6 +29,13 @@
             user-select: none;
             -webkit-touch-callout: none;
         }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .plant-floating {
+            animation: floatSlow 4s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="bg-darkbg text-gray-100 font-sans antialiased selection:bg-accent selection:text-white" oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
@@ -338,10 +345,10 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Beat-Lab & Digitaler Studio-Garten (Stilles Wachstum)</span>
+                <span>Beat-Lab & Digitaler Studio-Garten (High-End Grafik & Stilles Wachstum)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab & Garden 🎧🌿</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, füttere deine Pflanzen mit Sound und lass den digitalen Garten ungestört gedeihen!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, füttere deine Pflanzen mit Sound und genieße den lebendigen, wachsenden Studio-Garten!</p>
         </div>
 
         <!-- AUTH SCREEN -->
@@ -413,7 +420,7 @@
                 <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 shadow-2xl space-y-4">
                     <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
                         <i class="fa-solid fa-store text-indigo-400"></i>
-                        <span>Studio Equipment Upgrades (Erweitert)</span>
+                        <span>Studio Equipment Upgrades</span>
                     </h3>
 
                     <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
@@ -462,73 +469,133 @@
                 </div>
             </div>
 
-            <!-- DIGITALER STUDIO-GARTEN SECTION (STILLES WACHSTUM) -->
-            <div class="bg-cardbg border border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/30">
-                            <i class="fa-solid fa-seedling"></i>
+            <!-- HOCHWERTIGER DIGITALER STUDIO-GARTEN (GRAFISCH VERFEINERT) -->
+            <div class="bg-gradient-to-br from-cardbg via-emerald-950/20 to-cardbg border border-emerald-500/50 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-emerald-950/30 space-y-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-800/80 pb-5">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-emerald-600/30 border border-emerald-400/40">
+                            <i class="fa-solid fa-seedling animate-pulse"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-white">Digitaler Studio-Garten 🌿</h3>
-                            <p class="text-xs text-gray-400">Pflanzen genießen deine Beats & Klänge und bringen dir passive Multiplikatoren (Wächst ganz ohne Pop-ups!)</p>
+                            <h3 class="text-xl font-black text-white flex items-center space-x-2">
+                                <span>Digitaler Studio-Garten 🌿</span>
+                                <span class="text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full">Live Terrarium</span>
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Pflanzen absorbieren deine Sound-Vibes und verleihen dir mächtige autonome Boni.</p>
                         </div>
                     </div>
-                    <span class="text-xs font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800 px-3 py-1.5 rounded-full">Garten-Energie aktiv</span>
+                    <div class="flex items-center space-x-2 bg-darkbg/80 border border-gray-800 px-4 py-2 rounded-xl text-xs text-gray-300">
+                        <i class="fa-solid fa-sun text-amber-400"></i>
+                        <span>Studio-Atmosphäre: Optimal</span>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Plant 1 -->
-                    <div class="bg-darkbg border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <!-- Plant 1: Melodie-Blume -->
+                    <div class="bg-darkbg/90 border border-emerald-500/30 hover:border-emerald-500/60 transition-all duration-300 rounded-2xl p-6 flex flex-col justify-between space-y-5 relative overflow-hidden group shadow-xl">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/15 transition duration-500"></div>
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-sm text-emerald-300"><i class="fa-solid fa-spa mr-1.5"></i> Melodie-Blume</span>
-                                <span id="plant1Level" class="text-xs font-bold bg-gray-800 px-2 py-0.5 rounded text-gray-300">Stufe 1</span>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/40 plant-floating">
+                                        <i class="fa-solid fa-spa"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-emerald-300">Melodie-Blume</h4>
+                                        <span id="plant1Level" class="text-[11px] font-semibold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60">Stufe 1</span>
+                                    </div>
+                                </div>
                             </div>
-                            <p id="plant1Desc" class="text-xs text-gray-400 mb-3">Genießt Klicks und bringt extra Fans.</p>
-                            <div class="w-full bg-gray-800 rounded-full h-2 mb-1">
-                                <div id="plant1Bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            <p class="text-xs text-gray-400 mb-3 leading-relaxed">Genießt Klicks und verstärkt deine Fan-Anziehungskraft.</p>
+                            <div class="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-3 mb-4 space-y-1">
+                                <span class="block text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Aktiver Bonus</span>
+                                <span id="plant1Bonus" class="text-xs font-bold text-emerald-300">+1 Extra-Fan pro Klick</span>
                             </div>
-                            <span id="plant1Exp" class="text-[10px] text-gray-500">Fortschritt: 0 / 50</span>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-gray-400">Wachstum</span>
+                                    <span id="plant1Exp" class="text-emerald-400 font-mono">0 / 50</span>
+                                </div>
+                                <div class="w-full bg-gray-900 rounded-full h-2.5 p-0.5 border border-gray-800">
+                                    <div id="plant1Bar" class="bg-gradient-to-r from-emerald-600 to-teal-400 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                            </div>
                         </div>
-                        <button onclick="feedPlant(0)" class="w-full bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-300 text-xs py-2 rounded-xl font-semibold transition">
-                            Düngen (Kostet <span id="plant1Cost">50</span> Beats)
+                        <button onclick="feedPlant(0)" class="w-full bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-droplet text-emerald-400"></i>
+                            <span>Düngen (<span id="plant1Cost">50</span> Beats)</span>
                         </button>
                     </div>
 
-                    <!-- Plant 2 -->
-                    <div class="bg-darkbg border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <!-- Plant 2: Synth-Bäumchen -->
+                    <div class="bg-darkbg/90 border border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 rounded-2xl p-6 flex flex-col justify-between space-y-5 relative overflow-hidden group shadow-xl">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/15 transition duration-500"></div>
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-sm text-purple-300"><i class="fa-solid fa-tree mr-1.5"></i> Synth-Bäumchen</span>
-                                <span id="plant2Level" class="text-xs font-bold bg-gray-800 px-2 py-0.5 rounded text-gray-300">Stufe 1</span>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg border border-purple-500/40 plant-floating">
+                                        <i class="fa-solid fa-tree"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-purple-300">Synth-Bäumchen</h4>
+                                        <span id="plant2Level" class="text-[11px] font-semibold text-purple-400 bg-purple-950/80 px-2 py-0.5 rounded border border-purple-800/60">Stufe 1</span>
+                                    </div>
+                                </div>
                             </div>
-                            <p id="plant2Desc" class="text-xs text-gray-400 mb-3">Wächst durch BPS und boostet Beats.</p>
-                            <div class="w-full bg-gray-800 rounded-full h-2 mb-1">
-                                <div id="plant2Bar" class="bg-purple-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            <p class="text-xs text-gray-400 mb-3 leading-relaxed">Wächst durch BPS-Energie und boostet die Produktion.</p>
+                            <div class="bg-purple-950/30 border border-purple-500/20 rounded-xl p-3 mb-4 space-y-1">
+                                <span class="block text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Aktiver Bonus</span>
+                                <span id="plant2Bonus" class="text-xs font-bold text-purple-300">+0% BPS-Multiplikator</span>
                             </div>
-                            <span id="plant2Exp" class="text-[10px] text-gray-500">Fortschritt: 0 / 200</span>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-gray-400">Wachstum</span>
+                                    <span id="plant2Exp" class="text-purple-400 font-mono">0 / 250</span>
+                                </div>
+                                <div class="w-full bg-gray-900 rounded-full h-2.5 p-0.5 border border-gray-800">
+                                    <div id="plant2Bar" class="bg-gradient-to-r from-purple-600 to-indigo-400 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                            </div>
                         </div>
-                        <button onclick="feedPlant(1)" class="w-full bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/40 text-purple-300 text-xs py-2 rounded-xl font-semibold transition">
-                            Düngen (Kostet <span id="plant2Cost">200</span> Beats)
+                        <button onclick="feedPlant(1)" class="w-full bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/50 text-purple-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-droplet text-purple-400"></i>
+                            <span>Düngen (<span id="plant2Cost">200</span> Beats)</span>
                         </button>
                     </div>
 
-                    <!-- Plant 3 -->
-                    <div class="bg-darkbg border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <!-- Plant 3: Bass-Kaktus -->
+                    <div class="bg-darkbg/90 border border-pink-500/30 hover:border-pink-500/60 transition-all duration-300 rounded-2xl p-6 flex flex-col justify-between space-y-5 relative overflow-hidden group shadow-xl">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl group-hover:bg-pink-500/15 transition duration-500"></div>
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-sm text-pink-300"><i class="fa-solid fa-seedling mr-1.5"></i> Bass-Kaktus</span>
-                                <span id="plant3Level" class="text-xs font-bold bg-gray-800 px-2 py-0.5 rounded text-gray-300">Stufe 1</span>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center text-lg border border-pink-500/40 plant-floating">
+                                        <i class="fa-solid fa-seedling"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-pink-300">Bass-Kaktus</h4>
+                                        <span id="plant3Level" class="text-[11px] font-semibold text-pink-400 bg-pink-950/80 px-2 py-0.5 rounded border border-pink-800/60">Stufe 1</span>
+                                    </div>
+                                </div>
                             </div>
-                            <p id="plant3Desc" class="text-xs text-gray-400 mb-3">Erzeugt automatische Spezial-Beats.</p>
-                            <div class="w-full bg-gray-800 rounded-full h-2 mb-1">
-                                <div id="plant3Bar" class="bg-pink-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            <p class="text-xs text-gray-400 mb-3 leading-relaxed">Erzeugt automatische Spezial-Beats im Rhythmus.</p>
+                            <div class="bg-pink-950/30 border border-pink-500/20 rounded-xl p-3 mb-4 space-y-1">
+                                <span class="block text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Aktiver Bonus</span>
+                                <span id="plant3Bonus" class="text-xs font-bold text-pink-300">Inaktiv (Ab Stufe 2 aktiv)</span>
                             </div>
-                            <span id="plant3Exp" class="text-[10px] text-gray-500">Fortschritt: 0 / 1000</span>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-gray-400">Wachstum</span>
+                                    <span id="plant3Exp" class="text-pink-400 font-mono">0 / 1200</span>
+                                </div>
+                                <div class="w-full bg-gray-900 rounded-full h-2.5 p-0.5 border border-gray-800">
+                                    <div id="plant3Bar" class="bg-gradient-to-r from-pink-600 to-rose-400 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                            </div>
                         </div>
-                        <button onclick="feedPlant(2)" class="w-full bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/40 text-pink-300 text-xs py-2 rounded-xl font-semibold transition">
-                            Düngen (Kostet <span id="plant3Cost">1000</span> Beats)
+                        <button onclick="feedPlant(2)" class="w-full bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/50 text-pink-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-droplet text-pink-400"></i>
+                            <span>Düngen (<span id="plant3Cost">1000</span> Beats)</span>
                         </button>
                     </div>
                 </div>
@@ -775,7 +842,7 @@
                 const gainNode = audioCtx.createGain();
                 gainNode.gain.setValueAtTime(0.0001, now);
                 gainNode.gain.linearRampToValueAtTime(0.1, now + 0.01);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.2); // Knackig & kurz
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
 
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
@@ -969,7 +1036,6 @@
         }
 
         function checkGardenLevel(index) {
-            // Wächst im Hintergrund still weiter ohne Pop-up
             while (gameData.garden[index].exp >= gameData.garden[index].maxExp) {
                 gameData.garden[index].exp -= gameData.garden[index].maxExp;
                 gameData.garden[index].level++;
@@ -1031,15 +1097,28 @@
             if (cLabel) cLabel.innerText = gameData.label;
             if (coLabel) coLabel.innerText = Math.floor(4000 * Math.pow(1.22, gameData.label)).toLocaleString();
 
+            // Garden UI & Live Dynamic Bonuses
             for (let i = 0; i < 3; i++) {
                 let p = gameData.garden[i];
                 document.getElementById(`plant${i+1}Level`).innerText = 'Stufe ' + p.level;
                 let pct = Math.min(100, Math.floor((p.exp / p.maxExp) * 100));
                 document.getElementById(`plant${i+1}Bar`).style.width = pct + '%';
-                document.getElementById(`plant${i+1}Exp`).innerText = `Fortschritt: ${Math.floor(p.exp)} / ${p.maxExp}`;
+                document.getElementById(`plant${i+1}Exp`).innerText = `${Math.floor(p.exp)} / ${p.maxExp}`;
                 
                 let costs = [50 * p.level, 200 * p.level, 1000 * p.level];
                 document.getElementById(`plant${i+1}Cost`).innerText = costs[i].toLocaleString();
+
+                // Live Bonus Descriptions
+                if (i === 0) {
+                    let bonusVal = 1 + Math.floor((p.level - 1) * 0.5);
+                    document.getElementById('plant1Bonus').innerText = `+${bonusVal} Extra-Fan(s) pro Klick`;
+                } else if (i === 1) {
+                    let bonusPct = Math.round((p.level - 1) * 8);
+                    document.getElementById('plant2Bonus').innerText = `+${bonusPct}% BPS-Multiplikator`;
+                } else if (i === 2) {
+                    let bonusBeats = (p.level > 1) ? (p.level * 0.05).toFixed(2) : '0';
+                    document.getElementById('plant3Bonus').innerText = p.level > 1 ? `+${bonusBeats} Spezial-Beats / Tick` : 'Inaktiv (Ab Stufe 2 aktiv)';
+                }
             }
         }
 
