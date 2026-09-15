@@ -109,7 +109,7 @@
             </div>
         </div>
 
-        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO (GROß, HD & VOLL RESPONSIV) -->
+        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             <div id="garten-auth-container" class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl max-w-md mx-auto text-left">
                 <h2 class="text-xl font-bold text-emerald-400">Bio-Garden Access Gateway</h2>
@@ -137,7 +137,7 @@
                 </div>
                 <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- Großes, ultra-detailliertes & voll responsives HD-Canvas -->
+                <!-- Sauberes, responsives HD-Canvas ohne störende Seitenränder -->
                 <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)] bg-[#d2e8cc]">
                     <canvas id="garden-canvas" width="1400" height="900" class="w-full h-auto object-contain cursor-pointer block"></canvas>
                 </div>
@@ -247,7 +247,6 @@
                 }
             }
 
-            // Tab Switch Login/Register
             const tabLoginBtn = document.getElementById('tab-login-btn');
             const tabRegisterBtn = document.getElementById('tab-register-btn');
             const formLogin = document.getElementById('form-login');
@@ -268,7 +267,6 @@
                 });
             }
 
-            // Register Handler
             const submitRegisterBtn = document.getElementById('submit-register-btn');
             if(submitRegisterBtn) {
                 submitRegisterBtn.addEventListener('click', () => {
@@ -290,7 +288,6 @@
                 });
             }
 
-            // Login Handler
             const submitLoginBtn = document.getElementById('submit-login-btn');
             if(submitLoginBtn) {
                 submitLoginBtn.addEventListener('click', () => {
@@ -307,7 +304,6 @@
                 });
             }
 
-            // Logout Handler
             const logoutBtn = document.getElementById('logout-btn');
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
@@ -318,7 +314,6 @@
                 });
             }
 
-            // Live Song API
             async function fetchCurrentSong() {
                 try {
                     let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
@@ -336,7 +331,6 @@
             setInterval(fetchCurrentSong, 15000);
             fetchCurrentSong();
 
-            // Webradio Stream Setup
             const radioStreamEl = document.getElementById('external-audio-stream');
             const toggleRadioBtn = document.getElementById('toggle-radio-btn');
             const audioStatusText = document.getElementById('audio-status-text');
@@ -364,15 +358,15 @@
                 });
             }
 
-            // --- ULTRA-DETAILREICHES ARCHITEKTUR-CANVAS (HD & RESPONSIV) ---
+            // --- OPTIMIERTER & HARMONISCH SYNCHRONISIERTER ARCHITEKTUR-GARTEN ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
             let customPlants = [];
 
             function addGardenElement(type) {
-                let rx = 150 + Math.random() * 1100;
-                let ry = 150 + Math.random() * 550;
+                let rx = 200 + Math.random() * 1000;
+                let ry = 200 + Math.random() * 500;
                 customPlants.push({ x: rx, y: ry, type: type });
                 ripples.push({ x: rx, y: ry, radius: 12, alpha: 1.0 });
             }
@@ -381,9 +375,10 @@
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 140) + 1) / 2 : 0.1;
+                // Präzise Takt-Synchronisation für den aktiven Stream
+                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 125) + 1) / 2 : 0.05;
 
-                // 1. Hintergrund-Rasen (Edler Architekten-Lawn mit Struktur)
+                // 1. Edler Rasen (Hintergrund)
                 let lawnGrad = ctx.createLinearGradient(0, 0, 0, 900);
                 lawnGrad.addColorStop(0, '#c2f8cb');
                 lawnGrad.addColorStop(0.5, '#a3e635');
@@ -391,128 +386,107 @@
                 ctx.fillStyle = lawnGrad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Feine Rasenstreifen
-                ctx.fillStyle = 'rgba(74, 222, 128, 0.25)';
+                ctx.fillStyle = 'rgba(74, 222, 128, 0.22)';
                 for (let i = 0; i < canvas.width; i += 60) {
                     ctx.fillRect(i, 0, 30, canvas.height);
                 }
 
-                // 2. Moderner rechteckiger Teich (Rechts unten) mit Reflexionen
+                // 2. Moderner Teich (Rechts unten)
                 ctx.fillStyle = '#0284c7';
-                ctx.fillRect(820, 480, 480, 320);
-                let pondGrad = ctx.createLinearGradient(820, 480, 1300, 800);
+                ctx.fillRect(850, 500, 420, 280);
+                let pondGrad = ctx.createLinearGradient(850, 500, 1270, 780);
                 pondGrad.addColorStop(0, '#38bdf8');
                 pondGrad.addColorStop(0.5, '#0ea5e9');
                 pondGrad.addColorStop(1, '#0369a1');
                 ctx.fillStyle = pondGrad;
-                ctx.fillRect(835, 495, 450, 290);
+                ctx.fillRect(865, 515, 390, 250);
 
-                // Teich-Schilf / Uferbepflanzung
+                // Uferbepflanzung
                 ctx.fillStyle = '#166534';
-                for(let s=0; s<12; s++) {
-                    ctx.fillRect(820 + s*35, 470, 4, 30);
+                for(let s=0; s<10; s++) {
+                    ctx.fillRect(850 + s*35, 490, 4, 25);
                     ctx.fillStyle = '#ca8a04';
-                    ctx.fillRect(820 + s*35, 465, 4, 8); // Kolben
+                    ctx.fillRect(850 + s*35, 485, 4, 7);
                     ctx.fillStyle = '#166534';
                 }
 
-                // Brunnenfontäne im Teich mit Puls
-                ctx.strokeStyle = `rgba(255, 255, 255, ${0.6 + pulse * 0.4})`;
-                ctx.lineWidth = 4;
+                // Fontäne im Teich mit sauberem Takt-Puls
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + pulse * 0.6})`;
+                ctx.lineWidth = 4 + (pulse * 2);
                 ctx.beginPath();
-                ctx.arc(1060, 640, 25 + (pulse * 20), 0, Math.PI * 2);
+                ctx.arc(1060, 640, 20 + (pulse * 16), 0, Math.PI * 2);
                 ctx.stroke();
 
-                // 3. Kies- & Schotterbereich mit modernen Schiefer-Trittplatten (Links)
+                // 3. Kies- & Schotterbereich mit Schiefer-Trittplatten (Zentral)
                 ctx.fillStyle = '#e2e8f0';
-                ctx.fillRect(150, 180, 600, 450);
-                // Kies-Textur
+                ctx.fillRect(180, 200, 560, 420);
                 ctx.fillStyle = '#cbd5e1';
-                for(let k=0; k<400; k++) {
-                    let kx = 160 + Math.random() * 580;
-                    let ky = 190 + Math.random() * 430;
+                for(let k=0; k<300; k++) {
+                    let kx = 190 + Math.random() * 540;
+                    let ky = 210 + Math.random() * 400;
                     ctx.fillRect(kx, ky, 3, 3);
                 }
 
-                // Dunkle Steinfliesen (Schieferplatten diagonal/versetzt)
                 ctx.fillStyle = '#334155';
-                for (let r = 0; r < 7; r++) {
-                    ctx.fillRect(200 + r * 65, 360 + r * 35, 80, 40);
+                for (let r = 0; r < 6; r++) {
+                    ctx.fillRect(230 + r * 65, 380 + r * 32, 75, 38);
                 }
 
-                // 4. Holzterrasse im Vordergrund (Unten) mit feiner Maserung & Möbeln
+                // 4. Holzterrasse im Vordergrund (Unten)
                 ctx.fillStyle = '#b45309';
-                ctx.fillRect(250, 750, 900, 140);
+                ctx.fillRect(250, 760, 900, 130);
                 ctx.strokeStyle = '#78350f';
                 ctx.lineWidth = 2;
                 for (let x = 250; x < 1150; x += 35) {
-                    ctx.beginPath(); ctx.moveTo(x, 750); ctx.lineTo(x, 890); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(x, 760); ctx.lineTo(x, 890); ctx.stroke();
                 }
-                // Terrassentisch & Stühle
                 ctx.fillStyle = '#451a03';
-                ctx.fillRect(625, 790, 150, 70);
+                ctx.fillRect(625, 795, 150, 65);
 
-                // 5. Kugelbäume (Topiary / Buchsbaumkugeln auf Stamm)
+                // 5. Kugelbäume (Topiary) mit sanftem Puls
                 function drawTopiary(bx, by) {
                     ctx.fillStyle = '#3f3f46';
-                    ctx.fillRect(bx - 8, by, 16, 80); // Stamm
+                    ctx.fillRect(bx - 7, by, 14, 75);
                     ctx.fillStyle = '#15803d';
-                    ctx.beginPath(); ctx.arc(bx, by - 20, 42 * (1 + pulse * 0.08), 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(bx, by - 18, 38 * (1 + pulse * 0.05), 0, Math.PI * 2); ctx.fill();
                     ctx.fillStyle = '#4ade80';
-                    ctx.beginPath(); ctx.arc(bx - 10, by - 32, 18, 0, Math.PI * 2); ctx.fill(); // Glanzpunkt
+                    ctx.beginPath(); ctx.arc(bx - 8, by - 28, 15, 0, Math.PI * 2); ctx.fill();
                 }
-                drawTopiary(260, 260);
-                drawTopiary(380, 260);
-                drawTopiary(540, 280);
-                drawTopiary(660, 280);
+                drawTopiary(280, 280);
+                drawTopiary(400, 280);
+                drawTopiary(560, 300);
 
-                // 6. Großer, mächtiger Baum oben rechts
+                // 6. Großer Baum oben rechts
                 ctx.fillStyle = '#27272a';
-                ctx.fillRect(1080, 80, 30, 150);
+                ctx.fillRect(1060, 90, 26, 140);
                 ctx.fillStyle = '#14532d';
-                ctx.beginPath(); ctx.arc(1095, 60, 95 * (1 + pulse * 0.05), 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(1073, 70, 85 * (1 + pulse * 0.03), 0, Math.PI * 2); ctx.fill();
                 ctx.fillStyle = '#22c55e';
-                ctx.beginPath(); ctx.arc(1055, 40, 55, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(1135, 45, 55, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(1035, 50, 48, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(1110, 55, 48, 0, Math.PI * 2); ctx.fill();
 
-                // 7. Farbenprächtige Blumenbeete & Staudenrabatten (Seitenränder)
-                function drawRichFlowerBed(fx, fy, fw, fh, mainCol, accentCol) {
-                    ctx.fillStyle = mainCol;
-                    ctx.fillRect(fx, fy, fw, fh);
-                    // Dichte Blumencluster
-                    for (let f = 0; f < 35; f++) {
-                        ctx.fillStyle = f % 2 === 0 ? accentCol : '#ffffff';
-                        ctx.beginPath();
-                        ctx.arc(fx + Math.random() * fw, fy + Math.random() * fh, 6 + Math.random() * 8, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
-                // Rechtes Blumenbeet (Staudenmeer)
-                drawRichFlowerBed(1300, 150, 80, 600, '#a21caf', '#e879f9');
-                // Linkes Blumenbeet
-                drawRichFlowerBed(30, 400, 90, 300, '#db2777', '#f472b6');
-
-                // 8. Benutzer-gepflanzte Elemente
+                // 7. Benutzer-Elemente
                 customPlants.forEach(el => {
                     ctx.save();
                     ctx.translate(el.x, el.y);
+                    let plantScale = 1 + pulse * 0.08;
                     if (el.type === 'grass') {
                         ctx.fillStyle = '#166534';
-                        ctx.fillRect(-18, -12, 36, 24);
+                        ctx.fillRect(-15, -10, 30 * plantScale, 20 * plantScale);
                     } else if (el.type === 'flowers') {
                         ctx.fillStyle = '#f43f5e';
-                        ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI*2); ctx.fill();
+                        ctx.beginPath(); ctx.arc(0, 0, 20 * plantScale, 0, Math.PI*2); ctx.fill();
                         ctx.fillStyle = '#fde047';
-                        ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.fill();
+                        ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI*2); ctx.fill();
                     } else if (el.type === 'tree') {
                         drawTopiary(0, 0);
                     }
                     ctx.restore();
                 });
 
-                // Dynamische Wasser-Ripples
+                // Wasser-Ripples
                 ripples.forEach((rip, idx) => {
-                    rip.radius += 3;
+                    rip.radius += 2.8;
                     rip.alpha -= 0.015;
                     if (rip.alpha <= 0) {
                         ripples.splice(idx, 1);
