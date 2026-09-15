@@ -106,10 +106,10 @@
 
         </div>
 
-        <!-- 2. GAME-SEITE (Login/Reg Tor + Massives Tycoon-Studio + Admin unten) -->
+        <!-- 2. GAME-SEITE -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center">
             
-            <!-- AUTH CONTAINER (Sichtbar wenn nicht eingeloggt) -->
+            <!-- AUTH CONTAINER -->
             <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
@@ -117,13 +117,11 @@
                     <p class="text-xs text-gray-400 mt-1">Registriere dich mit einer E-Mail und einem PIN oder logge dich ein, um dein Studio und den Admin-Bereich zu entsperren.</p>
                 </div>
 
-                <!-- Tabs für Login / Registrierung -->
                 <div class="flex border-b border-gray-800 mb-2">
                     <button type="button" id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition">Einloggen</button>
                     <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition">Registrieren</button>
                 </div>
 
-                <!-- LOGIN FORM -->
                 <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
@@ -136,7 +134,6 @@
                     <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔒 Einloggen & Studio öffnen</button>
                 </div>
 
-                <!-- REGISTRATION FORM -->
                 <div id="form-register" class="space-y-3 hidden">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse (Einzigartig):</label>
@@ -154,10 +151,9 @@
                 </div>
             </div>
 
-            <!-- GAME & TYCOON CONTAINER (Wird erst NACH erfolgreichem Login sichtbar) -->
+            <!-- GAME & TYCOON CONTAINER -->
             <div id="game-main-container" class="hidden space-y-6">
                 
-                <!-- Game Header / User Bar -->
                 <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
                     <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
                     <button type="button" id="logout-btn" class="bg-red-900/40 hover:bg-red-900 text-red-300 text-[10px] px-2.5 py-1 rounded-xl border border-red-700/50 transition">🚪 Abmelden</button>
@@ -168,7 +164,7 @@
                     <p class="text-gray-400 text-xs">Riffs produzieren, Hash-Rate steigern, Charts stürmen & Fans gewinnen!</p>
                 </div>
 
-                <!-- Haupt-Clicker (Vollkommen starr, keine Bewegung) -->
+                <!-- Haupt-Clicker (Vollkommen starr, absolut null Bewegung) -->
                 <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl border border-purple-400/30 flex items-center justify-center gap-3 cursor-pointer">
                     <span class="text-2xl">🎸</span> Riff einspielen <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+1</span>
                 </button>
@@ -196,7 +192,7 @@
                 <!-- TYCOON UPGRADE SEKTIONEN -->
                 <div class="space-y-4 text-left">
                     
-                    <!-- 1. HASH-RATE RIGS (GoMining Stil) -->
+                    <!-- 1. HASH-RATE MINER -->
                     <div class="bg-[#131b2e] border border-cyan-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
                             <h3 class="font-bold text-xs text-cyan-400 flex items-center gap-1.5">⚡ Hash-Rate Miner (+0.05 BPS)</h3>
@@ -204,26 +200,26 @@
                         </div>
                         <p class="text-[11px] text-gray-400">Tokenisierte Rechenleistung für stetige Riff-Power im GoMining-Stil.</p>
                         <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">
-                            ⚡ Miner aktivieren (<span id="rig-cost">50</span> Riffs)
+                            ⚡ Hash-Rate Miner aktivieren (<span id="rig-cost">50</span> Riffs)
                         </button>
                     </div>
 
-                    <!-- 2. MUSIK-RELEASES & CHARTS -->
+                    <!-- 2. CLOUDBEATS ALBUM-RELEASE -->
                     <div class="bg-[#131b2e] border border-indigo-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 CloudBeats Release (+0.20 BPS)</h3>
+                            <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 CloudBeats Album-Release (+0.20 BPS)</h3>
                             <span id="albums-count" class="text-xs text-gray-400">Releases: 0</span>
                         </div>
                         <p class="text-[11px] text-gray-400">Veröffentliche neue Tracks in der Cloud für treue Fans (+10 Fans).</p>
                         <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">
-                            💿 Cloud-Release droppen (<span id="album-cost">250</span> Riffs)
+                            💿 CloudBeats Album veröffentlichen (<span id="album-cost">250</span> Riffs)
                         </button>
                     </div>
 
-                    <!-- 3. AUTONOME AI-PRODUCER -->
+                    <!-- 3. AI PRODUCER & LYRIC BOT -->
                     <div class="bg-[#131b2e] border border-purple-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 AI Lyric & Beat Generator (+0.80 BPS)</h3>
+                            <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 AI Producer & Lyric Bot (+0.80 BPS)</h3>
                             <span id="ai-count" class="text-xs text-gray-400">Agenten: 0</span>
                         </div>
                         <p class="text-[11px] text-gray-400">Autonomer KI-Producer für automatische Riff- & Songproduktion.</p>
@@ -232,16 +228,16 @@
                         </button>
                     </div>
 
-                    <!-- 4. BEAT STAKING POOL -->
+                    <!-- 4. $GOMINING & STAKING POOL -->
                     <div class="bg-[#131b2e] border border-emerald-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">💎 $GOMINING & Beat Staking (+0.05 BPS)</h3>
+                            <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">💎 $GOMINING & Staking Pool (+0.05 BPS)</h3>
                             <span id="staked-count" class="text-xs text-emerald-300">Gesperrt: 0</span>
                         </div>
                         <p class="text-[11px] text-gray-400">Sperre 100 Riffs im Staking-Pool für passive Zinsen & BPS-Bonus.</p>
                         <div class="flex gap-2">
-                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">💎 100 Riffs staken</button>
-                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">🔓 Riffs auszahlen</button>
+                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">💎 Riffs staken</button>
+                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">🔓 Staking auszahlen</button>
                         </div>
                     </div>
 
@@ -251,14 +247,13 @@
                     ← Zurück zur Startseite
                 </button>
 
-                <!-- 🛠️ ADMINISTRATOR-BEREICH -->
+                <!-- ADMINISTRATOR-BEREICH -->
                 <div class="bg-[#131b2e] border border-amber-500/40 p-5 rounded-3xl shadow-2xl space-y-4 text-left mt-8">
                     <div class="flex items-center gap-2 border-b border-gray-800 pb-2">
                         <span class="text-xl">🛠️</span>
                         <h3 class="font-bold text-sm text-amber-400">CloudBeats Admin-Bereich</h3>
                     </div>
 
-                    <!-- PIN ÄNDERN -->
                     <div class="space-y-3">
                         <h4 class="font-bold text-xs text-yellow-400">🔑 Sicherheits-PIN ändern</h4>
                         <div>
@@ -268,7 +263,6 @@
                         <button type="button" id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN aktualisieren</button>
                     </div>
 
-                    <!-- GEFAHRENZONE: SPIELSTAND ZURÜCKSETZEN -->
                     <div class="border-t border-red-900/50 pt-3 space-y-2">
                         <h4 class="font-bold text-xs text-red-400">⚠️ Gefahrenzone</h4>
                         <button type="button" id="admin-reset-game-btn" class="w-full bg-red-900/60 hover:bg-red-900 text-red-200 font-semibold py-2 rounded-xl text-xs transition shadow border border-red-700/50">Nur Spielstand zurücksetzen (Account bleibt erhalten)</button>
@@ -319,7 +313,7 @@
             </div>
         </div>
 
-        <!-- 6. ADMIN-SEITE (Allgemein) -->
+        <!-- 6. ADMIN-SEITE -->
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
                 <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ System Hub</h2>
@@ -340,7 +334,7 @@
         </div>
     </footer>
 
-    <!-- CLEAN PURE SINE & DRY ENVELOPE ENGINE -->
+    <!-- HIGH-END STUDIO SINGLE TONE ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -420,7 +414,6 @@
                 }
             }
 
-            // Tabs Login / Reg
             const tabLoginBtn = document.getElementById('tab-login-btn');
             const tabRegisterBtn = document.getElementById('tab-register-btn');
             const formLogin = document.getElementById('form-login');
@@ -441,7 +434,6 @@
                 });
             }
 
-            // Registrierung
             const submitRegisterBtn = document.getElementById('submit-register-btn');
             if(submitRegisterBtn) {
                 submitRegisterBtn.addEventListener('click', () => {
@@ -478,7 +470,6 @@
                 });
             }
 
-            // Login
             const submitLoginBtn = document.getElementById('submit-login-btn');
             if(submitLoginBtn) {
                 submitLoginBtn.addEventListener('click', () => {
@@ -503,7 +494,6 @@
                 });
             }
 
-            // Logout
             const logoutBtn = document.getElementById('logout-btn');
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
@@ -517,7 +507,6 @@
                 });
             }
 
-            // Admin PIN ändern
             const adminChangePinBtn = document.getElementById('admin-change-pin-btn');
             if(adminChangePinBtn) {
                 adminChangePinBtn.addEventListener('click', () => {
@@ -537,14 +526,14 @@
                 });
             }
 
-            // 🎵 REINER, TROCKENER SINUS-TON (Ohne Wellen-Überlagerung und ohne Echo)
+            // 🎵 HIGH-END STUDIO SINGLE TONE (Reiner Sinus, genau 1 Ton pro Trigger, absolut trocken, 0% Wellen, 0% Arpeggio)
             let audioCtx = null;
-            const cleanHarmonicPool = [
+            const studioScale = [
                 261.63, 293.66, 329.63, 392.00, 440.00,
                 523.25, 587.33, 659.25, 783.99, 880.00
             ];
 
-            function playCleanTone() {
+            function playSingleTone() {
                 if (!soundEnabled || currentView !== 'game') return;
 
                 try {
@@ -552,17 +541,17 @@
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
                     const now = audioCtx.currentTime;
-                    let freq = cleanHarmonicPool[Math.floor(Math.random() * cleanHarmonicPool.length)];
+                    let freq = studioScale[Math.floor(Math.random() * studioScale.length)];
 
-                    // Nur ein einzelner reiner Sinus-Oszillator (keine Wellen-Kombination)
+                    // Exakt 1 reiner Sinus-Oszillator (keine Wellen, kein Arpeggio/mehrfaches Hinterher)
                     let osc = audioCtx.createOscillator();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(freq, now);
 
-                    // Extrem kurzer, trockener Envelope (fast kein Ausklang/Echo)
+                    // Extrem kurze, trockene Hüllkurve ohne Echo
                     let gainNode = audioCtx.createGain();
                     gainNode.gain.setValueAtTime(0.0001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.07, now + 0.01);
+                    gainNode.gain.linearRampToValueAtTime(0.06, now + 0.008);
                     gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
 
                     osc.connect(gainNode);
@@ -613,7 +602,7 @@
 
             function produceBeat() {
                 beats += 1;
-                playCleanTone();
+                playSingleTone();
                 updateDisplay();
                 saveGame();
             }
@@ -774,17 +763,17 @@
                 });
             }
 
-            // AUTO-PRODUKTION & SEHR LANGSAM STEIGENDE TON-GESCHWINDIGKEIT
+            // AUTO-PRODUKTION & SANFT STEIGENDE TON-FREQUENZ
             setInterval(() => {
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
                         
                         let totalUpgrades = rigs + albums + aiAgents;
-                        let dynamicToneChance = Math.min(0.20, 0.04 + (totalUpgrades * 0.001));
+                        let dynamicToneChance = Math.min(0.18, 0.03 + (totalUpgrades * 0.0008));
 
                         if (Math.random() < dynamicToneChance && currentView === 'game') {
-                            playCleanTone();
+                            playSingleTone();
                         }
                     }
                     if (fps > 0) fans += fps / 10;
