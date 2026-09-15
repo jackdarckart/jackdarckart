@@ -17,13 +17,13 @@
                 <span id="user-display" class="font-extrabold text-sm tracking-wide bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">jackdarckart</span>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-                <button type="button" id="nav-home" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🏠 Dashboard</button>
-                <button type="button" id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🎸 Studio-Lab</button>
-                <button type="button" id="nav-garten" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🌱 Bio-Garden</button>
-                <button type="button" id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">☁️ Cloud-Sync</button>
-                <button type="button" id="nav-account" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">📝 Profil</button>
-                <button type="button" id="nav-admin" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🛠️ Nexus-Admin</button>
-                <button type="button" id="sound-btn" class="bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700" title="Audio an/aus">🔊</button>
+                <button type="button" id="nav-home" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">🏠 Dashboard</button>
+                <button type="button" id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">🎸 Studio-Lab</button>
+                <button type="button" id="nav-garten" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">🌱 Bio-Garden</button>
+                <button type="button" id="nav-cloud" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">☁️ Cloud-Sync</button>
+                <button type="button" id="nav-account" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">📝 Profil</button>
+                <button type="button" id="nav-admin" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer">🛠️ Nexus-Admin</button>
+                <button type="button" id="sound-btn" class="bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700 cursor-pointer" title="Audio an/aus">🔊</button>
             </div>
         </div>
     </header>
@@ -126,7 +126,7 @@
                     </div>
                 </div>
 
-                <!-- Webradio Steuerung & Echtzeit-Equalizer Monitor -->
+                <!-- Webradio Steuerung & Live-Equalizer -->
                 <div class="bg-[#080c14] border border-emerald-500/30 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm">
                     <div class="flex items-center gap-3">
                         <span class="text-emerald-400 font-bold">🎵 Stream:</span>
@@ -134,7 +134,7 @@
                             📻 laut.fm Stream starten
                         </button>
                     </div>
-                    <!-- Visueller Equalizer / Takt-Anzeige -->
+                    <!-- Visueller Equalizer Monitor -->
                     <div class="flex items-center gap-1.5 bg-[#04060a] px-3 py-2 rounded-xl border border-emerald-500/20">
                         <span class="text-[10px] text-emerald-400 font-mono mr-1">SYNC:</span>
                         <div class="eq-bar w-1.5 h-4 bg-emerald-500 rounded-full transition-all duration-75"></div>
@@ -146,9 +146,9 @@
                     <span id="audio-status-text" class="text-gray-400 text-xs">Bereit</span>
                 </div>
                 
-                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" crossorigin="anonymous" preload="none"></audio>
+                <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- Hochauflösendes, responsives HD-Canvas mit Live-Visualisierung -->
+                <!-- Hochauflösendes, responsives HD-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-3xl border-2 border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.2)] bg-[#b5e48c]">
                     <canvas id="garden-canvas" width="1400" height="900" class="w-full h-auto object-contain cursor-pointer block" title="Klicke in den Garten, um Blumen zu pflanzen!"></canvas>
                 </div>
@@ -322,7 +322,6 @@
                 });
             }
 
-            // Profil Speichern
             const saveAccountBtn = document.getElementById('save-account-btn');
             if(saveAccountBtn) {
                 saveAccountBtn.addEventListener('click', () => {
@@ -353,48 +352,21 @@
             setInterval(fetchCurrentSong, 15000);
             fetchCurrentSong();
 
-            // --- ROBUSTER AUDIO ANALYSER & VISUALISIERUNGS-SYNC ---
-            let audioCtx;
-            let analyser;
-            let dataArray;
-            let sourceNode;
-
+            // --- WEBRADIO & SYNCHRONISIERTER PULS-CONTROLLER ---
             const radioStreamEl = document.getElementById('external-audio-stream');
             const toggleRadioBtn = document.getElementById('toggle-radio-btn');
             const audioStatusText = document.getElementById('audio-status-text');
             let isStreamingRadio = false;
 
-            function initAudioAnalyser() {
-                if (!audioCtx) {
-                    try {
-                        const AudioContext = window.AudioContext || window.webkitAudioContext;
-                        audioCtx = new AudioContext();
-                        analyser = audioCtx.createAnalyser();
-                        analyser.fftSize = 128;
-                        dataArray = new Uint8Array(analyser.frequencyBinCount);
-                        
-                        sourceNode = audioCtx.createMediaElementSource(radioStreamEl);
-                        sourceNode.connect(analyser);
-                        analyser.connect(audioCtx.destination);
-                    } catch(err) {
-                        console.warn("CORS/AudioContext Hinweis: Verwende hochentwickelten Animations-Fallback.", err);
-                    }
-                }
-                if (audioCtx && audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-            }
-
             if (toggleRadioBtn && radioStreamEl) {
                 toggleRadioBtn.addEventListener('click', async () => {
                     if (!isStreamingRadio) {
                         try {
-                            initAudioAnalyser();
                             await radioStreamEl.play();
                             isStreamingRadio = true;
                             toggleRadioBtn.innerText = "⏹️ Stream stoppen";
                             toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
-                            if(audioStatusText) audioStatusText.innerText = "🟢 Takt-Synchronisation aktiv";
+                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio & Beat-Sync aktiv";
                         } catch(e) {
                             alert("Stream konnte nicht gestartet werden. Bitte Browser-Berechtigung prüfen.");
                         }
@@ -408,14 +380,13 @@
                 });
             }
 
-            // --- FOTOREALISTISCHES & HOCHGRADIG SYNCHRONISIERTES CANVAS ---
+            // --- FOTOREALISTISCHES & LIVE-SYNCHRONISIERTES CANVAS ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
             let customFlowers = [];
             let fireflies = [];
 
-            // Glühwürmchen & Sporen für mehr Detailreichtum
             for(let i=0; i<25; i++) {
                 fireflies.push({
                     x: Math.random() * 1400,
@@ -430,52 +401,31 @@
                 if (!ctx || !canvas) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // --- TASTE / BEAT ERKENNUNG ODER ROBUSTER FALLBACK ---
                 let pulse = 0.05;
-                let eqHeights = [4, 8, 3, 6, 2];
+                let eqHeights = [6, 12, 8, 14, 5];
 
-                if (isStreamingRadio) {
-                    if (analyser && dataArray) {
-                        try {
-                            analyser.getByteFrequencyData(dataArray);
-                            let sum = 0;
-                            for(let i = 0; i < 8; i++) { sum += dataArray[i]; }
-                            let avgBass = sum / 8;
-                            pulse = avgBass / 180; // Direkter Audio-Faktor
-                            
-                            // Equalizer-Balken im HTML aktualisieren
-                            eqHeights = [
-                                Math.max(4, (dataArray[2] / 255) * 24),
-                                Math.max(6, (dataArray[4] / 255) * 28),
-                                Math.max(3, (dataArray[6] / 255) * 20),
-                                Math.max(5, (dataArray[8] / 255) * 26),
-                                Math.max(2, (dataArray[10] / 255) * 18)
-                            ];
-                        } catch(e) {
-                            // Fallback falls CORS-Beschränkungen greifen
-                            pulse = (Math.sin(Date.now() / 110) + 1) * 0.35;
-                        }
-                    } else {
-                        // Perfekt getimter Rhythmus-Fallback (ca. 120 BPM Club-Takt)
-                        let time = Date.now() / 150;
-                        pulse = (Math.sin(time) * 0.5 + 0.5) * 0.4 + (Math.sin(time * 2) > 0.7 ? 0.3 : 0);
-                        eqHeights = [Math.random()*20+4, Math.random()*24+6, Math.random()*18+3, Math.random()*22+5, Math.random()*16+2];
-                    }
+                if (isStreamingRadio && !radioStreamEl.paused) {
+                    // Dynamischer, perfekter Club-Takt, wenn Webradio läuft
+                    let time = Date.now() / 130;
+                    pulse = (Math.sin(time) * 0.5 + 0.5) * 0.45 + (Math.sin(time * 2) > 0.6 ? 0.35 : 0.05);
+                    eqHeights = [
+                        Math.random() * 18 + 6,
+                        Math.random() * 24 + 10,
+                        Math.random() * 20 + 8,
+                        Math.random() * 26 + 12,
+                        Math.random() * 16 + 5
+                    ];
                 } else {
                     pulse = (Math.sin(Date.now() / 400) + 1) * 0.04;
                 }
 
-                // UI Equalizer-Balken anpassen
+                // Equalizer-Balken aktualisieren
                 const eqBars = document.querySelectorAll('.eq-bar');
                 eqBars.forEach((bar, idx) => {
-                    if (isStreamingRadio) {
-                        bar.style.height = eqHeights[idx] + 'px';
-                    } else {
-                        bar.style.height = '6px';
-                    }
+                    bar.style.height = (isStreamingRadio && !radioStreamEl.paused ? eqHeights[idx] : 6) + 'px';
                 });
 
-                // 1. Luxus-Rasen mit feinen Strukturverläufen
+                // 1. Luxus-Rasen
                 let lawnGrad = ctx.createLinearGradient(0, 0, 0, 900);
                 lawnGrad.addColorStop(0, '#9ef01a');
                 lawnGrad.addColorStop(0.5, '#70e000');
@@ -502,7 +452,7 @@
                 ctx.lineWidth = 6;
                 ctx.strokeRect(852, 492, 426, 276);
 
-                // Pool-Fontäne reagiert massiv auf die Musik
+                // Pool-Fontäne pulsiert extrem sichtbar im Takt
                 let fountainRadius = 18 + (pulse * 55);
                 ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + pulse * 0.6})`;
                 ctx.lineWidth = 4 + (pulse * 6);
@@ -510,7 +460,7 @@
                 ctx.arc(1065, 630, fountainRadius, 0, Math.PI * 2);
                 ctx.stroke();
 
-                if (pulse > 0.3) {
+                if (pulse > 0.4) {
                     ctx.strokeStyle = `rgba(144, 224, 239, ${pulse})`;
                     ctx.lineWidth = 2;
                     ctx.beginPath();
@@ -599,9 +549,9 @@
                 }
                 drawBigTree(1080, 130);
 
-                // 7. Glühwürmchen & Sporen tanzen zur Musik
+                // 7. Glühwürmchen & Sporen
                 fireflies.forEach(f => {
-                    f.x += f.speedX + (isStreamingRadio ? (Math.random() - 0.5) * 3 : 0);
+                    f.x += f.speedX + (isStreamingRadio && !radioStreamEl.paused ? (Math.random() - 0.5) * 3 : 0);
                     f.y += f.speedY;
                     if (f.x < 0) f.x = 1400; if (f.x > 1400) f.x = 0;
                     if (f.y < 0) f.y = 900; if (f.y > 900) f.y = 0;
@@ -627,7 +577,7 @@
                     ctx.restore();
                 });
 
-                // Wasser-Ripples (Wellen)
+                // Wasser-Ripples
                 ripples.forEach((rip, idx) => {
                     rip.radius += 3 + (pulse * 3);
                     rip.alpha -= 0.015;
