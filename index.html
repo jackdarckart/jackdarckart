@@ -50,26 +50,17 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (LOGIN & GAME) -->
+        <!-- 2. STUDIO-LAB (GAME & UPGRADES MODUL) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
             
-            <!-- Auth Gateway (Login / Register) -->
+            <!-- Auth Gateway -->
             <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
                     <h2 class="text-xl font-bold text-purple-400">CloudBeats Access Gateway</h2>
-                    <p class="text-xs text-gray-400 mt-1">Bitte mit E-Mail und PIN anmelden.</p>
                 </div>
-
-                <div class="flex border-b border-gray-800 mb-2">
-                    <button type="button" id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer">Anmelden</button>
-                    <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer">Registrieren</button>
-                </div>
-
                 <div id="auth-msg" class="text-xs text-center font-medium text-amber-400 min-h-[16px]"></div>
-
-                <!-- Login Form -->
-                <div id="form-login" class="space-y-3">
+                <div class="space-y-3">
                     <div>
                         <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
                         <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" value="artur.hamm90@gmail.com">
@@ -80,22 +71,9 @@
                     </div>
                     <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 cursor-pointer">🔒 Studio entsperren</button>
                 </div>
-
-                <!-- Register Form -->
-                <div id="form-register" class="space-y-3 hidden">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
-                        <input type="email" id="reg-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="name@domain.de">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">PIN festlegen (min. 3 Zeichen):</label>
-                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="PIN">
-                    </div>
-                    <button type="button" id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 cursor-pointer">✨ Account erstellen</button>
-                </div>
             </div>
 
-            <!-- Main Studio Container (Eingeloggt) -->
+            <!-- Main Studio Container -->
             <div id="game-main-container" class="space-y-4 hidden">
                 <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
                     <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
@@ -117,7 +95,7 @@
                     </div>
                 </div>
 
-                <!-- Upgrades & Sound-Töne Shop -->
+                <!-- Upgrades Shop -->
                 <div class="bg-[#131b2e] border border-purple-500/30 p-4 rounded-3xl text-left space-y-3">
                     <h3 class="text-sm font-bold text-purple-300">⚡ Studio Upgrades &amp; Sound-Töne</h3>
                     <div class="space-y-2">
@@ -142,7 +120,7 @@
             <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
         </div>
 
-        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO (MIT TAKT-SYNC) -->
+        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO (GARTEN RENDER MODUL) -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             <div class="bg-[#101722] border border-emerald-500/40 p-4 sm:p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
@@ -166,7 +144,7 @@
                 
                 <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- Sauberes HD-Canvas mit Live-Takt-Sync -->
+                <!-- HD-Canvas mit optimierter Renderer-Engine -->
                 <div class="relative w-full overflow-hidden rounded-2xl border-2 border-emerald-500/40 shadow-xl bg-[#b5e48c]">
                     <canvas id="garden-canvas" width="1200" height="750" class="w-full h-auto object-contain block"></canvas>
                 </div>
@@ -215,249 +193,348 @@
         </div>
     </footer>
 
-    <!-- SCRIPT -->
+    <!-- MODULAR SYSTEM SCRIPTS (OPTIMIERT & RESSSOURCENSPAREND) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            let beats = 3449;
-            let fans = 586;
-            let clickPower = 5;
-            let autoBeatsActive = false;
-            let username = localStorage.getItem('cb_user') || 'jackdarckart';
-            let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || 'artur.hamm90@gmail.com';
-            let currentView = localStorage.getItem('cb_view') || 'home';
 
-            // Multi-User Datenbank initialisieren
-            let usersDB = {};
-            try {
-                usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-            } catch(e) { usersDB = {}; }
-
-            if (!usersDB['artur.hamm90@gmail.com']) {
-                usersDB['artur.hamm90@gmail.com'] = { pin: '1234', beats: 3449, fans: 586, power: 5, auto: false };
-                localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-            }
-
-            function loadUserData() {
-                if (!loggedInUser || !usersDB[loggedInUser]) return;
-                let u = usersDB[loggedInUser];
-                beats = Number(u.beats) || 3449;
-                fans = Number(u.fans) || 586;
-                clickPower = Number(u.power) || 5;
-                autoBeatsActive = Boolean(u.auto);
-            }
-
-            function saveGame() {
-                if (!loggedInUser) return;
-                try {
-                    usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    if (!usersDB[loggedInUser]) {
-                        usersDB[loggedInUser] = { pin: '1234' };
+            /* ========================================================
+               MODUL 1: GAME & ECONOMY ENGINE (Studio-Lab & Upgrades)
+               ======================================================== */
+            const GameEngine = {
+                beats: 3449,
+                fans: 586,
+                clickPower: 5,
+                autoBeatsActive: false,
+                loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || 'artur.hamm90@gmail.com',
+                
+                init() {
+                    let usersDB = {};
+                    try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                    if (!usersDB[this.loggedInUser]) {
+                        usersDB[this.loggedInUser] = { pin: '1234', beats: 3449, fans: 586, power: 5, auto: false };
+                        localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     }
-                    usersDB[loggedInUser] = { ...usersDB[loggedInUser], beats, fans, power: clickPower, auto: autoBeatsActive };
-                    localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-                } catch(e) {}
-            }
+                    this.load();
+                    this.startAutoBeatInterval();
+                },
 
-            if (loggedInUser) {
-                loadUserData();
-            }
+                load() {
+                    try {
+                        let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                        if (db[this.loggedInUser]) {
+                            let u = db[this.loggedInUser];
+                            this.beats = Number(u.beats) || 3449;
+                            this.fans = Number(u.fans) || 586;
+                            this.clickPower = Number(u.power) || 5;
+                            this.autoBeatsActive = Boolean(u.auto);
+                        }
+                    } catch(e) {}
+                },
 
-            const userDisplay = document.getElementById('user-display');
-            const usernameInput = document.getElementById('reg-username');
-            const clickPowerDisplay = document.getElementById('click-power-display');
+                save() {
+                    if (!this.loggedInUser) return;
+                    try {
+                        let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                        db[this.loggedInUser] = { 
+                            pin: '1234', 
+                            beats: this.beats, 
+                            fans: this.fans, 
+                            power: this.clickPower, 
+                            auto: this.autoBeatsActive 
+                        };
+                        localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
+                    } catch(e) {}
+                },
 
-            if (userDisplay) userDisplay.innerText = username;
-            if (usernameInput) usernameInput.value = username;
+                playTone() {
+                    try {
+                        const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+                        const osc = ctxAudio.createOscillator();
+                        const gain = ctxAudio.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(440 + (this.clickPower * 15), ctxAudio.currentTime);
+                        gain.gain.setValueAtTime(0.12, ctxAudio.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.12);
+                        osc.connect(gain);
+                        gain.connect(ctxAudio.destination);
+                        osc.start();
+                        osc.stop(ctxAudio.currentTime + 0.12);
+                    } catch(e) {}
+                },
 
-            function updateGameViewState() {
-                const authContainer = document.getElementById('game-auth-container');
-                const mainContainer = document.getElementById('game-main-container');
+                startAutoBeatInterval() {
+                    setInterval(() => {
+                        if (this.autoBeatsActive) {
+                            this.beats += 1;
+                            this.updateUI();
+                            this.save();
+                        }
+                    }, 1000);
+                },
 
-                if (loggedInUser) {
-                    loadUserData();
-                    if(authContainer) authContainer.classList.add('hidden');
-                    if(mainContainer) mainContainer.classList.remove('hidden');
-                    const emailSpan = document.getElementById('logged-user-email');
-                    if(emailSpan) emailSpan.innerText = "Eingeloggt: " + loggedInUser;
-                    updateDisplay();
+                updateUI() {
+                    const bEl = document.getElementById('beats-count');
+                    const fEl = document.getElementById('fans-count');
+                    const pEl = document.getElementById('click-power-display');
+                    if(bEl) bEl.innerText = Math.floor(this.beats).toLocaleString('de-DE');
+                    if(fEl) fEl.innerText = Math.floor(this.fans).toLocaleString('de-DE');
+                    if(pEl) pEl.innerText = this.clickPower;
+
+                    if (this.autoBeatsActive) {
+                        const status = document.getElementById('upg2-status');
+                        if(status) status.innerText = "Aktiv! +1 Beat pro Sekunde";
+                    }
+                }
+            };
+
+            GameEngine.init();
+
+            // Studio Events
+            document.getElementById('produce-beat-btn').addEventListener('click', () => {
+                GameEngine.beats += GameEngine.clickPower;
+                GameEngine.fans += 1;
+                GameEngine.playTone();
+                GameEngine.updateUI();
+                GameEngine.save();
+            });
+
+            document.getElementById('buy-upgrade-1').addEventListener('click', () => {
+                if (GameEngine.beats >= 100) {
+                    GameEngine.beats -= 100;
+                    GameEngine.clickPower += 2;
+                    GameEngine.playTone();
+                    GameEngine.updateUI();
+                    GameEngine.save();
+                    document.getElementById('upg1-status').innerText = "Aktiv! +2 Power (Level " + ((GameEngine.clickPower - 5)/2 + 1) + ")";
                 } else {
-                    if(authContainer) authContainer.classList.remove('hidden');
-                    if(mainContainer) mainContainer.classList.add('hidden');
+                    const st = document.getElementById('upg1-status');
+                    st.innerText = "❌ Nicht genug Beats! (100 benötigt)";
+                    setTimeout(() => { st.innerText = "+2 Beats pro Klick & Sound-Ton"; }, 2500);
                 }
-            }
+            });
 
-            // Tabs Login / Register Switch
-            const tabLoginBtn = document.getElementById('tab-login-btn');
-            const tabRegisterBtn = document.getElementById('tab-register-btn');
-            const formLogin = document.getElementById('form-login');
-            const formRegister = document.getElementById('form-register');
-            const authMsg = document.getElementById('auth-msg');
+            document.getElementById('buy-upgrade-2').addEventListener('click', () => {
+                if (GameEngine.beats >= 500 && !GameEngine.autoBeatsActive) {
+                    GameEngine.beats -= 500;
+                    GameEngine.autoBeatsActive = true;
+                    GameEngine.playTone();
+                    GameEngine.updateUI();
+                    GameEngine.save();
+                    document.getElementById('upg2-status').innerText = "Aktiv! +1 Beat pro Sekunde";
+                } else if (GameEngine.beats < 500 && !GameEngine.autoBeatsActive) {
+                    const st = document.getElementById('upg2-status');
+                    st.innerText = "❌ Nicht genug Beats! (500 benötigt)";
+                    setTimeout(() => { st.innerText = "+1 Beat pro Sekunde"; }, 2500);
+                }
+            });
 
-            if(tabLoginBtn && tabRegisterBtn) {
-                tabLoginBtn.addEventListener('click', () => {
-                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer";
-                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
-                    formLogin.classList.remove('hidden');
-                    formRegister.classList.add('hidden');
-                    if(authMsg) authMsg.innerText = "";
-                });
-                tabRegisterBtn.addEventListener('click', () => {
-                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 border-b-2 border-emerald-500 transition cursor-pointer";
-                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
-                    formRegister.classList.remove('hidden');
-                    formLogin.classList.add('hidden');
-                    if(authMsg) authMsg.innerText = "";
-                });
-            }
-
-            // Login Button Logik
-            const submitLoginBtn = document.getElementById('submit-login-btn');
-            if(submitLoginBtn) {
-                submitLoginBtn.addEventListener('click', () => {
-                    const email = document.getElementById('login-email').value.trim().toLowerCase();
-                    const pin = document.getElementById('login-pin').value.trim();
-                    usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-
-                    if (usersDB[email] && usersDB[email].pin === pin) {
-                        loggedInUser = email;
-                        localStorage.setItem('beat_lab_logged_in_user', email);
-                        updateGameViewState();
-                    } else {
-                        if(authMsg) authMsg.innerText = "❌ Falsche E-Mail-Adresse oder PIN!";
-                    }
-                });
-            }
-
-            // Register Button Logik
-            const submitRegisterBtn = document.getElementById('submit-register-btn');
-            if(submitRegisterBtn) {
-                submitRegisterBtn.addEventListener('click', () => {
-                    const email = document.getElementById('reg-email').value.trim().toLowerCase();
-                    const pin = document.getElementById('reg-pin').value.trim();
-                    if (!email || !email.includes('@')) {
-                        if(authMsg) authMsg.innerText = "❌ Bitte gültige E-Mail eingeben!";
-                        return;
-                    }
-                    if (!pin || pin.length < 3) {
-                        if(authMsg) authMsg.innerText = "❌ PIN muss min. 3 Zeichen haben!";
-                        return;
-                    }
-
-                    usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    if (usersDB[email]) {
-                        if(authMsg) authMsg.innerText = "❌ E-Mail bereits registriert!";
-                        return;
-                    }
-
-                    usersDB[email] = { pin, beats: 0, fans: 0, power: 5, auto: false };
-                    localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-                    loggedInUser = email;
+            document.getElementById('submit-login-btn').addEventListener('click', () => {
+                const email = document.getElementById('login-email').value.trim().toLowerCase();
+                const pin = document.getElementById('login-pin').value.trim();
+                let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                if (db[email] && db[email].pin === pin) {
+                    GameEngine.loggedInUser = email;
                     localStorage.setItem('beat_lab_logged_in_user', email);
-                    updateGameViewState();
-                });
-            }
-
-            // Logout Button Logik
-            const logoutBtn = document.getElementById('logout-btn');
-            if(logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    saveGame();
-                    loggedInUser = null;
-                    localStorage.removeItem('beat_lab_logged_in_user');
-                    updateGameViewState();
-                });
-            }
-
-            // Audio-Synthesizer (Töne beim Klicken)
-            function playClickTone() {
-                try {
-                    const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = ctxAudio.createOscillator();
-                    const gain = ctxAudio.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(440 + (clickPower * 15), ctxAudio.currentTime);
-                    gain.gain.setValueAtTime(0.12, ctxAudio.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.12);
-                    osc.connect(gain);
-                    gain.connect(ctxAudio.destination);
-                    osc.start();
-                    osc.stop(ctxAudio.currentTime + 0.12);
-                } catch(e) {}
-            }
-
-            // Auto-Beat Generator (Jede Sekunde +1 Beat im Hintergrund)
-            setInterval(() => {
-                if (autoBeatsActive && loggedInUser) {
-                    beats += 1;
-                    updateDisplay();
-                    saveGame();
+                    GameEngine.load();
+                    updateViewState();
+                } else {
+                    document.getElementById('auth-msg').innerText = "❌ Falsche E-Mail oder PIN!";
                 }
-            }, 1000);
+            });
 
-            function updateDisplay() {
-                let bEl = document.getElementById('beats-count');
-                let fEl = document.getElementById('fans-count');
-                if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
-                if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
-                if(clickPowerDisplay) clickPowerDisplay.innerText = clickPower;
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                GameEngine.save();
+                GameEngine.loggedInUser = null;
+                localStorage.removeItem('beat_lab_logged_in_user');
+                updateViewState();
+            });
 
-                if (autoBeatsActive) {
-                    const upg2Status = document.getElementById('upg2-status');
-                    if (upg2Status) upg2Status.innerText = "Aktiv! +1 Beat pro Sekunde";
+            function updateViewState() {
+                const authC = document.getElementById('game-auth-container');
+                const mainC = document.getElementById('game-main-container');
+                if (GameEngine.loggedInUser) {
+                    authC.classList.add('hidden');
+                    mainC.classList.remove('hidden');
+                    document.getElementById('logged-user-email').innerText = "Eingeloggt: " + GameEngine.loggedInUser;
+                    GameEngine.updateUI();
+                } else {
+                    authC.classList.remove('hidden');
+                    mainC.classList.add('hidden');
                 }
             }
+            updateViewState();
 
-            // Upgrades Kaufen
-            const buyUpg1 = document.getElementById('buy-upgrade-1');
-            if(buyUpg1) {
-                buyUpg1.addEventListener('click', () => {
-                    if (beats >= 100) {
-                        beats -= 100;
-                        clickPower += 2;
-                        playClickTone();
-                        updateDisplay();
-                        saveGame();
-                        const upg1Status = document.getElementById('upg1-status');
-                        if (upg1Status) upg1Status.innerText = "Aktiv! +2 Power (Level " + ((clickPower - 5)/2 + 1) + ")";
+
+            /* ========================================================
+               MODUL 2: GARDEN & AUDIO-SYNC RENDERER (Bio-Garden & Canvas)
+               ======================================================== */
+            const GardenEngine = {
+                canvas: document.getElementById('garden-canvas'),
+                ctx: null,
+                audioEl: document.getElementById('external-audio-stream'),
+                toggleBtn: document.getElementById('toggle-radio-btn'),
+                statusText: document.getElementById('audio-status-text'),
+                isStreaming: false,
+
+                init() {
+                    if (!this.canvas) return;
+                    this.ctx = this.canvas.getContext('2d');
+                    this.bindRadioEvents();
+                    this.startRenderLoop();
+                    this.fetchSongInfo();
+                    setInterval(() => this.fetchSongInfo(), 15000);
+                },
+
+                bindRadioEvents() {
+                    if (!this.toggleBtn || !this.audioEl) return;
+                    this.toggleBtn.addEventListener('click', async () => {
+                        if (!this.isStreaming) {
+                            try {
+                                await this.audioEl.play();
+                                this.isStreaming = true;
+                                this.toggleBtn.innerText = "⏹️ Stream stoppen";
+                                this.toggleBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
+                                this.statusText.innerText = "🟢 Webradio aktiv & synchronisiert";
+                            } catch(e) {}
+                        } else {
+                            this.audioEl.pause();
+                            this.isStreaming = false;
+                            this.toggleBtn.innerText = "📻 Stream starten";
+                            this.toggleBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
+                            this.statusText.innerText = "Bereit";
+                        }
+                    });
+                },
+
+                async fetchSongInfo() {
+                    try {
+                        let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
+                        if (res.ok) {
+                            let data = await res.json();
+                            let songEl = document.getElementById('current-song-display');
+                            if (songEl && data) {
+                                let artist = data.artist ? data.artist.name : "";
+                                let title = data.title || "";
+                                songEl.innerText = artist || title ? `🎶 Live: ${artist} ${title ? '– ' + title : ''}` : `🎶 laut.fm/jackdarckart`;
+                            }
+                        }
+                    } catch(e) {}
+                },
+
+                startRenderLoop() {
+                    const render = () => {
+                        this.drawScene();
+                        requestAnimationFrame(render);
+                    };
+                    requestAnimationFrame(render);
+                },
+
+                drawScene() {
+                    const ctx = this.ctx;
+                    const canvas = this.canvas;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Takt-Puls Berechnung
+                    let pulse = 0.02;
+                    if (this.isStreaming && !this.audioEl.paused) {
+                        let time = Date.now() / 250;
+                        pulse = (Math.sin(time) * 0.5 + 0.5) * 0.035;
                     } else {
-                        const upg1Status = document.getElementById('upg1-status');
-                        if (upg1Status) {
-                            upg1Status.innerText = "❌ Nicht genug Beats! (100 benötigt)";
-                            setTimeout(() => { upg1Status.innerText = "+2 Beats pro Klick & Sound-Ton"; }, 2500);
-                        }
+                        pulse = (Math.sin(Date.now() / 800) + 1) * 0.015;
                     }
-                });
-            }
 
-            const buyUpg2 = document.getElementById('buy-upgrade-2');
-            if(buyUpg2) {
-                buyUpg2.addEventListener('click', () => {
-                    if (beats >= 500 && !autoBeatsActive) {
-                        beats -= 500;
-                        autoBeatsActive = true;
-                        playClickTone();
-                        updateDisplay();
-                        saveGame();
-                        const upg2Status = document.getElementById('upg2-status');
-                        if (upg2Status) upg2Status.innerText = "Aktiv! +1 Beat pro Sekunde";
-                    } else if (beats < 500 && !autoBeatsActive) {
-                        const upg2Status = document.getElementById('upg2-status');
-                        if (upg2Status) {
-                            upg2Status.innerText = "❌ Nicht genug Beats! (500 benötigt)";
-                            setTimeout(() => { upg2Status.innerText = "+1 Beat pro Sekunde"; }, 2500);
-                        }
+                    // Rasen Hintergrund
+                    let lawnGrad = ctx.createLinearGradient(0, 0, 0, 750);
+                    lawnGrad.addColorStop(0, '#9ef01a');
+                    lawnGrad.addColorStop(0.5, '#70e000');
+                    lawnGrad.addColorStop(1, '#38b000');
+                    ctx.fillStyle = lawnGrad;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+                    for (let i = 0; i < canvas.width; i += 60) {
+                        ctx.fillRect(i, 0, 30, canvas.height);
                     }
-                });
-            }
 
-            // Ansichten Umschalten
+                    // Pool
+                    ctx.fillStyle = '#014f86';
+                    ctx.fillRect(720, 380, 400, 240);
+                    let poolGrad = ctx.createLinearGradient(720, 380, 1120, 620);
+                    poolGrad.addColorStop(0, '#2a6f97');
+                    poolGrad.addColorStop(0.5, '#014f86');
+                    poolGrad.addColorStop(1, '#012a4a');
+                    ctx.fillStyle = poolGrad;
+                    ctx.fillRect(732, 392, 376, 216);
+
+                    ctx.strokeStyle = '#adb5bd';
+                    ctx.lineWidth = 5;
+                    ctx.strokeRect(730, 390, 380, 220);
+
+                    let fountainRadius = 15 + (pulse * 20);
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + pulse * 2})`;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(920, 500, fountainRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Kiesgarten & Details
+                    ctx.fillStyle = '#e9ecef';
+                    ctx.fillRect(120, 120, 500, 360);
+                    ctx.fillStyle = '#ced4da';
+                    for(let k=0; k<150; k++) {
+                        ctx.fillRect(130 + (k * 13) % 480, 130 + (k * 7) % 340, 2, 2);
+                    }
+
+                    ctx.fillStyle = '#212529';
+                    for (let r = 0; r < 5; r++) {
+                        ctx.fillRect(160 + r * 58, 280 + r * 30, 70, 35);
+                        ctx.strokeStyle = '#343a40';
+                        ctx.lineWidth = 1.5;
+                        ctx.strokeRect(160 + r * 58, 280 + r * 30, 70, 35);
+                    }
+
+                    // Holzterrasse
+                    let woodGrad = ctx.createLinearGradient(150, 630, 150, 750);
+                    woodGrad.addColorStop(0, '#bb7e3d');
+                    woodGrad.addColorStop(0.5, '#a0522d');
+                    woodGrad.addColorStop(1, '#8b4513');
+                    ctx.fillStyle = woodGrad;
+                    ctx.fillRect(150, 630, 900, 120);
+
+                    // Kugelbäume (Pulsieren im Takt)
+                    const drawTopiary = (bx, by) => {
+                        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                        ctx.beginPath(); ctx.ellipse(bx, by + 8, 20, 8, 0, 0, Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#4a3b32';
+                        ctx.fillRect(bx - 6, by - 15, 12, 40);
+
+                        let crownRadius = 32 * (1 + pulse * 0.5);
+                        let gradDark = ctx.createRadialGradient(bx-8, by-30, 4, bx, by-25, crownRadius);
+                        gradDark.addColorStop(0, '#52b788');
+                        gradDark.addColorStop(0.6, '#2d6a4f');
+                        gradDark.addColorStop(1, '#1b4332');
+                        ctx.fillStyle = gradDark;
+                        ctx.beginPath(); ctx.arc(bx, by - 25, crownRadius, 0, Math.PI * 2); ctx.fill();
+                    };
+                    drawTopiary(200, 200);
+                    drawTopiary(290, 200);
+                    drawTopiary(420, 215);
+                }
+            };
+
+            GardenEngine.init();
+
+
+            /* ========================================================
+               GLOBAL NAVIGATION & ROUTER
+               ======================================================== */
+            let currentView = localStorage.getItem('cb_view') || 'home';
             function switchView(view) {
                 currentView = view;
                 localStorage.setItem('cb_view', view);
                 document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
                 let target = document.getElementById('view-' + view);
                 if (target) target.classList.remove('hidden');
-                if (view === 'game') updateGameViewState();
             }
 
             function bindClick(id, handler) {
@@ -478,208 +555,14 @@
             bindClick('account-to-home-btn', () => switchView('home'));
             bindClick('admin-to-home-btn', () => switchView('home'));
 
-            bindClick('produce-beat-btn', () => {
-                beats += clickPower;
-                fans += 1;
-                playClickTone();
-                updateDisplay();
-                saveGame();
+            document.getElementById('save-account-btn').addEventListener('click', () => {
+                const newName = document.getElementById('reg-username').value.trim();
+                if (newName) {
+                    localStorage.setItem('cb_user', newName);
+                    document.getElementById('user-display').innerText = newName;
+                }
             });
 
-            // Profil Speichern
-            const saveAccountBtn = document.getElementById('save-account-btn');
-            if(saveAccountBtn) {
-                saveAccountBtn.addEventListener('click', () => {
-                    const newName = usernameInput ? usernameInput.value.trim() : '';
-                    if (newName) {
-                        username = newName;
-                        localStorage.setItem('cb_user', username);
-                        if (userDisplay) userDisplay.innerText = username;
-                        saveGame();
-                    }
-                });
-            }
-
-            // Webradio Song Info
-            async function fetchCurrentSong() {
-                try {
-                    let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
-                    if (res.ok) {
-                        let data = await res.json();
-                        let songEl = document.getElementById('current-song-display');
-                        if (songEl && data) {
-                            let artist = data.artist ? data.artist.name : "";
-                            let title = data.title || "";
-                            songEl.innerText = artist || title ? `🎶 Live: ${artist} ${title ? '– ' + title : ''}` : `🎶 laut.fm/jackdarckart`;
-                        }
-                    }
-                } catch(e) {}
-            }
-            setInterval(fetchCurrentSong, 15000);
-            fetchCurrentSong();
-
-            // Webradio Stream Controller & Takt-Sync
-            const radioStreamEl = document.getElementById('external-audio-stream');
-            const toggleRadioBtn = document.getElementById('toggle-radio-btn');
-            const audioStatusText = document.getElementById('audio-status-text');
-            let isStreamingRadio = false;
-
-            if (toggleRadioBtn && radioStreamEl) {
-                toggleRadioBtn.addEventListener('click', async () => {
-                    if (!isStreamingRadio) {
-                        try {
-                            await radioStreamEl.play();
-                            isStreamingRadio = true;
-                            toggleRadioBtn.innerText = "⏹️ Stream stoppen";
-                            toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
-                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio aktiv & synchronisiert";
-                        } catch(e) {}
-                    } else {
-                        radioStreamEl.pause();
-                        isStreamingRadio = false;
-                        toggleRadioBtn.innerText = "📻 Stream starten";
-                        toggleRadioBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
-                        if(audioStatusText) audioStatusText.innerText = "Bereit";
-                    }
-                });
-            }
-
-            // --- ARCHITEKTUR-GARTEN CANVAS (MIT LIVE-TAKT-SYNC) ---
-            const canvas = document.getElementById('garden-canvas');
-            const ctx = canvas ? canvas.getContext('2d') : null;
-
-            function drawGarden() {
-                if (!ctx || !canvas) return;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                let pulse = 0.02;
-                if (isStreamingRadio && !radioStreamEl.paused) {
-                    let time = Date.now() / 250;
-                    pulse = (Math.sin(time) * 0.5 + 0.5) * 0.035;
-                } else {
-                    pulse = (Math.sin(Date.now() / 800) + 1) * 0.015;
-                }
-
-                // 1. Rasen
-                let lawnGrad = ctx.createLinearGradient(0, 0, 0, 750);
-                lawnGrad.addColorStop(0, '#9ef01a');
-                lawnGrad.addColorStop(0.5, '#70e000');
-                lawnGrad.addColorStop(1, '#38b000');
-                ctx.fillStyle = lawnGrad;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
-                for (let i = 0; i < canvas.width; i += 60) {
-                    ctx.fillRect(i, 0, 30, canvas.height);
-                }
-
-                // 2. Pool
-                ctx.fillStyle = '#014f86';
-                ctx.fillRect(720, 380, 400, 240);
-                let poolGrad = ctx.createLinearGradient(720, 380, 1120, 620);
-                poolGrad.addColorStop(0, '#2a6f97');
-                poolGrad.addColorStop(0.5, '#014f86');
-                poolGrad.addColorStop(1, '#012a4a');
-                ctx.fillStyle = poolGrad;
-                ctx.fillRect(732, 392, 376, 216);
-
-                ctx.strokeStyle = '#adb5bd';
-                ctx.lineWidth = 5;
-                ctx.strokeRect(730, 390, 380, 220);
-
-                let fountainRadius = 15 + (pulse * 20);
-                ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + pulse * 2})`;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(920, 500, fountainRadius, 0, Math.PI * 2);
-                ctx.stroke();
-
-                // 3. Kiesgarten
-                ctx.fillStyle = '#e9ecef';
-                ctx.fillRect(120, 120, 500, 360);
-                ctx.fillStyle = '#ced4da';
-                for(let k=0; k<200; k++) {
-                    ctx.fillRect(130 + Math.random() * 480, 130 + Math.random() * 340, 2, 2);
-                }
-
-                ctx.fillStyle = '#212529';
-                for (let r = 0; r < 5; r++) {
-                    ctx.fillRect(160 + r * 58, 280 + r * 30, 70, 35);
-                    ctx.strokeStyle = '#343a40';
-                    ctx.lineWidth = 1.5;
-                    ctx.strokeRect(160 + r * 58, 280 + r * 30, 70, 35);
-                }
-
-                ctx.fillStyle = '#4cc9f0';
-                ctx.fillRect(300, 190, 16, 45);
-                ctx.fillStyle = '#3a86ff';
-                ctx.beginPath(); ctx.arc(308, 180, 11, 0, Math.PI*2); ctx.fill();
-
-                // 4. Holzterrasse
-                let woodGrad = ctx.createLinearGradient(150, 630, 150, 750);
-                woodGrad.addColorStop(0, '#bb7e3d');
-                woodGrad.addColorStop(0.5, '#a0522d');
-                woodGrad.addColorStop(1, '#8b4513');
-                ctx.fillStyle = woodGrad;
-                ctx.fillRect(150, 630, 900, 120);
-                
-                ctx.strokeStyle = '#5c2c16';
-                ctx.lineWidth = 2;
-                for (let x = 150; x < 1050; x += 30) {
-                    ctx.beginPath(); ctx.moveTo(x, 630); ctx.lineTo(x, 750); ctx.stroke();
-                }
-
-                ctx.fillStyle = '#2b1b17';
-                ctx.fillRect(525, 665, 130, 55);
-
-                // 5. Kugelbäume (Pulsieren im Takt)
-                function drawTopiary(bx, by) {
-                    ctx.fillStyle = 'rgba(0,0,0,0.2)';
-                    ctx.beginPath(); ctx.ellipse(bx, by + 8, 20, 8, 0, 0, Math.PI*2); ctx.fill();
-                    
-                    ctx.fillStyle = '#4a3b32';
-                    ctx.fillRect(bx - 6, by - 15, 12, 40);
-
-                    let crownRadius = 32 * (1 + pulse * 0.5);
-                    let gradDark = ctx.createRadialGradient(bx-8, by-30, 4, bx, by-25, crownRadius);
-                    gradDark.addColorStop(0, '#52b788');
-                    gradDark.addColorStop(0.6, '#2d6a4f');
-                    gradDark.addColorStop(1, '#1b4332');
-                    
-                    ctx.fillStyle = gradDark;
-                    ctx.beginPath(); ctx.arc(bx, by - 25, crownRadius, 0, Math.PI * 2); ctx.fill();
-                }
-                drawTopiary(200, 200);
-                drawTopiary(290, 200);
-                drawTopiary(420, 215);
-
-                // 6. Großer Baum
-                function drawBigTree(bx, by) {
-                    ctx.fillStyle = 'rgba(0,0,0,0.25)';
-                    ctx.beginPath(); ctx.ellipse(bx, by + 12, 35, 14, 0, 0, Math.PI*2); ctx.fill();
-
-                    ctx.fillStyle = '#3a2e2b';
-                    ctx.fillRect(bx - 12, by - 35, 24, 70);
-
-                    let bigTreeRadius = 75 * (1 + pulse * 0.3);
-                    let bigGrad = ctx.createRadialGradient(bx-15, by-55, 12, bx, by-50, bigTreeRadius + 4);
-                    bigGrad.addColorStop(0, '#74c69d');
-                    bigGrad.addColorStop(0.5, '#2d6a4f');
-                    bigGrad.addColorStop(1, '#081c15');
-
-                    ctx.fillStyle = bigGrad;
-                    ctx.beginPath(); ctx.arc(bx, by - 50, bigTreeRadius, 0, Math.PI * 2); ctx.fill();
-                }
-                drawBigTree(920, 110);
-
-                requestAnimationFrame(drawGarden);
-            }
-
-            if(canvas) {
-                requestAnimationFrame(drawGarden);
-            }
-
-            updateGameViewState();
             switchView(currentView);
         });
     </script>
