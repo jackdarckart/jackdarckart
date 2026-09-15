@@ -341,7 +341,7 @@
                 <span>Exklusives Studio-Minigame (Admin-Geschützt)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Dein Spielstand ist durch deinen Master-PIN geschützt.</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Genieße beim Klicken harmonische Wohlfühl-Töne!</p>
         </div>
 
         <!-- Game Dashboard -->
@@ -363,7 +363,7 @@
         <!-- Main Clicker Area -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
             <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
-                <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer, um neue Beats aufzunehmen:</p>
+                <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & Wohlfühl-Klänge:</p>
                 <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
                     <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
                     <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
@@ -537,6 +537,40 @@
         let pendingNewEmail = '';
         let pendingVerificationCode = '';
 
+        // --- WEB AUDIO SYNTHESIZER FÜR SCHÖNE TÖNE ---
+        let audioCtx = null;
+        function playPleasantTone() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                // Pentatonische Wohlfühl-Frequenzen (Harmonisch, kein schriller Ton)
+                // C5, D5, E5, G5, A5, C6
+                const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+                const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                
+                osc.type = 'sine'; // Weicher Sinuston
+                osc.frequency.setValueAtTime(randomNote, audioCtx.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime); // Sanfte Lautstärke
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35); // Sanftes Ausklingen
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } catch(e) {
+                // Browser-Sicherheitsrichtlinien für Audio im Hintergrund ignorieren
+            }
+        }
+
         function showCustomModal(mode, title, text, placeholder, showCancel = true) {
             modalMode = mode;
             document.getElementById('modalTitle').innerText = title;
@@ -583,8 +617,6 @@
                 actionContainer.classList.add('hidden');
             }
 
-            document.getElementById('customModal').classList.add('hidden'); // Fix: keep hidden until called correctly or managed via state
-            // Re-open info properly
             document.getElementById('customModal').classList.remove('hidden');
             modalCallback = null;
         }
@@ -602,7 +634,7 @@
             closeCustomModal(true, val);
         }
 
-        // --- DIREKTER 3-SCHRITT SETUP WIZARD ---
+        // --- 3-SCHRITT SETUP WIZARD ---
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
@@ -611,7 +643,6 @@
         }
 
         function startPinEmailSetupWizard() {
-            // Schritt 1: Neuen PIN eingeben
             showCustomModal('setup', '🔒 Neuer Master-PIN', 'Lege deinen geheimen Master-PIN fest:', 'Neuen PIN eingeben...', false);
             modalCallback = function(success, pinVal) {
                 if (!success || !pinVal) {
@@ -622,7 +653,6 @@
                 }
                 pendingNewPin = pinVal;
 
-                // Schritt 2: E-Mail-Adresse eingeben
                 setTimeout(() => {
                     showCustomModal('setup', '📧 E-Mail-Adresse', 'Gib deine E-Mail-Adresse für den Bestätigungscode ein:', 'Deine E-Mail-Adresse...', false);
                     modalCallback = function(succ2, emailVal) {
@@ -634,10 +664,8 @@
                         }
                         pendingNewEmail = emailVal;
 
-                        // 6-stelligen Code generieren
                         pendingVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-                        // Schritt 3: Direktes Code-Eingabefenster öffnen
                         setTimeout(() => {
                             showCustomModal('setup', '🔑 Bestätigungscode eingeben', `Ein Code wurde an "${pendingNewEmail}" gesendet.\n\n(Dein Code lautet: ${pendingVerificationCode})\n\nGib den 6-stelligen Code hier ein:`, '6-stelliger Code...', false);
                             modalCallback = function(succ3, codeInput) {
@@ -788,6 +816,7 @@
         function clickBeat() {
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
+            playPleasantTone(); // Spiele einen harmonischen, angenehmen Ton ab
             updateGameUI();
             saveGame();
         }
@@ -805,6 +834,7 @@
                 if (type === 'synth') gameData.synth++;
                 if (type === 'desk') gameData.desk++;
                 if (type === 'label') gameData.label++;
+                playPleasantTone();
                 updateGameUI();
                 saveGame();
             }
@@ -870,11 +900,12 @@
             audio.addEventListener('play', function() { localStorage.setItem('streamPlaying', 'true'); });
             audio.addEventListener('pause', function() { localStorage.setItem('streamPlaying', 'false'); });
         }
-        window.addEventListener('load', function() {
+        window.ensureAudioPlayback = function() {
             if (localStorage.getItem('streamPlaying') === 'true' && audio) {
                 audio.play().catch(function(err) { console.log("Autoplay blockiert:", err); });
             }
-        });
+        };
+        window.addEventListener('load', function() { window.ensureAudioPlayback(); });
 
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
         document.addEventListener('keydown', function(e) {
