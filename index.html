@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- PROFESSIONELLE STADION-ROCK POWERCHORD AUDIO ENGINE -->
+    <!-- HARMONIC PENTATONIC SEQUENTIAL RIFF ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,12 +541,12 @@
                 });
             }
 
-            // 🎸 STADION-ROCK AUDIO ENGINE (Sauber, druckvoll und harmonisch)
+            // 🎸 PERFEKTE ROCK-PENTATONIK AUDIO ENGINE (Töne nacheinander per Zufall, 100% harmonisch)
             let audioCtx = null;
             let masterCompressor = null;
 
             function makeDistortionCurve(amount) {
-                let k = amount || 180,
+                let k = amount || 200,
                     n = 44100,
                     curve = new Float32Array(n),
                     deg = Math.PI / 180;
@@ -557,8 +557,20 @@
                 return curve;
             }
 
-            // Feste, perfekt harmonierende Rock-Grundtöne (Drop-D / E-Moll Skala)
-            const rockRootNotes = [73.42, 82.41, 98.00, 110.00, 123.47, 146.83];
+            // Strenge E-Moll Pentatonik / Rock-Skala in Hz (Garantierte Harmonie bei jeder Zufallsauswahl)
+            const rockPentatonicScale = [
+                82.41,   // E2
+                98.00,   // G2
+                110.00,  // A2
+                123.47,  // B2
+                146.83,  // D3
+                164.81,  // E3
+                196.00,  // G3
+                220.00,  // A3
+                246.94,  // B3
+                293.66,  // D4
+                329.63   // E4
+            ];
 
             function playRockStudioSound() {
                 if (!soundEnabled || currentView === 'home') return;
@@ -570,91 +582,81 @@
                         masterCompressor = audioCtx.createDynamicsCompressor();
                         masterCompressor.threshold.setValueAtTime(-8, audioCtx.currentTime);
                         masterCompressor.knee.setValueAtTime(4, audioCtx.currentTime);
-                        masterCompressor.ratio.setValueAtTime(14, audioCtx.currentTime);
-                        masterCompressor.attack.setValueAtTime(0.001, audioCtx.currentTime);
-                        masterCompressor.release.setValueAtTime(0.08, audioCtx.currentTime);
+                        masterCompressor.ratio.setValueAtTime(15, audioCtx.currentTime);
+                        masterCompressor.attack.setValueAtTime(0.0005, audioCtx.currentTime);
+                        masterCompressor.release.setValueAtTime(0.06, audioCtx.currentTime);
                         masterCompressor.connect(audioCtx.destination);
                     }
 
                     const now = audioCtx.currentTime;
 
-                    // Wähle einen sauberen Grundton aus der Rock-Skala
-                    let root = rockRootNotes[Math.floor(Math.random() * rockRootNotes.length)];
-                    // Power-Chord Intervalle: Grundton, Quinte, Oktave
-                    let frequencies = [root * 2, root * 3, root * 4];
+                    // Master Distortion & Echo Chain
+                    let delay = audioCtx.createDelay();
+                    let delayFeedback = audioCtx.createGain();
+                    let delayWet = audioCtx.createGain();
 
-                    // Master Effekte (Zerre & Kompressor)
+                    delay.delayTime.setValueAtTime(0.12, now);
+                    delayFeedback.gain.setValueAtTime(0.12, now);
+                    delayWet.gain.setValueAtTime(0.08, now);
+
+                    delay.connect(delayFeedback);
+                    delayFeedback.connect(delay);
+                    delay.connect(delayWet);
+                    delayWet.connect(masterCompressor);
+
                     let distortion = audioCtx.createWaveShaper();
-                    distortion.curve = makeDistortionCurve(160);
+                    distortion.curve = makeDistortionCurve(180);
                     distortion.oversample = '4x';
 
                     let cabinet = audioCtx.createBiquadFilter();
                     cabinet.type = 'peaking';
-                    cabinet.frequency.setValueAtTime(2500, now);
-                    cabinet.gain.setValueAtTime(10, now);
-                    if (cabinet.Q) cabinet.Q.setValueAtTime(3.0, now);
+                    cabinet.frequency.setValueAtTime(2600, now);
+                    cabinet.gain.setValueAtTime(12, now);
+                    if (cabinet.Q) cabinet.Q.setValueAtTime(3.5, now);
 
-                    let guitarGain = audioCtx.createGain();
-                    guitarGain.gain.setValueAtTime(0.0001, now);
-                    guitarGain.gain.linearRampToValueAtTime(0.18, now + 0.005);
-                    guitarGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-
-                    // Oszillatoren für den fetten Power-Chord
-                    let oscs = [];
-                    frequencies.forEach((freq, idx) => {
-                        let o = audioCtx.createOscillator();
-                        o.type = (idx === 0) ? 'sawtooth' : 'triangle';
-                        o.frequency.setValueAtTime(freq, now);
-                        o.detune.setValueAtTime((Math.random() - 0.5) * 10, now);
-                        
-                        let filter = audioCtx.createBiquadFilter();
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(freq * 12, now);
-                        filter.frequency.exponentialRampToValueAtTime(freq * 3, now + 0.4);
-
-                        o.connect(filter);
-                        filter.connect(guitarGain);
-                        oscs.push(o);
-                    });
-
-                    // Brachialer Sub-Bass für das Fundament
-                    let subBass = audioCtx.createOscillator();
-                    subBass.type = 'sawtooth';
-                    subBass.frequency.setValueAtTime(root, now);
-
-                    let subFilter = audioCtx.createBiquadFilter();
-                    subFilter.type = 'lowpass';
-                    subFilter.frequency.setValueAtTime(120, now);
-
-                    let subGain = audioCtx.createGain();
-                    subGain.gain.setValueAtTime(0.0001, now);
-                    subGain.gain.linearRampToValueAtTime(0.22, now + 0.01);
-                    subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-
-                    subBass.connect(subFilter);
-                    subFilter.connect(subGain);
-                    subGain.connect(masterCompressor);
-
-                    guitarGain.connect(distortion);
                     distortion.connect(cabinet);
                     cabinet.connect(masterCompressor);
+                    cabinet.connect(delay);
 
-                    // Starten
-                    oscs.forEach(o => { o.start(now); o.stop(now + 0.45); });
-                    subBass.start(now);
-                    subBass.stop(now + 0.45);
+                    // --- SEQUENZIELLE ZUFALLS-NOTEN (4 Töne nacheinander aus der echten Skala) ---
+                    let noteCount = 4;
+                    let stepDuration = 0.09; // Schneller, flüssiger Riff-Lauf
 
-                    // Aufräumen
-                    setTimeout(() => {
-                        try {
-                            oscs.forEach(o => o.disconnect());
-                            subBass.disconnect();
-                            guitarGain.disconnect();
-                            subGain.disconnect();
-                            distortion.disconnect();
-                            cabinet.disconnect();
-                        } catch(e){}
-                    }, 600);
+                    for (let i = 0; i < noteCount; i++) {
+                        let noteTime = now + (i * stepDuration);
+                        // Zufällige Note aus der absolut sauberen Pentatonik-Skala
+                        let randomFreq = rockPentatonicScale[Math.floor(Math.random() * rockPentatonicScale.length)];
+
+                        let filter = audioCtx.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(randomFreq * 10, noteTime);
+                        filter.frequency.exponentialRampToValueAtTime(randomFreq * 2.5, noteTime + 0.25);
+
+                        let noteGain = audioCtx.createGain();
+                        noteGain.gain.setValueAtTime(0.0001, noteTime);
+                        noteGain.gain.linearRampToValueAtTime(0.16, noteTime + 0.003);
+                        noteGain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.28);
+
+                        let o = audioCtx.createOscillator();
+                        o.type = (i % 2 === 0) ? 'sawtooth' : 'triangle';
+                        o.frequency.setValueAtTime(randomFreq, noteTime);
+                        o.detune.setValueAtTime((Math.random() - 0.5) * 12, noteTime);
+
+                        o.connect(filter);
+                        filter.connect(noteGain);
+                        noteGain.connect(distortion);
+
+                        o.start(noteTime);
+                        o.stop(noteTime + 0.3);
+
+                        setTimeout(() => {
+                            try {
+                                o.disconnect();
+                                filter.disconnect();
+                                noteGain.disconnect();
+                            } catch(e){}
+                        }, (i * stepDuration + 0.35) * 1000);
+                    }
 
                 } catch (e) {}
             }
@@ -864,7 +866,6 @@
                 }
             }, 100);
 
-            // LANGSAMER, GLEICHMÄSSIGER GESCHWINDIGKEITS-ANSTIEG
             function scheduleNextBackgroundSound() {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
                     playRockStudioSound();
