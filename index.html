@@ -7,6 +7,13 @@
     <!-- Sicherheits-Header & Tailwind CSS -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 0 25px rgba(168, 85, 247, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+        .audio-pulse { animation: pulseGlow 0.25s ease-in-out; }
+    </style>
 </head>
 <body class="bg-[#0b0f19] text-white min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
@@ -340,7 +347,7 @@
         </div>
     </footer>
 
-    <!-- ERWEITERTE AUTOMATISCHE ARPEGGIO- & MELODIE-ENGINE -->
+    <!-- POLISHER AUDIO & TYCOON ENGINE -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
@@ -537,23 +544,29 @@
                 });
             }
 
-            // 🎵 ERWEITERTE AUDIO-ENGINE MIT GROSSEM HARMONISCHEN NOTENPOOL (Zufällige Arpeggios)
+            // 🎵 HARMONISCHER NOTENPOOL & AUDIO ENGINE (Zufällige Arpeggios mit optischem Feedback)
             let audioCtx = null;
-            // Großer, erweiterter Notenpool (C-Dur / A-Moll Pentatonik über 3 Oktaven für maximale Vielfalt)
             const extendedNotePool = [
                 130.81, 146.83, 164.81, 196.00, 220.00, // Tief
                 261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, // Mitte
                 523.25, 587.33, 659.25, 698.46, 783.99, 880.00  // Hoch
             ];
 
+            function triggerVisualPulse() {
+                const btn = document.getElementById('produce-beat-btn');
+                if (btn) {
+                    btn.classList.add('audio-pulse');
+                    setTimeout(() => btn.classList.remove('audio-pulse'), 250);
+                }
+            }
+
             function playRandomMelodySequence() {
-                if (!soundEnabled || currentView === 'home') return;
+                if (!soundEnabled || currentView !== 'game') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
                     const now = audioCtx.currentTime;
-                    // Spiele 3 Töne nacheinander per Zufall aus dem großen Pool
                     let noteCount = 3;
                     let step = 0.08;
 
@@ -580,6 +593,7 @@
                             try { osc.disconnect(); gain.disconnect(); } catch(e){}
                         }, (i * step + 0.35) * 1000);
                     }
+                    triggerVisualPulse();
                 } catch(e) {}
             }
 
@@ -780,13 +794,13 @@
                 });
             }
 
-            // AUTO-PRODUKTION & HINTERGRUND-SOUNDSCHLEIFE (Läuft jede Sekunde automatisch mit)
+            // AUTO-PRODUKTION & HINTERGRUND-SOUNDSCHLEIFE
             setInterval(() => {
                 if (loggedInUser) {
                     if (bps > 0) {
                         beats += bps / 10;
-                        // Automatische Sound-Wiedergabe im Takt bei aktiven Rigs/BPS
-                        if (Math.random() < 0.4 && currentView === 'game') {
+                        // Automatische Arpeggios im Takt der Hintergrund-Riffs
+                        if (Math.random() < 0.35 && currentView === 'game') {
                             playRandomMelodySequence();
                         }
                     }
