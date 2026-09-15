@@ -199,10 +199,10 @@
                     <!-- 1. HASH-RATE RIGS (GoMining Stil) -->
                     <div class="bg-[#131b2e] border border-cyan-500/30 p-4 rounded-2xl space-y-2">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-cyan-400 flex items-center gap-1.5">⚡ Mining Rig (+1 BPS)</h3>
+                            <h3 class="font-bold text-xs text-cyan-400 flex items-center gap-1.5">⚡ Mining Rig (+0.2 BPS)</h3>
                             <span id="rigs-count" class="text-xs text-gray-400">Anzahl: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Generiert automatische Hash-Power für dein Studio.</p>
+                        <p class="text-[11px] text-gray-400">Generiert sanfte Hash-Power für deinen schrittweisen Aufbau.</p>
                         <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
                             Rig kaufen (<span id="rig-cost">50</span> Beats)
                         </button>
@@ -214,7 +214,7 @@
                             <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 Single / Album Release</h3>
                             <span id="albums-count" class="text-xs text-gray-400">Releases: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Drop einen Track für Fans & passiven Fan-Zuwachs (+50 Fans, +2 BPS, +1 FPS).</p>
+                        <p class="text-[11px] text-gray-400">Drop einen Track für stetiges Wachstum (+25 Fans, +0.8 BPS, +0.3 FPS).</p>
                         <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
                             Release droppen (<span id="album-cost">250</span> Beats)
                         </button>
@@ -226,7 +226,7 @@
                             <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 AI-Producer Agent</h3>
                             <span id="ai-count" class="text-xs text-gray-400">Agenten: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Ein KI-Agent, der unermüdlich Beats (+8 BPS) & Fans (+2 FPS) generiert.</p>
+                        <p class="text-[11px] text-gray-400">Ein KI-Agent für fortgeschrittene Automatisierung (+2.5 BPS, +0.8 FPS).</p>
                         <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">
                             Agenten anheuern (<span id="ai-cost">1000</span> Beats)
                         </button>
@@ -238,7 +238,7 @@
                             <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">💎 Beat-Staking Pool</h3>
                             <span id="staked-count" class="text-xs text-emerald-300">Gesperrt: 0</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Sperre Beats im Pool für passive Zinsen (+0.5 BPS Bonus).</p>
+                        <p class="text-[11px] text-gray-400">Sperre Beats im Pool für feine passive Zinsen (+0.2 BPS Bonus).</p>
                         <div class="flex gap-2">
                             <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">100 Staken</button>
                             <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 rounded-xl text-xs transition shadow">Unstake</button>
@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Entspannte, zufällige Studio-Engine & Tycoon-Logik -->
+    <!-- Ausbalancierte Studio-Engine & Tycoon-Logik -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,7 +541,7 @@
                 });
             }
 
-            // VÖLLIG ZUFÄLLIGE, HARMONISCHE STUDIO-SYNTHESIZER-ENGINE
+            // ENTSPANNTE, ZUFÄLLIGE C-MOLL STUDIO-SYNTHESIZER-ENGINE
             let audioCtx = null;
             const cMinorPool = [
                 130.81, 155.56, 174.61, 196.00, 233.08, 
@@ -569,18 +569,18 @@
 
                     filter.type = 'lowpass';
                     filter.frequency.setValueAtTime(2500, now);
-                    filter.frequency.exponentialRampToValueAtTime(350, now + 0.5);
+                    filter.frequency.exponentialRampToValueAtTime(350, now + 0.6);
 
                     gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.32, now + 0.04);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+                    gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
 
                     osc.connect(filter);
                     filter.connect(gain);
                     gain.connect(audioCtx.destination);
 
                     osc.start(now);
-                    osc.stop(now + 0.6);
+                    osc.stop(now + 0.7);
                 } catch (e) {}
             }
 
@@ -625,13 +625,13 @@
                 saveGame();
             }
 
-            // TYCOON UPGRADE LOGIK
+            // AUSBALANCIERTE TYCOON UPGRADE LOGIK (Sehr langsame, stetige Steigerung)
             function buyRig() {
                 if (beats >= rigCost) {
                     beats -= rigCost;
                     rigs += 1;
-                    hashRate += 5;
-                    bps += 1.0;
+                    hashRate += 2;
+                    bps += 0.2; // Feinere Steigerung (+0.2 BPS)
                     rigCost = Math.floor(rigCost * 1.35);
                     updateDisplay();
                     saveGame();
@@ -644,9 +644,9 @@
                 if (beats >= albumCost) {
                     beats -= albumCost;
                     albums += 1;
-                    fans += 50;
-                    bps += 2.0;
-                    fps += 1.0;
+                    fans += 25;
+                    bps += 0.8; // Angenehme Steigerung (+0.8 BPS)
+                    fps += 0.3; // Sanfter passiver Fan-Zuwachs (+0.3 FPS)
                     albumCost = Math.floor(albumCost * 1.5);
                     updateDisplay();
                     saveGame();
@@ -659,8 +659,8 @@
                 if (beats >= aiCost) {
                     beats -= aiCost;
                     aiAgents += 1;
-                    bps += 8.0;
-                    fps += 2.0;
+                    bps += 2.5; // Solider, aber kontrollierter Zuwachs (+2.5 BPS)
+                    fps += 0.8; // Moderater Fan-Zuwachs (+0.8 FPS)
                     aiCost = Math.floor(aiCost * 1.4);
                     updateDisplay();
                     saveGame();
@@ -673,7 +673,7 @@
                 if (beats >= 100) {
                     beats -= 100;
                     stakedBeats += 100;
-                    bps += 0.5;
+                    bps += 0.2;
                     updateDisplay();
                     saveGame();
                 } else {
@@ -685,7 +685,7 @@
                 if (stakedBeats >= 100) {
                     stakedBeats -= 100;
                     beats += 100;
-                    bps = Math.max(0, bps - 0.5);
+                    bps = Math.max(0, bps - 0.2);
                     updateDisplay();
                     saveGame();
                 } else {
@@ -791,7 +791,7 @@
                 }
             }, 100);
 
-            // 2. Entspannter Hintergrund-Zufalls-Takt (spielt jetzt alle 3,5 Sekunden einen wohlklingenden Ton)
+            // 2. Entspannter Hintergrund-Takt (alle 3,5 Sekunden ein Ton, wenn BPS aktiv ist)
             setInterval(() => {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
                     playRandomHarmonicSound();
