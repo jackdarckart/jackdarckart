@@ -333,34 +333,18 @@
         </section>
     </div>
 
-    <!-- MINI GAME VIEW ("🎮 Beat-Lab") -->
+    <!-- MINI GAME VIEW ("🎮 Beat-Lab") - FREI FÜR JEDEN NUTZER -->
     <div id="gameView" class="hidden py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (PIN-Gesichert)</span>
+                <span>Exklusives Studio-Minigame (Für alle geöffnet)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
             <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße druckvolle, rockige Synth-Riffs und Power-Chords!</p>
         </div>
 
-        <!-- GESPERRTER ZUSTAND (WENN ABGEMELDET) -->
-        <div id="gameLockScreen" class="bg-cardbg border border-indigo-500/40 rounded-3xl p-10 text-center max-w-xl mx-auto shadow-2xl space-y-6 my-10">
-            <div class="w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-3xl mx-auto border border-indigo-500/30">
-                <i class="fa-solid fa-lock"></i>
-            </div>
-            <div>
-                <h3 class="text-2xl font-bold mb-2">Beat-Lab ist gesperrt</h3>
-                <p class="text-sm text-gray-400 leading-relaxed">Zum Schutz vor Manipulation ist das Spiel und der Admin-Bereich passwortgeschützt. Bitte melde dich an, um zu spielen.</p>
-            </div>
-            <button onclick="toggleAdminAuth()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white py-4 rounded-2xl font-bold text-sm shadow-xl shadow-indigo-600/30 transition flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-key"></i>
-                <span>Jetzt mit Master-PIN anmelden</span>
-            </button>
-        </div>
-
-        <!-- ENTSPERRTER SPIEL- & ADMIN-BEREICH (WENN ANGEMELDET) -->
-        <div id="gameMainContent" class="hidden space-y-8">
+        <div id="gameMainContent" class="space-y-8">
             <!-- Game Dashboard -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
@@ -441,28 +425,23 @@
                 </div>
             </div>
 
-            <!-- Cloud Sync, PIN Settings & Reset Section -->
+            <!-- Cloud Sync, PIN & E-Mail Wiederherstellung -->
             <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
-                <div class="text-left">
-                    <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Sicherer Admin-Bereich</h4>
-                    <p class="text-xs text-gray-400">Deine Cloud-ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">Lade...</code></p>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Cloud-Sicherung & PIN-Schutz</h4>
+                        <p class="text-xs text-gray-400">Deine Cloud-ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">Lade...</code></p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="openPinSetupModal()" class="bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/40 text-indigo-300 text-xs px-4 py-2 rounded-xl font-semibold transition">
+                            <i class="fa-solid fa-key mr-1.5"></i> PIN & E-Mail festlegen
+                        </button>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 w-full">
-                    <button id="adminAuthBtn" onclick="toggleAdminAuth()" class="w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
-                        <i id="adminAuthIcon" class="fa-solid fa-lock-open"></i>
-                        <span id="adminAuthBtnText">Admin abmelden</span>
-                    </button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                     <button onclick="promptLoadCloudId()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-rotate"></i>
-                        <span>Auf anderem Gerät laden</span>
-                    </button>
-                    <button onclick="changeAdminPin()" class="w-full bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-key"></i>
-                        <span>Master-PIN ändern</span>
-                    </button>
-                    <button onclick="openForgotPinModalDirect()" class="w-full bg-amber-950/50 hover:bg-amber-900 border border-amber-800/60 text-amber-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-envelope"></i>
-                        <span>PIN vergessen?</span>
+                        <span>Spielstand von anderem Gerät laden</span>
                     </button>
                     <button onclick="confirmResetGame()" class="w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-trash-can"></i>
@@ -484,30 +463,27 @@
     <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
         <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 max-w-md w-full mx-auto shadow-2xl text-center space-y-6">
             <div id="modalIcon" class="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-2xl mx-auto border border-indigo-500/30">
-                <i class="fa-solid fa-lock"></i>
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
             <div>
                 <h3 id="modalTitle" class="text-xl font-bold mb-2">Sicherheits-PIN</h3>
-                <p id="modalText" class="text-sm text-gray-400 leading-relaxed">Bitte gib deinen Master-PIN ein.</p>
+                <p id="modalText" class="text-sm text-gray-400 leading-relaxed">Bitte Eingabe tätigen.</p>
             </div>
             
-            <!-- Input-Feld -->
             <div id="modalInputContainer">
-                <input type="text" id="modalInput" placeholder="Master-PIN eingeben..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-center text-white text-lg tracking-widest focus:outline-none focus:border-indigo-500">
+                <input type="text" id="modalInput" placeholder="Eingabe..." class="w-full bg-darkbg border border-gray-700 rounded-xl px-4 py-3 text-center text-white text-lg tracking-widest focus:outline-none focus:border-indigo-500">
             </div>
 
-            <!-- Interaktiver Button für "PIN vergessen?" -->
+            <!-- Link für "PIN vergessen?" -->
             <div id="modalLinkContainer" class="hidden pt-1">
                 <button onclick="openForgotPinModalFromPrompt()" class="w-full bg-indigo-950/60 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-300 text-xs py-2.5 px-4 rounded-xl font-semibold transition flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-key"></i>
-                    <span>PIN vergessen? (Per E-Mail wiederherstellen)</span>
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>PIN vergessen? (Per E-Mail anfordern)</span>
                 </button>
             </div>
 
-            <!-- Zusätzlicher Aktions-Container -->
             <div id="modalActionContainer" class="hidden"></div>
 
-            <!-- Buttons -->
             <div class="flex items-center justify-center gap-3 pt-2">
                 <button id="modalCancelBtn" onclick="closeCustomModal(false)" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 py-3 rounded-xl font-semibold text-sm transition">Abbrechen</button>
                 <button id="modalConfirmBtn" onclick="handleModalConfirm()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-semibold text-sm transition shadow-lg shadow-indigo-600/30">Bestätigen</button>
@@ -545,7 +521,7 @@
                 home.classList.add('hidden');
                 game.classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                checkAndSetupPinOnce();
+                loadGame();
             } else {
                 game.classList.add('hidden');
                 home.classList.remove('hidden');
@@ -556,13 +532,9 @@
 
         let modalCallback = null;
         let modalMode = 'pin';
-        let isAdminLoggedIn = localStorage.getItem('jackAdminLoggedIn') === 'true';
-        
         let pendingNewPin = '';
-        let pendingNewEmail = '';
-        let pendingVerificationCode = '';
 
-        // --- STABILER AUDIO-KONTEXT & ROCK-SYNTHESIZER ---
+        // --- AUDIO SYSTEM & ROCK-SYNTHESIZER ---
         let audioCtx = null;
         let ambientTimer = 0;
 
@@ -577,7 +549,6 @@
             return audioCtx;
         }
 
-        // Globaler Aktivierungs-Listener für Audio
         ['click', 'touchstart', 'keydown'].forEach(evt => {
             document.addEventListener(evt, function() {
                 if (audioCtx && audioCtx.state === 'suspended') {
@@ -590,12 +561,9 @@
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
-                if (ctx.state === 'suspended') {
-                    ctx.resume();
-                }
+                if (ctx.state === 'suspended') ctx.resume();
 
                 const now = ctx.currentTime;
-
                 const rockSets = [
                     [110.00, 164.81, 220.00, 329.63, 440.00], 
                     [82.41, 123.47, 164.81, 246.94, 329.63],  
@@ -604,7 +572,6 @@
                 ];
 
                 const chord = rockSets[Math.floor(Math.random() * rockSets.length)];
-
                 const masterGain = ctx.createGain();
                 masterGain.gain.setValueAtTime(0.5, now);
 
@@ -641,7 +608,7 @@
             }
         }
 
-        function showCustomModal(mode, title, text, placeholder, showCancel = true) {
+        function showCustomModal(mode, title, text, placeholder, showCancel = true, showLink = false) {
             modalMode = mode;
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalText').innerText = text;
@@ -659,13 +626,13 @@
             inputContainer.classList.remove('hidden');
             cancelBtn.style.display = showCancel ? 'block' : 'none';
 
-            if (mode === 'setup' || mode === 'forgot') {
-                input.type = mode === 'forgot' ? 'email' : 'text';
+            if (mode === 'email' || mode === 'forgot') {
+                input.type = 'email';
             } else if (mode === 'pin') {
                 input.type = 'password';
-                linkContainer.classList.remove('hidden');
-            } else if (mode === 'info') {
-                inputContainer.classList.add('hidden');
+                if (showLink) linkContainer.classList.remove('hidden');
+            } else {
+                input.type = 'text';
             }
 
             document.getElementById('customModal').classList.remove('hidden');
@@ -687,7 +654,7 @@
                 actionContainer.classList.add('hidden');
             }
 
-            document.getElementById('customModal').classList.add('hidden');
+            document.getElementById('customModal').classList.remove('hidden');
             modalCallback = null;
         }
 
@@ -704,104 +671,62 @@
             closeCustomModal(true, val);
         }
 
-        // --- STABILE ADMIN-AUTHENTIFIZIERUNG ---
-        function toggleAdminAuth() {
-            if (isAdminLoggedIn) {
-                isAdminLoggedIn = false;
-                localStorage.setItem('jackAdminLoggedIn', 'false');
-                updateAdminAuthUI();
-                showInfoModal('🔒 Abgemeldet', 'Du hast dich erfolgreich abgemeldet. Das Beat-Lab ist nun gesperrt.');
-            } else {
-                showCustomModal('pin', '🔑 Admin Anmelden', 'Bitte gib deinen Master-PIN ein, um das Spiel zu entsperren:', 'Master-PIN eingeben...');
-                modalCallback = function(success, enteredPin) {
-                    if (!success) return;
-                    let pin = localStorage.getItem('jackAdminPin') || '1234';
-                    let tempPin = localStorage.getItem('jackTempPin');
+        // --- PIN & E-MAIL SETUP WIZARD ---
+        function openPinSetupModal() {
+            showCustomModal('pin', '🔒 Master-PIN festlegen', 'Gib deinen neuen Master-PIN ein:', 'Neuer PIN...', true, true);
+            modalCallback = function(succ, pinVal) {
+                if (!succ || !pinVal) return;
+                pendingNewPin = pinVal;
 
-                    if (enteredPin === pin || (tempPin && enteredPin === tempPin)) {
-                        if (tempPin && enteredPin === tempPin) {
-                            localStorage.removeItem('jackTempPin');
-                        }
-                        isAdminLoggedIn = true;
-                        localStorage.setItem('jackAdminLoggedIn', 'true');
-                        updateAdminAuthUI();
-                    } else {
-                        showInfoModal('❌ Zugriff verweigert', 'Falscher PIN! Zugriff verweigert.');
-                    }
-                };
-            }
-        }
-
-        function updateAdminAuthUI() {
-            const lockScreen = document.getElementById('gameLockScreen');
-            const mainContent = document.getElementById('gameMainContent');
-            const btnText = document.getElementById('adminAuthBtnText');
-            const btnIcon = document.getElementById('adminAuthIcon');
-            const btnContainer = document.getElementById('adminAuthBtn');
-
-            if (isAdminLoggedIn) {
-                lockScreen.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                if (btnText) {
-                    btnText.innerText = 'Admin abmelden';
-                    btnIcon.className = 'fa-solid fa-lock-open';
-                    btnContainer.className = 'w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2';
-                }
-            } else {
-                lockScreen.classList.remove('hidden');
-                mainContent.classList.add('hidden');
-                if (btnText) {
-                    btnText.innerText = 'Admin anmelden';
-                    btnIcon.className = 'fa-solid fa-lock';
-                    btnContainer.className = 'w-full bg-emerald-950/50 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2';
-                }
-            }
-        }
-
-        function verifyPin(onSuccess) {
-            if (isAdminLoggedIn) {
-                onSuccess();
-                return;
-            }
-            toggleAdminAuth();
-        }
-
-        function checkAndSetupPinOnce() {
-            let pin = localStorage.getItem('jackAdminPin');
-            if (!pin || pin.trim() === '') {
-                localStorage.setItem('jackAdminPin', '1234');
-                localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-            }
-            // Übernehme den gespeicherten Login-Status dauerhaft
-            isAdminLoggedIn = localStorage.getItem('jackAdminLoggedIn') === 'true';
-            updateAdminAuthUI();
-        }
-
-        function changeAdminPin() {
-            verifyPin(function() {
-                showCustomModal('setup', '🔒 Neuer Master-PIN', 'Lege deinen neuen Master-PIN fest:', 'Neuer PIN...', false);
-                modalCallback = function(succ, newPin) {
-                    if (succ && newPin) {
-                        localStorage.setItem('jackAdminPin', newPin);
-                        showInfoModal('✅ Gespeichert', 'Dein Master-PIN wurde erfolgreich aktualisiert.');
-                    }
-                };
-            });
-        }
-
-        function openForgotPinModalDirect() {
-            startForgotPinProcess();
+                setTimeout(() => {
+                    showCustomModal('email', '📧 E-Mail-Adresse', 'Gib deine E-Mail-Adresse für die Wiederherstellung ein:', 'Deine E-Mail-Adresse...');
+                    modalCallback = function(succ2, emailVal) {
+                        if (!succ2 || !emailVal) return;
+                        localStorage.setItem('jackAdminPin', pendingNewPin);
+                        localStorage.setItem('jackAdminEmail', emailVal);
+                        showInfoModal('✅ Erfolgreich', 'Dein Master-PIN und deine E-Mail-Adresse wurden erfolgreich gespeichert!');
+                    };
+                }, 300);
+            };
         }
 
         function openForgotPinModalFromPrompt() {
             document.getElementById('customModal').classList.add('hidden');
-            startForgotPinProcess();
+            showCustomModal('forgot', '📧 PIN per E-Mail anfordern', 'Gib deine hinterlegte E-Mail-Adresse ein:', 'Deine E-Mail-Adresse...');
+            modalCallback = function(succ, emailInput) {
+                if (!succ || !emailInput) return;
+                let savedEmail = localStorage.getItem('jackAdminEmail');
+
+                if (!savedEmail || emailInput.trim().toLowerCase() !== savedEmail.toLowerCase()) {
+                    showInfoModal('❌ Fehler', 'Diese E-Mail-Adresse ist nicht hinterlegt.');
+                    return;
+                }
+
+                let tempPin = 'TMP-' + Math.floor(1000 + Math.random() * 9000);
+                localStorage.setItem('jackTempPin', tempPin);
+                showInfoModal('📨 Neuer PIN gesendet', 'Ein temporärer PIN wurde an deine E-Mail gesendet:\n\n' + tempPin + '\n\nDu kannst ihn nutzen, um dich anzumelden.');
+            };
         }
 
-        function startForgotPinProcess() {
-            let tempPin = 'TMP-' + Math.floor(1000 + Math.random() * 9000);
-            localStorage.setItem('jackTempPin', tempPin);
-            showInfoModal('📨 Notfall-PIN generiert', 'Dein temporärer Notfall-PIN lautet: ' + tempPin + '\n\nDu kannst dich jetzt damit im Login-Fenster anmelden.');
+        function verifyPinForAction(onSuccess) {
+            let savedPin = localStorage.getItem('jackAdminPin');
+            if (!savedPin) {
+                onSuccess(); // Falls kein PIN gesetzt ist, direkt erlauben
+                return;
+            }
+
+            showCustomModal('pin', '🔑 PIN erforderlich', 'Bitte gib deinen Master-PIN ein:', 'Master-PIN...', true, true);
+            modalCallback = function(succ, enteredPin) {
+                if (!succ) return;
+                let tempPin = localStorage.getItem('jackTempPin');
+
+                if (enteredPin === savedPin || (tempPin && enteredPin === tempPin)) {
+                    if (tempPin && enteredPin === tempPin) localStorage.removeItem('jackTempPin');
+                    onSuccess();
+                } else {
+                    showInfoModal('❌ Falscher PIN', 'Der eingegebene PIN war falsch.');
+                }
+            };
         }
 
         // --- SPIELSTAND & CLOUD-SICHERUNG ---
@@ -829,7 +754,6 @@
             let lastId = localStorage.getItem('jackBeatLab_lastId') || gameData.cloudId;
             let saved = localStorage.getItem('jackBeatLab_' + lastId);
             
-            // Falls unter der letzten ID nichts gefunden wird, suche in allen Keys nach dem höchsten Spielstand
             if (!saved) {
                 for (let i = 0; i < localStorage.length; i++) {
                     let key = localStorage.key(i);
@@ -858,26 +782,24 @@
         }
 
         function promptLoadCloudId() {
-            verifyPin(function() {
-                showCustomModal('setup', '☁️ Cloud-ID laden', 'Gib die Cloud-ID ein, die du laden möchtest:', 'Cloud-ID (z.B. JB-XXXX)...');
-                modalCallback = function(succ, enteredId) {
-                    if (succ && enteredId) {
-                        enteredId = enteredId.trim().toUpperCase();
-                        let saved = localStorage.getItem('jackBeatLab_' + enteredId);
-                        if (saved) {
-                            localStorage.setItem('jackBeatLab_lastId', enteredId);
-                            loadGame();
-                            showInfoModal('✅ Erfolg', 'Spielstand erfolgreich geladen!');
-                        } else {
-                            showInfoModal('❌ Fehler', 'Kein Spielstand unter dieser Cloud-ID gefunden.');
-                        }
+            showCustomModal('setup', '☁️ Cloud-ID laden', 'Gib die Cloud-ID ein, die du laden möchtest:', 'Cloud-ID (z.B. JB-XXXX)...');
+            modalCallback = function(succ, enteredId) {
+                if (succ && enteredId) {
+                    enteredId = enteredId.trim().toUpperCase();
+                    let saved = localStorage.getItem('jackBeatLab_' + enteredId);
+                    if (saved) {
+                        localStorage.setItem('jackBeatLab_lastId', enteredId);
+                        loadGame();
+                        showInfoModal('✅ Erfolg', 'Spielstand erfolgreich geladen!');
+                    } else {
+                        showInfoModal('❌ Fehler', 'Kein Spielstand unter dieser Cloud-ID gefunden.');
                     }
-                };
-            });
+                }
+            };
         }
 
         function confirmResetGame() {
-            verifyPin(function() {
+            verifyPinForAction(function() {
                 let resetBtnHtml = `<button onclick="executeReset()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🗑️ Ja, Beat-Lab wirklich zurücksetzen</button>`;
                 showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du dein "Beat-Lab" wirklich komplett zurücksetzen?', resetBtnHtml);
             });
@@ -893,7 +815,6 @@
         }
 
         function clickBeat() {
-            if (!isAdminLoggedIn) return;
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
             playRockSynth(); 
@@ -902,7 +823,6 @@
         }
 
         function buyUpgrade(type) {
-            if (!isAdminLoggedIn) return;
             let cost = 0;
             if (type === 'mic') cost = Math.floor(15 * Math.pow(1.15, gameData.mic));
             if (type === 'synth') cost = Math.floor(100 * Math.pow(1.15, gameData.synth));
@@ -956,7 +876,6 @@
         }
 
         setInterval(function() {
-            if (!isAdminLoggedIn) return;
             let bps = getBps();
             if (bps > 0) {
                 gameData.beats += bps / 10;
@@ -975,12 +894,11 @@
         }, 100);
 
         setInterval(function() { 
-            if (isAdminLoggedIn) saveGame(); 
+            saveGame(); 
         }, 5000);
 
         window.addEventListener('load', function() {
             loadGame();
-            checkAndSetupPinOnce();
             let savedView = localStorage.getItem('jackCurrentView') || 'home';
             switchView(savedView);
             if (localStorage.getItem('streamPlaying') === 'true' && audio) {
