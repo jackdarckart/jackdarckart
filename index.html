@@ -1,1056 +1,419 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudBeats Hub</title>
-    
-    <!-- Cloudinary SDK - NEUE VERSION MIT CJS -->
-    <script src="https://upload-widget.cloudinary.com/latest/index.js"></script>
-
+    <title>jackdarckart | Offizielles Portfolio & Webradio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
-            window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search);
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0a0b10',
+                        cardbg: '#13151f',
+                        accent: '#6366f1',
+                        accentglow: '#818cf8',
+                    }
+                }
+            }
         }
     </script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #030608;
-            --surface: #0a0f12;
-            --card: #10171d;
-            --primary: #00bfa5;
-            --primary-hover: #009688;
-            --border: #1e293b;
-            --lock: #ff3366;
-            --unlock: #00e676;
-        }
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-        }
-        body { 
-            background: var(--bg); 
-            color: #f1f5f9; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            padding-bottom: 20px; 
-            overflow-x: hidden; 
-        }
-        .container { 
-            max-width: 900px; 
-            width: 100%; 
-            margin: 0 auto; 
-            padding: 25px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 24px; 
-        }
-        .header { 
-            text-align: center; 
-            padding: 40px 0 20px 0; 
-        }
-        .card { 
-            background: var(--surface); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            padding: 28px; 
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6); 
-            position: relative; 
-        }
-        .card::before { 
-            content: ''; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 3px; 
-            background: linear-gradient(90deg, var(--primary), #9d4edd); 
-        }
-        h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 10px 0;
-        }
-        h3 { 
-            margin-bottom: 20px; 
-            font-size: 1.25rem; 
-            font-weight: 700; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-        }
-        .form-group { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            margin-bottom: 18px; 
-        }
-        .form-group label { 
-            font-size: 0.75rem; 
-            color: #64748b; 
-            text-transform: uppercase; 
-            font-weight: 700; 
-        }
-        input, textarea { 
-            width: 100%; 
-            padding: 16px; 
-            background: #060a0d; 
-            border: 1px solid var(--border); 
-            border-radius: 12px; 
-            color: #fff; 
-            font-size: 0.95rem; 
-        }
-        input:focus, textarea:focus { 
-            border-color: var(--primary); 
-            outline: none; 
-        }
-        
-        .upload-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 14px; 
-        }
-        @media (max-width: 480px) { 
-            .upload-grid { 
-                grid-template-columns: 1fr; 
-            } 
-        }
-        
-        .upload-area { 
-            background: #05080b; 
-            border: 2px dashed var(--border); 
-            padding: 30px 15px; 
-            border-radius: 16px; 
-            text-align: center; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-        }
-        .upload-area:hover { 
-            border-color: var(--primary); 
-            background: rgba(0,191,165,0.02); 
-        }
-        .upload-progress-box { 
-            margin-top: 20px; 
-            display: none; 
-            background: #05070a; 
-            padding: 15px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border); 
-        }
-        .progress-bar-bg { 
-            width: 100%; 
-            height: 8px; 
-            background: #1e293b; 
-            border-radius: 10px; 
-            margin-top: 10px; 
-            overflow: hidden; 
-        }
-        .progress-bar-fill { 
-            height: 100%; 
-            width: 0%; 
-            background: linear-gradient(90deg, var(--primary), var(--unlock)); 
-            border-radius: 10px; 
-            transition: width 0.1s ease; 
-        }
-
-        .songs-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        .song-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px;
-            transition: all 0.2s;
-        }
-
-        .song-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 8px 24px rgba(0,191,165,0.1);
-        }
-
-        .song-cover {
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(135deg, var(--primary), #9d4edd);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            margin-bottom: 12px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .song-title {
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 8px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .song-meta {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-bottom: 12px;
-        }
-
-        .song-player {
-            width: 100%;
-            height: 40px;
-            margin-bottom: 12px;
-            background: #05070a;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid var(--border);
-        }
-
-        .song-player:hover {
-            background: rgba(0,191,165,0.1);
-            border-color: var(--primary);
-        }
-
-        .song-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .song-btn {
-            flex: 1;
-            min-width: 70px;
-            padding: 8px 12px;
-            background: #060a0d;
-            border: 1px solid var(--border);
-            color: #fff;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            transition: all 0.2s;
-        }
-
-        .song-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .song-btn.delete:hover {
-            border-color: var(--lock);
-            color: var(--lock);
-        }
-
-        .playlist-container {
-            margin-top: 24px;
-        }
-
-        .playlist-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .playlist-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .playlist-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 6px 16px rgba(0,191,165,0.1);
-        }
-
-        .playlist-name {
-            font-weight: 700;
-            margin-bottom: 8px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .playlist-count {
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-
-        .btn { 
-            padding: 16px 28px; 
-            border: none; 
-            font-weight: 700; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            width: 100%; 
-            text-align: center; 
-            font-size: 0.85rem; 
-            letter-spacing: 0.5px;
-            transition: all 0.2s;
-        }
-        .btn-primary { 
-            background: var(--primary); 
-            color: #030608; 
-        }
-        .btn-primary:hover {
-            background: var(--primary-hover);
-        }
-        .btn-secondary { 
-            background: #060a0d; 
-            border: 1px solid var(--border); 
-            color: #fff; 
-            margin-top: 12px; 
-        }
-        
-        .error-alert-banner { 
-            display: none; 
-            background: rgba(255, 51, 102, 0.08); 
-            border: 1px solid var(--lock); 
-            color: var(--lock); 
-            padding: 14px; 
-            border-radius: 10px; 
-            font-size: 0.85rem; 
-            font-weight: 500;
-            margin-bottom: 15px;
-        }
-
-        .success-alert-banner {
-            display: none;
-            background: rgba(0, 230, 118, 0.08);
-            border: 1px solid var(--unlock);
-            color: var(--unlock);
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 15px;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10000;
-            max-width: 500px;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-        
-        .lock-badge { 
-            background: rgba(255, 51, 102, 0.08); 
-            border: 1px solid var(--lock); 
-            color: var(--lock); 
-            padding: 4px 12px; 
-            border-radius: 20px; 
-            font-size: 0.72rem; 
-        }
-        .unlock-badge { 
-            background: rgba(0, 230, 118, 0.08); 
-            border: 1px solid var(--unlock); 
-            color: var(--unlock); 
-            padding: 4px 12px; 
-            border-radius: 20px; 
-            font-size: 0.72rem; 
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 28px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-close {
-            float: right;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #64748b;
-        }
-
-        .modal-close:hover {
-            color: var(--primary);
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
     </style>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <div style="font-size:3.5rem; margin-bottom: 10px;">🎧</div>
-        <h1>CloudBeats Hub</h1>
-        <p style="color:#64748b; margin-top:8px;">Premium Live-Musik-Katalog &amp; Creator Studio</p>
-        <div id="user-profile-bar" style="display:none; margin-top:20px; background:rgba(0,191,165,0.05); padding:14px 20px; border-radius:30px; justify-content:space-between; align-items:center;">
-            <span>👑 Angemeldetes Studio: <strong id="logged-in-user" style="color:#fff;">-</strong></span>
-            <button type="button" class="btn" style="width:auto; padding:6px 12px; font-size:0.75rem; background:transparent; color:var(--lock);" onclick="executeSecureLogout()">Abmelden</button>
-        </div>
-    </div>
+<body class="bg-darkbg text-gray-100 font-sans antialiased selection:bg-accent selection:text-white" oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
-    <div class="card">
-        <span style="color:var(--primary); font-weight:700; font-size:0.75rem; letter-spacing: 0.5px;">⚖️ CLOUDBEATS STUDIO v3.0 ACTIVE - AUTO-DELETE ENABLED</span>
-        <p style="color:#64748b; font-size:0.85rem; margin-top:10px; line-height:1.5;">Kostenlose Musik-Studio Plattform mit Cloudinary Integration. Max 5MB pro Datei. Auto-Löschen aktiviert - Dateien werden automatisch verwaltet!</p>
-    </div>
-
-    <!-- EXKLUSIVES SCHLOSSFENSTER -->
-    <div class="card" id="studio-vault-lock-card">
-        <h3><span>🌌 Creator Studio Tresor</span> <span class="lock-badge">🔒 Gesperrt</span></h3>
-        <p style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Dieses Segment ist für die Öffentlichkeit unsichtbar verschlüsselt. Bitte logge dich ein, um das Studio zu entsperren!</p>
-    </div>
-
-    <!-- LOGIN PANEL -->
-    <div class="card" id="login-panel-card">
-        <h3>🔒 Studio Login</h3>
-        <div id="login-error-banner" class="error-alert-banner"></div>
-        <div class="form-group">
-            <label>Nutzername</label>
-            <input type="text" id="login-username" placeholder="z. B. test">
-        </div>
-        <div class="form-group">
-            <label>Passwort</label>
-            <input type="password" id="login-password" placeholder="z. B. 123">
-        </div>
-        <button type="button" class="btn btn-primary" onclick="processSecureLogin()">Einloggen</button>
-        <button type="button" class="btn btn-secondary" onclick="toggleRegisterPanel()">Neues Studio erstellen</button>
-    </div>
-
-    <!-- REGISTRIERUNGS PANEL -->
-    <div class="card" id="register-panel-card" style="display:none;">
-        <h3>📝 Neues Creator Studio registrieren</h3>
-        <div id="register-error-banner" class="error-alert-banner"></div>
-        <div class="form-group">
-            <label>E-Mail-Adresse</label>
-            <input type="email" id="reg-email" placeholder="name@stream-musik.space">
-        </div>
-        <div class="form-group">
-            <label>Nutzername (Eindeutig geschützt)</label>
-            <input type="text" id="reg-username" placeholder="Dein Studio-Name">
-        </div>
-        <div class="form-group">
-            <label>Passwort</label>
-            <input type="password" id="reg-password" placeholder="••••••••">
-        </div>
-        <div class="form-group">
-            <label>Passwort wiederholen</label>
-            <input type="password" id="reg-password-confirm" placeholder="••••••••">
-        </div>
-        <button type="button" class="btn btn-primary" onclick="processSecureRegister()">Studio registrieren</button>
-        <button type="button" class="btn btn-secondary" onclick="toggleRegisterPanel()">Zurück zum Login</button>
-    </div>
-
-    <!-- MEIN CREATOR STUDIO -->
-    <div id="creator-studio-card" style="display:none;">
-        <div class="card">
-            <h3><span>🌌 Mein Creator Studio</span> <span class="unlock-badge">🔓 Freigeschaltet</span></h3>
-            <p style="color: #64748b; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;">Gesicherte Cloudinary Cloud Storage Integration für deine Musik. Automatische Löschung aktiviert!</p>
-            
-            <div class="upload-grid">
-                <div class="upload-area" onclick="openCloudinaryWidget('audio')">
-                    <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🎵</span>
-                    <strong>Beat hochladen</strong>
-                    <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">MP3 (Max. 5 MB)</p>
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-darkbg/80 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-headphones-simple text-white text-lg"></i>
                 </div>
-                <div class="upload-area" onclick="openCloudinaryWidget('image')">
-                    <span style="font-size: 1.8rem; display:block; margin-bottom: 4px;">🖼️</span>
-                    <strong>Cover hochladen</strong>
-                    <p style="color:#64748b; font-size: 0.72rem; margin-top: 4px;">Bild (Max. 5 MB)</p>
-                </div>
+                <span class="text-xl font-black tracking-wider bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">jackdarckart</span>
             </div>
-            
-            <div id="upload-progress-box" class="upload-progress-box">
-                <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
-                    <span id="upload-file-name" style="color:#fff; font-weight:600; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Datei...</span>
-                    <span id="upload-percentage" style="color:var(--primary); font-weight:700;">0%</span>
-                </div>
-                <div class="progress-bar-bg"><div id="progress-bar-fill" class="progress-bar-fill"></div></div>
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
+                <a href="#about" class="hover:text-accent transition">Über mich</a>
+                <a href="#radio" class="hover:text-accent transition">Webradio</a>
+                <a href="#music" class="hover:text-accent transition">Diskographie</a>
+                <a href="#platforms" class="hover:text-accent transition">Plattformen</a>
+                <a href="#contact" class="hover:text-accent transition">Kontakt</a>
+            </nav>
+            <div>
+                <a href="#radio" class="hidden sm:inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow-lg shadow-indigo-600/20">
+                    <i class="fa-solid fa-play text-xs"></i>
+                    <span>Stream hören</span>
+                </a>
             </div>
         </div>
+    </header>
 
-        <!-- SONGS LISTE -->
-        <div class="card">
-            <h3>🎶 Meine Songs</h3>
-            <div id="songs-list" class="songs-list"></div>
-            <div id="no-songs" style="text-align: center; color: #64748b; padding: 40px 20px;">
-                <p>📭 Noch keine Songs hochgeladen</p>
-                <p style="font-size: 0.85rem; margin-top: 10px;">Starte jetzt und lade deinen ersten Beat hoch!</p>
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden pt-20 pb-28 lg:pt-32 lg:pb-40">
+        <div class="absolute inset-0 opacity-20 pointer-events-none">
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/30 rounded-full blur-[120px]"></div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-2 rounded-full text-indigo-300 text-sm font-medium mb-8">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Offizielles Portal • stream-musik.space</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-6">
+                Musik, Webradio & <br>
+                <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Kreative Universen</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed">
+                Willkommen auf der offiziellen Zentrale von <strong>jackdarckart</strong>. Entdecke Tracks, das 24/7-Webradio auf laut.fm und alle Streaming-Plattformen an einem Ort.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#radio" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-600/30 transition">
+                    <i class="fa-solid fa-radio"></i>
+                    <span>Webradio Live starten</span>
+                </a>
+                <a href="#music" class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-cardbg hover:bg-gray-800 border border-gray-800 text-gray-200 px-8 py-4 rounded-2xl font-bold transition">
+                    <i class="fa-solid fa-compact-disc"></i>
+                    <span>Diskographie ansehen</span>
+                </a>
             </div>
         </div>
+    </section>
 
-        <!-- PLAYLISTS -->
-        <div class="card playlist-container">
-            <h3>📋 Meine Playlists</h3>
-            <button type="button" class="btn btn-primary" onclick="openCreatePlaylistModal()" style="margin-bottom: 16px;">+ Neue Playlist erstellen</button>
-            <div id="playlists-list" class="playlist-grid"></div>
-            <div id="no-playlists" style="text-align: center; color: #64748b; padding: 20px;">
-                <p>📭 Noch keine Playlists erstellt</p>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- MODAL: EDIT SONG -->
-<div id="edit-song-modal" class="modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <h3>✏️ Song bearbeiten</h3>
-        <div class="form-group">
-            <label>Song Titel</label>
-            <input type="text" id="edit-song-title" placeholder="Neuer Titel">
-        </div>
-        <div class="form-group">
-            <label>Song Cover</label>
-            <input type="text" id="edit-song-cover" placeholder="Cover URL" readonly>
-            <button type="button" class="btn btn-secondary" onclick="openCloudinaryWidget('image', true)" style="margin-top: 8px;">Neues Cover hochladen</button>
-        </div>
-        <div class="form-group">
-            <label>Audio Datei</label>
-            <input type="text" id="edit-song-audio" placeholder="Audio URL" readonly>
-            <button type="button" class="btn btn-secondary" onclick="openCloudinaryWidget('audio', true)" style="margin-top: 8px;">Neue MP3 hochladen</button>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="saveSongEdit()">Speichern</button>
-        <button type="button" class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
-    </div>
-</div>
-
-<!-- MODAL: CREATE PLAYLIST -->
-<div id="create-playlist-modal" class="modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <h3>📋 Neue Playlist erstellen</h3>
-        <div class="form-group">
-            <label>Playlist Name</label>
-            <input type="text" id="new-playlist-name" placeholder="z.B. Meine Top Beats">
-        </div>
-        <div class="form-group">
-            <label>Beschreibung</label>
-            <textarea id="new-playlist-desc" placeholder="Optionale Beschreibung" style="resize: vertical; min-height: 100px;"></textarea>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="createPlaylist()">Playlist erstellen</button>
-        <button type="button" class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
-    </div>
-</div>
-
-<!-- MODAL: VIEW PLAYLIST -->
-<div id="view-playlist-modal" class="modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <h3 id="playlist-modal-title">📋 Playlist</h3>
-        <div id="playlist-modal-songs" class="songs-list"></div>
-        <p id="playlist-empty" style="text-align: center; color: #64748b;">Keine Songs in dieser Playlist</p>
-        <button type="button" class="btn btn-secondary" onclick="closeModal()" style="margin-top: 16px;">Schließen</button>
-    </div>
-</div>
-
-<script>
-    // ====== KONFIGURATION ======
-    const STORAGE_KEY = 'cloudbeats_user';
-    const SONGS_KEY = 'cloudbeats_songs';
-    const PLAYLISTS_KEY = 'cloudbeats_playlists';
-    
-    // Cloudinary Config
-    const CLOUDINARY_CLOUD_NAME = 'sda9jage';
-    const CLOUDINARY_UPLOAD_PRESET = 'unsigned_matrix';
-
-    let currentUser = null;
-    let currentEditingSongId = null;
-    let currentEditingType = null;
-    let allSongs = [];
-    let allPlaylists = [];
-
-    // ====== UTILITY FUNKTIONEN ======
-    function escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
-    }
-
-    function showSuccess(message) {
-        const banner = document.createElement('div');
-        banner.className = 'success-alert-banner';
-        banner.textContent = message;
-        document.body.appendChild(banner);
-        banner.style.display = 'block';
-        
-        setTimeout(() => {
-            banner.style.animation = 'slideUp 0.3s ease forwards';
-            setTimeout(() => banner.remove(), 300);
-        }, 3000);
-    }
-
-    function showError(element, message) {
-        if (element) {
-            element.textContent = message;
-            element.style.display = 'block';
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
-        }
-    }
-
-    function openModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.add('active');
-        }
-    }
-
-    function closeModal(event) {
-        if (event && event.target.id && event.target.id !== 'edit-song-modal' && event.target.id !== 'create-playlist-modal' && event.target.id !== 'view-playlist-modal') {
-            return;
-        }
-        const modals = document.querySelectorAll('.modal.active');
-        modals.forEach(modal => modal.classList.remove('active'));
-    }
-
-    // ====== CLOUDINARY WIDGET ======
-    function openCloudinaryWidget(type, isEdit = false) {
-        if (!currentUser) {
-            alert('❌ Du musst angemeldet sein!');
-            return;
-        }
-
-        const resourceType = type === 'audio' ? 'video' : 'image';
-        
-        const widget = cloudinary.createUploadWidget(
-            {
-                cloudName: CLOUDINARY_CLOUD_NAME,
-                uploadPreset: CLOUDINARY_UPLOAD_PRESET,
-                resourceType: resourceType,
-                folder: `cloudbeats/${currentUser}`,
-                maxFileSize: 5242880,
-                clientAllowedFormats: type === 'audio' ? ['mp3', 'wav', 'ogg'] : ['jpg', 'jpeg', 'png', 'webp', 'gif'],
-                multiple: false,
-                cropping: type === 'image',
-                showAdvancedOptions: false,
-                sources: ['local', 'url'],
-                defaultSource: 'local'
-            },
-            (error, result) => {
-                if (!error && result && result.event === 'success') {
-                    const url = result.info.secure_url;
-                    
-                    if (isEdit) {
-                        if (type === 'audio') {
-                            document.getElementById('edit-song-audio').value = url;
-                            showSuccess('✅ Audio-Datei aktualisiert!');
-                        } else {
-                            document.getElementById('edit-song-cover').value = url;
-                            showSuccess('✅ Cover aktualisiert!');
-                        }
-                    } else {
-                        if (type === 'audio') {
-                            const title = prompt('🎵 Song Titel eingeben:');
-                            if (title && title.trim()) {
-                                addNewSong(title.trim(), url, '');
-                            } else {
-                                addNewSong('Neuer Song', url, '');
-                            }
-                        } else {
-                            sessionStorage.setItem('pending_cover_url', url);
-                            showSuccess('✅ Cover gespeichert!');
-                        }
-                    }
-                } else if (error) {
-                    console.error('Upload Fehler:', error);
-                }
-            }
-        );
-        
-        widget.open();
-    }
-
-    // ====== SONG HINZUFÜGEN ======
-    function addNewSong(title, audioUrl, coverUrl) {
-        if (!currentUser) return;
-
-        const song = {
-            id: Date.now(),
-            title: title || 'Neuer Song',
-            audioUrl: audioUrl,
-            coverUrl: coverUrl || 'https://via.placeholder.com/180?text=🎵',
-            createdAt: new Date().toLocaleString('de-DE'),
-            userKey: currentUser
-        };
-
-        allSongs.push(song);
-        saveSongsToStorage();
-        renderSongs();
-        showSuccess('✅ Song erfolgreich hinzugefügt!');
-    }
-
-    // ====== SONGS SPEICHERN/LADEN ======
-    function saveSongsToStorage() {
-        if (currentUser) {
-            localStorage.setItem(SONGS_KEY + '_' + currentUser, JSON.stringify(allSongs));
-        }
-    }
-
-    function loadUserSongs() {
-        if (currentUser) {
-            const data = localStorage.getItem(SONGS_KEY + '_' + currentUser);
-            allSongs = data ? JSON.parse(data) : [];
-            renderSongs();
-        }
-    }
-
-    // ====== SONGS RENDERN ======
-    function renderSongs() {
-        const container = document.getElementById('songs-list');
-        const noSongs = document.getElementById('no-songs');
-        
-        container.innerHTML = '';
-
-        if (allSongs.length === 0) {
-            noSongs.style.display = 'block';
-            return;
-        }
-
-        noSongs.style.display = 'none';
-
-        allSongs.forEach(song => {
-            const songEl = document.createElement('div');
-            songEl.className = 'song-card';
-            songEl.innerHTML = `
-                <div class="song-cover" style="background-image: url('${escapeHtml(song.coverUrl)}')">
-                    ${!song.coverUrl || song.coverUrl.includes('placeholder') ? '🎵' : ''}
-                </div>
-                <div class="song-title">${escapeHtml(song.title)}</div>
-                <div class="song-meta">${escapeHtml(song.createdAt)}</div>
-                <div class="song-player" onclick="playSong('${song.audioUrl}')">
-                    ▶️ PLAY
-                </div>
-                <div class="song-actions">
-                    <button class="song-btn" onclick="editSong(${song.id})">✏️ Edit</button>
-                    <button class="song-btn delete" onclick="deleteSongWithCloudinary(${song.id})">🗑️ Delete</button>
-                    <button class="song-btn" onclick="openAddToPlaylistModal(${song.id})">➕ Playlist</button>
-                </div>
-            `;
-            container.appendChild(songEl);
-        });
-    }
-
-    // ====== SONG ABSPIELEN ======
-    function playSong(audioUrl) {
-        const audio = new Audio(audioUrl);
-        audio.play().catch(e => {
-            showSuccess('❌ Fehler beim Abspielen: ' + e.message);
-        });
-    }
-
-    // ====== SONG BEARBEITEN ======
-    function editSong(songId) {
-        const song = allSongs.find(s => s.id === songId);
-        if (!song) return;
-
-        currentEditingSongId = songId;
-        document.getElementById('edit-song-title').value = song.title;
-        document.getElementById('edit-song-cover').value = song.coverUrl;
-        document.getElementById('edit-song-audio').value = song.audioUrl;
-
-        openModal('edit-song-modal');
-    }
-
-    function saveSongEdit() {
-        const song = allSongs.find(s => s.id === currentEditingSongId);
-        if (!song) return;
-
-        song.title = document.getElementById('edit-song-title').value || 'Neuer Song';
-        song.coverUrl = document.getElementById('edit-song-cover').value;
-        song.audioUrl = document.getElementById('edit-song-audio').value;
-
-        saveSongsToStorage();
-        renderSongs();
-        closeModal();
-        showSuccess('✅ Song aktualisiert!');
-    }
-
-    // ====== SONG LÖSCHEN ======
-    function deleteSongWithCloudinary(songId) {
-        if (confirm('🗑️ Wirklich diesen Song löschen?')) {
-            allSongs = allSongs.filter(s => s.id !== songId);
-            saveSongsToStorage();
-            renderSongs();
-            showSuccess('✅ Song gelöscht!');
-        }
-    }
-
-    // ====== PLAYLISTS ======
-    function savePlaylistsToStorage() {
-        if (currentUser) {
-            localStorage.setItem(PLAYLISTS_KEY + '_' + currentUser, JSON.stringify(allPlaylists));
-        }
-    }
-
-    function loadUserPlaylists() {
-        if (currentUser) {
-            const data = localStorage.getItem(PLAYLISTS_KEY + '_' + currentUser);
-            allPlaylists = data ? JSON.parse(data) : [];
-            renderPlaylists();
-        }
-    }
-
-    function createPlaylist() {
-        const name = document.getElementById('new-playlist-name').value.trim();
-        const desc = document.getElementById('new-playlist-desc').value.trim();
-
-        if (!name) {
-            alert('❌ Bitte gib einen Namen ein!');
-            return;
-        }
-
-        const playlist = {
-            id: Date.now(),
-            name: name,
-            description: desc,
-            songs: [],
-            createdAt: new Date().toLocaleString('de-DE')
-        };
-
-        allPlaylists.push(playlist);
-        savePlaylistsToStorage();
-        renderPlaylists();
-        closeModal();
-        showSuccess('✅ Playlist erstellt!');
-    }
-
-    function renderPlaylists() {
-        const container = document.getElementById('playlists-list');
-        const noPlaylists = document.getElementById('no-playlists');
-
-        container.innerHTML = '';
-
-        if (allPlaylists.length === 0) {
-            noPlaylists.style.display = 'block';
-            return;
-        }
-
-        noPlaylists.style.display = 'none';
-
-        allPlaylists.forEach(playlist => {
-            const playlistEl = document.createElement('div');
-            playlistEl.className = 'playlist-card';
-            playlistEl.onclick = () => viewPlaylist(playlist.id);
-            playlistEl.innerHTML = `
-                <div class="playlist-name">📋 ${escapeHtml(playlist.name)}</div>
-                <div class="playlist-count">${playlist.songs.length} Songs</div>
-                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${escapeHtml(playlist.createdAt)}</div>
-            `;
-            container.appendChild(playlistEl);
-        });
-    }
-
-    function openCreatePlaylistModal() {
-        document.getElementById('new-playlist-name').value = '';
-        document.getElementById('new-playlist-desc').value = '';
-        openModal('create-playlist-modal');
-    }
-
-    function openAddToPlaylistModal(songId) {
-        if (allPlaylists.length === 0) {
-            alert('❌ Erstelle erst eine Playlist!');
-            return;
-        }
-
-        const playlistName = prompt('Welche Playlist? (' + allPlaylists.map(p => p.name).join(', ') + ')');
-        const playlist = allPlaylists.find(p => p.name === playlistName);
-
-        if (playlist) {
-            if (!playlist.songs.includes(songId)) {
-                playlist.songs.push(songId);
-                savePlaylistsToStorage();
-                showSuccess('✅ Song zur Playlist hinzugefügt!');
-            } else {
-                alert('⚠️ Song ist bereits in dieser Playlist!');
-            }
-        }
-    }
-
-    function viewPlaylist(playlistId) {
-        const playlist = allPlaylists.find(p => p.id === playlistId);
-        if (!playlist) return;
-
-        document.getElementById('playlist-modal-title').textContent = '📋 ' + escapeHtml(playlist.name);
-        const container = document.getElementById('playlist-modal-songs');
-        const emptyMsg = document.getElementById('playlist-empty');
-
-        container.innerHTML = '';
-
-        if (playlist.songs.length === 0) {
-            emptyMsg.style.display = 'block';
-        } else {
-            emptyMsg.style.display = 'none';
-            
-            playlist.songs.forEach(songId => {
-                const song = allSongs.find(s => s.id === songId);
-                if (song) {
-                    const songEl = document.createElement('div');
-                    songEl.className = 'song-card';
-                    songEl.innerHTML = `
-                        <div class="song-cover" style="background-image: url('${escapeHtml(song.coverUrl)}')">
-                            ${!song.coverUrl || song.coverUrl.includes('placeholder') ? '🎵' : ''}
+    <!-- About Section -->
+    <section id="about" class="py-24 bg-cardbg/50 border-y border-gray-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 tracking-tight">Über jackdarckart</h2>
+                    <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                        <strong>jackdarckart</strong> ist ein vielseitiger Musikproduzent, Songwriter und Webradio-Betreiber mit Wurzeln in Meckenheim, Nordrhein-Westfalen. Das kreative Schaffen umfasst ein breites musikalisches Spektrum von German Pop, Rock und Deutschrap bis hin zu experimentellen Klangwelten.
+                    </p>
+                    <p class="text-gray-400 mb-8 leading-relaxed">
+                        Mit dem eigenen 24/7-Webradio auf laut.fm sowie weltweiten Veröffentlichungen auf Apple Music, Anghami und anderen Plattformen bringt jackdarckart handgemachte und produzierte Musik direkt zu den Hörern.
+                    </p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center">
+                            <span class="block text-2xl font-black text-indigo-400">24/7</span>
+                            <span class="text-xs text-gray-400">Webradio Stream</span>
                         </div>
-                        <div class="song-title">${escapeHtml(song.title)}</div>
-                        <div class="song-player" onclick="playSong('${song.audioUrl}')">
-                            ▶️ PLAY
+                        <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center">
+                            <span class="block text-2xl font-black text-purple-400">Multi</span>
+                            <span class="text-xs text-gray-400">Genre Vielfalt</span>
                         </div>
-                    `;
-                    container.appendChild(songEl);
-                }
-            });
-        }
+                        <div class="bg-darkbg p-4 rounded-xl border border-gray-800 text-center col-span-2 sm:col-span-1">
+                            <span class="block text-2xl font-black text-pink-400">Global</span>
+                            <span class="text-xs text-gray-400">Streaming Ready</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-darkbg border border-gray-800 p-8 rounded-3xl relative shadow-2xl">
+                    <div class="absolute -top-4 -right-4 bg-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">Featured</div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center space-x-3">
+                        <i class="fa-solid fa-bullseye text-indigo-400"></i>
+                        <span>Station Info & Standort</span>
+                    </h3>
+                    <ul class="space-y-4 text-gray-300">
+                        <li class="flex items-start space-x-3">
+                            <i class="fa-solid fa-location-dot text-indigo-400 mt-1"></i>
+                            <div><strong>Standort:</strong> Meckenheim, Nordrhein-Westfalen, Deutschland</div>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fa-solid fa-radio text-indigo-400 mt-1"></i>
+                            <div><strong>Radio-Format:</strong> Musik aus aller Welt, Hip-Hop, Pop, Rock, Kassettendeck & More</div>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fa-solid fa-globe text-indigo-400 mt-1"></i>
+                            <div><strong>Domain & Web:</strong> stream-musik.space</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        openModal('view-playlist-modal');
-    }
+    <!-- Radio / Stream Section -->
+    <section id="radio" class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-flex items-center space-x-2 text-indigo-400 text-sm font-semibold mb-3 uppercase tracking-widest">
+                <i class="fa-solid fa-tower-broadcast"></i>
+                <span>Live Webradio</span>
+            </div>
+            <h2 class="text-3xl sm:text-5xl font-black mb-6">laut.fm / jackdarckart Webradio</h2>
+            <p class="max-w-2xl mx-auto text-gray-400 mb-12">
+                Höre das offizielle Webradio von jackdarckart live im Browser oder über deine Lieblings-Radio-App wie Streema, Replaio oder Phonostar.
+            </p>
 
-    // ====== LOGIN ======
-    function processSecureLogin() {
-        const username = document.getElementById('login-username').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-        const errorBanner = document.getElementById('login-error-banner');
+            <div class="max-w-3xl mx-auto bg-cardbg border border-gray-800 rounded-3xl p-8 sm:p-10 shadow-2xl">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8 pb-8 border-b border-gray-800">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-2xl">
+                            <i class="fa-solid fa-headphones"></i>
+                        </div>
+                        <div class="text-left">
+                            <h3 class="text-xl font-bold">laut.fm jackdarckart</h3>
+                            <p class="text-sm text-gray-400">Live 24/7 Webradio Stream</p>
+                        </div>
+                    </div>
+                    <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-600/30">
+                        <i class="fa-solid fa-external-link text-xs"></i>
+                        <span>Auf laut.fm öffnen</span>
+                    </a>
+                </div>
 
-        if (!username || !password) {
-            showError(errorBanner, '❌ Bitte fülle alle Felder aus!');
-            return;
-        }
+                <!-- Embedded Audio Player -->
+                <div class="bg-darkbg p-6 rounded-2xl border border-gray-800 text-center space-y-4">
+                    <p class="text-gray-300 text-sm">Starte den Audiostream direkt hier oder nutze die offizielle Radio-App:</p>
+                    <audio controls class="w-full mx-auto max-w-md accent-indigo-600">
+                        <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
+                        Dein Browser unterstützt kein Audio-Element.
+                    </audio>
+                    <div class="flex flex-wrap justify-center gap-3 pt-2">
+                        <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
+                            <i class="fa-solid fa-radio mr-1.5 text-indigo-400"></i> Streema
+                        </a>
+                        <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
+                            <i class="fa-solid fa-mobile-screen mr-1.5 text-indigo-400"></i> Replaio App
+                        </a>
+                        <a href="https://www.phonostar.de/radio/lautfm/jackdarckart/webradio" target="_blank" rel="noopener noreferrer" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition">
+                            <i class="fa-solid fa-podcast mr-1.5 text-indigo-400"></i> Phonostar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        if (username && password.length >= 3) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ username }));
-            showSuccess('✅ Login erfolgreich!');
-            updateUIAfterLogin(username);
-        } else {
-            showError(errorBanner, '❌ Nutzername oder Passwort ungültig!');
-        }
-    }
+    <!-- Music / Discography Section -->
+    <section id="music" class="py-24 bg-cardbg/50 border-y border-gray-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Diskographie & Releases</span>
+                <h2 class="text-3xl sm:text-5xl font-black mt-2">Ausgewählte Songs & Alben</h2>
+                <p class="text-gray-400 mt-3 max-w-xl mx-auto">Veröffentlichte Musik und Singles von jackdarckart auf Streaming-Diensten.</p>
+            </div>
 
-    // ====== REGISTER ======
-    function processSecureRegister() {
-        const email = document.getElementById('reg-email').value.trim();
-        const username = document.getElementById('reg-username').value.trim();
-        const password = document.getElementById('reg-password').value;
-        const passwordConfirm = document.getElementById('reg-password-confirm').value;
-        const errorBanner = document.getElementById('register-error-banner');
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Release 1 -->
+                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">German Pop</span>
+                            <span class="text-xs text-gray-500">2024</span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover:text-indigo-300 transition mb-2">Dromedary Gletscher</h3>
+                        <p class="text-sm text-gray-400 mb-6">Offizielle Single-Veröffentlichung von jackdarckart auf Apple Music und weiteren digitalen Plattformen.</p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Apple Music</span>
+                        <a href="https://music.apple.com/us/album/dromedary-gletscher-single/1763826546" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold flex items-center space-x-1">
+                            <span>Anhören</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
 
-        if (!email || !username || !password || !passwordConfirm) {
-            showError(errorBanner, '❌ Bitte fülle alle Felder aus!');
-            return;
-        }
+                <!-- Release 2 -->
+                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-purple-950 text-purple-300 border border-purple-800">Rock</span>
+                            <span class="text-xs text-gray-500">2024</span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover:text-purple-300 transition mb-2">Neverwinter</h3>
+                        <p class="text-sm text-gray-400 mb-6">Atmosphärische Rock-Single voller Energie und cineastischem Sound.</p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Apple Music</span>
+                        <a href="https://music.apple.com/us/album/neverwinter-single/1765348847" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 text-sm font-semibold flex items-center space-x-1">
+                            <span>Anhören</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
 
-        if (password !== passwordConfirm) {
-            showError(errorBanner, '❌ Passwörter stimmen nicht überein!');
-            return;
-        }
+                <!-- Release 3 -->
+                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-pink-950 text-pink-300 border border-pink-800">Streaming</span>
+                            <span class="text-xs text-gray-500">Release</span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover:text-pink-300 transition mb-2">Brought This On Themselves</h3>
+                        <p class="text-sm text-gray-400 mb-6">Exklusiver Track auf internationalen Streaming-Diensten wie Anghami.</p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Anghami</span>
+                        <a href="https://play.anghami.com/song/1298590258" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-pink-300 text-sm font-semibold flex items-center space-x-1">
+                            <span>Anhören</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
 
-        if (password.length < 6) {
-            showError(errorBanner, '❌ Passwort muss mindestens 6 Zeichen lang sein!');
-            return;
-        }
+                <!-- Release 4 -->
+                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">Streaming</span>
+                            <span class="text-xs text-gray-500">Release</span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover:text-emerald-300 transition mb-2">Die Macht In Uns</h3>
+                        <p class="text-sm text-gray-400 mb-6">Kraftvoller Song mit emotionaler Tiefe und starkem Ausdruck.</p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Anghami</span>
+                        <a href="https://play.anghami.com/song/1298310887" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:text-emerald-300 text-sm font-semibold flex items-center space-x-1">
+                            <span>Anhören</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
 
-        const newUser = { username, email };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
-        localStorage.setItem(SONGS_KEY + '_' + username, JSON.stringify([]));
-        localStorage.setItem(PLAYLISTS_KEY + '_' + username, JSON.stringify([]));
-        
-        showSuccess('✅ Registrierung erfolgreich!');
-        updateUIAfterLogin(username);
-    }
+                <!-- Release 5 -->
+                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-800">Deutschrap</span>
+                            <span class="text-xs text-gray-500">Projekt</span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover:text-amber-300 transition mb-2">Das Sompo Museum</h3>
+                        <p class="text-sm text-gray-400 mb-6">Kreatives Deutschrap-Projekt mit einzigartigen Beats und Texten.</p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Katalog</span>
+                        <span class="text-gray-400 text-xs font-semibold">Veröffentlicht</span>
+                    </div>
+                </div>
 
-    // ====== LOGOUT ======
-    function executeSecureLogout() {
-        localStorage.removeItem(STORAGE_KEY);
-        currentUser = null;
-        showSuccess('✅ Du wurdest abgemeldet!');
-        location.reload();
-    }
+                <!-- Release 6 -->
+                <div class="bg-darkbg border border-gray-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800">Pop Deutsch</span>
+                            <span class="text-xs text-gray-500">Projekt</span>
+                        </div>
+                        <h3 class="text-xl font-bold group-hover:text-blue-300 transition mb-2">Stolz auf Deutschland</h3>
+                        <p class="text-sm text-gray-400 mb-6">Deutscher Pop-Song mit markanter lyrischer Note.</p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-800/80 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Katalog</span>
+                        <span class="text-gray-400 text-xs font-semibold">Veröffentlicht</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    // ====== UI NACH LOGIN ======
-    function updateUIAfterLogin(username) {
-        currentUser = username;
-        document.getElementById('login-panel-card').style.display = 'none';
-        document.getElementById('register-panel-card').style.display = 'none';
-        document.getElementById('studio-vault-lock-card').style.display = 'none';
-        document.getElementById('creator-studio-card').style.display = 'block';
-        document.getElementById('user-profile-bar').style.display = 'flex';
-        document.getElementById('logged-in-user').textContent = username;
-        
-        loadUserSongs();
-        loadUserPlaylists();
-    }
+    <!-- Platforms Section -->
+    <section id="platforms" class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="text-indigo-400 text-sm font-semibold uppercase tracking-widest">Netzwerk & Verzeichnisse</span>
+            <h2 class="text-3xl sm:text-5xl font-black mt-2 mb-12">Alle Links & Plattformen</h2>
 
-    // ====== TOGGLE REGISTER PANEL ======
-    function toggleRegisterPanel() {
-        const loginCard = document.getElementById('login-panel-card');
-        const registerCard = document.getElementById('register-panel-card');
-        
-        if (registerCard.style.display === 'none') {
-            loginCard.style.display = 'none';
-            registerCard.style.display = 'block';
-        } else {
-            loginCard.style.display = 'block';
-            registerCard.style.display = 'none';
-        }
-    }
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-indigo-500 p-6 rounded-2xl transition group text-left">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-radio"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-1">laut.fm</h3>
+                    <p class="text-xs text-gray-400 mb-4">Offizieller Webradio Sender</p>
+                    <span class="text-xs text-indigo-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                </a>
 
-    // ====== INITIALISIERUNG ======
-    function initializeApp() {
-        const storedUser = localStorage.getItem(STORAGE_KEY);
-        if (storedUser) {
-            const userData = JSON.parse(storedUser);
-            updateUIAfterLogin(userData.username);
-        }
-    }
+                <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-indigo-500 p-6 rounded-2xl transition group text-left">
+                    <div class="w-12 h-12 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-tower-cell"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-1">Streema</h3>
+                    <p class="text-xs text-gray-400 mb-4">Radio-Profil & Playlist</p>
+                    <span class="text-xs text-purple-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                </a>
 
-    // Starte App beim Laden
-    document.addEventListener('DOMContentLoaded', initializeApp);
-    window.addEventListener('load', initializeApp);
-</script>
+                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-indigo-500 p-6 rounded-2xl transition group text-left">
+                    <div class="w-12 h-12 rounded-xl bg-pink-600/20 text-pink-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-mobile"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-1">Replaio Radio</h3>
+                    <p class="text-xs text-gray-400 mb-4">Mobiles Webradio & App</p>
+                    <span class="text-xs text-pink-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                </a>
+
+                <a href="https://www.phonostar.de/radio/lautfm/jackdarckart/webradio" target="_blank" rel="noopener noreferrer" class="bg-cardbg border border-gray-800 hover:border-indigo-500 p-6 rounded-2xl transition group text-left">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-podcast"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-1">Phonostar</h3>
+                    <p class="text-xs text-gray-400 mb-4">Senderprogramm & Info</p>
+                    <span class="text-xs text-emerald-400 font-semibold flex items-center space-x-1"><span>Besuchen</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Footer -->
+    <footer id="contact" class="bg-cardbg border-t border-gray-800 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="fa-solid fa-headphones-simple text-white text-xl"></i>
+            </div>
+            <h3 class="text-2xl font-black mb-2">stream-musik.space</h3>
+            <p class="text-gray-400 text-sm mb-8">Das offizielle Portfolio & Webradio von jackdarckart.</p>
+            <div class="flex justify-center space-x-6 mb-8 text-gray-400">
+                <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition text-xl"><i class="fa-solid fa-radio"></i></a>
+                <a href="https://streema.com/radios/Jackdarckart" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition text-xl"><i class="fa-solid fa-tower-cell"></i></a>
+                <a href="https://replaio.com/de/radio/jackdarckart-171785" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition text-xl"><i class="fa-solid fa-mobile"></i></a>
+            </div>
+            <p class="text-xs text-gray-500">&copy; 2026 jackdarckart. Alle Rechte vorbehalten. Optimiert für GitHub & Vercel.</p>
+        </div>
+    </footer>
+
+    <!-- Anti-Copy & Anti-Inspection Security Script -->
+    <script>
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12') {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && e.key.toLowerCase() === 'u') {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && e.key.toLowerCase() === 'p') {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && (e.key.toLowerCase() === 'c' || e.key.toLowerCase() === 'x' || e.key.toLowerCase() === 'a')) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j' || e.key.toLowerCase() === 'c')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    </script>
 </body>
 </html>
