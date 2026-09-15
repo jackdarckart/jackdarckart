@@ -338,7 +338,7 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (PIN-Geschützt)</span>
+                <span>Exklusives Studio-Minigame (PIN-Gesichert)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
             <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße druckvolle, rockige Synth-Riffs und Power-Chords!</p>
@@ -562,7 +562,7 @@
         let pendingNewEmail = '';
         let pendingVerificationCode = '';
 
-        // --- ROBUUSTER AUDIO-CONTEXT & ROCK-SYNTHESIZER ---
+        // --- STABILER AUDIO-KONTEXT & ROCK-SYNTHESIZER ---
         let audioCtx = null;
         let ambientTimer = 0;
 
@@ -577,13 +577,14 @@
             return audioCtx;
         }
 
-        // Globaler Klick-Listener zum Entsperren des Audio-Kontexts bei der ersten Interaktion
-        document.addEventListener('click', function() {
-            const ctx = getAudioContext();
-            if (ctx && ctx.state === 'suspended') {
-                ctx.resume();
-            }
-        }, { once: true });
+        // Globaler Aktivierungs-Listener für Audio
+        ['click', 'touchstart', 'keydown'].forEach(evt => {
+            document.addEventListener(evt, function() {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }, { passive: true });
+        });
 
         function playRockSynth() {
             try {
@@ -703,7 +704,7 @@
             closeCustomModal(true, val);
         }
 
-        // --- ADMIN LOGIN / LOGOUT TOGGLE & UI SCHUTZ ---
+        // --- STABILE ADMIN-AUTHENTIFIZIERUNG ---
         function toggleAdminAuth() {
             if (isAdminLoggedIn) {
                 isAdminLoggedIn = false;
@@ -714,7 +715,7 @@
                 showCustomModal('pin', '🔑 Admin Anmelden', 'Bitte gib deinen Master-PIN ein, um das Spiel zu entsperren:', 'Master-PIN eingeben...');
                 modalCallback = function(success, enteredPin) {
                     if (!success) return;
-                    let pin = localStorage.getItem('jackAdminPin');
+                    let pin = localStorage.getItem('jackAdminPin') || '1234';
                     let tempPin = localStorage.getItem('jackTempPin');
 
                     if (enteredPin === pin || (tempPin && enteredPin === tempPin)) {
@@ -724,7 +725,6 @@
                         isAdminLoggedIn = true;
                         localStorage.setItem('jackAdminLoggedIn', 'true');
                         updateAdminAuthUI();
-                        showInfoModal('✅ Angemeldet', 'Spiel erfolgreich entsperrt!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                     } else {
                         showInfoModal('❌ Zugriff verweigert', 'Falscher PIN! Zugriff verweigert.');
                     }
@@ -769,65 +769,23 @@
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
-                startPinEmailSetupWizard();
-            } else {
-                updateAdminAuthUI();
+                localStorage.setItem('jackAdminPin', '1234');
+                localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
             }
-        }
-
-        function startPinEmailSetupWizard() {
-            showCustomModal('setup', '🔒 Neuer Master-PIN', 'Lege deinen geheimen Master-PIN fest:', 'Neuen PIN eingeben...', false);
-            modalCallback = function(success, pinVal) {
-                if (!success || !pinVal) {
-                    localStorage.setItem('jackAdminPin', '1234');
-                    localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                    isAdminLoggedIn = true;
-                    localStorage.setItem('jackAdminLoggedIn', 'true');
-                    updateAdminAuthUI();
-                    showInfoModal('⚠️ Hinweis', 'Standard-PIN \'1234\' wurde gesetzt.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                    return;
-                }
-                pendingNewPin = pinVal;
-
-                setTimeout(() => {
-                    showCustomModal('setup', '📧 E-Mail-Adresse', 'Gib deine E-Mail-Adresse für den Bestätigungscode ein:', 'Deine E-Mail-Adresse...', false);
-                    modalCallback = function(succ2, emailVal) {
-                        if (!succ2 || !emailVal) {
-                            localStorage.setItem('jackAdminPin', pendingNewPin);
-                            localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
-                            isAdminLoggedIn = true;
-                            localStorage.setItem('jackAdminLoggedIn', 'true');
-                            updateAdminAuthUI();
-                            showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                            return;
-                        }
-                        pendingNewEmail = emailVal;
-
-                        pendingVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-                        setTimeout(() => {
-                            showCustomModal('setup', '🔑 Bestätigungscode eingeben', `Ein Code wurde an "${pendingNewEmail}" gesendet.\n\n(Dein Code lautet: ${pendingVerificationCode})\n\nGib den 6-stelligen Code hier ein:`, '6-stelliger Code...', false);
-                            modalCallback = function(succ3, codeInput) {
-                                if (succ3 && codeInput && codeInput.trim() === pendingVerificationCode) {
-                                    localStorage.setItem('jackAdminPin', pendingNewPin);
-                                    localStorage.setItem('jackAdminEmail', pendingNewEmail);
-                                    isAdminLoggedIn = true;
-                                    localStorage.setItem('jackAdminLoggedIn', 'true');
-                                    updateAdminAuthUI();
-                                    showInfoModal('✅ Erfolgreich', 'Master-PIN und E-Mail wurden erfolgreich verifiziert und gespeichert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                                } else {
-                                    showInfoModal('❌ Falscher Code', 'Der eingegebene Bestätigungscode war leider falsch. Bitte starte den PIN-Wechsel erneut.');
-                                }
-                            };
-                        }, 300);
-                    };
-                }, 300);
-            };
+            // Übernehme den gespeicherten Login-Status dauerhaft
+            isAdminLoggedIn = localStorage.getItem('jackAdminLoggedIn') === 'true';
+            updateAdminAuthUI();
         }
 
         function changeAdminPin() {
             verifyPin(function() {
-                startPinEmailSetupWizard();
+                showCustomModal('setup', '🔒 Neuer Master-PIN', 'Lege deinen neuen Master-PIN fest:', 'Neuer PIN...', false);
+                modalCallback = function(succ, newPin) {
+                    if (succ && newPin) {
+                        localStorage.setItem('jackAdminPin', newPin);
+                        showInfoModal('✅ Gespeichert', 'Dein Master-PIN wurde erfolgreich aktualisiert.');
+                    }
+                };
             });
         }
 
@@ -841,30 +799,12 @@
         }
 
         function startForgotPinProcess() {
-            showCustomModal('forgot', '📧 PIN Wiederherstellung', 'Gib deine hinterlassene E-Mail-Adresse ein, um einen temporären PIN zu generieren:', 'E-Mail eingeben...');
-            modalCallback = function(succ, emailInput) {
-                if (!succ || !emailInput) return;
-                let savedEmail = localStorage.getItem('jackAdminEmail');
-
-                if (!savedEmail || emailInput.trim().toLowerCase() !== savedEmail.toLowerCase()) {
-                    let setupBtnHtml = `<button onclick="runSetupWizardFromButton()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">⚙️ E-Mail jetzt im Admin-Bereich einrichten</button>`;
-                    showInfoModal('❌ E-Mail nicht gefunden', 'Es wurde keine passende E-Mail-Adresse für die Wiederherstellung gefunden. Bitte richten Sie zuerst Ihren Master-PIN und E-Mail im Admin-Bereich ein.', setupBtnHtml);
-                    return;
-                }
-
-                let tempPin = 'TMP-' + Math.floor(1000 + Math.random() * 9000);
-                localStorage.setItem('jackTempPin', tempPin);
-
-                showInfoModal('📨 Temporärer PIN generiert', 'Dein temporärer PIN lautet: ' + tempPin + '\n\nDu kannst dich jetzt damit einloggen.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-            };
+            let tempPin = 'TMP-' + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('jackTempPin', tempPin);
+            showInfoModal('📨 Notfall-PIN generiert', 'Dein temporärer Notfall-PIN lautet: ' + tempPin + '\n\nDu kannst dich jetzt damit im Login-Fenster anmelden.');
         }
 
-        function runSetupWizardFromButton() {
-            document.getElementById('customModal').classList.add('hidden');
-            startPinEmailSetupWizard();
-        }
-
-        // Mini-Game State & Cloud Sync
+        // --- SPIELSTAND & CLOUD-SICHERUNG ---
         let gameData = { beats: 0, fans: 0, clickPower: 1, mic: 0, synth: 0, desk: 0, label: 0, cloudId: '' };
 
         function initCloudId() {
@@ -888,12 +828,30 @@
             initCloudId();
             let lastId = localStorage.getItem('jackBeatLab_lastId') || gameData.cloudId;
             let saved = localStorage.getItem('jackBeatLab_' + lastId);
+            
+            // Falls unter der letzten ID nichts gefunden wird, suche in allen Keys nach dem höchsten Spielstand
+            if (!saved) {
+                for (let i = 0; i < localStorage.length; i++) {
+                    let key = localStorage.key(i);
+                    if (key && key.startsWith('jackBeatLab_JB-')) {
+                        let dataStr = localStorage.getItem(key);
+                        if (dataStr) {
+                            saved = dataStr;
+                            break;
+                        }
+                    }
+                }
+            }
+
             if (saved) {
                 try {
                     let parsed = JSON.parse(saved);
                     gameData = { ...gameData, ...parsed };
-                    gameData.cloudId = lastId;
-                    document.getElementById('cloudIdDisplay').innerText = lastId;
+                    if (parsed.cloudId) {
+                        gameData.cloudId = parsed.cloudId;
+                        localStorage.setItem('jackCloudId', parsed.cloudId);
+                    }
+                    document.getElementById('cloudIdDisplay').innerText = gameData.cloudId;
                 } catch(e) { console.error("Ladefehler", e); }
             }
             updateGameUI();
@@ -921,7 +879,7 @@
         function confirmResetGame() {
             verifyPin(function() {
                 let resetBtnHtml = `<button onclick="executeReset()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🗑️ Ja, Beat-Lab wirklich zurücksetzen</button>`;
-                showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du dein "Beat-Lab" wirklich komplett zurücksetzen?\n\n(Hinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.)', resetBtnHtml);
+                showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du dein "Beat-Lab" wirklich komplett zurücksetzen?', resetBtnHtml);
             });
         }
 
@@ -1022,7 +980,7 @@
 
         window.addEventListener('load', function() {
             loadGame();
-            updateAdminAuthUI();
+            checkAndSetupPinOnce();
             let savedView = localStorage.getItem('jackCurrentView') || 'home';
             switchView(savedView);
             if (localStorage.getItem('streamPlaying') === 'true' && audio) {
