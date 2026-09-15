@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Direct Dual-Layer Heavy Guitar & Bass Rock Engine & Tycoon Logic -->
+    <!-- Master-Engine mit Studio Mastering Compressor & Cabinet Simulation -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,11 +541,12 @@
                 });
             }
 
-            // HEAVY GUITAR & BASS DUAL-LAYER ROCK ENGINE (TROCKEN, DIREKT & DRÜCKEND)
+            // MASTER AUDIO ENGINE MIT STUDIO-MASTERING KOMPRESSOR & CABINET-SIMULATION
             let audioCtx = null;
+            let masterCompressor = null;
 
             function makeDistortionCurve(amount) {
-                let k = amount || 90,
+                let k = amount || 95,
                     n = 44100,
                     curve = new Float32Array(n),
                     deg = Math.PI / 180;
@@ -556,7 +557,6 @@
                 return curve;
             }
 
-            // Gitarren- & Bass-Frequenzpool (Tiefe Riffs & Powerchords)
             const rockNotes = [
                 73.42, 82.41, 98.00, 110.00, 123.47, 130.81, 
                 146.83, 164.81, 196.00, 220.00, 246.94, 293.66
@@ -568,67 +568,86 @@
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
+                    // Master Kompressor initialisieren (Glättet und mastert den Sound professionell)
+                    if (!masterCompressor) {
+                        masterCompressor = audioCtx.createDynamicsCompressor();
+                        masterCompressor.threshold.setValueAtTime(-14, audioCtx.currentTime);
+                        masterCompressor.knee.setValueAtTime(4, audioCtx.currentTime);
+                        masterCompressor.ratio.setValueAtTime(6, audioCtx.currentTime);
+                        masterCompressor.attack.setValueAtTime(0.002, audioCtx.currentTime);
+                        masterCompressor.release.setValueAtTime(0.12, audioCtx.currentTime);
+                        masterCompressor.connect(audioCtx.destination);
+                    }
+
                     const now = audioCtx.currentTime;
                     let rootFreq = rockNotes[Math.floor(Math.random() * rockNotes.length)];
 
-                    // --- 1. LEAD-GITARRE (Verzerrt, Power-Chords) ---
+                    // --- 1. LEAD-GITARRE MIT CABINET-SIMULATION & OVERDRIVE ---
                     let guitarOsc1 = audioCtx.createOscillator();
                     let guitarOsc2 = audioCtx.createOscillator();
                     let distortion = audioCtx.createWaveShaper();
                     let guitarFilter = audioCtx.createBiquadFilter();
+                    let cabinetFilter = audioCtx.createBiquadFilter(); // Simuliert echten Gitarren-Verstärker-Speaker
                     let guitarGain = audioCtx.createGain();
 
-                    distortion.curve = makeDistortionCurve(100);
+                    distortion.curve = makeDistortionCurve(110);
                     distortion.oversample = '4x';
 
                     guitarOsc1.type = 'sawtooth';
                     guitarOsc2.type = 'square';
                     guitarOsc1.frequency.setValueAtTime(rootFreq * 2, now);
-                    guitarOsc2.frequency.setValueAtTime(rootFreq * 3, now); // Quinte / Power-Chord
+                    guitarOsc2.frequency.setValueAtTime(rootFreq * 3, now); // Power-Chord Quinte
 
-                    guitarOsc1.detune.setValueAtTime(Math.random() * 10 - 5, now);
-                    guitarOsc2.detune.setValueAtTime(Math.random() * 16 - 8, now);
+                    guitarOsc1.detune.setValueAtTime(Math.random() * 8 - 4, now);
+                    guitarOsc2.detune.setValueAtTime(Math.random() * 14 - 7, now);
 
                     guitarFilter.type = 'lowpass';
-                    guitarFilter.frequency.setValueAtTime(3200, now);
-                    guitarFilter.frequency.exponentialRampToValueAtTime(500, now + 0.35);
+                    guitarFilter.frequency.setValueAtTime(3600, now);
+                    guitarFilter.frequency.exponentialRampToValueAtTime(600, now + 0.3);
 
-                    let guitarDuration = 0.4;
+                    // Cabinet Filter (Mitten-Push für authentischen Gitarren-Druck)
+                    cabinetFilter.type = 'peaking';
+                    cabinetFilter.frequency.setValueAtTime(1800, now);
+                    cabinetFilter.gain.setValueAtTime(6, now);
+                    if (cabinetFilter.Q) cabinetFilter.Q.setValueAtTime(2, now);
+
+                    let guitarDuration = 0.38;
                     guitarGain.gain.setValueAtTime(0.0001, now);
-                    guitarGain.gain.linearRampToValueAtTime(0.2, now + 0.01);
+                    guitarGain.gain.linearRampToValueAtTime(0.18, now + 0.008); // Knackiger Plektrum-Attack
                     guitarGain.gain.exponentialRampToValueAtTime(0.0001, now + guitarDuration);
 
                     guitarOsc1.connect(guitarFilter);
                     guitarOsc2.connect(guitarFilter);
                     guitarFilter.connect(distortion);
-                    distortion.connect(guitarGain);
-                    guitarGain.connect(audioCtx.destination);
+                    distortion.connect(cabinetFilter);
+                    cabinetFilter.connect(guitarGain);
+                    guitarGain.connect(masterCompressor);
 
                     guitarOsc1.start(now);
                     guitarOsc2.start(now);
                     guitarOsc1.stop(now + guitarDuration);
                     guitarOsc2.stop(now + guitarDuration);
 
-                    // --- 2. HEAVY ROCK-BASS (Drückender Sub- & Mid-Bass) ---
+                    // --- 2. HEAVY ROCK-BASS (Druckvoller Sub-Kanal) ---
                     let bassOsc = audioCtx.createOscillator();
                     let bassFilter = audioCtx.createBiquadFilter();
                     let bassGain = audioCtx.createGain();
 
                     bassOsc.type = 'sawtooth';
-                    bassOsc.frequency.setValueAtTime(rootFreq * 0.5, now); // Tiefe Bassnote
+                    bassOsc.frequency.setValueAtTime(rootFreq * 0.5, now);
 
                     bassFilter.type = 'lowpass';
-                    bassFilter.frequency.setValueAtTime(750, now);
-                    bassFilter.frequency.exponentialRampToValueAtTime(120, now + 0.45);
+                    bassFilter.frequency.setValueAtTime(650, now);
+                    bassFilter.frequency.exponentialRampToValueAtTime(100, now + 0.4);
 
-                    let bassDuration = 0.45;
+                    let bassDuration = 0.4;
                     bassGain.gain.setValueAtTime(0.0001, now);
-                    bassGain.gain.linearRampToValueAtTime(0.26, now + 0.015);
+                    bassGain.gain.linearRampToValueAtTime(0.22, now + 0.012);
                     bassGain.gain.exponentialRampToValueAtTime(0.0001, now + bassDuration);
 
                     bassOsc.connect(bassFilter);
                     bassFilter.connect(bassGain);
-                    bassGain.connect(audioCtx.destination);
+                    bassGain.connect(masterCompressor);
 
                     bassOsc.start(now);
                     bassOsc.stop(now + bassDuration);
@@ -843,7 +862,7 @@
                 }
             }, 100);
 
-            // 2. Aktiver Rock-Hintergrund-Takt (spielt jetzt alle 1,6 Sekunden fette Gitarren & Bass-Riffs, wenn BPS aktiv ist)
+            // 2. Fetter Rock-Hintergrund-Takt (alle 1,6 Sekunden ein direktes, gemastertes Riff & Bass-Gewitter)
             setInterval(() => {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
                     playRockStudioSound();
