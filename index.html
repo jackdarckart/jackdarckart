@@ -31,19 +31,19 @@
         }
         @keyframes plantSway {
             0%, 100% { transform: rotate(-3deg) scale(1); }
-            50% { transform: rotate(3deg) scale(1.03); }
+            50% { transform: rotate(3deg) scale(1.04); }
         }
-        @keyframes waterRipple {
-            0% { transform: scale(0.95); opacity: 0.6; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.6; }
+        @keyframes pondRipple {
+            0% { transform: scale(0.96); opacity: 0.5; }
+            50% { transform: scale(1.04); opacity: 0.9; }
+            100% { transform: scale(0.96); opacity: 0.5; }
         }
-        .garden-plant {
-            animation: plantSway 4s ease-in-out infinite;
+        .garden-element {
+            animation: plantSway 4.5s ease-in-out infinite;
             transform-origin: bottom center;
         }
-        .water-pond {
-            animation: waterRipple 3s ease-in-out infinite;
+        .pond-animation {
+            animation: pondRipple 3s ease-in-out infinite;
         }
     </style>
 </head>
@@ -354,7 +354,7 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Beat-Lab & Landschaftlicher Studio-Garten (Architektur & Live-Reaktion)</span>
+                <span>Beat-Lab & Landschaftlicher Garten-Plan (Architektur & Live-Reaktion)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab & Garden 🎧🌿</h2>
             <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, füttere deine Zonen und erlebe einen landschaftlichen Garten-Plan mit Teich, Wegen und reagierenden Pflanzen!</p>
@@ -478,51 +478,66 @@
                 </div>
             </div>
 
-            <!-- DER LANDSCHAFTLICHE STUDIO-GARTEN (GARTENPLAN MIT WEGEN, KLANG-TEICH & ZONEN) -->
-            <div class="relative bg-gradient-to-b from-emerald-950/80 via-cardbg to-darkbg border-2 border-emerald-500/60 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden space-y-6">
+            <!-- DER ECHTE LANDSCHAFTLICHE GARTEN-PLAN (VOGELPERSPEKTIVE / BLUEPRINT LAYOUT) -->
+            <div class="relative bg-gradient-to-b from-emerald-950/90 via-cardbg to-darkbg border-2 border-emerald-500/60 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden space-y-6">
                 
                 <!-- Plan Header -->
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-emerald-500/30 pb-5">
                     <div class="flex items-center space-x-4">
                         <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white flex items-center justify-center text-2xl shadow-xl shadow-emerald-600/40 border border-emerald-300/40">
-                            <i class="fa-solid fa-map-location-dot"></i>
+                            <i class="fa-solid fa-map"></i>
                         </div>
                         <div>
                             <h3 class="text-xl font-black text-white flex items-center space-x-3">
                                 <span>Landschaftlicher Studio-Gartenplan 🌿📐</span>
-                                <span class="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 px-2.5 py-0.5 rounded-full">Live Ökosystem</span>
+                                <span class="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 px-2.5 py-0.5 rounded-full">Blueprint Layout</span>
                             </h3>
-                            <p class="text-xs text-gray-300 mt-0.5">Gestalteter Garten mit Holzterrasse, Steinfliesen-Wegen, Klang-Teich und reaktiven Pflanzenparzellen.</p>
+                            <p class="text-xs text-gray-300 mt-0.5">Gestalteter Garten mit Holzterrasse, Steinfliesen-Wegen, Klang-Teich und reaktiven Pflanzzonen.</p>
                         </div>
                     </div>
                     <div class="bg-darkbg/90 border border-emerald-500/40 px-4 py-2 rounded-xl text-xs text-emerald-300 font-semibold flex items-center space-x-2">
                         <i class="fa-solid fa-water text-cyan-400 animate-pulse"></i>
-                        <span>Teich-Resonanz aktiv</span>
+                        <span>Klang-Teich & Ökosystem Aktiv</span>
                     </div>
                 </div>
 
-                <!-- THE GARDEN LANDSCAPE MAP LAYOUT -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <!-- PARZELLE 1: BLUMENRABATTE & STAUDEN (Melodie-Blume) -->
-                    <div class="bg-gradient-to-b from-emerald-950/90 to-darkbg border-2 border-emerald-500/50 hover:border-emerald-400 transition rounded-3xl p-6 flex flex-col justify-between space-y-5 relative shadow-xl">
-                        <div class="space-y-4">
+                <!-- GARTEN-GRUNDRISS VISUELLER PLAN (BLUEPRINT) -->
+                <div class="bg-emerald-950/20 border-2 border-emerald-600/40 rounded-3xl p-4 sm:p-6 relative overflow-hidden space-y-6 shadow-inner">
+                    <!-- Vordergrund: Holzterrasse (Stuhl & Tisch Bereich) -->
+                    <div class="bg-amber-950/60 border border-amber-700/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+                        <div class="flex items-center space-x-3 text-amber-300">
+                            <i class="fa-solid fa-chair text-xl"></i>
+                            <div>
+                                <span class="font-bold text-sm block">Holzterrasse & Lounge</span>
+                                <span class="text-[11px] text-amber-200/70">Studio-Aussicht & Entspannung</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-amber-900/40 px-3 py-1.5 rounded-xl text-xs text-amber-200 border border-amber-700/40">
+                            <i class="fa-solid fa-sun text-amber-400"></i>
+                            <span>Sonnenseite</span>
+                        </div>
+                    </div>
+
+                    <!-- Hauptgarten-Bereich: Wege, Teich und 3 Zonen -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- ZONE A: STAUDENBEET & BLUMEN (Melodie-Blume) -->
+                        <div class="bg-gradient-to-b from-emerald-900/60 to-darkbg border-2 border-emerald-500/50 hover:border-emerald-400 transition rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xl relative">
                             <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-full border border-emerald-800">Zone A: Staudenbeet</span>
+                                <span class="text-[11px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-950 px-2.5 py-1 rounded-full border border-emerald-800">Zone A: Staudenbeet</span>
                                 <span id="plant1LevelBadge" class="text-xs font-bold bg-emerald-500 text-black px-2 py-0.5 rounded">Stufe 1</span>
                             </div>
                             
-                            <!-- Grafische Garten-Ansicht -->
-                            <div class="h-36 bg-emerald-950/40 border border-emerald-500/40 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden p-3">
-                                <div id="plant1Graphic" class="garden-plant z-10">
-                                    <svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(52,211,153,0.8)]" viewBox="0 0 100 100" fill="none">
+                            <div class="h-32 bg-emerald-950/50 border border-emerald-500/40 rounded-xl flex flex-col items-center justify-center relative p-3">
+                                <div id="plant1Graphic" class="garden-element z-10">
+                                    <svg class="w-16 h-16 drop-shadow-[0_0_12px_rgba(52,211,153,0.8)]" viewBox="0 0 100 100" fill="none">
                                         <path d="M50 90V60" stroke="#34D399" stroke-width="6" stroke-linecap="round"/>
                                         <path d="M50 70C35 70 25 50 35 35C45 20 50 45 50 45" fill="#10B981" stroke="#34D399" stroke-width="4"/>
                                         <circle cx="50" cy="25" r="9" fill="#F472B6" class="animate-pulse"/>
                                     </svg>
                                 </div>
-                                <span id="plant1Title" class="text-xs font-bold text-emerald-200 mt-2 z-10">Melodie-Keimling</span>
-                                <div class="absolute bottom-2 text-[9px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">Reagiert auf Klicks</div>
+                                <span id="plant1Title" class="text-xs font-bold text-emerald-200 mt-1 z-10">Melodie-Keimling</span>
+                                <div class="absolute bottom-1 text-[9px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">Reagiert auf Klicks</div>
                             </div>
 
                             <p class="text-xs text-gray-300">Zieht durch Klicks im Studio magisch neue Fans an.</p>
@@ -541,32 +556,29 @@
                                     <div id="plant1Bar" class="bg-gradient-to-r from-emerald-600 to-teal-400 h-1.5 rounded-full transition-all" style="width: 0%"></div>
                                 </div>
                             </div>
+
+                            <button onclick="feedPlant(0)" class="w-full bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/60 text-emerald-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-droplet text-emerald-400"></i>
+                                <span>Düngen (<span id="plant1Cost">50</span> Beats)</span>
+                            </button>
                         </div>
 
-                        <button onclick="feedPlant(0)" class="w-full bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/60 text-emerald-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-droplet text-emerald-400"></i>
-                            <span>Düngen (<span id="plant1Cost">50</span> Beats)</span>
-                        </button>
-                    </div>
-
-                    <!-- PARZELLE 2: BAUMALLEE / KUGELBÄUME (Synth-Bäumchen) -->
-                    <div class="bg-gradient-to-b from-purple-950/90 to-darkbg border-2 border-purple-500/50 hover:border-purple-400 transition rounded-3xl p-6 flex flex-col justify-between space-y-5 relative shadow-xl">
-                        <div class="space-y-4">
+                        <!-- ZONE B: BAUMALLEE / KUGELBÄUME (Synth-Bäumchen) -->
+                        <div class="bg-gradient-to-b from-purple-900/60 to-darkbg border-2 border-purple-500/50 hover:border-purple-400 transition rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xl relative">
                             <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-black uppercase tracking-widest text-purple-400 bg-purple-950 px-2.5 py-1 rounded-full border border-purple-800">Zone B: Baumallee</span>
+                                <span class="text-[11px] font-black uppercase tracking-wider text-purple-300 bg-purple-950 px-2.5 py-1 rounded-full border border-purple-800">Zone B: Baumallee</span>
                                 <span id="plant2LevelBadge" class="text-xs font-bold bg-purple-500 text-white px-2 py-0.5 rounded">Stufe 1</span>
                             </div>
                             
-                            <!-- Grafische Garten-Ansicht -->
-                            <div class="h-36 bg-purple-950/40 border border-purple-500/40 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden p-3">
-                                <div id="plant2Graphic" class="garden-plant z-10" style="animation-delay: -1.5s;">
-                                    <svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(192,132,252,0.8)]" viewBox="0 0 100 100" fill="none">
+                            <div class="h-32 bg-purple-950/50 border border-purple-500/40 rounded-xl flex flex-col items-center justify-center relative p-3">
+                                <div id="plant2Graphic" class="garden-element z-10" style="animation-delay: -1.5s;">
+                                    <svg class="w-16 h-16 drop-shadow-[0_0_12px_rgba(192,132,252,0.8)]" viewBox="0 0 100 100" fill="none">
                                         <path d="M50 90V45" stroke="#A78BFA" stroke-width="7" stroke-linecap="round"/>
                                         <circle cx="50" cy="35" r="22" fill="#8B5CF6" stroke="#C084FC" stroke-width="4"/>
                                     </svg>
                                 </div>
-                                <span id="plant2Title" class="text-xs font-bold text-purple-200 mt-2 z-10">Synth-Bäumchen</span>
-                                <div class="absolute bottom-2 text-[9px] text-purple-400 bg-purple-950/80 px-2 py-0.5 rounded border border-purple-800">Nährt sich von BPS</div>
+                                <span id="plant2Title" class="text-xs font-bold text-purple-200 mt-1 z-10">Synth-Bäumchen</span>
+                                <div class="absolute bottom-1 text-[9px] text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded border border-purple-800">Nährt sich von BPS</div>
                             </div>
 
                             <p class="text-xs text-gray-300">Wächst durch automatische Beats und boostet die Produktion.</p>
@@ -585,32 +597,28 @@
                                     <div id="plant2Bar" class="bg-gradient-to-r from-purple-600 to-indigo-400 h-1.5 rounded-full transition-all" style="width: 0%"></div>
                                 </div>
                             </div>
+
+                            <button onclick="feedPlant(1)" class="w-full bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/60 text-purple-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-droplet text-purple-400"></i>
+                                <span>Düngen (<span id="plant2Cost">200</span> Beats)</span>
+                            </button>
                         </div>
 
-                        <button onclick="feedPlant(1)" class="w-full bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/60 text-purple-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-droplet text-purple-400"></i>
-                            <span>Düngen (<span id="plant2Cost">200</span> Beats)</span>
-                        </button>
-                    </div>
-
-                    <!-- PARZELLE 3: KLANG-TEICH & STEINGARTEN (Bass-Kaktus) -->
-                    <div class="bg-gradient-to-b from-pink-950/90 to-darkbg border-2 border-pink-500/50 hover:border-pink-400 transition rounded-3xl p-6 flex flex-col justify-between space-y-5 relative shadow-xl">
-                        <div class="space-y-4">
+                        <!-- ZONE C: KLANG-TEICH & STEINGARTEN (Bass-Kaktus) -->
+                        <div class="bg-gradient-to-b from-pink-900/60 to-darkbg border-2 border-pink-500/50 hover:border-pink-400 transition rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xl relative">
                             <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-black uppercase tracking-widest text-pink-400 bg-pink-950 px-2.5 py-1 rounded-full border border-pink-800">Zone C: Steingarten</span>
+                                <span class="text-[11px] font-black uppercase tracking-wider text-pink-300 bg-pink-950 px-2.5 py-1 rounded-full border border-pink-800">Zone C: Klang-Teich</span>
                                 <span id="plant3LevelBadge" class="text-xs font-bold bg-pink-500 text-white px-2 py-0.5 rounded">Stufe 1</span>
                             </div>
                             
-                            <!-- Grafische Garten-Ansicht -->
-                            <div class="h-36 bg-pink-950/40 border border-pink-500/40 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden p-3">
-                                <div id="plant3Graphic" class="garden-plant z-10 water-pond" style="animation-delay: -2.5s;">
-                                    <svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(244,114,182,0.8)]" viewBox="0 0 100 100" fill="none">
+                            <div class="h-32 bg-pink-950/50 border border-pink-500/40 rounded-xl flex flex-col items-center justify-center relative p-3">
+                                <div id="plant3Graphic" class="garden-element z-10 pond-animation" style="animation-delay: -2.5s;">
+                                    <svg class="w-16 h-16 drop-shadow-[0_0_12px_rgba(244,114,182,0.8)]" viewBox="0 0 100 100" fill="none">
                                         <rect x="42" y="30" width="16" height="55" rx="8" fill="#EC4899" stroke="#F472B6" stroke-width="4"/>
-                                        <path d="M30 50H42" stroke="#F472B6" stroke-width="4" stroke-linecap="round"/>
                                     </svg>
                                 </div>
-                                <span id="plant3Title" class="text-xs font-bold text-pink-200 mt-2 z-10">Käthchen Sukkulente</span>
-                                <div class="absolute bottom-2 text-[9px] text-pink-400 bg-pink-950/80 px-2 py-0.5 rounded border border-pink-800">Pulsierende Vibes</div>
+                                <span id="plant3Title" class="text-xs font-bold text-pink-200 mt-1 z-10">Käthchen Sukkulente</span>
+                                <div class="absolute bottom-1 text-[9px] text-pink-300 bg-pink-950/80 px-2 py-0.5 rounded border border-pink-800">Pulsierende Vibes</div>
                             </div>
 
                             <p class="text-xs text-gray-300">Erzeugt automatische Spezial-Beats im Takt des Ökosystems.</p>
@@ -629,15 +637,16 @@
                                     <div id="plant3Bar" class="bg-gradient-to-r from-pink-600 to-rose-400 h-1.5 rounded-full transition-all" style="width: 0%"></div>
                                 </div>
                             </div>
+
+                            <button onclick="feedPlant(2)" class="w-full bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/60 text-pink-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-droplet text-pink-400"></i>
+                                <span>Düngen (<span id="plant3Cost">1000</span> Beats)</span>
+                            </button>
                         </div>
 
-                        <button onclick="feedPlant(2)" class="w-full bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/60 text-pink-300 text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-droplet text-pink-400"></i>
-                            <span>Düngen (<span id="plant3Cost">1000</span> Beats)</span>
-                        </button>
                     </div>
-
                 </div>
+
             </div>
 
             <!-- Account, Backup & Reset Sektion -->
@@ -1149,13 +1158,13 @@
             let graphic1 = document.getElementById('plant1Graphic');
             let title1 = document.getElementById('plant1Title');
             if (p1.level >= 5) {
-                graphic1.innerHTML = `<svg class="w-24 h-24 drop-shadow-[0_0_15px_rgba(52,211,153,0.9)]" viewBox="0 0 100 100" fill="none"><path d="M50 95V40" stroke="#34D399" stroke-width="8" stroke-linecap="round"/><path d="M50 65C25 65 15 35 30 20C45 5 50 40 50 40" fill="#059669" stroke="#34D399" stroke-width="4"/><circle cx="50" cy="18" r="12" fill="#F472B6" class="animate-pulse"/></svg>`;
+                graphic1.innerHTML = `<svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(52,211,153,0.9)]" viewBox="0 0 100 100" fill="none"><path d="M50 95V40" stroke="#34D399" stroke-width="8" stroke-linecap="round"/><path d="M50 65C25 65 15 35 30 20C45 5 50 40 50 40" fill="#059669" stroke="#34D399" stroke-width="4"/><circle cx="50" cy="18" r="12" fill="#F472B6" class="animate-pulse"/></svg>`;
                 title1.innerText = 'Legendärer Klang-Baum (Lvl ' + p1.level + ')';
             } else if (p1.level >= 3) {
-                graphic1.innerHTML = `<svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(52,211,153,0.8)]" viewBox="0 0 100 100" fill="none"><path d="M50 90V50" stroke="#34D399" stroke-width="6" stroke-linecap="round"/><path d="M50 65C30 65 20 45 32 30C44 15 50 40 50 40" fill="#10B981" stroke="#34D399" stroke-width="4"/><circle cx="50" cy="24" r="10" fill="#F472B6"/></svg>`;
+                graphic1.innerHTML = `<svg class="w-18 h-18 drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]" viewBox="0 0 100 100" fill="none"><path d="M50 90V50" stroke="#34D399" stroke-width="6" stroke-linecap="round"/><path d="M50 65C30 65 20 45 32 30C44 15 50 40 50 40" fill="#10B981" stroke="#34D399" stroke-width="4"/><circle cx="50" cy="24" r="10" fill="#F472B6"/></svg>`;
                 title1.innerText = 'Blühende Sound-Blume (Lvl ' + p1.level + ')';
             } else {
-                graphic1.innerHTML = `<svg class="w-16 h-16 drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]" viewBox="0 0 100 100" fill="none"><path d="M50 90V60" stroke="#34D399" stroke-width="6" stroke-linecap="round"/><path d="M50 70C35 70 25 50 35 35C45 20 50 45 50 45" fill="#10B981" stroke="#34D399" stroke-width="4"/><circle cx="50" cy="25" r="8" fill="#F472B6"/></svg>`;
+                graphic1.innerHTML = `<svg class="w-16 h-16 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" viewBox="0 0 100 100" fill="none"><path d="M50 90V60" stroke="#34D399" stroke-width="6" stroke-linecap="round"/><path d="M50 70C35 70 25 50 35 35C45 20 50 45 50 45" fill="#10B981" stroke="#34D399" stroke-width="4"/><circle cx="50" cy="25" r="8" fill="#F472B6"/></svg>`;
                 title1.innerText = 'Melodie-Keimling (Lvl ' + p1.level + ')';
             }
 
@@ -1172,13 +1181,13 @@
             let graphic2 = document.getElementById('plant2Graphic');
             let title2 = document.getElementById('plant2Title');
             if (p2.level >= 5) {
-                graphic2.innerHTML = `<svg class="w-24 h-24 drop-shadow-[0_0_15px_rgba(192,132,252,0.9)]" viewBox="0 0 100 100" fill="none"><path d="M50 95V35" stroke="#A78BFA" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="28" r="26" fill="#7C3AED" stroke="#C084FC" stroke-width="4"/><circle cx="28" cy="45" r="16" fill="#6D28D9" stroke="#C084FC" stroke-width="3"/></svg>`;
+                graphic2.innerHTML = `<svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(192,132,252,0.9)]" viewBox="0 0 100 100" fill="none"><path d="M50 95V35" stroke="#A78BFA" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="28" r="26" fill="#7C3AED" stroke="#C084FC" stroke-width="4"/><circle cx="28" cy="45" r="16" fill="#6D28D9" stroke="#C084FC" stroke-width="3"/></svg>`;
                 title2.innerText = 'Synth-Urwald (Lvl ' + p2.level + ')';
             } else if (p2.level >= 3) {
-                graphic2.innerHTML = `<svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(192,132,252,0.8)]" viewBox="0 0 100 100" fill="none"><path d="M50 90V40" stroke="#A78BFA" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="32" r="20" fill="#8B5CF6" stroke="#C084FC" stroke-width="4"/></svg>`;
+                graphic2.innerHTML = `<svg class="w-18 h-18 drop-shadow-[0_0_10px_rgba(192,132,252,0.8)]" viewBox="0 0 100 100" fill="none"><path d="M50 90V40" stroke="#A78BFA" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="32" r="20" fill="#8B5CF6" stroke="#C084FC" stroke-width="4"/></svg>`;
                 title2.innerText = 'Ausgereifter Synth (Lvl ' + p2.level + ')';
             } else {
-                graphic2.innerHTML = `<svg class="w-16 h-16 drop-shadow-[0_0_10px_rgba(192,132,252,0.8)]" viewBox="0 0 100 100" fill="none"><path d="M50 90V45" stroke="#A78BFA" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="35" r="22" fill="#8B5CF6" stroke="#C084FC" stroke-width="4"/></svg>`;
+                graphic2.innerHTML = `<svg class="w-16 h-16 drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]" viewBox="0 0 100 100" fill="none"><path d="M50 90V45" stroke="#A78BFA" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="35" r="22" fill="#8B5CF6" stroke="#C084FC" stroke-width="4"/></svg>`;
                 title2.innerText = 'Synth-Bäumchen (Lvl ' + p2.level + ')';
             }
 
@@ -1195,13 +1204,13 @@
             let graphic3 = document.getElementById('plant3Graphic');
             let title3 = document.getElementById('plant3Title');
             if (p3.level >= 5) {
-                graphic3.innerHTML = `<svg class="w-24 h-24 drop-shadow-[0_0_15px_rgba(244,114,182,0.9)]" viewBox="0 0 100 100" fill="none"><rect x="38" y="20" width="24" height="70" rx="12" fill="#DB2777" stroke="#F472B6" stroke-width="5"/><circle cx="50" cy="12" r="9" fill="#FACC15" class="animate-bounce"/></svg>`;
+                graphic3.innerHTML = `<svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(244,114,182,0.9)]" viewBox="0 0 100 100" fill="none"><rect x="38" y="20" width="24" height="70" rx="12" fill="#DB2777" stroke="#F472B6" stroke-width="5"/><circle cx="50" cy="12" r="9" fill="#FACC15" class="animate-bounce"/></svg>`;
                 title3.innerText = 'Mega-Bass-Monolith (Lvl ' + p3.level + ')';
             } else if (p3.level >= 3) {
-                graphic3.innerHTML = `<svg class="w-20 h-20 drop-shadow-[0_0_12px_rgba(244,114,182,0.8)]" viewBox="0 0 100 100" fill="none"><rect x="40" y="25" width="20" height="62" rx="10" fill="#EC4899" stroke="#F472B6" stroke-width="4"/><circle cx="50" cy="16" r="7" fill="#FACC15"/></svg>`;
+                graphic3.innerHTML = `<svg class="w-18 h-18 drop-shadow-[0_0_10px_rgba(244,114,182,0.8)]" viewBox="0 0 100 100" fill="none"><rect x="40" y="25" width="20" height="62" rx="10" fill="#EC4899" stroke="#F472B6" stroke-width="4"/><circle cx="50" cy="16" r="7" fill="#FACC15"/></svg>`;
                 title3.innerText = 'Starke Sukkulente (Lvl ' + p3.level + ')';
             } else {
-                graphic3.innerHTML = `<svg class="w-16 h-16 drop-shadow-[0_0_10px_rgba(244,114,182,0.8)]" viewBox="0 0 100 100" fill="none"><rect x="42" y="30" width="16" height="55" rx="8" fill="#EC4899" stroke="#F472B6" stroke-width="4"/></svg>`;
+                graphic3.innerHTML = `<svg class="w-16 h-16 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" viewBox="0 0 100 100" fill="none"><rect x="42" y="30" width="16" height="55" rx="8" fill="#EC4899" stroke="#F472B6" stroke-width="4"/></svg>`;
                 title3.innerText = 'Käthchen Sukkulente (Lvl ' + p3.level + ')';
             }
         }
