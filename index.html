@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jackdarckart | Offizielles Musik- & Kunst-Hub</title>
-    <!-- Tailwind CSS -->
+    <!-- Sicherheits-Header & Tailwind CSS -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#0b0f19] text-white min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
@@ -105,40 +106,128 @@
 
         </div>
 
-        <!-- 2. GAME-SEITE (Beat-Lab) -->
+        <!-- 2. GAME-SEITE (Beat-Lab mit geschütztem Login / Reg & Admin unten) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center">
-            <div class="mb-4">
-                <h2 class="text-2xl font-black text-purple-400 mb-1">Beat-Lab Studio</h2>
-                <p class="text-gray-400 text-xs">Produziere Beats und erweitere dein Studio!</p>
+            
+            <!-- AUTH CONTAINER (Wird angezeigt, wenn nicht eingeloggt) -->
+            <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left">
+                <div class="text-center">
+                    <span class="text-3xl mb-2 block">🔐</span>
+                    <h2 class="text-xl font-bold text-purple-400">Beat-Lab Sicherheitstor</h2>
+                    <p class="text-xs text-gray-400 mt-1">Bitte registriere dich oder logge dich ein, um das Spiel und den Admin-Bereich freizuschalten.</p>
+                </div>
+
+                <!-- Tabs für Login / Registrierung -->
+                <div class="flex border-b border-gray-800 mb-2">
+                    <button id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition">Einloggen</button>
+                    <button id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition">Registrieren</button>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <div id="form-login" class="space-y-3">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
+                        <input type="email5" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Sicherheits-PIN:</label>
+                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Dein PIN">
+                    </div>
+                    <button id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔒 Einloggen & Spiel starten</button>
+                </div>
+
+                <!-- REGISTRATION FORM (Versteckt bis Klick) -->
+                <div id="form-register" class="space-y-3 hidden">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse (Einzigartig):</label>
+                        <input type="email" id="reg-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="deine@email.de">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Neuen Sicherheits-PIN erstellen:</label>
+                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Zahl oder Code">
+                    </div>
+                    <button id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">✨ Account erstellen & sichern</button>
+                </div>
+
+                <div class="pt-2 text-center">
+                    <button id="auth-to-home-btn" class="text-gray-400 hover:text-white text-xs underline">← Zurück zur Startseite</button>
+                </div>
             </div>
 
-            <button id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl mb-6 transition border border-purple-400/30 flex items-center justify-center gap-3">
-                <span class="text-2xl">🎵</span> Beat produzieren <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+1</span>
-            </button>
+            <!-- GAME & ADMIN CONTAINER (Wird erst NACH Login sichtbar) -->
+            <div id="game-main-container" class="hidden space-y-6">
+                
+                <!-- Game Header -->
+                <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
+                    <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
+                    <button id="logout-btn" class="bg-red-900/40 hover:bg-red-900 text-red-300 text-[10px] px-2.5 py-1 rounded-xl border border-red-700/50 transition">🚪 Abmelden</button>
+                </div>
 
-            <div class="space-y-3.5 mb-6">
-                <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
-                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Produzierte Beats</p>
-                    <p id="beats-count" class="text-3xl font-black text-purple-400">0</p>
+                <div>
+                    <h2 class="text-2xl font-black text-purple-400 mb-1">Beat-Lab Studio</h2>
+                    <p class="text-gray-400 text-xs">Produziere Beats und verwalte dein Studio!</p>
                 </div>
-                <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
-                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Fans / Hörerschaft</p>
-                    <p id="fans-count" class="text-3xl font-black text-pink-400">0</p>
+
+                <button id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 active:scale-95 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl transition border border-purple-400/30 flex items-center justify-center gap-3">
+                    <span class="text-2xl">🎵</span> Beat produzieren <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+1</span>
+                </button>
+
+                <div class="space-y-3.5">
+                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
+                        <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Produzierte Beats</p>
+                        <p id="beats-count" class="text-3xl font-black text-purple-400">0</p>
+                    </div>
+                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
+                        <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Fans / Hörerschaft</p>
+                        <p id="fans-count" class="text-3xl font-black text-pink-400">0</p>
+                    </div>
+                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
+                        <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Beats pro Sekunde</p>
+                        <p id="bps-count" class="text-3xl font-black text-emerald-400">0.0</p>
+                    </div>
                 </div>
-                <div class="bg-[#131b2e]/90 border border-gray-800/80 p-4 rounded-2xl shadow-lg">
-                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold">Beats pro Sekunde</p>
-                    <p id="bps-count" class="text-3xl font-black text-emerald-400">0.0</p>
+
+                <button id="game-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
+                    ← Zurück zur Startseite
+                </button>
+
+                <!-- 🛠️ VOLLSTÄNDIGER ADMIN-BEREICH GANZ UNTEN IM GAME-BEREICH -->
+                <div class="bg-[#131b2e] border border-amber-500/40 p-5 rounded-3xl shadow-2xl space-y-4 text-left mt-8">
+                    <div class="flex items-center gap-2 border-b border-gray-800 pb-2">
+                        <span class="text-xl">🛠️</span>
+                        <h3 class="font-bold text-sm text-amber-400">Game & Admin-Steuerung</h3>
+                    </div>
+
+                    <!-- Statistik Override -->
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-[11px] text-gray-400 block mb-1">Beats anpassen:</label>
+                            <input type="number" id="admin-beats-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-gray-400 block mb-1">Fans anpassen:</label>
+                            <input type="number" id="admin-fans-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-gray-400 block mb-1">BPS anpassen:</label>
+                            <input type="number" step="0.1" id="admin-bps-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs">
+                        </div>
+                        <button id="apply-admin-btn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-xl text-xs transition shadow">Werte übernehmen</button>
+                    </div>
+
+                    <!-- PIN ÄNDERN IM ADMIN-BEREICH -->
+                    <div class="border-t border-gray-800 pt-3 space-y-3">
+                        <h4 class="font-bold text-xs text-yellow-400">🔑 Sicherheits-PIN ändern</h4>
+                        <div>
+                            <label class="text-[11px] text-gray-400 block mb-1">Neuen PIN eingeben:</label>
+                            <input type="password" id="admin-new-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs" placeholder="Neuer PIN">
+                        </div>
+                        <button id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN aktualisieren</button>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- Exklusiver Passwort-Reset-Button im Game-Bereich -->
-            <button id="reset-game-pass-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-yellow-400 font-semibold py-3 rounded-2xl text-xs transition border border-yellow-500/30 mb-3 flex items-center justify-center gap-2">
-                <span>🔑</span> Spiel-Passwort zurücksetzen
-            </button>
-
-            <button id="game-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
-                ← Zurück zur Startseite
-            </button>
         </div>
 
         <!-- 3. GARTEN-SEITE -->
@@ -176,11 +265,7 @@
                 </div>
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">E-Mail:</label>
-                    <input type="email" id="reg-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Neues Passwort:</label>
-                    <input type="password" id="reg-password" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
+                    <input type="email" id="reg-email-main" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
                 <button id="save-account-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Account speichern</button>
                 <button id="account-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
@@ -189,23 +274,11 @@
             </div>
         </div>
 
-        <!-- 6. ADMIN-SEITE -->
+        <!-- 6. ADMIN-SEITE (Allgemein) -->
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
-                <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ Admin-Steuerung</h2>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Beats:</label>
-                    <input type="number" id="admin-beats-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Fans:</label>
-                    <input type="number" id="admin-fans-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">BPS:</label>
-                    <input type="number" step="0.1" id="admin-bps-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
-                </div>
-                <button id="apply-admin-btn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Werte anwenden</button>
+                <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ System Hub</h2>
+                <p class="text-xs text-gray-400">Nutze den spezifischen Admin-Bereich direkt im Game-Modul (nach erfolgreichem Login), um deine Spiel-Metriken und PINs zu verwalten.</p>
                 <button id="admin-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
@@ -218,13 +291,14 @@
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
             <span id="save-status">💾 Automatisch gespeichert</span>
-            <button id="reset-game-btn" class="text-red-400 hover:underline">Zurücksetzen</button>
+            <button id="reset-game-btn" class="text-red-400 hover:underline">Gesamten Spielstand zurücksetzen</button>
         </div>
     </footer>
 
-    <!-- JavaScript Logik -->
+    <!-- JavaScript Logik & Sicheres Auth + Admin System -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Spielstand-Variablen mit absolutem Fortschritts-Schutz
             let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 40430;
             let fans = parseInt(localStorage.getItem('beat_lab_fans')) || 14603;
             let bps = parseFloat(localStorage.getItem('beat_lab_bps')) || 161.0;
@@ -232,8 +306,145 @@
             let soundEnabled = true;
             let currentView = 'home';
 
+            // Auth-Zustand prüfen
+            let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
+
             const userDisplay = document.getElementById('user-display');
             if (userDisplay) userDisplay.innerText = username;
+
+            // UI Ansichten umschalten (Auth vs. Game)
+            function updateGameViewState() {
+                const authContainer = document.getElementById('game-auth-container');
+                const mainContainer = document.getElementById('game-main-container');
+                const loggedEmailDisplay = document.getElementById('logged-user-email');
+
+                if (loggedInUser) {
+                    if(authContainer) authContainer.classList.add('hidden');
+                    if(mainContainer) mainContainer.classList.remove('hidden');
+                    if(loggedEmailDisplay) loggedEmailDisplay.innerText = "👤 " + loggedInUser;
+                    updateDisplay();
+                } else {
+                    if(authContainer) authContainer.classList.remove('hidden');
+                    if(mainContainer) mainContainer.classList.add('hidden');
+                }
+            }
+
+            // Tabs Umschalten (Login <-> Registrieren)
+            const tabLoginBtn = document.getElementById('tab-login-btn');
+            const tabRegisterBtn = document.getElementById('tab-register-btn');
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+
+            if(tabLoginBtn && tabRegisterBtn) {
+                tabLoginBtn.addEventListener('click', () => {
+                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition";
+                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition";
+                    formLogin.classList.remove('hidden');
+                    formRegister.classList.add('hidden');
+                });
+
+                tabRegisterBtn.addEventListener('click', () => {
+                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 border-b-2 border-emerald-500 transition";
+                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition";
+                    formRegister.classList.remove('hidden');
+                    formLogin.classList.add('hidden');
+                });
+            }
+
+            // REGISTRIERUNG (Mit strengem Schutz vor doppelten E-Mails / Info-Diebstahl)
+            const submitRegisterBtn = document.getElementById('submit-register-btn');
+            if(submitRegisterBtn) {
+                submitRegisterBtn.addEventListener('click', () => {
+                    const emailInput = document.getElementById('reg-email').value.trim().toLowerCase();
+                    const pinInput = document.getElementById('reg-pin').value.trim();
+
+                    if (!emailInput || !emailInput.includes('@')) {
+                        alert("❌ Bitte gib eine gültige E-Mail-Adresse ein.");
+                        return;
+                    }
+                    if (!pinInput || pinInput.length < 3) {
+                        alert("❌ Der PIN muss mindestens 3 Zeichen lang sein.");
+                        return;
+                    }
+
+                    // Benutzerdatenbank laden
+                    let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+
+                    // Schutz: Prüfen ob E-Mail bereits existiert (Niemand kann die gleichen Anmeldeinfos verwenden)
+                    if (usersDB[emailInput]) {
+                        alert("⚠️ Diese E-Mail-Adresse ist bereits registriert! Wähle eine andere oder logge dich ein.");
+                        return;
+                    }
+
+                    // Account anlegen
+                    usersDB[emailInput] = { pin: pinInput, created: Date.now() };
+                    localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
+
+                    // Direkt einloggen, Fortschritt bleibt zu 100% erhalten
+                    loggedInUser = emailInput;
+                    localStorage.setItem('beat_lab_logged_in_user', emailInput);
+                    localStorage.setItem('beat_lab_email', emailInput);
+
+                    alert("🎉 Erfolgreich registriert und sicher eingeloggt!");
+                    updateGameViewState();
+                });
+            }
+
+            // LOGIN
+            const submitLoginBtn = document.getElementById('submit-login-btn');
+            if(submitLoginBtn) {
+                submitLoginBtn.addEventListener('click', () => {
+                    const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
+                    const pinInput = document.getElementById('login-pin').value.trim();
+
+                    let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+
+                    if (!usersDB[emailInput] || usersDB[emailInput].pin !== pinInput) {
+                        alert("❌ Falsche E-Mail-Adresse oder falscher PIN!");
+                        return;
+                    }
+
+                    loggedInUser = emailInput;
+                    localStorage.setItem('beat_lab_logged_in_user', emailInput);
+                    localStorage.setItem('beat_lab_email', emailInput);
+
+                    alert("🚀 Erfolgreich eingeloggt! Willkommen zurück im Beat-Lab.");
+                    updateGameViewState();
+                });
+            }
+
+            // LOGOUT
+            const logoutBtn = document.getElementById('logout-btn');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    loggedInUser = null;
+                    localStorage.removeItem('beat_lab_logged_in_user');
+                    updateGameViewState();
+                    alert("🔒 Erfolgreich abgemeldet.");
+                });
+            }
+
+            // ADMIN: PIN ÄNDERN IM GAME-BEREICH (Ganz unten)
+            const adminChangePinBtn = document.getElementById('admin-change-pin-btn');
+            if(adminChangePinBtn) {
+                adminChangePinBtn.addEventListener('click', () => {
+                    const newPin = document.getElementById('admin-new-pin').value.trim();
+                    if (!newPin || newPin.length < 3) {
+                        alert("❌ Bitte gib einen gültigen neuen PIN (mind. 3 Zeichen) ein.");
+                        return;
+                    }
+
+                    let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                    if (loggedInUser && usersDB[loggedInUser]) {
+                        usersDB[loggedInUser].pin = newPin;
+                        localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
+                        alert("✅ Dein Sicherheits-PIN wurde erfolgreich im Admin-Bereich aktualisiert!");
+                        document.getElementById('admin-new-pin').value = '';
+                    } else {
+                        alert("❌ Fehler: Kein aktiver Benutzer gefunden.");
+                    }
+                });
+            }
 
             let audioCtx = null;
             function playBeatSound() {
@@ -276,7 +487,8 @@
                 let target = document.getElementById('view-' + view);
                 if (target) target.classList.remove('hidden');
 
-                if (view === 'admin') {
+                if (view === 'game') {
+                    updateGameViewState();
                     let bIn = document.getElementById('admin-beats-input');
                     let fIn = document.getElementById('admin-fans-input');
                     let bpsIn = document.getElementById('admin-bps-input');
@@ -286,9 +498,9 @@
                 }
                 if (view === 'account') {
                     let rUser = document.getElementById('reg-username');
-                    let rEmail = document.getElementById('reg-email');
+                    let rEmailMain = document.getElementById('reg-email-main');
                     if(rUser) rUser.value = username;
-                    if(rEmail) rEmail.value = localStorage.getItem('beat_lab_email') || '';
+                    if(rEmailMain) rEmailMain.value = localStorage.getItem('beat_lab_email') || '';
                 }
 
                 ['home', 'game', 'garten', 'cloud', 'account', 'admin'].forEach(v => {
@@ -327,42 +539,22 @@
                 localStorage.setItem('beat_lab_user', username);
             }
 
-            function submitRegister() {
-                let regUser = document.getElementById('reg-username').value;
-                let regEmail = document.getElementById('reg-email').value;
-                let regPass = document.getElementById('reg-password').value;
-                if (regUser && regUser.trim() !== "") {
-                    username = regUser.trim();
-                    let ud = document.getElementById('user-display');
-                    if(ud) ud.innerText = username;
-                    localStorage.setItem('beat_lab_email', regEmail);
-                    if(regPass) localStorage.setItem('beat_lab_pass', regPass);
+            // Admin Werte Übernehmen
+            const applyAdminBtn = document.getElementById('apply-admin-btn');
+            if(applyAdminBtn) {
+                applyAdminBtn.addEventListener('click', () => {
+                    beats = parseFloat(document.getElementById('admin-beats-input').value) || beats;
+                    fans = parseInt(document.getElementById('admin-fans-input').value) || fans;
+                    bps = parseFloat(document.getElementById('admin-bps-input').value) || bps;
+                    updateDisplay();
                     saveGame();
-                    alert("🎉 Account erfolgreich gespeichert!");
-                }
-            }
-
-            // Funktion zum Zurücksetzen des Game-Passworts (nur im Game-Bereich)
-            function resetGamePassword() {
-                let newPass = prompt("🔑 Gib ein neues Passwort für dein Game ein:");
-                if (newPass !== null) {
-                    localStorage.setItem('beat_lab_pass', newPass.trim());
-                    alert("✅ Spiel-Passwort erfolgreich zurückgesetzt und gespeichert!");
-                }
-            }
-
-            function applyAdminStats() {
-                beats = parseFloat(document.getElementById('admin-beats-input').value) || beats;
-                fans = parseInt(document.getElementById('admin-fans-input').value) || fans;
-                bps = parseFloat(document.getElementById('admin-bps-input').value) || bps;
-                updateDisplay();
-                saveGame();
-                alert("🛠️ Admin-Werte übernommen!");
+                    alert("🛠️ Admin-Werte im Spiel erfolgreich übernommen!");
+                });
             }
 
             function exportSave() {
                 try {
-                    const saveData = { beats, fans, bps, username, email: localStorage.getItem('beat_lab_email') || '', pass: localStorage.getItem('beat_lab_pass') || '' };
+                    const saveData = { beats, fans, bps, username, email: loggedInUser || '' };
                     const code = btoa(JSON.stringify(saveData));
                     navigator.clipboard.writeText(code).then(() => {
                         alert("📋 Cloud-Code in die Zwischenablage kopiert!");
@@ -381,10 +573,6 @@
                         fans = data.fans || 14603;
                         bps = data.bps || 161.0;
                         username = data.username || 'jackdarckart';
-                        if(data.email) localStorage.setItem('beat_lab_email', data.email);
-                        if(data.pass) localStorage.setItem('beat_lab_pass', data.pass);
-                        let ud = document.getElementById('user-display');
-                        if(ud) ud.innerText = username;
                         saveGame();
                         updateDisplay();
                         alert("🚀 Spielstand erfolgreich geladen!");
@@ -395,17 +583,20 @@
             }
 
             function resetGame() {
-                if (confirm("Wirklich alles zurücksetzen?")) {
+                if (confirm("Wirklich den gesamten Spielstand zurücksetzen?")) {
                     localStorage.clear();
                     beats = 40430; fans = 14603; bps = 161.0; username = 'jackdarckart';
+                    loggedInUser = null;
                     let ud = document.getElementById('user-display');
                     if(ud) ud.innerText = username;
+                    updateGameViewState();
                     updateDisplay();
                     saveGame();
+                    alert("🔄 Spielstand wurde komplett zurückgesetzt.");
                 }
             }
 
-            // Event-Listener Bindungen
+            // Event-Listener Bindungen für alle Navigationen & Buttons
             document.getElementById('nav-home').addEventListener('click', () => switchView('home'));
             document.getElementById('nav-game').addEventListener('click', () => switchView('game'));
             document.getElementById('nav-garten').addEventListener('click', () => switchView('garten'));
@@ -415,29 +606,43 @@
             document.getElementById('sound-btn').addEventListener('click', toggleSound);
 
             document.getElementById('home-to-game-btn').addEventListener('click', () => switchView('game'));
+            document.getElementById('auth-to-home-btn').addEventListener('click', () => switchView('home'));
             document.getElementById('produce-beat-btn').addEventListener('click', produceBeat);
-            document.getElementById('reset-game-pass-btn').addEventListener('click', resetGamePassword);
             document.getElementById('game-to-home-btn').addEventListener('click', () => switchView('home'));
             document.getElementById('garten-to-home-btn').addEventListener('click', () => switchView('home'));
             document.getElementById('export-btn').addEventListener('click', exportSave);
             document.getElementById('import-btn').addEventListener('click', importSave);
             document.getElementById('cloud-to-home-btn').addEventListener('click', () => switchView('home'));
-            document.getElementById('save-account-btn').addEventListener('click', submitRegister);
+            
+            const saveAccountBtn = document.getElementById('save-account-btn');
+            if(saveAccountBtn) {
+                saveAccountBtn.addEventListener('click', () => {
+                    let regUser = document.getElementById('reg-username').value;
+                    if (regUser && regUser.trim() !== "") {
+                        username = regUser.trim();
+                        let ud = document.getElementById('user-display');
+                        if(ud) ud.innerText = username;
+                        saveGame();
+                        alert("🎉 Account-Profil gespeichert!");
+                    }
+                });
+            }
+
             document.getElementById('account-to-home-btn').addEventListener('click', () => switchView('home'));
-            document.getElementById('apply-admin-btn').addEventListener('click', applyAdminStats);
             document.getElementById('admin-to-home-btn').addEventListener('click', () => switchView('home'));
             document.getElementById('reset-game-btn').addEventListener('click', resetGame);
 
-            // Auto-production
+            // Automatische Produktion (BPS)
             setInterval(() => {
                 beats += bps / 10;
-                updateDisplay();
+                if (loggedInUser) updateDisplay();
             }, 100);
 
-            // Auto-save
+            // Automatisches Speichern
             setInterval(() => { saveGame(); }, 5000);
 
             updateDisplay();
+            updateGameViewState();
         });
     </script>
 </body>
