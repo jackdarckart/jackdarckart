@@ -50,76 +50,60 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME) -->
-        <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center">
-            <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left">
-                <div class="text-center">
-                    <span class="text-3xl mb-2 block">🔐</span>
-                    <h2 class="text-xl font-bold text-purple-400">CloudBeats Access Gateway</h2>
-                    <p class="text-xs text-gray-400 mt-1">Authentifiziere dich sicher per E-Mail und PIN.</p>
+        <!-- 2. STUDIO-LAB (GAME & UPGRADES & TÖNE) -->
+        <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
+            <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
+                <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Artur Hamm</span>
+                <button type="button" id="logout-btn" class="bg-red-900/40 text-red-300 text-[10px] px-2.5 py-1 rounded-xl cursor-pointer">🚪 Account Info</button>
+            </div>
+
+            <!-- Haupt-Produktion Button -->
+            <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl cursor-pointer active:scale-95 transition">
+                🎧 Master-Beat Live einspielen (+5)
+            </button>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-3 text-left">
+                <div class="bg-[#131b2e] p-3.5 rounded-2xl border border-gray-800">
+                    <p class="text-[10px] text-gray-400 uppercase">Beats</p>
+                    <p id="beats-count" class="text-xl font-black text-purple-400">3.449</p>
                 </div>
-                <div class="flex border-b border-gray-800 mb-2">
-                    <button type="button" id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer">Anmelden</button>
-                    <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer">Registrieren</button>
-                </div>
-                <div id="form-login" class="space-y-3">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
-                        <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="name@domain.de">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">PIN-Code:</label>
-                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="1234">
-                    </div>
-                    <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 cursor-pointer">🔒 Studio entsperren</button>
-                </div>
-                <div id="form-register" class="space-y-3 hidden">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">E-Mail-Adresse:</label>
-                        <input type="email" id="reg-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="name@domain.de">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">PIN festlegen (min. 3 Zeichen):</label>
-                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="PIN-Code">
-                    </div>
-                    <button type="button" id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2 cursor-pointer">✨ Account erstellen</button>
+                <div class="bg-[#131b2e] p-3.5 rounded-2xl border border-gray-800">
+                    <p class="text-[10px] text-gray-400 uppercase">Fans</p>
+                    <p id="fans-count" class="text-xl font-black text-pink-400">586</p>
                 </div>
             </div>
 
-            <div id="game-main-container" class="hidden space-y-6">
-                <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
-                    <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
-                    <button type="button" id="logout-btn" class="bg-red-900/40 text-red-300 text-[10px] px-2.5 py-1 rounded-xl cursor-pointer">🚪 Abmelden</button>
-                </div>
-                <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl cursor-pointer">
-                    🎧 Master-Beat Live einspielen (+5)
-                </button>
-                <div class="grid grid-cols-2 gap-3 text-left">
-                    <div class="bg-[#131b2e] p-3.5 rounded-2xl border border-gray-800">
-                        <p class="text-[10px] text-gray-400 uppercase">Beats</p>
-                        <p id="beats-count" class="text-xl font-black text-purple-400">0</p>
+            <!-- Upgrades & Töne Shop Sektion -->
+            <div class="bg-[#131b2e] border border-purple-500/30 p-4 rounded-3xl text-left space-y-3">
+                <h3 class="text-sm font-bold text-purple-300">⚡ Studio Upgrades &amp; Sound-Töne</h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center bg-[#0b0f19] p-2.5 rounded-xl border border-gray-800">
+                        <div>
+                            <p class="text-xs font-semibold text-white">🎹 Synth-Bass Modul</p>
+                            <p class="text-[10px] text-gray-400">+2 Beats pro Klick &amp; Custom Sound-Ton</p>
+                        </div>
+                        <button type="button" id="buy-upgrade-1" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold cursor-pointer">100 Beats</button>
                     </div>
-                    <div class="bg-[#131b2e] p-3.5 rounded-2xl border border-gray-800">
-                        <p class="text-[10px] text-gray-400 uppercase">Fans</p>
-                        <p id="fans-count" class="text-xl font-black text-pink-400">0</p>
+                    <div class="flex justify-between items-center bg-[#0b0f19] p-2.5 rounded-xl border border-gray-800">
+                        <div>
+                            <p class="text-xs font-semibold text-white">🚀 Auto-Beat Machine</p>
+                            <p class="text-[10px] text-gray-400">Generiert automatisch alle 5 Sek. Beats</p>
+                        </div>
+                        <button type="button" id="buy-upgrade-2" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold cursor-pointer">500 Beats</button>
                     </div>
                 </div>
-                <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
             </div>
+
+            <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 py-3 rounded-2xl text-xs cursor-pointer">← Dashboard</button>
         </div>
 
         <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
-            <div id="garten-auth-container" class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl max-w-md mx-auto text-left">
-                <h2 class="text-xl font-bold text-emerald-400">Bio-Garden Access Gateway</h2>
-                <p class="text-xs text-gray-400 mt-1">Bitte im Studio-Lab anmelden, um den Garten zu betreten.</p>
-                <button type="button" id="garten-to-game-login-btn" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm mt-3 cursor-pointer">Zum Login</button>
-            </div>
-
-            <div id="garten-main-container" class="hidden bg-[#101722] border border-emerald-500/40 p-4 sm:p-6 rounded-3xl shadow-2xl space-y-4">
+            <div id="garten-main-container" class="bg-[#101722] border border-emerald-500/40 p-4 sm:p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
                     <span class="text-3xl mb-1 block">🏡</span>
-                    <h2 class="text-xl sm:text-2xl font-black text-emerald-400 mb-1">Architektur-Landschaftsgarten</h2>
+                    <h2 class="text-xl sm:text-2xl font-black text-emerald-400 mb-1">Architektur-Landschaftsgarten &amp; Takt-Sync</h2>
                     <div id="current-song-display" class="text-xs sm:text-sm text-emerald-300 bg-[#080c14] border border-emerald-500/30 py-1.5 px-4 rounded-xl mt-1 inline-block shadow-inner">
                         🎶 Lade Song...
                     </div>
@@ -162,7 +146,7 @@
             <div class="bg-[#131b2e] border border-blue-500/30 p-6 rounded-3xl space-y-3">
                 <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Künstler-Profil</h2>
                 <label class="text-xs text-gray-400 block">Künstlername:</label>
-                <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm" placeholder="jackdarckart">
+                <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm" value="jackdarckart">
                 <button type="button" id="save-account-btn" class="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold cursor-pointer">Änderungen speichern</button>
                 <button type="button" id="account-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs mt-2 cursor-pointer">← Dashboard</button>
             </div>
@@ -190,133 +174,134 @@
     <!-- SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            let beats = 0;
-            let fans = 0;
+            // Account & Stats mit deinen exakten Werten initialisieren falls leer
+            let beats = parseFloat(localStorage.getItem('beat_lab_beats')) || 3449;
+            let fans = parseInt(localStorage.getItem('beat_lab_fans')) || 586;
+            let clickPower = parseInt(localStorage.getItem('beat_lab_power')) || 5;
+            let autoBeatsActive = localStorage.getItem('beat_lab_auto') === 'true';
+            
             let username = localStorage.getItem('beat_lab_user') || 'jackdarckart';
-            let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
             let currentView = localStorage.getItem('beat_lab_current_view') || 'home';
 
-            function loadUserData() {
-                if (!loggedInUser) return;
-                try {
-                    let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    if (usersDB[loggedInUser]) {
-                        let u = usersDB[loggedInUser];
-                        beats = u.beats || 0;
-                        fans = u.fans || 0;
-                    }
-                } catch(e) {}
-            }
-
             function saveGame() {
-                if (!loggedInUser) return;
-                try {
-                    let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                    if (usersDB[loggedInUser]) {
-                        usersDB[loggedInUser] = { ...usersDB[loggedInUser], beats, fans };
-                        localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-                    }
-                } catch(e) {}
+                localStorage.setItem('beat_lab_beats', beats);
+                localStorage.setItem('beat_lab_fans', fans);
+                localStorage.setItem('beat_lab_power', clickPower);
+                localStorage.setItem('beat_lab_auto', autoBeatsActive);
+                localStorage.setItem('beat_lab_user', username);
+                localStorage.setItem('beat_lab_current_view', currentView);
             }
 
-            if (loggedInUser) loadUserData();
             const userDisplay = document.getElementById('user-display');
             if (userDisplay) userDisplay.innerText = username;
 
             const usernameInput = document.getElementById('reg-username');
             if (usernameInput) usernameInput.value = username;
 
-            function updateGameViewState() {
-                const authContainer = document.getElementById('game-auth-container');
-                const mainContainer = document.getElementById('game-main-container');
-                const gartenAuthContainer = document.getElementById('garten-auth-container');
-                const gartenMainContainer = document.getElementById('garten-main-container');
+            // Audio-Effekt (Synthesizer Töne per Web Audio API)
+            function playClickTone() {
+                try {
+                    const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctxAudio.createOscillator();
+                    const gain = ctxAudio.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440 + (clickPower * 20), ctxAudio.currentTime);
+                    gain.gain.setValueAtTime(0.15, ctxAudio.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctxAudio.currentTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(ctxAudio.destination);
+                    osc.start();
+                    osc.stop(ctxAudio.currentTime + 0.15);
+                } catch(e) {}
+            }
 
-                if (loggedInUser) {
-                    loadUserData();
-                    if(authContainer) authContainer.classList.add('hidden');
-                    if(mainContainer) mainContainer.classList.remove('hidden');
-                    if(gartenAuthContainer) gartenAuthContainer.classList.add('hidden');
-                    if(gartenMainContainer) gartenMainContainer.classList.remove('hidden');
-                    const emailSpan = document.getElementById('logged-user-email');
-                    if(emailSpan) emailSpan.innerText = "Eingeloggt: " + loggedInUser;
+            // Auto-Beat Generator
+            setInterval(() => {
+                if (autoBeatsActive) {
+                    beats += 1;
                     updateDisplay();
-                } else {
-                    if(authContainer) authContainer.classList.remove('hidden');
-                    if(mainContainer) mainContainer.classList.add('hidden');
-                    if(gartenAuthContainer) gartenAuthContainer.classList.remove('hidden');
-                    if(gartenMainContainer) gartenMainContainer.classList.add('hidden');
-                }
-            }
-
-            // Tabs Login/Register
-            const tabLoginBtn = document.getElementById('tab-login-btn');
-            const tabRegisterBtn = document.getElementById('tab-register-btn');
-            const formLogin = document.getElementById('form-login');
-            const formRegister = document.getElementById('form-register');
-
-            if(tabLoginBtn && tabRegisterBtn) {
-                tabLoginBtn.addEventListener('click', () => {
-                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition cursor-pointer";
-                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
-                    formLogin.classList.remove('hidden');
-                    formRegister.classList.add('hidden');
-                });
-                tabRegisterBtn.addEventListener('click', () => {
-                    tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-emerald-400 border-b-2 border-emerald-500 transition cursor-pointer";
-                    tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition cursor-pointer";
-                    formRegister.classList.remove('hidden');
-                    formLogin.classList.add('hidden');
-                });
-            }
-
-            const submitRegisterBtn = document.getElementById('submit-register-btn');
-            if(submitRegisterBtn) {
-                submitRegisterBtn.addEventListener('click', () => {
-                    const email = document.getElementById('reg-email').value.trim().toLowerCase();
-                    const pin = document.getElementById('reg-pin').value.trim();
-                    if (!email || !email.includes('@')) { alert("Bitte eine gültige E-Mail-Adresse eingeben!"); return; }
-                    if (!pin || pin.length < 3) { alert("Die PIN muss mindestens 3 Zeichen lang sein."); return; }
-
-                    let usersDB = {};
-                    try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    if (usersDB[email]) { alert("Diese E-Mail-Adresse ist bereits registriert!"); return; }
-
-                    usersDB[email] = { pin, beats: 0, fans: 0 };
-                    localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-                    loggedInUser = email;
-                    localStorage.setItem('beat_lab_logged_in_user', email);
-                    updateGameViewState();
-                    alert("Account erfolgreich erstellt!");
-                });
-            }
-
-            const submitLoginBtn = document.getElementById('submit-login-btn');
-            if(submitLoginBtn) {
-                submitLoginBtn.addEventListener('click', () => {
-                    const email = document.getElementById('login-email').value.trim().toLowerCase();
-                    const pin = document.getElementById('login-pin').value.trim();
-                    let usersDB = {};
-                    try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    if (!usersDB[email] || usersDB[email].pin !== pin) { alert("Falsche E-Mail-Adresse oder PIN!"); return; }
-
-                    loggedInUser = email;
-                    localStorage.setItem('beat_lab_logged_in_user', email);
-                    updateGameViewState();
-                    alert("Erfolgreich angemeldet!");
-                });
-            }
-
-            const logoutBtn = document.getElementById('logout-btn');
-            if(logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
                     saveGame();
-                    loggedInUser = null;
-                    localStorage.removeItem('beat_lab_logged_in_user');
-                    updateGameViewState();
+                }
+            }, 5000);
+
+            function updateDisplay() {
+                let bEl = document.getElementById('beats-count');
+                let fEl = document.getElementById('fans-count');
+                if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
+                if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
+            }
+            updateDisplay();
+
+            // Upgrades Kaufen
+            const buyUpg1 = document.getElementById('buy-upgrade-1');
+            if(buyUpg1) {
+                buyUpg1.addEventListener('click', () => {
+                    if (beats >= 100) {
+                        beats -= 100;
+                        clickPower += 2;
+                        playClickTone();
+                        updateDisplay();
+                        saveGame();
+                        alert("Synth-Bass Modul aktiviert! +2 Klick-Power.");
+                    } else {
+                        alert("Nicht genug Beats! (Benötigt 100 Beats)");
+                    }
                 });
             }
 
+            const buyUpg2 = document.getElementById('buy-upgrade-2');
+            if(buyUpg2) {
+                buyUpg2.addEventListener('click', () => {
+                    if (beats >= 500) {
+                        beats -= 500;
+                        autoBeatsActive = true;
+                        playClickTone();
+                        updateDisplay();
+                        saveGame();
+                        alert("Auto-Beat Machine erfolgreich gestartet!");
+                    } else {
+                        alert("Nicht genug Beats! (Benötigt 500 Beats)");
+                    }
+                });
+            }
+
+            // Ansichten Umschalten
+            function switchView(view) {
+                currentView = view;
+                localStorage.setItem('beat_lab_current_view', view);
+                document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
+                let target = document.getElementById('view-' + view);
+                if (target) target.classList.remove('hidden');
+            }
+
+            function bindClick(id, handler) {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', handler);
+            }
+
+            bindClick('nav-home', () => switchView('home'));
+            bindClick('nav-game', () => switchView('game'));
+            bindClick('nav-garten', () => switchView('garten'));
+            bindClick('nav-cloud', () => switchView('cloud'));
+            bindClick('nav-account', () => switchView('account'));
+            bindClick('nav-admin', () => switchView('admin'));
+            bindClick('home-to-game-btn', () => switchView('game'));
+            bindClick('game-to-home-btn', () => switchView('home'));
+            bindClick('garten-to-home-btn', () => switchView('home'));
+            bindClick('garten-to-game-login-btn', () => switchView('game'));
+            bindClick('cloud-to-home-btn', () => switchView('home'));
+            bindClick('account-to-home-btn', () => switchView('home'));
+            bindClick('admin-to-home-btn', () => switchView('home'));
+
+            bindClick('produce-beat-btn', () => {
+                beats += clickPower;
+                fans += 1;
+                playClickTone();
+                updateDisplay();
+                saveGame();
+            });
+
+            // Profil Speichern
             const saveAccountBtn = document.getElementById('save-account-btn');
             if(saveAccountBtn) {
                 saveAccountBtn.addEventListener('click', () => {
@@ -347,7 +332,7 @@
             setInterval(fetchCurrentSong, 15000);
             fetchCurrentSong();
 
-            // --- WEBRADIO & STABILER STREAM-CONTROLLER ---
+            // Webradio Stream Controller
             const radioStreamEl = document.getElementById('external-audio-stream');
             const toggleRadioBtn = document.getElementById('toggle-radio-btn');
             const audioStatusText = document.getElementById('audio-status-text');
@@ -361,7 +346,7 @@
                             isStreamingRadio = true;
                             toggleRadioBtn.innerText = "⏹️ Stream stoppen";
                             toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3.5 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
-                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio aktiv";
+                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio aktiv & synchronisiert";
                         } catch(e) {
                             alert("Stream konnte nicht gestartet werden.");
                         }
@@ -375,7 +360,7 @@
                 });
             }
 
-            // --- STABILES ARCHITEKTUR-GARTEN CANVAS ---
+            // --- ARCHITEKTUR-GARTEN CANVAS ---
             const canvas = document.getElementById('garden-canvas');
             const ctx = canvas ? canvas.getContext('2d') : null;
             let ripples = [];
@@ -550,49 +535,13 @@
                     customFlowers.push({ x: clickX, y: clickY });
                     ripples.push({ x: clickX, y: clickY, radius: 10, alpha: 1.0 });
 
-                    beats += 5;
+                    beats += clickPower;
                     fans += 1;
+                    playClickTone();
                     updateDisplay();
                     saveGame();
                 });
             }
-
-            function updateDisplay() {
-                let bEl = document.getElementById('beats-count');
-                let fEl = document.getElementById('fans-count');
-                if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
-                if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
-            }
-
-            function switchView(view) {
-                currentView = view;
-                localStorage.setItem('beat_lab_current_view', view);
-                document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
-                let target = document.getElementById('view-' + view);
-                if (target) target.classList.remove('hidden');
-                if (view === 'game' || view === 'garten') updateGameViewState();
-            }
-
-            function bindClick(id, handler) {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('click', handler);
-            }
-
-            bindClick('nav-home', () => switchView('home'));
-            bindClick('nav-game', () => switchView('game'));
-            bindClick('nav-garten', () => switchView('garten'));
-            bindClick('nav-cloud', () => switchView('cloud'));
-            bindClick('nav-account', () => switchView('account'));
-            bindClick('nav-admin', () => switchView('admin'));
-            bindClick('home-to-game-btn', () => switchView('game'));
-            bindClick('game-to-home-btn', () => switchView('home'));
-            bindClick('garten-to-home-btn', () => switchView('home'));
-            bindClick('garten-to-game-login-btn', () => switchView('game'));
-            bindClick('cloud-to-home-btn', () => switchView('home'));
-            bindClick('account-to-home-btn', () => switchView('home'));
-            bindClick('admin-to-home-btn', () => switchView('home'));
-
-            bindClick('produce-beat-btn', () => { beats += 5; fans += 1; updateDisplay(); saveGame(); });
 
             switchView(currentView);
         });
