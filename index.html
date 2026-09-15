@@ -183,10 +183,10 @@
                         </a>
                     </div>
 
-                    <!-- Persistent Audio Player -->
+                    <!-- Audio Player (ohne blockierendes crossorigin) -->
                     <div class="bg-darkbg p-6 rounded-2xl border border-gray-800 text-center space-y-4">
-                        <p class="text-gray-300 text-sm">Starte den Audiostream (der Garten reagiert sanft im Takt zur Musik):</p>
-                        <audio id="radioStream" controls crossorigin="anonymous" preload="auto" class="w-full mx-auto max-w-md accent-indigo-600">
+                        <p class="text-gray-300 text-sm">Starte den Audiostream (der Garten reagiert harmonisch im Hintergrund):</p>
+                        <audio id="radioStream" controls preload="auto" class="w-full mx-auto max-w-md accent-indigo-600">
                             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
                             Dein Browser unterstützt kein Audio-Element.
                         </audio>
@@ -440,7 +440,7 @@
                             <p class="text-xs text-gray-400">+1 Beat / Sekunde</p>
                             <span class="text-xs text-indigo-300 font-semibold">Besitz: <span id="countMic">0</span></span>
                         </div>
-                        <button onclick="buyUpgrade('mic')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                        <button id="btnMic" onclick="buyUpgrade('mic')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
                             <span id="costMic">20</span> Beats
                         </button>
                     </div>
@@ -451,7 +451,7 @@
                             <p class="text-xs text-gray-400">+5 Beats / Sekunde</p>
                             <span class="text-xs text-purple-300 font-semibold">Besitz: <span id="countSynth">0</span></span>
                         </div>
-                        <button onclick="buyUpgrade('synth')" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                        <button id="btnSynth" onclick="buyUpgrade('synth')" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
                             <span id="costSynth">150</span> Beats
                         </button>
                     </div>
@@ -462,7 +462,7 @@
                             <p class="text-xs text-gray-400">+25 Beats / Sekunde</p>
                             <span class="text-xs text-pink-300 font-semibold">Besitz: <span id="countDesk">0</span></span>
                         </div>
-                        <button onclick="buyUpgrade('desk')" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                        <button id="btnDesk" onclick="buyUpgrade('desk')" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
                             <span id="costDesk">800</span> Beats
                         </button>
                     </div>
@@ -473,7 +473,7 @@
                             <p class="text-xs text-gray-400">+100 Beats / Sekunde</p>
                             <span class="text-xs text-emerald-300 font-semibold">Besitz: <span id="countLabel">0</span></span>
                         </div>
-                        <button onclick="buyUpgrade('label')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                        <button id="btnLabel" onclick="buyUpgrade('label')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
                             <span id="costLabel">4000</span> Beats
                         </button>
                     </div>
@@ -556,13 +556,13 @@
 
         <!-- Dünger & Audio Mute Steuerung -->
         <div class="flex flex-wrap justify-center gap-3 pt-2">
-            <button onclick="feedPlant(0)" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+            <button id="btnGarden0" onclick="feedPlant(0)" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
                 Stauden düngen (<span id="gardenCost0">50</span> B)
             </button>
-            <button onclick="feedPlant(1)" class="bg-purple-600/30 hover:bg-purple-600 border border-purple-500 text-purple-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+            <button id="btnGarden1" onclick="feedPlant(1)" class="bg-purple-600/30 hover:bg-purple-600 border border-purple-500 text-purple-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
                 Bäume düngen (<span id="gardenCost1">200</span> B)
             </button>
-            <button onclick="feedPlant(2)" class="bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
+            <button id="btnGarden2" onclick="feedPlant(2)" class="bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md">
                 Teich düngen (<span id="gardenCost2">1000</span> B)
             </button>
             <button id="soundToggleBtn" onclick="toggleGameSound()" class="bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md inline-flex items-center space-x-1.5">
@@ -780,11 +780,8 @@
             }
         }
 
-        // --- AUDIO & SANFTES REAKTIVITÄTS-SYSTEM ---
+        // --- ROBUSTES AUDIO SYSTEM OHNE CORS-BLOCKADEN ---
         let audioCtx = null;
-        let audioAnalyser = null;
-        let audioDataArray = null;
-        let audioSourceConnected = false;
         let ambientTimer = 0;
         let targetPulse = 0;
         let currentPulse = 0;
@@ -798,21 +795,6 @@
                 if (audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
-
-                const audioEl = document.getElementById('radioStream');
-                if (audioEl && !audioSourceConnected) {
-                    try {
-                        const source = audioCtx.createMediaElementSource(audioEl);
-                        audioAnalyser = audioCtx.createAnalyser();
-                        audioAnalyser.fftSize = 256;
-                        source.connect(audioAnalyser);
-                        audioAnalyser.connect(audioCtx.destination);
-                        audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
-                        audioSourceConnected = true;
-                    } catch(err) {
-                        console.log("Audio Source already connected or restricted", err);
-                    }
-                }
             } catch(e) {
                 console.log("Audio init error:", e);
             }
@@ -825,7 +807,7 @@
         });
 
         function playCleanCrispSound() {
-            if (!gameSoundEnabled) return; // Stoppt alle In-Game Töne, wenn Sound ausgeschaltet ist
+            if (!gameSoundEnabled) return; 
             try {
                 unlockAudio();
                 if (!audioCtx) return;
@@ -1101,20 +1083,12 @@
             const w = canvas.width;
             const h = canvas.height;
 
-            let audioBass = 0;
-            if (audioAnalyser && audioDataArray) {
-                audioAnalyser.getByteFrequencyData(audioDataArray);
-                let bassSum = 0;
-                for (let i = 0; i < 6; i++) bassSum += audioDataArray[i];
-                audioBass = (bassSum / 6) / 255.0; 
-            }
-
-            animTime += 0.007 + (audioBass * 0.004);
+            animTime += 0.009;
 
             currentPulse += (targetPulse - currentPulse) * 0.08;
             targetPulse += (0 - targetPulse) * 0.05;
 
-            let reactFactor = currentPulse + (audioBass * 0.25);
+            let reactFactor = currentPulse;
 
             let bgGrad = ctx.createRadialGradient(w/2, h/2, 80, w/2, h/2, w * 0.8);
             bgGrad.addColorStop(0, '#0f3822');
@@ -1146,7 +1120,7 @@
             ctx.fillRect(315, 532 + terraceSway, 22, 32); 
             ctx.fillRect(463, 532 + terraceSway, 22, 32);
 
-            let pondGrad = ctx.createRadialGradient(500, 330, 15 + audioBass*4, 500, 330, 120 + audioBass*10);
+            let pondGrad = ctx.createRadialGradient(500, 330, 15, 500, 330, 120);
             pondGrad.addColorStop(0, '#38bdf8');
             pondGrad.addColorStop(0.6, '#0284c7');
             pondGrad.addColorStop(1, '#0369a1');
@@ -1172,7 +1146,7 @@
             }
 
             let treeLvl = gameData.garden[1].level;
-            let windSway = Math.sin(animTime * 1.0) * (2 + audioBass * 2.5);
+            let windSway = Math.sin(animTime * 1.0) * 2;
             let baseRadius = (30 + Math.min(treeLvl * 2, 16)) * (1 + reactFactor * 0.05);
             let treePositions = [[110, 100], [210, 100], [110, 180], [210, 180]];
             
@@ -1189,7 +1163,7 @@
                 ctx.beginPath(); ctx.arc(pos[0] + sW, pos[1] - 5, baseRadius, 0, Math.PI * 2); ctx.fill();
             });
 
-            let bigTreeSway = Math.sin(animTime * 0.9) * (2.5 + audioBass * 3);
+            let bigTreeSway = Math.sin(animTime * 0.9) * 2.5;
             let bigRadius = (60 + Math.cos(animTime * 0.7) * 3) * (1 + reactFactor * 0.06);
             ctx.fillStyle = '#451a03';
             ctx.fillRect(620 - 7 + bigTreeSway*0.3, 90, 14, 50);
@@ -1214,7 +1188,7 @@
             ctx.fillStyle = 'rgba(250, 204, 21, 0.7)';
             particles.forEach(p => {
                 p.x += p.vx + (Math.sin(animTime * 0.5) * 0.15);
-                p.y += p.vy - (audioBass * 0.2);
+                p.y += p.vy;
                 if(p.y < 10) p.y = h - 10;
                 if(p.x < 10 || p.x > w-10) p.vx *= -1;
 
@@ -1256,23 +1230,27 @@
 
             const cMic = document.getElementById('countMic');
             const coMic = document.getElementById('costMic');
+            let costMic = Math.floor(20 * Math.pow(1.22, gameData.mic));
             if (cMic) cMic.innerText = gameData.mic;
-            if (coMic) coMic.innerText = Math.floor(20 * Math.pow(1.22, gameData.mic)).toLocaleString();
+            if (coMic) coMic.innerText = costMic.toLocaleString();
 
             const cSynth = document.getElementById('countSynth');
             const coSynth = document.getElementById('costSynth');
+            let costSynth = Math.floor(150 * Math.pow(1.22, gameData.synth));
             if (cSynth) cSynth.innerText = gameData.synth;
-            if (coSynth) coSynth.innerText = Math.floor(150 * Math.pow(1.22, gameData.synth)).toLocaleString();
+            if (coSynth) coSynth.innerText = costSynth.toLocaleString();
 
             const cDesk = document.getElementById('countDesk');
             const coDesk = document.getElementById('costDesk');
+            let costDesk = Math.floor(800 * Math.pow(1.22, gameData.desk));
             if (cDesk) cDesk.innerText = gameData.desk;
-            if (coDesk) coDesk.innerText = Math.floor(800 * Math.pow(1.22, gameData.desk)).toLocaleString();
+            if (coDesk) coDesk.innerText = costDesk.toLocaleString();
 
             const cLabel = document.getElementById('countLabel');
             const coLabel = document.getElementById('costLabel');
+            let costLabel = Math.floor(4000 * Math.pow(1.22, gameData.label));
             if (cLabel) cLabel.innerText = gameData.label;
-            if (coLabel) coLabel.innerText = Math.floor(4000 * Math.pow(1.22, gameData.label)).toLocaleString();
+            if (coLabel) coLabel.innerText = costLabel.toLocaleString();
 
             const gLvl0 = document.getElementById('gardenLvl0');
             const gLvl1 = document.getElementById('gardenLvl1');
@@ -1281,12 +1259,44 @@
             if (gLvl1) gLvl1.innerText = gameData.garden[1].level;
             if (gLvl2) gLvl2.innerText = gameData.garden[2].level;
 
+            let costG0 = 50 * gameData.garden[0].level;
+            let costG1 = 200 * gameData.garden[1].level;
+            let costG2 = 1000 * gameData.garden[2].level;
+
             const gCost0 = document.getElementById('gardenCost0');
             const gCost1 = document.getElementById('gardenCost1');
             const gCost2 = document.getElementById('gardenCost2');
-            if (gCost0) gCost0.innerText = (50 * gameData.garden[0].level).toLocaleString();
-            if (gCost1) gCost1.innerText = (200 * gameData.garden[1].level).toLocaleString();
-            if (gCost2) gCost2.innerText = (1000 * gameData.garden[2].level).toLocaleString();
+            if (gCost0) gCost0.innerText = costG0.toLocaleString();
+            if (gCost1) gCost1.innerText = costG1.toLocaleString();
+            if (gCost2) gCost2.innerText = costG2.toLocaleString();
+
+            // --- LEUCHT- & PULSIER-LOGIK ---
+            setAffordability('btnMic', gameData.beats >= costMic, 'bg-indigo-600 hover:bg-indigo-500', 'bg-indigo-500 ring-2 ring-indigo-300 animate-pulse shadow-lg shadow-indigo-500/50');
+            setAffordability('btnSynth', gameData.beats >= costSynth, 'bg-purple-600 hover:bg-purple-500', 'bg-purple-500 ring-2 ring-purple-300 animate-pulse shadow-lg shadow-purple-500/50');
+            setAffordability('btnDesk', gameData.beats >= costDesk, 'bg-pink-600 hover:bg-pink-500', 'bg-pink-500 ring-2 ring-pink-300 animate-pulse shadow-lg shadow-pink-500/50');
+            setAffordability('btnLabel', gameData.beats >= costLabel, 'bg-emerald-600 hover:bg-emerald-500', 'bg-emerald-500 ring-2 ring-emerald-300 animate-pulse shadow-lg shadow-emerald-500/50');
+
+            setAffordability('btnGarden0', gameData.beats >= costG0, 'bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500 text-emerald-200', 'bg-emerald-600 border-2 border-emerald-300 text-white ring-2 ring-emerald-400 animate-pulse shadow-lg shadow-emerald-500/50');
+            setAffordability('btnGarden1', gameData.beats >= costG1, 'bg-purple-600/30 hover:bg-purple-600 border border-purple-500 text-purple-200', 'bg-purple-600 border-2 border-purple-300 text-white ring-2 ring-purple-400 animate-pulse shadow-lg shadow-purple-500/50');
+            setAffordability('btnGarden2', gameData.beats >= costG2, 'bg-pink-600/30 hover:bg-pink-600 border border-pink-500 text-pink-200', 'bg-pink-600 border-2 border-pink-300 text-white ring-2 ring-pink-400 animate-pulse shadow-lg shadow-pink-500/50');
+        }
+
+        function setAffordability(btnId, canAfford, normalClass, affordClass) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            if (canAfford) {
+                btn.className = getBaseButtonClasses(btnId) + ' ' + affordClass;
+            } else {
+                btn.className = getBaseButtonClasses(btnId) + ' ' + normalClass + ' opacity-70';
+            }
+        }
+
+        function getBaseButtonClasses(btnId) {
+            if (btnId.startsWith('btnGarden')) {
+                return 'px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-md';
+            } else {
+                return 'text-white text-xs px-4 py-2.5 rounded-lg font-bold transition';
+            }
         }
 
         setInterval(function() {
