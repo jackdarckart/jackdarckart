@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jackdarckart | CloudBeats & Rock-Lab Hub</title>
-    <!-- Sicherheits-Header & Tailwind CSS -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,14 +12,10 @@
     <!-- Header / Navigation -->
     <header class="w-full border-b border-gray-800/80 backdrop-blur-md sticky top-0 z-50 bg-[#0b0f19]/95 px-4 py-3">
         <div class="max-w-4xl mx-auto flex justify-between items-center overflow-x-auto">
-            
-            <!-- Branding / Username -->
             <div class="flex items-center space-x-2 shrink-0">
                 <span class="text-xl p-1.5 bg-purple-600/20 rounded-xl border border-purple-500/30">☁️</span>
                 <span id="user-display" class="font-extrabold text-sm tracking-wide bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">jackdarckart</span>
             </div>
-
-            <!-- Seiten-Navigation -->
             <div class="flex items-center gap-1.5 shrink-0">
                 <button type="button" id="nav-home" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🏠 Dashboard</button>
                 <button type="button" id="nav-game" class="bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700">🎸 Studio-Lab</button>
@@ -33,19 +28,17 @@
         </div>
     </header>
 
-    <!-- Main Content Container -->
+    <!-- Main Content -->
     <main class="max-w-3xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         
-        <!-- 1. DASHBOARD / STARTSEITE -->
+        <!-- 1. DASHBOARD -->
         <div id="view-home" class="view-page hidden w-full py-4 space-y-6 text-left">
-            
-            <!-- Hero Card -->
             <div class="bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-purple-500/30 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
                 <span class="inline-block text-4xl p-3 bg-purple-600/20 rounded-2xl mb-3 border border-purple-500/30">🤘</span>
                 <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">CloudBeats & Rock-Lab Hub</h1>
                 <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">CloudBeats Audio Ecosystem • Meckenheim, NRW</p>
                 <p class="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-lg mx-auto">
-                    Das offizielle Web-Ökosystem von jackdarckart. Hier verschmelzen High-End Audio-Mediathek, tokenisierte Hash-Rate-Economy und kraftvolle Musik-Produktionen zu einem meisterhaften Gesamtkunstwerk.
+                    Das offizielle Web-Ökosystem von jackdarckart. Hier verschmelzen High-End Audio-Mediathek, tokenisierte Hash-Rate-Economy und kraftvolle Musik-Produktionen.
                 </p>
                 <div class="mt-6 flex flex-wrap justify-center gap-3">
                     <button type="button" id="home-to-game-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl shadow-xl text-xs sm:text-sm transition flex items-center gap-2">
@@ -57,324 +50,144 @@
                 </div>
             </div>
 
-            <!-- Discography & Tracks Showcase -->
             <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl space-y-4">
                 <h2 class="text-lg font-bold text-indigo-400 flex items-center gap-2">💿 Master-Releases & Diskografie</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-purple-400 font-semibold">Rock & Alternative (2026)</span>
                         <h3 class="font-bold text-sm text-white">„Die Macht In Uns“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Kompromisslose Produktion, treibender Bass & pure Live-Energie.</p>
                     </div>
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-emerald-400 font-semibold">German Pop (2024)</span>
                         <h3 class="font-bold text-sm text-white">„Dromedary Gletscher“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Atmosphärische Soundscapes & experimentelle Klangreisen.</p>
-                    </div>
-                    <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
-                        <span class="text-xs text-blue-400 font-semibold">Deutschrap & Rock</span>
-                        <h3 class="font-bold text-sm text-white">„Das Sompo Museum“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Kulturelle Tiefe, urbane Beats & prägnanter Flow.</p>
-                    </div>
-                    <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
-                        <span class="text-xs text-pink-400 font-semibold">Rock & Suno AI</span>
-                        <h3 class="font-bold text-sm text-white">„Stolz auf Deutschland“ & „Die Stunden Fliegen“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Vielseitige Produktionen zwischen melodischer Hymne und Tiefgang.</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Offizielle Netzwerke -->
-            <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl space-y-4">
-                <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2">🌐 Offizielles Netzwerk</h2>
-                <div class="grid grid-cols-1 gap-3">
-                    <a href="https://www.reddit.com/user/jackdarckart" target="_blank" rel="noopener noreferrer" class="bg-[#0b0f19]/70 hover:bg-[#0b0f19] border border-orange-500/30 p-4 rounded-2xl transition block text-center group">
-                        <span class="text-2xl block mb-1">💬</span>
-                        <h3 class="font-bold text-xs text-orange-300 group-hover:underline">Reddit Creator Hub ↗</h3>
-                        <p class="text-[10px] text-gray-400 mt-1">Verifizierte Community, Krypto-Insights & Audio-Updates.</p>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Bio & Background Details -->
-            <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl space-y-2 text-xs text-gray-300 leading-relaxed">
-                <h2 class="text-sm font-bold text-amber-400 mb-1">📍 Creator-Standort Meckenheim</h2>
-                <p>
-                    Ansässig in <strong class="text-white">Meckenheim (Nordrhein-Westfalen)</strong>, entwickelt jackdarckart zukunftsweisende Web-Applikationen und Cloud-Hubs. Verfolge das Live-Streaming auf <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" class="text-emerald-400 underline">laut.fm</a> oder gestalte das interaktive Studio aktiv mit.
-                </p>
-            </div>
-
         </div>
 
-        <!-- 2. STUDIO-LAB SEITE -->
+        <!-- 2. STUDIO-LAB -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center">
-            
-            <!-- AUTH CONTAINER -->
             <div id="game-auth-container" class="bg-[#131b2e] border border-purple-500/30 p-6 rounded-3xl shadow-2xl space-y-4 text-left">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
                     <h2 class="text-xl font-bold text-purple-400">CloudBeats Access Gateway</h2>
-                    <p class="text-xs text-gray-400 mt-1">Authentifiziere dich per E-Mail und Sicherheits-PIN, um dein persönliches Studio und den Administrations-Bereich zu entsperren.</p>
+                    <p class="text-xs text-gray-400 mt-1">Authentifiziere dich per E-Mail und PIN.</p>
                 </div>
-
                 <div class="flex border-b border-gray-800 mb-2">
                     <button type="button" id="tab-login-btn" class="flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition">Anmelden</button>
                     <button type="button" id="tab-register-btn" class="flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition">Registrieren</button>
                 </div>
-
                 <div id="form-login" class="space-y-3">
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">Creator E-Mail:</label>
-                        <input type="email" id="login-email" autocomplete="off" spellcheck="false" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="name@domain.de">
+                        <label class="text-xs text-gray-400 block mb-1">E-Mail:</label>
+                        <input type="email" id="login-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="name@domain.de">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">Sicherheits-PIN:</label>
-                        <input type="password" id="login-pin" autocomplete="new-password" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Dein PIN-Code">
+                        <label class="text-xs text-gray-400 block mb-1">PIN:</label>
+                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="PIN-Code">
                     </div>
-                    <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔒 Studio entsperren & Starten</button>
+                    <button type="button" id="submit-login-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">🔒 Studio entsperren</button>
                 </div>
-
                 <div id="form-register" class="space-y-3 hidden">
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">E-Mail (Eindeutige ID):</label>
-                        <input type="email" id="reg-email" autocomplete="off" spellcheck="false" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="name@domain.de">
+                        <label class="text-xs text-gray-400 block mb-1">E-Mail:</label>
+                        <input type="email" id="reg-email" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="name@domain.de">
                     </div>
                     <div>
-                        <label class="text-xs text-gray-400 block mb-1">Sicherheits-PIN festlegen:</label>
-                        <input type="password" id="reg-pin" autocomplete="new-password" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-purple-500 outline-none" placeholder="Zahl oder Code">
+                        <label class="text-xs text-gray-400 block mb-1">PIN festlegen:</label>
+                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm outline-none" placeholder="PIN-Code">
                     </div>
-                    <button type="button" id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">✨ Account erstellen & sichern</button>
-                </div>
-
-                <div class="pt-2 text-center">
-                    <button type="button" id="auth-to-home-btn" class="text-gray-400 hover:text-white text-xs underline">← Zurück zum Dashboard</button>
+                    <button type="button" id="submit-register-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">✨ Account erstellen</button>
                 </div>
             </div>
 
-            <!-- GAME & TYCOON CONTAINER -->
             <div id="game-main-container" class="hidden space-y-6">
-                
                 <div class="flex justify-between items-center bg-[#131b2e] p-3 rounded-2xl border border-purple-500/30">
                     <span id="logged-user-email" class="text-xs text-purple-300 truncate max-w-[200px]">Eingeloggt</span>
-                    <button type="button" id="logout-btn" class="bg-red-900/40 hover:bg-red-900 text-red-300 text-[10px] px-2.5 py-1 rounded-xl border border-red-700/50 transition">🚪 Session beenden</button>
+                    <button type="button" id="logout-btn" class="bg-red-900/40 text-red-300 text-[10px] px-2.5 py-1 rounded-xl">🚪 Abmelden</button>
                 </div>
-
-                <div>
-                    <h2 class="text-2xl font-black text-purple-400 mb-1">CloudBeats Studio-Lab</h2>
-                    <p class="text-gray-400 text-xs">Beats aufnehmen, Hash-Rate maximieren, Charts dominieren & Community aufbauen!</p>
-                </div>
-
-                <!-- Haupt-Clicker -->
-                <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl border border-purple-400/30 flex items-center justify-center gap-3 cursor-pointer">
-                    <span class="text-2xl">🎧</span> Master-Beat Live einspielen <span class="text-xs bg-black/40 px-3 py-1 rounded-xl text-purple-200 font-semibold">+5</span>
+                <button type="button" id="produce-beat-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black py-5 px-6 rounded-3xl shadow-2xl text-xl">
+                    🎧 Master-Beat Live einspielen (+5)
                 </button>
-
-                <!-- Statistik Grid -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-3.5 rounded-2xl shadow-lg text-left">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Tokenized Beats ($BEATS)</p>
+                <div class="grid grid-cols-2 gap-3 text-left">
+                    <div class="bg-[#131b2e] p-3.5 rounded-2xl border border-gray-800">
+                        <p class="text-[10px] text-gray-400 uppercase">Beats</p>
                         <p id="beats-count" class="text-xl font-black text-purple-400">0</p>
                     </div>
-                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-3.5 rounded-2xl shadow-lg text-left">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Global Audience (Fans)</p>
+                    <div class="bg-[#131b2e] p-3.5 rounded-2xl border border-gray-800">
+                        <p class="text-[10px] text-gray-400 uppercase">Fans</p>
                         <p id="fans-count" class="text-xl font-black text-pink-400">0</p>
                     </div>
-                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-3.5 rounded-2xl shadow-lg text-left">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Output Velocity (BPS)</p>
-                        <p id="bps-count" class="text-xl font-black text-emerald-400">0.00</p>
-                    </div>
-                    <div class="bg-[#131b2e]/90 border border-gray-800/80 p-3.5 rounded-2xl shadow-lg text-left">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Hash-Power (TH/s)</p>
-                        <p id="hashrate-count" class="text-xl font-black text-cyan-400">0 TH/s</p>
-                    </div>
                 </div>
-
-                <!-- TYCOON UPGRADE SEKTIONEN -->
-                <div class="space-y-4 text-left">
-                    
-                    <!-- 1. HASH-RATE RIGS -->
-                    <div class="bg-[#131b2e] border border-cyan-500/30 p-4 rounded-2xl space-y-2">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-cyan-400 flex items-center gap-1.5">⚡ Decentralized Hash-Power Rig (+0.15 BPS)</h3>
-                            <span id="rigs-count" class="text-xs text-gray-400">Aktive Rigs: 0</span>
-                        </div>
-                        <p class="text-[11px] text-gray-400">Tokenisierte Bitcoin-Hash-Rate im professionellen Cloud-Stil zur vollautomatischen Generierung von Studio-Beats.</p>
-                        <button type="button" id="buy-rig-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">
-                            ⚡ Rig-Power aktivieren (<span id="rig-cost">50</span> $BEATS)
-                        </button>
-                    </div>
-
-                    <!-- 2. CLOUDBEATS ALBUM-RELEASE -->
-                    <div class="bg-[#131b2e] border border-indigo-500/30 p-4 rounded-2xl space-y-2">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-indigo-400 flex items-center gap-1.5">💿 Global Master-Album Release (+0.50 BPS)</h3>
-                            <span id="albums-count" class="text-xs text-gray-400">Releases: 0</span>
-                        </div>
-                        <p class="text-[11px] text-gray-400">Droppe professionelle Studio-Alben in die Cloud, um treue Fans und konstanten Output zu sichern (+20 Fans).</p>
-                        <button type="button" id="buy-album-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">
-                            💿 Album weltweit veröffentlichen (<span id="album-cost">250</span> $BEATS)
-                        </button>
-                    </div>
-
-                    <!-- 3. AI PRODUCER & LYRIC BOT -->
-                    <div class="bg-[#131b2e] border border-purple-500/30 p-4 rounded-2xl space-y-2">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-purple-400 flex items-center gap-1.5">🤖 Autonomous AI Lyric & Beat Agent (+2.00 BPS)</h3>
-                            <span id="ai-count" class="text-xs text-gray-400">Agenten: 0</span>
-                        </div>
-                        <p class="text-[11px] text-gray-400">Vollautomatisierter KI-Producer für nahtlose, autonome Hit-Produktion rund um die Uhr.</p>
-                        <button type="button" id="buy-ai-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">
-                            🤖 AI-Agenten anheuern (<span id="ai-cost">1000</span> $BEATS)
-                        </button>
-                    </div>
-
-                    <!-- 4. TOKEN STAKING & HASH VAULT -->
-                    <div class="bg-[#131b2e] border border-emerald-500/30 p-4 rounded-2xl space-y-2">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-xs text-emerald-400 flex items-center gap-1.5">💎 Token Staking & Hash Vault (+0.15 BPS)</h3>
-                            <span id="staked-count" class="text-xs text-emerald-300">Gesperrt: 0</span>
-                        </div>
-                        <p class="text-[11px] text-gray-400">Sperre deine Beats im hochprofitablen Staking-Pool für passive Erträge und BPS-Multiplikator.</p>
-                        <div class="flex gap-2">
-                            <button type="button" id="stake-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">💎 <span id="stake-cost">100</span> $BEATS staken</button>
-                            <button type="button" id="unstake-btn" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow cursor-pointer">🔓 Ertrag auszahlen</button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
-                    ← Zurück zum Dashboard
-                </button>
-
-                <!-- ADMINISTRATOR-BEREICH -->
-                <div class="bg-[#131b2e] border border-amber-500/40 p-5 rounded-3xl shadow-2xl space-y-4 text-left mt-8">
-                    <div class="flex items-center gap-2 border-b border-gray-800 pb-2">
-                        <span class="text-xl">🛠️</span>
-                        <h3 class="font-bold text-sm text-amber-400">Studio Nexus Control Center</h3>
-                    </div>
-
-                    <div class="space-y-3">
-                        <h4 class="font-bold text-xs text-yellow-400">🔑 Master PIN aktualisieren</h4>
-                        <div>
-                            <label class="text-[11px] text-gray-400 block mb-1">Neuer Sicherheits-PIN:</label>
-                            <input type="password" id="admin-new-pin" autocomplete="new-password" maxlength="6" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-xs" placeholder="Neuer PIN-Code">
-                        </div>
-                        <button type="button" id="admin-change-pin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded-xl text-xs transition shadow">PIN speichern</button>
-                    </div>
-
-                    <div class="border-t border-red-900/50 pt-3 space-y-2">
-                        <h4 class="font-bold text-xs text-red-400">⚠️ Studio Safety Zone</h4>
-                        <button type="button" id="admin-reset-game-btn" class="w-full bg-red-900/60 hover:bg-red-900 text-red-200 font-semibold py-2 rounded-xl text-xs transition shadow border border-red-700/50">Fortschritt zurücksetzen (Account bleibt aktiv)</button>
-                    </div>
-                </div>
-
+                <button type="button" id="game-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs">← Dashboard</button>
             </div>
-
         </div>
 
-        <!-- 3. BIO-GARDEN SEITE (Mit Webradio, Live Song-Anzeige & Puls-Synchronisation) -->
+        <!-- 3. BIO-GARDEN & WEBRADIO -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
-            
-            <!-- Garten Auth Container (falls nicht eingeloggt) -->
-            <div id="garten-auth-container" class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4 max-w-md mx-auto text-left">
-                <div class="text-center">
-                    <span class="text-3xl mb-2 block">🔒</span>
-                    <h2 class="text-xl font-bold text-emerald-400">Bio-Garden Access Gateway</h2>
-                    <p class="text-xs text-gray-400 mt-1">Bitte melde dich im Studio-Lab an, um das exklusive Klang-Biotop zu betreten.</p>
-                </div>
-                <button type="button" id="garten-to-game-login-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg mt-2">🔑 Zum Studio-Login</button>
+            <div id="garten-auth-container" class="bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl max-w-md mx-auto text-left">
+                <h2 class="text-xl font-bold text-emerald-400">Bio-Garden Access Gateway</h2>
+                <p class="text-xs text-gray-400 mt-1">Bitte im Studio-Lab anmelden.</p>
+                <button type="button" id="garten-to-game-login-btn" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm mt-3">Zum Login</button>
             </div>
 
-            <!-- Garten Main Container (nur für eingeloggte User) -->
             <div id="garten-main-container" class="hidden bg-[#131b2e] border border-emerald-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
                 <div>
                     <span class="text-4xl mb-2 block">🌱</span>
-                    <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden &amp; Live Visualizer</h2>
-                    <!-- Live Song Anzeige von Laut.fm -->
+                    <h2 class="text-2xl font-black text-emerald-400 mb-1">CloudBeats Bio-Garden &amp; Webradio</h2>
                     <div id="current-song-display" class="text-xs text-emerald-300 bg-[#0b0f19] border border-emerald-500/20 py-1.5 px-3 rounded-xl mt-2 inline-block">
-                        🎶 Lade aktuellen Songtitel...
+                        🎶 Lade Song...
                     </div>
                 </div>
 
-                <!-- Musik-Steuerung für Stream & Takt-Sync -->
                 <div class="bg-[#0b0f19] border border-emerald-500/30 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div class="flex items-center gap-2">
-                        <span class="text-emerald-400 font-bold">🎵 Stream &amp; Sync:</span>
+                        <span class="text-emerald-400 font-bold">🎵 Stream:</span>
                         <button type="button" id="toggle-radio-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer">
                             📻 laut.fm Stream starten
-                        </button>
-                        <button type="button" id="toggle-mic-btn" class="bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer">
-                            🎤 Mikrofon (Raum-Sync)
                         </button>
                     </div>
                     <span id="audio-status-text" class="text-gray-400 text-[11px]">Bereit</span>
                 </div>
-                <!-- Stabiler Audio-Player für laut.fm -->
                 <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- Großes, detailliertes grafisches Garten-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/40 shadow-2xl bg-[#06101e]">
                     <canvas id="garden-canvas" width="600" height="380" class="w-full h-auto cursor-pointer block"></canvas>
                 </div>
 
-                <!-- Kleine & unauffällige Pflanzen-Buttons -->
                 <div class="flex justify-center items-center gap-2 pt-1 flex-wrap">
-                    <button type="button" id="plant-1-btn" class="bg-[#0b0f19] hover:bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] transition cursor-pointer shadow">
-                        🌿 Farn (+2)
-                    </button>
-                    <button type="button" id="plant-2-btn" class="bg-[#0b0f19] hover:bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] transition cursor-pointer shadow">
-                        🌸 Blüte (+5)
-                    </button>
-                    <button type="button" id="plant-3-btn" class="bg-[#0b0f19] hover:bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] transition cursor-pointer shadow">
-                        🌳 Wurzel (+10)
-                    </button>
+                    <button type="button" id="plant-1-btn" class="bg-[#0b0f19] border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px]">🌿 Farn (+2)</button>
+                    <button type="button" id="plant-2-btn" class="bg-[#0b0f19] border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px]">🌸 Blüte (+5)</button>
+                    <button type="button" id="plant-3-btn" class="bg-[#0b0f19] border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-[11px]">🌳 Wurzel (+10)</button>
                 </div>
 
-                <div class="pt-2 border-t border-gray-800">
-                    <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700">
-                        ← Zurück zum Dashboard
-                    </button>
-                </div>
+                <button type="button" id="garten-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs">← Dashboard</button>
             </div>
         </div>
 
-        <!-- 4. CLOUD-SYNC SEITE -->
+        <!-- 4. CLOUD-SYNC -->
         <div id="view-cloud" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
-            <div class="bg-[#131b2e] border border-cyan-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
+            <div class="bg-[#131b2e] border border-cyan-500/30 p-6 rounded-3xl space-y-4">
                 <h2 class="text-xl font-bold text-cyan-400">☁️ Cloud-Nexus Sync</h2>
-                <p class="text-xs text-gray-400">Exportiere deinen Studio-Spielstand als verschlüsselten String oder importiere ihn auf einem Zweitgerät.</p>
-                <button type="button" id="export-btn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📤 Spielstand exportieren (Code kopieren)</button>
-                <button type="button" id="import-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📥 Spielstand importieren (Code einfügen)</button>
-                <button type="button" id="cloud-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
-                    ← Zurück zum Dashboard
-                </button>
+                <button type="button" id="cloud-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs">← Dashboard</button>
             </div>
         </div>
 
-        <!-- 5. PROFIL SEITE -->
+        <!-- 5. PROFIL -->
         <div id="view-account" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
-            <div class="bg-[#131b2e] border border-blue-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
-                <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Creator Profil & Identität</h2>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Offizieller Künstlername:</label>
-                    <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
-                </div>
-                <button type="button" id="save-account-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Künstlerprofil speichern</button>
-                <button type="button" id="account-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
-                    ← Zurück zum Dashboard
-                </button>
+            <div class="bg-[#131b2e] border border-blue-500/30 p-6 rounded-3xl space-y-3">
+                <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Profil</h2>
+                <input type="text" id="reg-username" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm" placeholder="Künstlername">
+                <button type="button" id="save-account-btn" class="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm">Speichern</button>
+                <button type="button" id="account-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs mt-2">← Dashboard</button>
             </div>
         </div>
 
-        <!-- 6. ADMIN SEITE -->
+        <!-- 6. ADMIN -->
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
-            <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
+            <div class="bg-[#131b2e] border border-amber-500/30 p-6 rounded-3xl space-y-3">
                 <h2 class="text-xl font-bold text-amber-400 mb-2">🛠️ Nexus System Hub</h2>
-                <p class="text-xs text-gray-400">Verwalte deine Sicherheits-PINs und Systemparameter direkt im Studio-Lab Kontrollzentrum.</p>
-                <button type="button" id="admin-to-home-btn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
-                    ← Zurück zum Dashboard
-                </button>
+                <button type="button" id="admin-to-home-btn" class="w-full bg-gray-800 text-gray-200 py-3 rounded-2xl text-xs">← Dashboard</button>
             </div>
         </div>
 
@@ -383,33 +196,20 @@
     <!-- Footer -->
     <footer class="w-full border-t border-gray-800/80 py-3 px-4 bg-[#0b0f19]">
         <div class="max-w-2xl mx-auto flex justify-between items-center text-xs text-gray-400">
-            <span id="save-status">💾 Live auto-gesichert</span>
-            <span class="text-gray-500">CloudBeats Audio Ecosystem</span>
+            <span id="save-status">💾 Auto-gesichert</span>
+            <span class="text-gray-500">CloudBeats Ecosystem</span>
         </div>
     </footer>
 
-    <!-- GENERATIVE AUDIO & VISUALIZER SCRIPT -->
+    <!-- SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let beats = 0;
             let fans = 0;
-            let bps = 0.0;
-            let fps = 0.0;
-            let hashRate = 0;
-            let rigs = 0;
-            let albums = 0;
-            let aiAgents = 0;
-            let stakedBeats = 0;
-
             let username = localStorage.getItem('beat_lab_user') || 'jackdarckart';
             let soundEnabled = true;
             let loggedInUser = localStorage.getItem('beat_lab_logged_in_user') || null;
             let currentView = localStorage.getItem('beat_lab_current_view') || 'home';
-
-            let rigCost = 50;
-            let albumCost = 250;
-            let aiCost = 1000;
-            let stakeCost = 100;
 
             function loadUserData() {
                 if (!loggedInUser) return;
@@ -419,17 +219,6 @@
                         let u = usersDB[loggedInUser];
                         beats = u.beats || 0;
                         fans = u.fans || 0;
-                        bps = u.bps || 0.0;
-                        fps = u.fps || 0.0;
-                        hashRate = u.hashRate || 0;
-                        rigs = u.rigs || 0;
-                        albums = u.albums || 0;
-                        aiAgents = u.aiAgents || 0;
-                        stakedBeats = u.stakedBeats || 0;
-                        rigCost = u.rigCost || 50;
-                        albumCost = u.albumCost || 250;
-                        aiCost = u.aiCost || 1000;
-                        stakeCost = u.stakeCost || 100;
                     }
                 } catch(e) {}
             }
@@ -439,10 +228,7 @@
                 try {
                     let usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
                     if (usersDB[loggedInUser]) {
-                        usersDB[loggedInUser] = {
-                            ...usersDB[loggedInUser],
-                            beats, fans, bps, fps, hashRate, rigs, albums, aiAgents, stakedBeats, rigCost, albumCost, aiCost, stakeCost
-                        };
+                        usersDB[loggedInUser] = { ...usersDB[loggedInUser], beats, fans };
                         localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
                     }
                 } catch(e) {}
@@ -456,8 +242,6 @@
             function updateGameViewState() {
                 const authContainer = document.getElementById('game-auth-container');
                 const mainContainer = document.getElementById('game-main-container');
-                const loggedEmailDisplay = document.getElementById('logged-user-email');
-
                 const gartenAuthContainer = document.getElementById('garten-auth-container');
                 const gartenMainContainer = document.getElementById('garten-main-container');
 
@@ -465,27 +249,24 @@
                     loadUserData();
                     if(authContainer) authContainer.classList.add('hidden');
                     if(mainContainer) mainContainer.classList.remove('hidden');
-                    if(loggedEmailDisplay) loggedEmailDisplay.innerText = "👤 " + loggedInUser;
-
                     if(gartenAuthContainer) gartenAuthContainer.classList.add('hidden');
                     if(gartenMainContainer) gartenMainContainer.classList.remove('hidden');
-
                     updateDisplay();
                 } else {
                     if(authContainer) authContainer.classList.remove('hidden');
                     if(mainContainer) mainContainer.classList.add('hidden');
-
                     if(gartenAuthContainer) gartenAuthContainer.classList.remove('hidden');
                     if(gartenMainContainer) gartenMainContainer.classList.add('hidden');
                 }
             }
 
+            // Tab Switch Login/Register
             const tabLoginBtn = document.getElementById('tab-login-btn');
             const tabRegisterBtn = document.getElementById('tab-register-btn');
             const formLogin = document.getElementById('form-login');
             const formRegister = document.getElementById('form-register');
 
-            if(tabLoginBtn && tabRegisterBtn && formLogin && formRegister) {
+            if(tabLoginBtn && tabRegisterBtn) {
                 tabLoginBtn.addEventListener('click', () => {
                     tabLoginBtn.className = "flex-1 py-2 text-xs font-bold text-purple-400 border-b-2 border-purple-500 transition";
                     tabRegisterBtn.className = "flex-1 py-2 text-xs font-bold text-gray-400 border-b-2 border-transparent transition";
@@ -500,99 +281,57 @@
                 });
             }
 
+            // Register Handler
             const submitRegisterBtn = document.getElementById('submit-register-btn');
             if(submitRegisterBtn) {
                 submitRegisterBtn.addEventListener('click', () => {
-                    const emailInput = document.getElementById('reg-email').value.trim().toLowerCase();
-                    const pinInput = document.getElementById('reg-pin').value.trim();
-
-                    if (!emailInput || !emailInput.includes('@')) {
-                        alert("❌ Bitte gib eine gültige E-Mail-Adresse ein.");
-                        return;
-                    }
-                    if (!pinInput || pinInput.length < 3) {
-                        alert("❌ Der PIN muss mindestens 3 Zeichen lang sein.");
-                        return;
-                    }
+                    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+                    const pin = document.getElementById('reg-pin').value.trim();
+                    if (!email || !email.includes('@')) { alert("Gültige E-Mail eingeben!"); return; }
+                    if (!pin || pin.length < 3) { alert("PIN mind. 3 Zeichen."); return; }
 
                     let usersDB = {};
                     try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                    if (usersDB[email]) { alert("E-Mail bereits vergeben!"); return; }
 
-                    if (usersDB[emailInput]) {
-                        alert("⚠️ Diese E-Mail ist bereits registriert!");
-                        return;
-                    }
-
-                    usersDB[emailInput] = { pin: pinInput, beats: 0, fans: 0, bps: 0.0, fps: 0.0, hashRate: 0, rigs: 0, albums: 0, aiAgents: 0, stakedBeats: 0, rigCost: 50, albumCost: 250, aiCost: 1000, stakeCost: 100, created: Date.now() };
+                    usersDB[email] = { pin, beats: 0, fans: 0 };
                     localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-
-                    loggedInUser = emailInput;
-                    localStorage.setItem('beat_lab_logged_in_user', emailInput);
-                    document.getElementById('reg-email').value = '';
-                    document.getElementById('reg-pin').value = '';
-
-                    alert("🎉 Account erstellt & Studio entsperrt!");
+                    loggedInUser = email;
+                    localStorage.setItem('beat_lab_logged_in_user', email);
                     updateGameViewState();
+                    alert("Account erstellt!");
                 });
             }
 
+            // Login Handler
             const submitLoginBtn = document.getElementById('submit-login-btn');
             if(submitLoginBtn) {
                 submitLoginBtn.addEventListener('click', () => {
-                    const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
-                    const pinInput = document.getElementById('login-pin').value.trim();
-
+                    const email = document.getElementById('login-email').value.trim().toLowerCase();
+                    const pin = document.getElementById('login-pin').value.trim();
                     let usersDB = {};
                     try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                    if (!usersDB[email] || usersDB[email].pin !== pin) { alert("Falsche E-Mail oder PIN!"); return; }
 
-                    if (!usersDB[emailInput] || usersDB[emailInput].pin !== pinInput) {
-                        alert("❌ Ungültige E-Mail oder falscher PIN!");
-                        return;
-                    }
-
-                    loggedInUser = emailInput;
-                    localStorage.setItem('beat_lab_logged_in_user', emailInput);
-                    document.getElementById('login-email').value = '';
-                    document.getElementById('login-pin').value = '';
-
-                    alert("🚀 Erfolgreich im Studio angemeldet!");
+                    loggedInUser = email;
+                    localStorage.setItem('beat_lab_logged_in_user', email);
                     updateGameViewState();
+                    alert("Eingeloggt!");
                 });
             }
 
+            // Logout Handler
             const logoutBtn = document.getElementById('logout-btn');
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
                     saveGame();
                     loggedInUser = null;
                     localStorage.removeItem('beat_lab_logged_in_user');
-                    if(document.getElementById('login-email')) document.getElementById('login-email').value = '';
-                    if(document.getElementById('login-pin')) document.getElementById('login-pin').value = '';
                     updateGameViewState();
-                    alert("🔒 Studio-Session sicher beendet.");
                 });
             }
 
-            const adminChangePinBtn = document.getElementById('admin-change-pin-btn');
-            if(adminChangePinBtn) {
-                adminChangePinBtn.addEventListener('click', () => {
-                    const newPin = document.getElementById('admin-new-pin').value.trim();
-                    if (!newPin || newPin.length < 3) {
-                        alert("❌ PIN muss mindestens 3 Zeichen lang sein.");
-                        return;
-                    }
-                    let usersDB = {};
-                    try { usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    if (loggedInUser && usersDB[loggedInUser]) {
-                        usersDB[loggedInUser].pin = newPin;
-                        localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-                        alert("✅ Master PIN erfolgreich aktualisiert!");
-                        document.getElementById('admin-new-pin').value = '';
-                    }
-                });
-            }
-
-            // --- LAUT.FM LIVE SONG API (Song-Erkennung) ---
+            // Live Song API
             async function fetchCurrentSong() {
                 try {
                     let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
@@ -602,64 +341,31 @@
                         if (songEl && data) {
                             let artist = data.artist ? data.artist.name : "";
                             let title = data.title || "";
-                            if (artist || title) {
-                                songEl.innerText = `🎶 Live: ${artist} ${title ? '– ' + title : ''}`;
-                            } else {
-                                songEl.innerText = `🎶 laut.fm/jackdarckart On Air`;
-                            }
+                            songEl.innerText = artist || title ? `🎶 Live: ${artist} ${title ? '– ' + title : ''}` : `🎶 laut.fm/jackdarckart On Air`;
                         }
                     }
-                } catch(e) {
-                    let songEl = document.getElementById('current-song-display');
-                    if (songEl) songEl.innerText = `🎶 laut.fm/jackdarckart On Air`;
-                }
+                } catch(e) {}
             }
             setInterval(fetchCurrentSong, 15000);
             fetchCurrentSong();
 
-            // 🎵 AUDIO & ROBUST STREAM SETUP
-            let globalAudioCtx = null;
-            let analyserNode = null;
-            let freqDataArray = null;
-            let isStreamingRadio = false;
-            let isUsingMic = false;
-
-            const studioScale = [
-                130.81, 146.83, 164.81, 196.00, 220.00,
-                261.63, 293.66, 329.63, 392.00, 440.00,
-                523.25, 587.33, 659.25, 783.99, 880.00, 1046.50
-            ];
-
-            function initAudioContext() {
-                if (!globalAudioCtx) {
-                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-                    globalAudioCtx = new window.AudioContext();
-                    analyserNode = globalAudioCtx.createAnalyser();
-                    analyserNode.fftSize = 256;
-                    freqDataArray = new Uint8Array(analyserNode.frequencyBinCount);
-                }
-                if (globalAudioCtx.state === 'suspended') {
-                    globalAudioCtx.resume();
-                }
-            }
-
+            // Webradio Stream Setup
             const radioStreamEl = document.getElementById('external-audio-stream');
             const toggleRadioBtn = document.getElementById('toggle-radio-btn');
             const audioStatusText = document.getElementById('audio-status-text');
+            let isStreamingRadio = false;
 
             if (toggleRadioBtn && radioStreamEl) {
                 toggleRadioBtn.addEventListener('click', async () => {
-                    initAudioContext();
                     if (!isStreamingRadio) {
                         try {
                             await radioStreamEl.play();
                             isStreamingRadio = true;
-                            isUsingMic = false;
                             toggleRadioBtn.innerText = "⏹️ Stream stoppen";
                             toggleRadioBtn.className = "bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
-                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio Stream läuft aktiv";
+                            if(audioStatusText) audioStatusText.innerText = "🟢 Webradio aktiv";
                         } catch(e) {
-                            alert("⚠️ Stream konnte nicht gestartet werden.");
+                            alert("Stream konnte nicht gestartet werden.");
                         }
                     } else {
                         radioStreamEl.pause();
@@ -671,90 +377,36 @@
                 });
             }
 
-            const toggleMicBtn = document.getElementById('toggle-mic-btn');
-            if (toggleMicBtn) {
-                toggleMicBtn.addEventListener('click', async () => {
-                    initAudioContext();
-                    if (!isUsingMic) {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                            let micSource = globalAudioCtx.createMediaStreamSource(stream);
-                            micSource.connect(analyserNode);
-                            isUsingMic = true;
-                            if (isStreamingRadio && radioStreamEl) {
-                                radioStreamEl.pause();
-                                isStreamingRadio = false;
-                                if(toggleRadioBtn) {
-                                    toggleRadioBtn.innerText = "📻 laut.fm Stream starten";
-                                    toggleRadioBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer";
-                                }
-                            }
-                            toggleMicBtn.innerText = "⏹️ Mikrofon stoppen";
-                            toggleMicBtn.className = "bg-red-900 text-white px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer border border-red-700";
-                            if(audioStatusText) audioStatusText.innerText = "🎤 Mikrofon-Raum-Sync aktiv";
-                        } catch(e) {
-                            alert("⚠️ Mikrofon-Zugriff verweigert.");
-                        }
-                    } else {
-                        window.location.reload();
-                    }
-                });
+            // Canvas Garden Animation
+            const canvas = document.getElementById('garden-canvas');
+            const ctx = canvas ? canvas.getContext('2d') : null;
+            let ripples = [];
+
+            function drawGarden() {
+                if (!ctx || !canvas) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                let pulse = isStreamingRadio ? (Math.sin(Date.now() / 200) + 1) / 3 : 0.1;
+
+                ctx.fillStyle = '#0f291e';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Fountain
+                ctx.strokeStyle = `rgba(110, 231, 183, ${0.4 + pulse})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(430, 200, 15 + (pulse * 10), 0, Math.PI * 2);
+                ctx.stroke();
+
+                requestAnimationFrame(drawGarden);
             }
+            if(canvas) requestAnimationFrame(drawGarden);
 
-            function playSingleTone(customFreq = null) {
-                if (!soundEnabled) return;
-                if (currentView !== 'game' && currentView !== 'garten') return;
-
-                try {
-                    initAudioContext();
-                    const now = globalAudioCtx.currentTime;
-                    let freq = customFreq !== null ? customFreq : studioScale[Math.floor(Math.random() * studioScale.length)];
-                    if (customFreq === null && Math.random() > 0.7) {
-                        freq *= (Math.random() > 0.5 ? 2 : 0.5);
-                    }
-
-                    let osc1 = globalAudioCtx.createOscillator();
-                    let osc2 = globalAudioCtx.createOscillator();
-                    let filter = globalAudioCtx.createBiquadFilter();
-                    let gainNode = globalAudioCtx.createGain();
-
-                    osc1.type = 'sine';
-                    osc2.type = 'triangle';
-                    osc1.frequency.setValueAtTime(freq, now);
-                    osc2.frequency.setValueAtTime(freq * 1.004, now);
-
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(1200, now);
-
-                    gainNode.gain.setValueAtTime(0.0001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.05, now + 0.04);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
-
-                    osc1.connect(filter);
-                    osc2.connect(filter);
-                    filter.connect(gainNode);
-                    gainNode.connect(globalAudioCtx.destination);
-
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc1.stop(now + 0.85);
-                    osc2.stop(now + 0.85);
-
-                    setTimeout(() => {
-                        try { osc1.disconnect(); osc2.disconnect(); filter.disconnect(); gainNode.disconnect(); } catch(e){}
-                    }, 900);
-                } catch(e) {}
-            }
-
-            function toggleSound() {
-                soundEnabled = !soundEnabled;
-                let btn = document.getElementById('sound-btn');
-                if (btn) {
-                    btn.innerText = soundEnabled ? "🔊" : "🔇";
-                    btn.className = soundEnabled 
-                        ? "bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700" 
-                        : "bg-red-900 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-red-700";
-                }
+            function updateDisplay() {
+                let bEl = document.getElementById('beats-count');
+                let fEl = document.getElementById('fans-count');
+                if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
+                if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
             }
 
             function switchView(view) {
@@ -763,271 +415,7 @@
                 document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
                 let target = document.getElementById('view-' + view);
                 if (target) target.classList.remove('hidden');
-
                 if (view === 'game' || view === 'garten') updateGameViewState();
-                if (view === 'account') {
-                    let rUser = document.getElementById('reg-username');
-                    if(rUser) rUser.value = username;
-                }
-
-                ['home', 'game', 'garten', 'cloud', 'account', 'admin'].forEach(v => {
-                    let b = document.getElementById('nav-' + v);
-                    if (b) {
-                        b.className = (v === view) 
-                            ? "bg-purple-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow"
-                            : "bg-gray-800 text-gray-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700";
-                    }
-                });
-            }
-
-            function produceBeat() {
-                beats += 5;
-                playSingleTone();
-                triggerGardenRipple();
-                updateDisplay();
-                saveGame();
-            }
-
-            function harvestPlant(amount, freq) {
-                beats += amount;
-                playSingleTone(freq);
-                triggerGardenRipple();
-                updateDisplay();
-                saveGame();
-            }
-
-            // --- ANIMATED GARDEN CANVAS (ROBUST STREAM & RHYTHM SYNC) ---
-            const canvas = document.getElementById('garden-canvas');
-            const ctx = canvas ? canvas.getContext('2d') : null;
-            let ripples = [];
-            let plantPulse = 0;
-
-            function triggerGardenRipple() {
-                ripples.push({ x: 380, y: 200, radius: 10, alpha: 1.0 });
-                plantPulse = 1.0;
-            }
-
-            function drawGarden() {
-                if (!ctx || !canvas) return;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                let bassEnergy = 0;
-                if (isUsingMic && analyserNode && freqDataArray) {
-                    try {
-                        analyserNode.getByteFrequencyData(freqDataArray);
-                        let bassSum = 0;
-                        for (let i = 0; i < 8; i++) { bassSum += freqDataArray[i]; }
-                        bassEnergy = bassSum / 8 / 255;
-                        if (bassEnergy > 0.55 && Math.random() < 0.2) {
-                            triggerGardenRipple();
-                        }
-                    } catch(e) {}
-                } else if (isStreamingRadio) {
-                    // Lebendiger Rhythmus-Puls, wenn der Webradio-Stream läuft
-                    bassEnergy = (Math.sin(Date.now() / 220) + 1) / 2.2;
-                    if (Math.random() < 0.1) {
-                        triggerGardenRipple();
-                    }
-                }
-
-                let time = Date.now() / 400;
-
-                ctx.fillStyle = '#0f291e';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#14532d';
-                ctx.fillRect(40, 20, 520, 30);
-                ctx.strokeStyle = '#166534';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(40, 20, 520, 30);
-
-                ctx.fillStyle = '#1a202c';
-                ctx.fillRect(80, 100, 220, 220);
-                ctx.fillStyle = '#2d3748';
-                for(let p=0; p<7; p++) {
-                    ctx.fillRect(95 + (p%3)*65, 115 + Math.floor(p/3)*65, 55, 50);
-                }
-
-                ctx.fillStyle = '#0e3440';
-                ctx.fillRect(320, 110, 220, 180);
-                ctx.strokeStyle = '#235868';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(320, 110, 220, 180);
-
-                let fountainRadius = 15 + (bassEnergy * 16) + Math.sin(time * 2) * 4;
-                ctx.strokeStyle = `rgba(110, 231, 183, ${0.4 + bassEnergy * 0.6})`;
-                ctx.lineWidth = 2 + (bassEnergy * 2.5);
-                ctx.beginPath();
-                ctx.arc(430, 200, fountainRadius, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ripples.forEach((rip, idx) => {
-                    rip.radius += 1.8 + (bassEnergy * 1.8);
-                    rip.alpha -= 0.015;
-                    if (rip.alpha <= 0) {
-                        ripples.splice(idx, 1);
-                    } else {
-                        ctx.strokeStyle = `rgba(110, 231, 183, ${rip.alpha})`;
-                        ctx.lineWidth = 2.5;
-                        ctx.beginPath();
-                        ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
-                        ctx.stroke();
-                    }
-                });
-
-                ctx.fillStyle = '#221911';
-                ctx.fillRect(150, 310, 300, 70);
-                ctx.strokeStyle = '#3d2b1f';
-                ctx.lineWidth = 1;
-                for(let x=150; x<450; x+=18) {
-                    ctx.beginPath(); ctx.moveTo(x, 310); ctx.lineTo(x, 380); ctx.stroke();
-                }
-
-                let pScale = 1 + (plantPulse * 0.12) + (bassEnergy * 0.35);
-                if (plantPulse > 0) plantPulse -= 0.03;
-
-                ctx.fillStyle = '#15803d';
-                ctx.beginPath(); ctx.arc(130, 80, 22 * pScale, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(200, 75, 26 * pScale, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(270, 80, 20 * pScale, 0, Math.PI*2); ctx.fill();
-
-                let windOffset = Math.sin(time) * (3 + bassEnergy * 6);
-                ctx.fillStyle = '#db2777';
-                for(let b=0; b<12; b++) {
-                    ctx.beginPath();
-                    ctx.arc(545 + Math.sin(b)*5, 120 + b*14 + windOffset, 7 + (bassEnergy * 3.5), 0, Math.PI*2);
-                    ctx.fill();
-                }
-                ctx.fillStyle = '#9333ea';
-                for(let b=0; b<8; b++) {
-                    ctx.beginPath();
-                    ctx.arc(60 + windOffset, 150 + b*18, 8, 0, Math.PI*2);
-                    ctx.fill();
-                }
-
-                ctx.fillStyle = '#14532d';
-                ctx.beginPath(); ctx.arc(500, 65, 40 * pScale, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#166534';
-                ctx.beginPath(); ctx.arc(530, 50, 35 * pScale, 0, Math.PI*2); ctx.fill();
-
-                requestAnimationFrame(drawGarden);
-            }
-
-            if(canvas) {
-                requestAnimationFrame(drawGarden);
-                canvas.addEventListener('click', (e) => {
-                    playSingleTone(329.63);
-                    triggerGardenRipple();
-                    beats += 5;
-                    updateDisplay();
-                    saveGame();
-                });
-            }
-
-            function buyRig() {
-                if (beats >= rigCost) {
-                    beats -= rigCost;
-                    rigs += 1;
-                    hashRate += 1;
-                    bps += 0.15;
-                    rigCost = Math.floor(rigCost * 1.40);
-                    updateDisplay();
-                    saveGame();
-                } else {
-                    alert("❌ Nicht genug $BEATS für dieses Rig!");
-                }
-            }
-
-            function buyAlbum() {
-                if (beats >= albumCost) {
-                    beats -= albumCost;
-                    albums += 1;
-                    fans += 20;
-                    bps += 0.50;
-                    fps += 0.20;
-                    albumCost = Math.floor(albumCost * 1.5);
-                    updateDisplay();
-                    saveGame();
-                } else {
-                    alert("❌ Nicht genug $BEATS für ein Album-Release!");
-                }
-            }
-
-            function buyAI() {
-                if (beats >= aiCost) {
-                    beats -= aiCost;
-                    aiAgents += 1;
-                    bps += 2.00;
-                    fps += 0.60;
-                    aiCost = Math.floor(aiCost * 1.55);
-                    updateDisplay();
-                    saveGame();
-                } else {
-                    alert("❌ Nicht genug $BEATS für einen AI-Agenten!");
-                }
-            }
-
-            function stakeBeats() {
-                if (beats >= stakeCost) {
-                    beats -= stakeCost;
-                    stakedBeats += stakeCost;
-                    bps += 0.15;
-                    stakeCost = Math.floor(stakeCost * 1.45);
-                    updateDisplay();
-                    saveGame();
-                } else {
-                    alert("❌ Nicht genug $BEATS für das Staking!");
-                }
-            }
-
-            function unstakeBeats() {
-                if (stakedBeats >= 100) {
-                    let released = stakedBeats;
-                    beats += released;
-                    stakedBeats = 0;
-                    bps = Math.max(0, bps - (released / 100 * 0.15));
-                    stakeCost = 100;
-                    updateDisplay();
-                    saveGame();
-                } else {
-                    alert("❌ Keine gestakten $BEATS im Vault vorhanden!");
-                }
-            }
-
-            function checkAffordability(elementId, cost) {
-                const el = document.getElementById(elementId);
-                if (!el) return;
-                if (beats >= cost) {
-                    el.classList.add('animate-pulse', 'ring-2', 'ring-offset-2', 'ring-offset-[#131b2e]', 'shadow-lg');
-                } else {
-                    el.classList.remove('animate-pulse', 'ring-2', 'ring-offset-2', 'ring-offset-[#131b2e]', 'shadow-lg');
-                }
-            }
-
-            function updateDisplay() {
-                let bEl = document.getElementById('beats-count');
-                let fEl = document.getElementById('fans-count');
-                let bpsEl = document.getElementById('bps-count');
-                let hrEl = document.getElementById('hashrate-count');
-                
-                if(bEl) bEl.innerText = Math.floor(beats).toLocaleString('de-DE');
-                if(fEl) fEl.innerText = Math.floor(fans).toLocaleString('de-DE');
-                if(bpsEl) bpsEl.innerText = bps.toFixed(2);
-                if(hrEl) hrEl.innerText = hashRate + " TH/s";
-
-                if(document.getElementById('rigs-count')) document.getElementById('rigs-count').innerText = "Aktive Rigs: " + rigs;
-                if(document.getElementById('rig-cost')) document.getElementById('rig-cost').innerText = rigCost;
-                if(document.getElementById('albums-count')) document.getElementById('albums-count').innerText = "Releases: " + albums;
-                if(document.getElementById('album-cost')) document.getElementById('album-cost').innerText = albumCost;
-                if(document.getElementById('ai-count')) document.getElementById('ai-count').innerText = "Agenten: " + aiAgents;
-                if(document.getElementById('ai-cost')) document.getElementById('ai-cost').innerText = aiCost;
-                if(document.getElementById('staked-count')) document.getElementById('staked-count').innerText = "Gesperrt: " + stakedBeats;
-                if(document.getElementById('stake-cost')) document.getElementById('stake-cost').innerText = stakeCost;
-
-                checkAffordability('buy-rig-btn', rigCost);
-                checkAffordability('buy-album-btn', albumCost);
-                checkAffordability('buy-ai-btn', aiCost);
-                checkAffordability('stake-btn', stakeCost);
             }
 
             function bindClick(id, handler) {
@@ -1041,16 +429,7 @@
             bindClick('nav-cloud', () => switchView('cloud'));
             bindClick('nav-account', () => switchView('account'));
             bindClick('nav-admin', () => switchView('admin'));
-            bindClick('sound-btn', toggleSound);
-
             bindClick('home-to-game-btn', () => switchView('game'));
-            bindClick('auth-to-home-btn', () => switchView('home'));
-            bindClick('produce-beat-btn', produceBeat);
-            bindClick('buy-rig-btn', buyRig);
-            bindClick('buy-album-btn', buyAlbum);
-            bindClick('buy-ai-btn', buyAI);
-            bindClick('stake-btn', stakeBeats);
-            bindClick('unstake-btn', unstakeBeats);
             bindClick('game-to-home-btn', () => switchView('home'));
             bindClick('garten-to-home-btn', () => switchView('home'));
             bindClick('garten-to-game-login-btn', () => switchView('game'));
@@ -1058,58 +437,11 @@
             bindClick('account-to-home-btn', () => switchView('home'));
             bindClick('admin-to-home-btn', () => switchView('home'));
 
-            bindClick('plant-1-btn', () => harvestPlant(2, 261.63));
-            bindClick('plant-2-btn', () => harvestPlant(5, 329.63));
-            bindClick('plant-3-btn', () => harvestPlant(10, 196.00));
+            bindClick('produce-beat-btn', () => { beats += 5; updateDisplay(); saveGame(); });
+            bindClick('plant-1-btn', () => { beats += 2; updateDisplay(); saveGame(); });
+            bindClick('plant-2-btn', () => { beats += 5; updateDisplay(); saveGame(); });
+            bindClick('plant-3-btn', () => { beats += 10; updateDisplay(); saveGame(); });
 
-            const saveAccountBtn = document.getElementById('save-account-btn');
-            if(saveAccountBtn) {
-                saveAccountBtn.addEventListener('click', () => {
-                    let regUser = document.getElementById('reg-username').value;
-                    if (regUser && regUser.trim() !== "") {
-                        username = regUser.trim();
-                        let ud = document.getElementById('user-display');
-                        if(ud) ud.innerText = username;
-                        localStorage.setItem('beat_lab_user', username);
-                        alert("🎉 Künstlerprofil erfolgreich gespeichert!");
-                    }
-                });
-            }
-
-            const adminResetGameBtn = document.getElementById('admin-reset-game-btn');
-            if(adminResetGameBtn) {
-                adminResetGameBtn.addEventListener('click', () => {
-                    if (confirm("⚠️ ACHTUNG: Möchtest du den Spielstand dieses Accounts auf 0 zurücksetzen?")) {
-                        beats = 0; fans = 0; bps = 0.0; fps = 0.0; hashRate = 0; rigs = 0; albums = 0; aiAgents = 0; stakedBeats = 0;
-                        rigCost = 50; albumCost = 250; aiCost = 1000; stakeCost = 100;
-                        updateDisplay();
-                        saveGame();
-                        alert("🔄 Studio-Fortschritt erfolgreich zurückgesetzt.");
-                    }
-                });
-            }
-
-            setInterval(() => {
-                if (loggedInUser) {
-                    if (bps > 0) {
-                        beats += bps / 10;
-                        let totalUpgrades = rigs + albums + aiAgents;
-                        let triggerChance = 0.004 + (Math.log(1 + totalUpgrades) * 0.0012); 
-                        triggerChance = Math.min(triggerChance, 0.025);
-
-                        if (Math.random() < triggerChance) {
-                            playSingleTone();
-                            triggerGardenRipple();
-                        }
-                    }
-                    if (fps > 0) fans += fps / 10;
-                    updateDisplay();
-                }
-            }, 100);
-
-            setInterval(() => { saveGame(); }, 5000);
-
-            updateDisplay();
             switchView(currentView);
         });
     </script>
