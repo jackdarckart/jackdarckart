@@ -37,10 +37,7 @@
         
         <!-- 1. STARTSEITE (Künstler-Hub) -->
         <div id="view-home" class="view-page w-full py-4 space-y-6 text-left">
-            
-            <!-- Hero Card -->
             <div class="bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-purple-500/30 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden text-center">
-                <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl"></div>
                 <span class="inline-block text-4xl p-3 bg-purple-600/20 rounded-2xl mb-3 border border-purple-500/30">🎛️</span>
                 <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">jackdarckart</h1>
                 <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide uppercase mb-4">Offizielles Musik-Hub • Meckenheim, NRW</p>
@@ -57,7 +54,7 @@
                 </div>
             </div>
 
-            <!-- Discography & Tracks Showcase -->
+            <!-- Discography Showcase -->
             <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl space-y-4">
                 <h2 class="text-lg font-bold text-indigo-400 flex items-center gap-2">💿 Veröffentlichungen & Highlights</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -83,18 +80,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Radio & Streaming Integration -->
-            <div class="bg-[#131b2e]/90 border border-gray-800/80 p-6 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="text-left">
-                    <h2 class="text-md font-bold text-cyan-400">🌐 Web-Streaming & Community</h2>
-                    <p class="text-xs text-gray-400 mt-1">Verfolgen Sie die Radio-Präsenz auf laut.fm, Streema und radio.de oder vernetzen Sie sich via GitHub & Cloud-Hubs.</p>
-                </div>
-                <button onclick="switchView('cloud')" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-5 rounded-2xl text-xs transition shrink-0">
-                    ☁️ Cloud & Sync öffnen
-                </button>
-            </div>
-
         </div>
 
         <!-- 2. GAME-SEITE (Beat-Lab) -->
@@ -143,18 +128,17 @@
         <!-- 4. CLOUD-SEITE -->
         <div id="view-cloud" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-cyan-500/30 p-6 rounded-3xl shadow-2xl space-y-4">
-                <h2 class="text-xl font-bold text-cyan-400">☁️ Cloud-Sync (Überall mitnehmen)</h2>
+                <h2 class="text-xl font-bold text-cyan-400">☁️ Cloud-Sync</h2>
                 <p class="text-xs text-gray-400">Exportiere deinen Spielstand als Code oder importiere ihn auf einem anderen Gerät.</p>
                 <button onclick="exportSave()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📤 Code kopieren (Export)</button>
                 <button onclick="importSave()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-2xl text-sm transition">📥 Code einfügen (Import)</button>
-                
                 <button onclick="switchView('home')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
             </div>
         </div>
 
-        <!-- 5. ACCOUNT & REGISTRIERUNG SEITE -->
+        <!-- 5. ACCOUNT-SEITE -->
         <div id="view-account" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="bg-[#131b2e] border border-blue-500/30 p-6 rounded-3xl shadow-2xl space-y-3">
                 <h2 class="text-xl font-bold text-blue-400 mb-2">📝 Account & Passwort</h2>
@@ -171,7 +155,6 @@
                     <input type="password" id="reg-password" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
                 <button onclick="submitRegister()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Account speichern</button>
-
                 <button onclick="switchView('home')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
@@ -195,7 +178,6 @@
                     <input type="number" step="0.1" id="admin-bps-input" class="w-full bg-[#0b0f19] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
                 </div>
                 <button onclick="applyAdminStats()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-sm transition mt-2">Werte anwenden</button>
-
                 <button onclick="switchView('home')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-3 rounded-2xl text-xs transition border border-gray-700 mt-2">
                     ← Zurück zur Startseite
                 </button>
@@ -221,7 +203,8 @@
         let soundEnabled = true;
         let currentView = 'home';
 
-        document.getElementById('user-display').innerText = username;
+        const userDisplay = document.getElementById('user-display');
+        if (userDisplay) userDisplay.innerText = username;
 
         let audioCtx = null;
         function playBeatSound() {
@@ -250,10 +233,12 @@
         function toggleSound() {
             soundEnabled = !soundEnabled;
             let btn = document.getElementById('sound-btn');
-            btn.innerText = soundEnabled ? "🔊" : "🔇";
-            btn.className = soundEnabled 
-                ? "bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700" 
-                : "bg-red-900 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-red-700";
+            if (btn) {
+                btn.innerText = soundEnabled ? "🔊" : "🔇";
+                btn.className = soundEnabled 
+                    ? "bg-gray-800 text-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-gray-700" 
+                    : "bg-red-900 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-red-700";
+            }
         }
 
         function switchView(view) {
@@ -263,13 +248,18 @@
             if (target) target.classList.remove('hidden');
 
             if (view === 'admin') {
-                document.getElementById('admin-beats-input').value = Math.floor(beats);
-                document.getElementById('admin-fans-input').value = fans;
-                document.getElementById('admin-bps-input').value = bps.toFixed(1);
+                let bIn = document.getElementById('admin-beats-input');
+                let fIn = document.getElementById('admin-fans-input');
+                let bpsIn = document.getElementById('admin-bps-input');
+                if(bIn) bIn.value = Math.floor(beats);
+                if(fIn) fIn.value = fans;
+                if(bpsIn) bpsIn.value = bps.toFixed(1);
             }
             if (view === 'account') {
-                document.getElementById('reg-username').value = username;
-                document.getElementById('reg-email').value = localStorage.getItem('beat_lab_email') || '';
+                let rUser = document.getElementById('reg-username');
+                let rEmail = document.getElementById('reg-email');
+                if(rUser) rUser.value = username;
+                if(rEmail) rEmail.value = localStorage.getItem('beat_lab_email') || '';
             }
 
             ['home', 'game', 'garten', 'cloud', 'account', 'admin'].forEach(v => {
@@ -314,7 +304,8 @@
             let regPass = document.getElementById('reg-password').value;
             if (regUser && regUser.trim() !== "") {
                 username = regUser.trim();
-                document.getElementById('user-display').innerText = username;
+                let ud = document.getElementById('user-display');
+                if(ud) ud.innerText = username;
                 localStorage.setItem('beat_lab_email', regEmail);
                 if(regPass) localStorage.setItem('beat_lab_pass', regPass);
                 saveGame();
@@ -350,7 +341,8 @@
                     username = data.username || 'jackdarckart';
                     if(data.email) localStorage.setItem('beat_lab_email', data.email);
                     if(data.pass) localStorage.setItem('beat_lab_pass', data.pass);
-                    document.getElementById('user-display').innerText = username;
+                    let ud = document.getElementById('user-display');
+                    if(ud) ud.innerText = username;
                     saveGame();
                     updateDisplay();
                     alert("🚀 Spielstand erfolgreich geladen!");
@@ -364,7 +356,8 @@
             if (confirm("Wirklich alles zurücksetzen?")) {
                 localStorage.clear();
                 beats = 40430; fans = 14603; bps = 161.0; username = 'jackdarckart';
-                document.getElementById('user-display').innerText = username;
+                let ud = document.getElementById('user-display');
+                if(ud) ud.innerText = username;
                 updateDisplay();
                 saveGame();
             }
