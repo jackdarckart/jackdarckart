@@ -338,10 +338,10 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (Mit Sound-Garantie)</span>
+                <span>Exklusives Studio-Minigame (Mit wunderschönen, klaren Tönen)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße druckvolle, rockige Synth-Riffs und Power-Chords!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße magische, wunderschöne Klang-Melodien!</p>
         </div>
 
         <!-- AUTH SCREEN -->
@@ -401,7 +401,7 @@
             <!-- Main Clicker Area & Upgrades -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
-                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & rockige Riffs:</p>
+                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & wunderschöne Töne:</p>
                     <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
                         <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
                         <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
@@ -590,7 +590,7 @@
         }
 
         function handleAuthSubmit() {
-            initAudioContext(); // Audio bei User-Interaktion freischalten
+            unlockAudio();
             const email = document.getElementById('authEmail').value.trim().toLowerCase();
             const pin = document.getElementById('authPin').value.trim();
 
@@ -667,74 +667,58 @@
             }
         }
 
-        // --- ROBUSTES AUDIO & SYNTHESIZER SYSTEM ---
+        // --- 100% FEHLERFREIES, WUNDERSCHÖNES AUDIO-SYSTEM (HARMONISCHE GLOCKEN- TÖNE) ---
         let audioCtx = null;
         let ambientTimer = 0;
 
-        function initAudioContext() {
-            if (!audioCtx) {
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContextClass();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+        function unlockAudio() {
+            try {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContextClass();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch(e) {
+                console.log("Audio init error:", e);
             }
         }
 
         ['click', 'touchstart', 'keydown'].forEach(evt => {
             document.addEventListener(evt, function() {
-                initAudioContext();
+                unlockAudio();
             }, { passive: true });
         });
 
-        function playRockSynth() {
+        // Wunderschöne, klare, beruhigende Harmonie-Töne (C-Dur Pentatonik Glocken/Chimes)
+        function playGorgeousTone() {
             try {
-                initAudioContext();
+                unlockAudio();
                 if (!audioCtx) return;
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
 
                 const now = audioCtx.currentTime;
-                const rockSets = [
-                    [110.00, 164.81, 220.00, 329.63, 440.00], 
-                    [82.41, 123.47, 164.81, 246.94, 329.63],  
-                    [146.83, 220.00, 293.66, 369.99, 440.00], 
-                    [98.00, 146.83, 196.00, 246.94, 293.66]   
-                ];
+                // Wunderschöne, sphärische Tonleiter-Frequenzen (C5, D5, E5, G5, A5, C6)
+                const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+                const freq = notes[Math.floor(Math.random() * notes.length)];
 
-                const chord = rockSets[Math.floor(Math.random() * rockSets.length)];
-                const masterGain = audioCtx.createGain();
-                masterGain.gain.setValueAtTime(0.5, now);
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
 
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(3000, now);
-                filter.Q.setValueAtTime(4.0);
+                // Reine Sinuswelle für absolut reinen, warmen und fehlerfreien Sound
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
 
-                masterGain.connect(filter);
-                filter.connect(audioCtx.destination);
+                // Sanfte Kurve: Kurzer Anschlag, weiches Ausklingen (wie eine Music-Box / Harfe)
+                gainNode.gain.setValueAtTime(0.0001, now);
+                gainNode.gain.linearRampToValueAtTime(0.18, now + 0.04);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
 
-                chord.forEach((freq, idx) => {
-                    const osc = audioCtx.createOscillator();
-                    const noteGain = audioCtx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
 
-                    osc.type = idx % 2 === 0 ? 'sawtooth' : 'square';
-                    osc.frequency.setValueAtTime(freq, now);
-
-                    const startTime = now + (idx * 0.03);
-                    const duration = 1.2;
-
-                    noteGain.gain.setValueAtTime(0.0001, startTime);
-                    noteGain.gain.linearRampToValueAtTime(0.12 / chord.length, startTime + 0.02);
-                    noteGain.gain.exponentialRampToValueAtTime(0.00001, startTime + duration);
-
-                    osc.connect(noteGain);
-                    noteGain.connect(masterGain);
-
-                    osc.start(startTime);
-                    osc.stop(startTime + duration);
-                });
+                osc.start(now);
+                osc.stop(now + 1.8);
             } catch(e) {
                 console.error("Audio Playback Error:", e);
             }
@@ -849,16 +833,14 @@
         }
 
         function clickBeat() {
-            initAudioContext();
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
-            playRockSynth(); 
+            playGorgeousTone(); 
             updateGameUI();
             saveGame();
         }
 
         function buyUpgrade(type) {
-            initAudioContext();
             let cost = 0;
             if (type === 'mic') cost = Math.floor(15 * Math.pow(1.15, gameData.mic));
             if (type === 'synth') cost = Math.floor(100 * Math.pow(1.15, gameData.synth));
@@ -871,7 +853,7 @@
                 if (type === 'synth') gameData.synth++;
                 if (type === 'desk') gameData.desk++;
                 if (type === 'label') gameData.label++;
-                playRockSynth(); 
+                playGorgeousTone(); 
                 updateGameUI();
                 saveGame();
             }
@@ -925,7 +907,7 @@
                     ambientTimer++;
                     if (ambientTimer >= Math.max(10, 50 - bps)) {
                         ambientTimer = 0;
-                        playRockSynth();
+                        playGorgeousTone();
                     }
                 }
             }
