@@ -338,119 +338,137 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (Admin-Geschützt)</span>
+                <span>Exklusives Studio-Minigame (PIN-Geschützt)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Genieße beim Klicken harmonische Wohlfühl-Töne!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und erweitere dein Musikstudio. Melde dich an, um zu spielen!</p>
         </div>
 
-        <!-- Game Dashboard -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
-                <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Produzierte Beats</span>
-                <span id="gameBeats" class="text-3xl font-black text-indigo-400">0</span>
+        <!-- GESPERRTER ZUSTAND (WENN ABGEMELDET) -->
+        <div id="gameLockScreen" class="bg-cardbg border border-indigo-500/40 rounded-3xl p-10 text-center max-w-xl mx-auto shadow-2xl space-y-6 my-10">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-3xl mx-auto border border-indigo-500/30">
+                <i class="fa-solid fa-lock"></i>
             </div>
-            <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
-                <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Fans / Hörerschaft</span>
-                <span id="gameFans" class="text-3xl font-black text-pink-400">0</span>
+            <div>
+                <h3 class="text-2xl font-bold mb-2">Beat-Lab ist gesperrt</h3>
+                <p class="text-sm text-gray-400 leading-relaxed">Zum Schutz vor Manipulation ist das Spiel und der Admin-Bereich passwortgeschützt. Bitte melde dich an, um zu spielen.</p>
             </div>
-            <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
-                <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Beats pro Sekunde</span>
-                <span id="gameBps" class="text-3xl font-black text-emerald-400">0</span>
-            </div>
+            <button onclick="toggleAdminAuth()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white py-4 rounded-2xl font-bold text-sm shadow-xl shadow-indigo-600/30 transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-key"></i>
+                <span>Jetzt mit Master-PIN anmelden</span>
+            </button>
         </div>
 
-        <!-- Main Clicker Area -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-            <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
-                <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & Wohlfühl-Klänge:</p>
-                <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
-                    <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
-                    <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
-                </button>
-                <span id="clickPowerText" class="text-xs text-gray-400 mt-6">+1 Beat pro Klick</span>
-            </div>
-
-            <!-- Upgrades Shop -->
-            <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 shadow-2xl space-y-4">
-                <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
-                    <i class="fa-solid fa-store text-indigo-400"></i>
-                    <span>Studio Equipment Upgrades</span>
-                </h3>
-
-                <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-                    <div>
-                        <h4 class="font-bold text-sm">USB-Mikrofon</h4>
-                        <p class="text-xs text-gray-400">+1 Beat / Sekunde</p>
-                        <span class="text-xs text-indigo-300 font-semibold">Besitz: <span id="countMic">0</span></span>
-                    </div>
-                    <button onclick="buyUpgrade('mic')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
-                        <span id="costMic">15</span> Beats
-                    </button>
+        <!-- ENTSPERRTER SPIEL- & ADMIN-BEREICH (WENN ANGEMELDET) -->
+        <div id="gameMainContent" class="hidden space-y-8">
+            <!-- Game Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
+                    <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Produzierte Beats</span>
+                    <span id="gameBeats" class="text-3xl font-black text-indigo-400">0</span>
                 </div>
-
-                <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-                    <div>
-                        <h4 class="font-bold text-sm">Synthesizer</h4>
-                        <p class="text-xs text-gray-400">+5 Beats / Sekunde</p>
-                        <span class="text-xs text-purple-300 font-semibold">Besitz: <span id="countSynth">0</span></span>
-                    </div>
-                    <button onclick="buyUpgrade('synth')" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
-                        <span id="costSynth">100</span> Beats
-                    </button>
+                <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
+                    <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Fans / Hörerschaft</span>
+                    <span id="gameFans" class="text-3xl font-black text-pink-400">0</span>
                 </div>
-
-                <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-                    <div>
-                        <h4 class="font-bold text-sm">Pro Mixing Desk</h4>
-                        <p class="text-xs text-gray-400">+25 Beats / Sekunde</p>
-                        <span class="text-xs text-pink-300 font-semibold">Besitz: <span id="countDesk">0</span></span>
-                    </div>
-                    <button onclick="buyUpgrade('desk')" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
-                        <span id="costDesk">500</span> Beats
-                    </button>
-                </div>
-
-                <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-                    <div>
-                        <h4 class="font-bold text-sm">Record Label</h4>
-                        <p class="text-xs text-gray-400">+100 Beats / Sekunde</p>
-                        <span class="text-xs text-emerald-300 font-semibold">Besitz: <span id="countLabel">0</span></span>
-                    </div>
-                    <button onclick="buyUpgrade('label')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
-                        <span id="costLabel">2500</span> Beats
-                    </button>
+                <div class="bg-cardbg border border-gray-800 rounded-2xl p-6 text-center shadow-xl">
+                    <span class="text-xs text-gray-400 uppercase tracking-widest block mb-1">Beats pro Sekunde</span>
+                    <span id="gameBps" class="text-3xl font-black text-emerald-400">0</span>
                 </div>
             </div>
-        </div>
 
-        <!-- Cloud Sync, PIN Settings & Reset Section -->
-        <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
-            <div class="text-left">
-                <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Sicherer Admin-Bereich</h4>
-                <p class="text-xs text-gray-400">Deine Cloud-ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">Lade...</code></p>
+            <!-- Main Clicker Area & Upgrades -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
+                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & Wohlfühl-Klänge:</p>
+                    <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
+                        <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
+                        <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
+                    </button>
+                    <span id="clickPowerText" class="text-xs text-gray-400 mt-6">+1 Beat pro Klick</span>
+                </div>
+
+                <!-- Upgrades Shop -->
+                <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 shadow-2xl space-y-4">
+                    <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
+                        <i class="fa-solid fa-store text-indigo-400"></i>
+                        <span>Studio Equipment Upgrades</span>
+                    </h3>
+
+                    <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm">USB-Mikrofon</h4>
+                            <p class="text-xs text-gray-400">+1 Beat / Sekunde</p>
+                            <span class="text-xs text-indigo-300 font-semibold">Besitz: <span id="countMic">0</span></span>
+                        </div>
+                        <button onclick="buyUpgrade('mic')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                            <span id="costMic">15</span> Beats
+                        </button>
+                    </div>
+
+                    <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm">Synthesizer</h4>
+                            <p class="text-xs text-gray-400">+5 Beats / Sekunde</p>
+                            <span class="text-xs text-purple-300 font-semibold">Besitz: <span id="countSynth">0</span></span>
+                        </div>
+                        <button onclick="buyUpgrade('synth')" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                            <span id="costSynth">100</span> Beats
+                        </button>
+                    </div>
+
+                    <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm">Pro Mixing Desk</h4>
+                            <p class="text-xs text-gray-400">+25 Beats / Sekunde</p>
+                            <span class="text-xs text-pink-300 font-semibold">Besitz: <span id="countDesk">0</span></span>
+                        </div>
+                        <button onclick="buyUpgrade('desk')" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                            <span id="costDesk">500</span> Beats
+                        </button>
+                    </div>
+
+                    <div class="bg-darkbg border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm">Record Label</h4>
+                            <p class="text-xs text-gray-400">+100 Beats / Sekunde</p>
+                            <span class="text-xs text-emerald-300 font-semibold">Besitz: <span id="countLabel">0</span></span>
+                        </div>
+                        <button onclick="buyUpgrade('label')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-lg font-bold transition">
+                            <span id="costLabel">2500</span> Beats
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 w-full">
-                <button id="adminAuthBtn" onclick="toggleAdminAuth()" class="w-full bg-emerald-950/50 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
-                    <i id="adminAuthIcon" class="fa-solid fa-lock"></i>
-                    <span id="adminAuthBtnText">Admin anmelden</span>
-                </button>
-                <button onclick="promptLoadCloudId()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-rotate"></i>
-                    <span>Auf anderem Gerät laden</span>
-                </button>
-                <button onclick="changeAdminPin()" class="w-full bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-key"></i>
-                    <span>Master-PIN ändern</span>
-                </button>
-                <button onclick="openForgotPinModalDirect()" class="w-full bg-amber-950/50 hover:bg-amber-900 border border-amber-800/60 text-amber-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-envelope"></i>
-                    <span>PIN vergessen?</span>
-                </button>
-                <button onclick="confirmResetGame()" class="w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-trash-can"></i>
-                    <span>Beat-Lab zurücksetzen</span>
-                </button>
+
+            <!-- Cloud Sync, PIN Settings & Reset Section -->
+            <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
+                <div class="text-left">
+                    <h4 class="font-bold text-sm mb-1 text-indigo-300"><i class="fa-solid fa-shield-halved mr-2"></i>Sicherer Admin-Bereich</h4>
+                    <p class="text-xs text-gray-400">Deine Cloud-ID: <code id="cloudIdDisplay" class="bg-darkbg px-2 py-1 rounded text-gray-200 font-mono">Lade...</code></p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 w-full">
+                    <button id="adminAuthBtn" onclick="toggleAdminAuth()" class="w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                        <i id="adminAuthIcon" class="fa-solid fa-lock-open"></i>
+                        <span id="adminAuthBtnText">Admin abmelden</span>
+                    </button>
+                    <button onclick="promptLoadCloudId()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Auf anderem Gerät laden</span>
+                    </button>
+                    <button onclick="changeAdminPin()" class="w-full bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-key"></i>
+                        <span>Master-PIN ändern</span>
+                    </button>
+                    <button onclick="openForgotPinModalDirect()" class="w-full bg-amber-950/50 hover:bg-amber-900 border border-amber-800/60 text-amber-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>PIN vergessen?</span>
+                    </button>
+                    <button onclick="confirmResetGame()" class="w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Beat-Lab zurücksetzen</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -538,7 +556,7 @@
 
         let modalCallback = null;
         let modalMode = 'pin';
-        let isAdminLoggedIn = false; // Status für Admin An- / Abmeldung
+        let isAdminLoggedIn = false; // Standardmäßig abgemeldet zum Schutz vor Manipulation
         
         let pendingNewPin = '';
         let pendingNewEmail = '';
@@ -637,14 +655,14 @@
             closeCustomModal(true, val);
         }
 
-        // --- ADMIN LOGIN / LOGOUT TOGGLE ---
+        // --- ADMIN LOGIN / LOGOUT TOGGLE & UI SCHUTZ ---
         function toggleAdminAuth() {
             if (isAdminLoggedIn) {
                 isAdminLoggedIn = false;
-                updateAdminAuthButton();
-                showInfoModal('🔒 Abgemeldet', 'Du hast dich erfolgreich aus dem Admin-Bereich abgemeldet.');
+                updateAdminAuthUI();
+                showInfoModal('🔒 Abgemeldet', 'Du hast dich erfolgreich abgemeldet. Das Beat-Lab ist nun gesperrt.');
             } else {
-                showCustomModal('pin', '🔑 Admin Anmelden', 'Bitte gib deinen Master-PIN ein, um dich anzumelden:', 'Master-PIN eingeben...');
+                showCustomModal('pin', '🔑 Admin Anmelden', 'Bitte gib deinen Master-PIN ein, um das Spiel zu entsperren:', 'Master-PIN eingeben...');
                 modalCallback = function(success, enteredPin) {
                     if (!success) return;
                     let pin = localStorage.getItem('jackAdminPin');
@@ -655,8 +673,8 @@
                             localStorage.removeItem('jackTempPin');
                         }
                         isAdminLoggedIn = true;
-                        updateAdminAuthButton();
-                        showInfoModal('✅ Angemeldet', 'Du bist jetzt erfolgreich als Admin angemeldet.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
+                        updateAdminAuthUI();
+                        showInfoModal('✅ Angemeldet', 'Spiel erfolgreich entsperrt!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                     } else {
                         showInfoModal('❌ Zugriff verweigert', 'Falscher PIN! Zugriff verweigert.');
                     }
@@ -664,19 +682,29 @@
             }
         }
 
-        function updateAdminAuthButton() {
-            const btn = document.getElementById('adminAuthBtnText');
-            const icon = document.getElementById('adminAuthIcon');
-            const container = document.getElementById('adminAuthBtn');
-            if (!btn) return;
+        function updateAdminAuthUI() {
+            const lockScreen = document.getElementById('gameLockScreen');
+            const mainContent = document.getElementById('gameMainContent');
+            const btnText = document.getElementById('adminAuthBtnText');
+            const btnIcon = document.getElementById('adminAuthIcon');
+            const btnContainer = document.getElementById('adminAuthBtn');
+
             if (isAdminLoggedIn) {
-                btn.innerText = 'Admin abmelden';
-                icon.className = 'fa-solid fa-lock-open';
-                container.className = 'w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2';
+                lockScreen.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                if (btnText) {
+                    btnText.innerText = 'Admin abmelden';
+                    btnIcon.className = 'fa-solid fa-lock-open';
+                    btnContainer.className = 'w-full bg-red-950/50 hover:bg-red-900 border border-red-800/60 text-red-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2';
+                }
             } else {
-                btn.innerText = 'Admin anmelden';
-                icon.className = 'fa-solid fa-lock';
-                container.className = 'w-full bg-emerald-950/50 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2';
+                lockScreen.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+                if (btnText) {
+                    btnText.innerText = 'Admin anmelden';
+                    btnIcon.className = 'fa-solid fa-lock';
+                    btnContainer.className = 'w-full bg-emerald-950/50 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2';
+                }
             }
         }
 
@@ -685,32 +713,15 @@
                 onSuccess();
                 return;
             }
-            showCustomModal('pin', '🔑 Sicherheits-PIN erforderlich', 'Bitte gib deinen geheimen Master-PIN ein, um fortzufahren:', 'Master-PIN eingeben...');
-            modalCallback = function(success, enteredPin) {
-                if (!success) return;
-                let pin = localStorage.getItem('jackAdminPin');
-                let tempPin = localStorage.getItem('jackTempPin');
-
-                if (enteredPin === pin || (tempPin && enteredPin === tempPin)) {
-                    if (tempPin && enteredPin === tempPin) {
-                        localStorage.removeItem('jackTempPin');
-                        showInfoModal('ℹ️ Hinweis', 'Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
-                        setTimeout(onSuccess, 1500);
-                        return;
-                    }
-                    isAdminLoggedIn = true;
-                    updateAdminAuthButton();
-                    onSuccess();
-                } else {
-                    showInfoModal('❌ Zugriff verweigert', 'Falscher PIN! Zugriff verweigert.');
-                }
-            };
+            toggleAdminAuth();
         }
 
         function checkAndSetupPinOnce() {
             let pin = localStorage.getItem('jackAdminPin');
             if (!pin || pin.trim() === '') {
                 startPinEmailSetupWizard();
+            } else {
+                updateAdminAuthUI();
             }
         }
 
@@ -721,7 +732,7 @@
                     localStorage.setItem('jackAdminPin', '1234');
                     localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
                     isAdminLoggedIn = true;
-                    updateAdminAuthButton();
+                    updateAdminAuthUI();
                     showInfoModal('⚠️ Hinweis', 'Standard-PIN \'1234\' wurde gesetzt.\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                     return;
                 }
@@ -734,7 +745,7 @@
                             localStorage.setItem('jackAdminPin', pendingNewPin);
                             localStorage.setItem('jackAdminEmail', 'admin@stream-musik.space');
                             isAdminLoggedIn = true;
-                            updateAdminAuthButton();
+                            updateAdminAuthUI();
                             showInfoModal('✅ Gespeichert', 'PIN gespeichert (Standard-E-Mail hinterlegt).\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                             return;
                         }
@@ -749,7 +760,7 @@
                                     localStorage.setItem('jackAdminPin', pendingNewPin);
                                     localStorage.setItem('jackAdminEmail', pendingNewEmail);
                                     isAdminLoggedIn = true;
-                                    updateAdminAuthButton();
+                                    updateAdminAuthUI();
                                     showInfoModal('✅ Erfolgreich', 'Master-PIN und E-Mail wurden erfolgreich verifiziert und gespeichert!\n\nHinweis: Es wird empfohlen, aber ist nicht zwingend erforderlich, den PIN zu ändern.');
                                 } else {
                                     showInfoModal('❌ Falscher Code', 'Der eingegebene Bestätigungscode war leider falsch. Bitte starte den PIN-Wechsel erneut.');
@@ -871,6 +882,7 @@
         }
 
         function clickBeat() {
+            if (!isAdminLoggedIn) return; // Strenger Manipulationsschutz bei Abmeldung
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
             playPleasantTone();
@@ -879,6 +891,7 @@
         }
 
         function buyUpgrade(type) {
+            if (!isAdminLoggedIn) return; // Strenger Manipulationsschutz bei Abmeldung
             let cost = 0;
             if (type === 'mic') cost = Math.floor(15 * Math.pow(1.15, gameData.mic));
             if (type === 'synth') cost = Math.floor(100 * Math.pow(1.15, gameData.synth));
@@ -932,6 +945,7 @@
         }
 
         setInterval(function() {
+            if (!isAdminLoggedIn) return; // Passives Einkommen stoppen, wenn abgemeldet
             let bps = getBps();
             if (bps > 0) {
                 gameData.beats += bps / 10;
@@ -940,11 +954,14 @@
             }
         }, 100);
 
-        setInterval(function() { saveGame(); }, 5000);
+        setInterval(function() { 
+            if (isAdminLoggedIn) saveGame(); 
+        }, 5000);
 
         // Beim Laden Ansicht und Spielstand wiederherstellen
         window.addEventListener('load', function() {
             loadGame();
+            updateAdminAuthUI();
             let savedView = localStorage.getItem('jackCurrentView') || 'home';
             switchView(savedView);
             if (localStorage.getItem('streamPlaying') === 'true' && audio) {
