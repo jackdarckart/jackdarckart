@@ -54,7 +54,6 @@
                 <a href="#about" onclick="switchView('home')" class="hover:text-accent transition">Über mich</a>
                 <a href="#radio" onclick="switchView('home')" class="hover:text-accent transition">Webradio</a>
                 <a href="#music" onclick="switchView('home')" class="hover:text-accent transition">Diskographie</a>
-                <a href="#platforms" onclick="switchView('home')" class="hover:text-accent transition">Plattformen</a>
                 <button onclick="switchView('game')" class="bg-indigo-600/20 border border-indigo-500/50 hover:bg-indigo-600 text-indigo-300 hover:text-white px-4 py-2 rounded-xl transition flex items-center space-x-2">
                     <i class="fa-solid fa-gamepad"></i>
                     <span>🎮 Beat-Lab</span>
@@ -227,9 +226,21 @@
                 </div>
             </div>
 
-            <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 flex items-center justify-between text-sm">
-                <div>Angemeldet als: <span id="loggedInEmailDisplay" class="text-indigo-300 font-mono">...</span></div>
-                <button onclick="logoutUser()" class="bg-red-950/50 border border-red-800 text-red-300 px-4 py-2 rounded-xl">Abmelden</button>
+            <!-- BACKUP & ACCOUNT SEKTION -->
+            <div class="bg-cardbg border border-gray-800 rounded-3xl p-6 space-y-4">
+                <div class="flex items-center justify-between text-sm">
+                    <div>Angemeldet als: <span id="loggedInEmailDisplay" class="text-indigo-300 font-mono">...</span></div>
+                    <button onclick="logoutUser()" class="bg-red-950/50 border border-red-800 text-red-300 px-4 py-2 rounded-xl">Abmelden</button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-800">
+                    <button onclick="exportSaveGame()" class="bg-indigo-950/50 hover:bg-indigo-900 border border-indigo-800 text-indigo-300 text-xs px-4 py-3 rounded-xl font-semibold transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-download"></i> <span>Backup herunterladen (.json)</span>
+                    </button>
+                    <label class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-4 py-3 rounded-xl font-semibold transition text-center flex items-center justify-center space-x-2 cursor-pointer">
+                        <i class="fa-solid fa-upload"></i> <span>Backup wiederherstellen</span>
+                        <input type="file" id="importFile" accept=".json" onchange="importSaveGame(event)" class="hidden">
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -239,13 +250,17 @@
     </div>
 
     <!-- GARDEN VIEW -->
-    <div id="gardenView" class="hidden py-4 px-2 sm:px-6 max-w-7xl mx-auto space-y-4 text-center">
-        <div class="flex items-center justify-between px-2">
-            <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 text-gray-300 px-4 py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-left"></i> Zum Beat-Lab</button>
-            <div class="text-emerald-400 text-xs font-semibold uppercase">🌿 Musik-Synchronisierter HD-Garten</div>
+    <div id="gardenView" class="hidden py-2 px-2 max-w-7xl mx-auto space-y-3 text-center">
+        <div class="flex items-center justify-between px-3">
+            <button onclick="switchView('game')" class="bg-cardbg border border-gray-800 hover:border-indigo-500 text-gray-300 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2">
+                <i class="fa-solid fa-arrow-left"></i> <span>Zum Beat-Lab</span>
+            </button>
+            <div class="text-emerald-400 text-xs font-extrabold uppercase tracking-widest bg-emerald-950/60 border border-emerald-500/30 px-3 py-1.5 rounded-full">
+                🌿 HD Musik-Garten
+            </div>
         </div>
-        <div class="relative w-full flex justify-center items-center bg-darkbg rounded-3xl p-2 border-2 border-emerald-500/50 shadow-2xl overflow-hidden cursor-pointer">
-            <canvas id="gardenCanvas" class="rounded-2xl shadow-2xl block mx-auto"></canvas>
+        <div class="relative w-full flex justify-center items-center bg-darkbg rounded-3xl p-1 border-2 border-emerald-500/40 shadow-2xl overflow-hidden cursor-pointer">
+            <canvas id="gardenCanvas" class="rounded-2xl shadow-2xl block w-full h-auto"></canvas>
         </div>
     </div>
 
@@ -291,6 +306,7 @@
         let audioCtx = null;
         let gameSoundEnabled = true;
         let ambientTimer = 0;
+        let particleEffects = [];
 
         function unlockAudioOnce() {
             try {
@@ -391,6 +407,40 @@
             localStorage.setItem('jackBeatLabUserSave_' + email.replace(/[^a-z0-9]/g, '_'), JSON.stringify(gameData));
         }
 
+        function exportSaveGame() {
+            saveGame();
+            let email = localStorage.getItem('jackLoggedInEmail') || 'player';
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gameData));
+            let downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "beat_lab_backup_" + email.replace(/[^a-z0-9]/g, '_') + ".json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importSaveGame(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let parsed = JSON.parse(e.target.result);
+                    if (parsed && typeof parsed.beats === 'number') {
+                        gameData = { ...gameData, ...parsed };
+                        saveGame();
+                        updateGameUI();
+                        showInfoModal('✅ Erfolg', 'Dein Spielstand wurde erfolgreich wiederhergestellt!');
+                    } else {
+                        showInfoModal('❌ Fehler', 'Die Datei ist keine gültige Backup-Datei.');
+                    }
+                } catch(err) {
+                    showInfoModal('❌ Fehler', 'Fehler beim Lesen der Datei.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
         function checkLoginState() {
             let email = localStorage.getItem('jackLoggedInEmail');
             if (email) {
@@ -469,31 +519,126 @@
             document.getElementById('costLabel').innerText = Math.floor(4000 * Math.pow(1.22, gameData.label)).toLocaleString();
         }
 
-        // Canvas / Garden Render
-        const VIRTUAL_W = 1200; const VIRTUAL_H = 720;
+        // Canvas / Stunning HD Garden Render
+        const VIRTUAL_W = 1200; const VIRTUAL_H = 700;
         function resizeCanvas() {
             const canvas = document.getElementById('gardenCanvas');
             if (!canvas) return;
             canvas.width = VIRTUAL_W; canvas.height = VIRTUAL_H;
-            canvas.style.width = '100%'; canvas.style.height = 'auto';
         }
 
+        let timeTick = 0;
         function drawGarden() {
             const canvas = document.getElementById('gardenCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#072b1a';
+            timeTick += 0.03;
+
+            // 1. Hintergrund-Farbverlauf (Satter Wald & Abendrot-Himmel)
+            let bgGrad = ctx.createLinearGradient(0, 0, 0, VIRTUAL_H);
+            bgGrad.addColorStop(0, '#061a12');
+            bgGrad.addColorStop(0.5, '#0b2e1f');
+            bgGrad.addColorStop(1, '#04160e');
+            ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, VIRTUAL_W, VIRTUAL_H);
-            ctx.fillStyle = '#38bdf8';
-            ctx.beginPath(); ctx.ellipse(850, 360, 130, 90, 0, 0, Math.PI*2); ctx.fill();
+
+            // 2. Glänzender Seerosenteich (Pond)
+            let pondGrad = ctx.createRadialGradient(900, 420, 20, 900, 420, 180);
+            pondGrad.addColorStop(0, '#38bdf8');
+            pondGrad.addColorStop(0.7, '#0284c7');
+            pondGrad.addColorStop(1, '#0369a1');
+            ctx.fillStyle = pondGrad;
+            ctx.beginPath();
+            ctx.ellipse(900, 420, 210, 110, Math.sin(timeTick * 0.5) * 0.05, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Teich-Reflexionen & Seerosen
+            ctx.fillStyle = '#7dd3fc';
+            ctx.beginPath(); ctx.arc(850, 390, 15, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(940, 450, 10, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = '#4ade80';
-            ctx.beginPath(); ctx.arc(200, 150, 60, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(830, 440, 18, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(970, 390, 22, 0, Math.PI*2); ctx.fill();
+
+            // 3. Dekorative Büsche & Bäume im Hintergrund
+            for (let i = 0; i < 6; i++) {
+                let bx = 150 + i * 180;
+                let by = 220 + Math.sin(i) * 30;
+                let bushGrad = ctx.createRadialGradient(bx, by, 10, bx, by, 90);
+                bushGrad.addColorStop(0, '#10b981');
+                bushGrad.addColorStop(1, '#065f46');
+                ctx.fillStyle = bushGrad;
+                ctx.beginPath(); ctx.arc(bx, by, 75, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // 4. Glühende Blumen & Pflanzen im Vordergrund
+            let flowerColors = ['#f43f5e', '#a855f7', '#fbbf24', '#ec4899', '#38bdf8'];
+            for (let i = 0; i < 12; i++) {
+                let fx = 100 + i * 95;
+                let fy = 580 + Math.sin(i + timeTick) * 15;
+                // Stem
+                ctx.strokeStyle = '#059669'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(fx, fy + 40); ctx.lineTo(fx, fy); ctx.stroke();
+                // Petals
+                ctx.fillStyle = flowerColors[i % flowerColors.length];
+                for (let p = 0; p < 5; p++) {
+                    let angle = (p * Math.PI * 2) / 5;
+                    let px = fx + Math.cos(angle) * 12;
+                    let py = fy + Math.sin(angle) * 12;
+                    ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fill();
+                }
+                // Center
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath(); ctx.arc(fx, fy, 7, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // 5. Partikel / Magische Musiknoten (Animation)
+            for (let i = particleEffects.length - 1; i >= 0; i--) {
+                let part = particleEffects[i];
+                part.y -= part.vy;
+                part.alpha -= 0.02;
+                if (part.alpha <= 0) {
+                    particleEffects.splice(i, 1);
+                    continue;
+                }
+                ctx.fillStyle = `rgba(56, 189, 248, ${part.alpha})`;
+                ctx.font = 'bold 24px sans-serif';
+                ctx.fillText('🎵', part.x, part.y);
+            }
+
+            // 6. Oberes HUD / Garten UI im Canvas
+            ctx.fillStyle = 'rgba(10, 11, 16, 0.85)';
+            ctx.roundRect(30, 25, 450, 90, 20);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Garten Status Text
+            let gLvl = gameData.garden[0].level;
+            let gExp = gameData.garden[0].exp;
+            let gMax = gameData.garden[0].maxExp;
+            let percent = Math.min(100, Math.floor((gExp / gMax) * 100));
+
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 20px sans-serif';
-            ctx.fillText('🌿 HD-Garten aktiv (Klicken für Sound & EXP!)', 400, 50);
+            ctx.font = 'bold 18px sans-serif';
+            ctx.fillText(`🌿 HD-Garten (Level ${gLvl})`, 55, 58);
+
+            ctx.fillStyle = '#9ca3af';
+            ctx.font = '14px sans-serif';
+            ctx.fillText(`Erfahrung (EXP): ${gExp} / ${gMax} (${percent}%)`, 55, 88);
+
+            // EXP Fortschrittsbalken
+            ctx.fillStyle = '#1f2937';
+            ctx.roundRect(280, 72, 180, 10, 5);
+            ctx.fill();
+            ctx.fillStyle = '#10b981';
+            ctx.roundRect(280, 72, Math.max(10, (180 * percent) / 100), 10, 5);
+            ctx.fill();
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            resizeCanvas();
             function loop() {
                 drawGarden();
                 requestAnimationFrame(loop);
@@ -502,10 +647,26 @@
 
             const cElem = document.getElementById('gardenCanvas');
             if (cElem) {
-                cElem.addEventListener('click', function() {
+                cElem.addEventListener('click', function(e) {
                     unlockAudioOnce();
                     playCleanCrispSound();
                     gameData.beats += Math.max(1, Math.floor(getBps() * 0.2));
+                    gameData.garden[0].exp += 5;
+                    
+                    if (gameData.garden[0].exp >= gameData.garden[0].maxExp) {
+                        gameData.garden[0].level++;
+                        gameData.garden[0].exp = 0;
+                        gameData.garden[0].maxExp = Math.floor(gameData.garden[0].maxExp * 1.5);
+                    }
+
+                    // Klick-Partikel hinzufügen
+                    const rect = cElem.getBoundingClientRect();
+                    const scaleX = VIRTUAL_W / rect.width;
+                    const scaleY = VIRTUAL_H / rect.height;
+                    let clickX = (e.clientX - rect.left) * scaleX;
+                    let clickY = (e.clientY - rect.top) * scaleY;
+                    particleEffects.push({ x: clickX, y: clickY, vy: 2.5, alpha: 1.0 });
+
                     updateGameUI();
                     saveGame();
                 });
@@ -522,7 +683,6 @@
                 gameData.fans += (bps / 50);
                 updateGameUI();
 
-                // BPS Sound-Trigger (spielt Töne passend zur Produktionsrate)
                 if (gameSoundEnabled) {
                     ambientTimer++;
                     let threshold = Math.max(8, 45 - Math.floor(bps / 4));
@@ -539,7 +699,9 @@
         window.onload = function() {
             let view = localStorage.getItem('jackCurrentView') || 'home';
             switchView(view);
+            resizeCanvas();
         };
+        window.onresize = resizeCanvas;
     </script>
 </body>
 </html>
