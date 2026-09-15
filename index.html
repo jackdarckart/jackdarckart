@@ -338,10 +338,10 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (High-End Studio Sound)</span>
+                <span>Exklusives Studio-Minigame (Knackiger, sauberer Sound für schnelles Spielen)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
-            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße hochqualitative, sphärische Studio-Klänge!</p>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße kristallklare, präzise Studio-Klänge!</p>
         </div>
 
         <!-- AUTH SCREEN -->
@@ -401,7 +401,7 @@
             <!-- Main Clicker Area & Upgrades -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-cardbg border border-gray-800 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl">
-                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & High-End Studio-Sound:</p>
+                    <p class="text-gray-300 text-sm mb-6">Klicke auf den Studio-Mixer für Beats & saubere Töne:</p>
                     <button onclick="clickBeat()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 hover:scale-105 active:scale-95 transition flex flex-col items-center justify-center shadow-2xl shadow-indigo-600/50 text-white font-black group cursor-pointer border-4 border-indigo-400/30">
                         <i class="fa-solid fa-compact-disc text-4xl mb-2 group-hover:rotate-180 transition duration-500"></i>
                         <span class="text-lg uppercase tracking-wider">REC / BEAT</span>
@@ -667,7 +667,7 @@
             }
         }
 
-        // --- HIGH-END STUDIO AUDIO SYSTEM (DUAL LAYER SYNTH + ECHO REVERB) ---
+        // --- OPTIMIERTES AUDIO-SYSTEM (TROCKEN, SAUBER & SCHNELL) ---
         let audioCtx = null;
         let ambientTimer = 0;
 
@@ -691,61 +691,39 @@
             }, { passive: true });
         });
 
-        function playHighQualityStudioSound() {
+        function playCleanCrispSound() {
             try {
                 unlockAudio();
                 if (!audioCtx) return;
 
                 const now = audioCtx.currentTime;
-                // Majestätische Studio-Chords (C-Dur / A-Moll Pentatonik)
-                const chordFrequencies = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
-                const freq = chordFrequencies[Math.floor(Math.random() * chordFrequencies.length)];
+                // Harmonie-Noten (C-Dur Pentatonik)
+                const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66];
+                const freq = notes[Math.floor(Math.random() * notes.length)];
 
-                // Master Gain mit sanftem Fade-Out
-                const masterGain = audioCtx.createGain();
-                masterGain.gain.setValueAtTime(0.0001, now);
-                masterGain.gain.linearRampToValueAtTime(0.14, now + 0.03);
-                masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.2);
+                // Kurzer, knackiger Gain ohne Hall/Echo, perfekt für schnelle Klicks
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.0001, now);
+                gainNode.gain.linearRampToValueAtTime(0.12, now + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.22); // Sehr kurzer Ausklang
 
-                // Studio Filter für warme analoge Klangästhetik
+                // Sauberer Filter gegen Störgeräusche
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(3500, now);
+                filter.frequency.setValueAtTime(4500, now);
 
-                // Eingebautes Konzertsaal-Echo (Delay & Feedback)
-                const delay = audioCtx.createDelay();
-                delay.delayTime.value = 0.22; // 220ms Echo
-                const feedback = audioCtx.createGain();
-                feedback.gain.value = 0.25; // 25% Rückkopplung für edlen Raumklang
-
-                // Verkettung für den Echo-Effekt
-                masterGain.connect(filter);
+                gainNode.connect(filter);
                 filter.connect(audioCtx.destination);
-                filter.connect(delay);
-                delay.connect(feedback);
-                feedback.connect(delay);
-                delay.connect(audioCtx.destination);
 
-                // Layer 1: Kristallklare Sinuswelle (Brillanz)
-                const osc1 = audioCtx.createOscillator();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(freq, now);
-                osc1.connect(masterGain);
+                // Dreiecks-Welle für vollen, sauberen Instrumenten-Ton
+                const osc = audioCtx.createOscillator();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now);
 
-                // Layer 2: Warme Dreiecks-Welle (Volumen & Instrumenten-Textur)
-                const osc2 = audioCtx.createOscillator();
-                osc2.type = 'triangle';
-                osc2.frequency.setValueAtTime(freq * 2, now); // Oktav-Harmonische
-                const osc2Gain = audioCtx.createGain();
-                osc2Gain.gain.setValueAtTime(0.25, now);
-                osc2.connect(osc2Gain);
-                osc2Gain.connect(masterGain);
+                osc.connect(gainNode);
 
-                // Sound abspielen
-                osc1.start(now);
-                osc2.start(now);
-                osc1.stop(now + 2.2);
-                osc2.stop(now + 2.2);
+                osc.start(now);
+                osc.stop(now + 0.22);
             } catch(e) {
                 console.error("Audio Playback Error:", e);
             }
@@ -862,7 +840,7 @@
         function clickBeat() {
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
-            playHighQualityStudioSound(); 
+            playCleanCrispSound(); 
             updateGameUI();
             saveGame();
         }
@@ -880,7 +858,7 @@
                 if (type === 'synth') gameData.synth++;
                 if (type === 'desk') gameData.desk++;
                 if (type === 'label') gameData.label++;
-                playHighQualityStudioSound(); 
+                playCleanCrispSound(); 
                 updateGameUI();
                 saveGame();
             }
@@ -932,9 +910,11 @@
                 const isGameActive = !document.getElementById('gameView').classList.contains('hidden') && !document.getElementById('gameMainContent').classList.contains('hidden');
                 if (isGameActive) {
                     ambientTimer++;
-                    if (ambientTimer >= Math.max(10, 50 - bps)) {
+                    // Bei hoher BPS begrenzen wir die Töne, damit es nicht übersteuert
+                    let triggerThreshold = Math.max(15, 60 - Math.floor(bps / 10));
+                    if (ambientTimer >= triggerThreshold) {
                         ambientTimer = 0;
-                        playHighQualityStudioSound();
+                        playCleanCrispSound();
                     }
                 }
             }
