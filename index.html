@@ -562,7 +562,7 @@
         let pendingNewEmail = '';
         let pendingVerificationCode = '';
 
-        // --- DRUCKVOLLER, ROCKIGER SYNTH-ROUTER & AMBIENT SYNTHESIZER ---
+        // --- ROBUUSTER AUDIO-CONTEXT & ROCK-SYNTHESIZER ---
         let audioCtx = null;
         let ambientTimer = 0;
 
@@ -577,49 +577,56 @@
             return audioCtx;
         }
 
+        // Globaler Klick-Listener zum Entsperren des Audio-Kontexts bei der ersten Interaktion
+        document.addEventListener('click', function() {
+            const ctx = getAudioContext();
+            if (ctx && ctx.state === 'suspended') {
+                ctx.resume();
+            }
+        }, { once: true });
+
         function playRockSynth() {
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
 
                 const now = ctx.currentTime;
 
-                // Rockige Power-Chord & Pentatonic-Skalen für maximale Vielfalt
                 const rockSets = [
-                    [110.00, 164.81, 220.00, 329.63, 440.00], // A Power Chord / Minor Rock
-                    [82.41, 123.47, 164.81, 246.94, 329.63],  // E Power Chord / Rock
-                    [146.83, 220.00, 293.66, 369.99, 440.00], // D Rock Riff
-                    [98.00, 146.83, 196.00, 246.94, 293.66]   // G Rock Crunch
+                    [110.00, 164.81, 220.00, 329.63, 440.00], 
+                    [82.41, 123.47, 164.81, 246.94, 329.63],  
+                    [146.83, 220.00, 293.66, 369.99, 440.00], 
+                    [98.00, 146.83, 196.00, 246.94, 293.66]   
                 ];
 
                 const chord = rockSets[Math.floor(Math.random() * rockSets.length)];
 
-                // Master Gain & Rock-Filter mit Resonanz für Biss
                 const masterGain = ctx.createGain();
-                masterGain.gain.setValueAtTime(0.45, now);
+                masterGain.gain.setValueAtTime(0.5, now);
 
                 const filter = ctx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(2800, now);
-                filter.Q.setValueAtTime(3.5); // Mehr Resonanz für den klassischen Synth-Rock-Klang
+                filter.frequency.setValueAtTime(3000, now);
+                filter.Q.setValueAtTime(4.0);
 
                 masterGain.connect(filter);
                 filter.connect(ctx.destination);
 
                 chord.forEach((freq, idx) => {
-                    // Sawtooth und Square für echte Rock-Harmonika
                     const osc = ctx.createOscillator();
                     const noteGain = ctx.createGain();
 
                     osc.type = idx % 2 === 0 ? 'sawtooth' : 'square';
                     osc.frequency.setValueAtTime(freq, now);
 
-                    // Schneller, knackiger Attack und rockiges Ausklingen
-                    const startTime = now + (idx * 0.035);
-                    const duration = 1.4;
+                    const startTime = now + (idx * 0.03);
+                    const duration = 1.2;
 
                     noteGain.gain.setValueAtTime(0.0001, startTime);
-                    noteGain.gain.linearRampToValueAtTime(0.1 / chord.length, startTime + 0.02);
+                    noteGain.gain.linearRampToValueAtTime(0.12 / chord.length, startTime + 0.02);
                     noteGain.gain.exponentialRampToValueAtTime(0.00001, startTime + duration);
 
                     osc.connect(noteGain);
@@ -931,7 +938,7 @@
             if (!isAdminLoggedIn) return;
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
-            playRockSynth(); // Spielt sofort ein knackiges Rock-Riff ab
+            playRockSynth(); 
             updateGameUI();
             saveGame();
         }
@@ -950,7 +957,7 @@
                 if (type === 'synth') gameData.synth++;
                 if (type === 'desk') gameData.desk++;
                 if (type === 'label') gameData.label++;
-                playRockSynth(); // Feierlicher Rock-Sound beim Kauf
+                playRockSynth(); 
                 updateGameUI();
                 saveGame();
             }
@@ -990,7 +997,6 @@
             if (coLabel) coLabel.innerText = Math.floor(2500 * Math.pow(1.15, gameData.label)).toLocaleString();
         }
 
-        // Passives Einkommen läuft weiter, Rock-Töne spielen NUR, wenn das Spiel aktiv auf dem Bildschirm ist
         setInterval(function() {
             if (!isAdminLoggedIn) return;
             let bps = getBps();
@@ -1014,7 +1020,6 @@
             if (isAdminLoggedIn) saveGame(); 
         }, 5000);
 
-        // Beim Laden Ansicht und Spielstand wiederherstellen
         window.addEventListener('load', function() {
             loadGame();
             updateAdminAuthUI();
@@ -1025,7 +1030,6 @@
             }
         });
 
-        // Audio Persistence & Security Script
         const audio = document.getElementById('radioStream');
         if (audio && 'mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
