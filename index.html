@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Harmonische Studio-Engine & Tycoon-Logik -->
+    <!-- Entspannte, zufällige Studio-Engine & Tycoon-Logik -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,44 +541,46 @@
                 });
             }
 
-            // HARMONISCHE C-MOLL STUDIO-SYNTHESIZER-ENGINE
+            // VÖLLIG ZUFÄLLIGE, HARMONISCHE STUDIO-SYNTHESIZER-ENGINE
             let audioCtx = null;
-            // Reine, perfekt aufeinander abgestimmte Frequenzen der C-Moll Tonleiter über mehrere Oktaven
-            const cMinorScale = [130.81, 155.56, 174.61, 196.00, 233.08, 261.63, 311.13, 349.23, 392.00, 466.16, 523.25];
-            let scaleStep = 0;
+            const cMinorPool = [
+                130.81, 155.56, 174.61, 196.00, 233.08, 
+                261.63, 311.13, 349.23, 392.00, 466.16, 
+                523.25, 622.25, 698.46, 783.99
+            ];
+            const synthTypes = ['sine', 'triangle', 'square', 'sawtooth'];
 
-            function playHarmonicSound() {
+            function playRandomHarmonicSound() {
                 if (!soundEnabled || currentView === 'home') return;
                 try {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
                     const now = audioCtx.currentTime;
-                    // Sequenzieller Durchlauf durch die Tonleiter für absolute Harmonie
-                    let freq = cMinorScale[scaleStep];
-                    scaleStep = (scaleStep + 1) % cMinorScale.length;
+                    let randomFreq = cMinorPool[Math.floor(Math.random() * cMinorPool.length)];
+                    let randomType = synthTypes[Math.floor(Math.random() * synthTypes.length)];
 
                     let osc = audioCtx.createOscillator();
                     let filter = audioCtx.createBiquadFilter();
                     let gain = audioCtx.createGain();
 
-                    osc.type = scaleStep % 2 === 0 ? 'sine' : 'triangle'; // Warme, saubere Wellenformen
-                    osc.frequency.setValueAtTime(freq, now);
+                    osc.type = randomType;
+                    osc.frequency.setValueAtTime(randomFreq, now);
 
                     filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(1800, now);
-                    filter.frequency.exponentialRampToValueAtTime(400, now + 0.35);
+                    filter.frequency.setValueAtTime(2500, now);
+                    filter.frequency.exponentialRampToValueAtTime(350, now + 0.5);
 
                     gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.35, now + 0.03);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+                    gain.gain.linearRampToValueAtTime(0.32, now + 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
 
                     osc.connect(filter);
                     filter.connect(gain);
                     gain.connect(audioCtx.destination);
 
                     osc.start(now);
-                    osc.stop(now + 0.4);
+                    osc.stop(now + 0.6);
                 } catch (e) {}
             }
 
@@ -618,7 +620,7 @@
 
             function produceBeat() {
                 beats += 1;
-                playHarmonicSound();
+                playRandomHarmonicSound();
                 updateDisplay();
                 saveGame();
             }
@@ -644,7 +646,7 @@
                     albums += 1;
                     fans += 50;
                     bps += 2.0;
-                    fps += 1.0; // Alben generieren nun passiv Fans pro Sekunde
+                    fps += 1.0;
                     albumCost = Math.floor(albumCost * 1.5);
                     updateDisplay();
                     saveGame();
@@ -658,7 +660,7 @@
                     beats -= aiCost;
                     aiAgents += 1;
                     bps += 8.0;
-                    fps += 2.0; // AI-Agents generieren ordentlich Fans
+                    fps += 2.0;
                     aiCost = Math.floor(aiCost * 1.4);
                     updateDisplay();
                     saveGame();
@@ -789,12 +791,12 @@
                 }
             }, 100);
 
-            // 2. Harmonischer Hintergrund-Takt (genau alle 1,5 Sekunden ein sauberer Ton, wenn BPS aktiv ist)
+            // 2. Entspannter Hintergrund-Zufalls-Takt (spielt jetzt alle 3,5 Sekunden einen wohlklingenden Ton)
             setInterval(() => {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
-                    playHarmonicSound();
+                    playRandomHarmonicSound();
                 }
-            }, 1500);
+            }, 3500);
 
             setInterval(() => { saveGame(); }, 5000);
 
