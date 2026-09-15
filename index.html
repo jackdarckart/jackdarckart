@@ -338,7 +338,7 @@
         <div class="text-center mb-10">
             <div class="inline-flex items-center space-x-2 bg-indigo-950/80 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-xs font-medium mb-4">
                 <i class="fa-solid fa-gamepad text-indigo-400"></i>
-                <span>Exklusives Studio-Minigame (Überall zugreifbar)</span>
+                <span>Exklusives Studio-Minigame (Mit Sound-Garantie)</span>
             </div>
             <h2 class="text-4xl sm:text-5xl font-black mb-3">Jack's Beat-Lab 🎧</h2>
             <p class="text-gray-400 max-w-xl mx-auto text-sm">Produziere Beats, gewinne Fans und genieße druckvolle, rockige Synth-Riffs und Power-Chords!</p>
@@ -590,6 +590,7 @@
         }
 
         function handleAuthSubmit() {
+            initAudioContext(); // Audio bei User-Interaktion freischalten
             const email = document.getElementById('authEmail').value.trim().toLowerCase();
             const pin = document.getElementById('authPin').value.trim();
 
@@ -666,36 +667,35 @@
             }
         }
 
-        // --- AUDIO SYSTEM & SYNTHESIZER ---
+        // --- ROBUSTES AUDIO & SYNTHESIZER SYSTEM ---
         let audioCtx = null;
         let ambientTimer = 0;
 
-        function getAudioContext() {
+        function initAudioContext() {
             if (!audioCtx) {
-                const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioCtxClass();
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
             }
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-            return audioCtx;
         }
 
         ['click', 'touchstart', 'keydown'].forEach(evt => {
             document.addEventListener(evt, function() {
-                if (audioCtx && audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
+                initAudioContext();
             }, { passive: true });
         });
 
         function playRockSynth() {
             try {
-                const ctx = getAudioContext();
-                if (!ctx) return;
-                if (ctx.state === 'suspended') ctx.resume();
+                initAudioContext();
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
 
-                const now = ctx.currentTime;
+                const now = audioCtx.currentTime;
                 const rockSets = [
                     [110.00, 164.81, 220.00, 329.63, 440.00], 
                     [82.41, 123.47, 164.81, 246.94, 329.63],  
@@ -704,20 +704,20 @@
                 ];
 
                 const chord = rockSets[Math.floor(Math.random() * rockSets.length)];
-                const masterGain = ctx.createGain();
+                const masterGain = audioCtx.createGain();
                 masterGain.gain.setValueAtTime(0.5, now);
 
-                const filter = ctx.createBiquadFilter();
+                const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
                 filter.frequency.setValueAtTime(3000, now);
                 filter.Q.setValueAtTime(4.0);
 
                 masterGain.connect(filter);
-                filter.connect(ctx.destination);
+                filter.connect(audioCtx.destination);
 
                 chord.forEach((freq, idx) => {
-                    const osc = ctx.createOscillator();
-                    const noteGain = ctx.createGain();
+                    const osc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
 
                     osc.type = idx % 2 === 0 ? 'sawtooth' : 'square';
                     osc.frequency.setValueAtTime(freq, now);
@@ -830,7 +830,6 @@
             reader.readAsText(file);
         }
 
-        // --- NUR DAS SPIEL ZURÜCKSETZEN (ACCOUNT BLEIBT ERHALTEN) ---
         function confirmResetGame() {
             let resetBtnHtml = `<button onclick="executeReset()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition shadow-md">🗑️ Ja, Beat-Lab wirklich zurücksetzen</button>`;
             showInfoModal('⚠️ Sicherheitsabfrage', 'Möchtest du dein "Beat-Lab" wirklich komplett zurücksetzen? (Dein Account bleibt erhalten)', resetBtnHtml);
@@ -850,6 +849,7 @@
         }
 
         function clickBeat() {
+            initAudioContext();
             gameData.beats += gameData.clickPower;
             gameData.fans += Math.floor(Math.random() * 2);
             playRockSynth(); 
@@ -858,6 +858,7 @@
         }
 
         function buyUpgrade(type) {
+            initAudioContext();
             let cost = 0;
             if (type === 'mic') cost = Math.floor(15 * Math.pow(1.15, gameData.mic));
             if (type === 'synth') cost = Math.floor(100 * Math.pow(1.15, gameData.synth));
