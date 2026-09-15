@@ -64,7 +64,7 @@
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-purple-400 font-semibold">Rock & Alternative (2026)</span>
                         <h3 class="font-bold text-sm text-white">„Die Macht In Uns“</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Kraftvolle Rock-Riffs, treibende Drums & Energie.</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Kraftvolle Rock-Riffs, treibende Basslines & Energie.</p>
                     </div>
                     <div class="bg-[#0b0f19]/70 border border-gray-800 p-3.5 rounded-2xl">
                         <span class="text-xs text-emerald-400 font-semibold">German Pop (2024)</span>
@@ -340,7 +340,7 @@
         </div>
     </footer>
 
-    <!-- Trockener, direkter Heavy-Rock Distortion & Power-Chord Synthesizer & Tycoon Logic -->
+    <!-- Direct Dual-Layer Heavy Guitar & Bass Rock Engine & Tycoon Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('beat_lab_beats');
@@ -541,11 +541,11 @@
                 });
             }
 
-            // TROCKENE, DIREKTE HEAVY-ROCK DISTORTION & POWER-CHORD ENGINE (OHNE HALL/ECHO)
+            // HEAVY GUITAR & BASS DUAL-LAYER ROCK ENGINE (TROCKEN, DIREKT & DRÜCKEND)
             let audioCtx = null;
 
             function makeDistortionCurve(amount) {
-                let k = amount || 80,
+                let k = amount || 90,
                     n = 44100,
                     curve = new Float32Array(n),
                     deg = Math.PI / 180;
@@ -556,11 +556,11 @@
                 return curve;
             }
 
-            const rockPool = [
-                98.00, 110.00, 123.47, 130.81, 146.83, 164.81, 174.61, 
-                196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00
+            // Gitarren- & Bass-Frequenzpool (Tiefe Riffs & Powerchords)
+            const rockNotes = [
+                73.42, 82.41, 98.00, 110.00, 123.47, 130.81, 
+                146.83, 164.81, 196.00, 220.00, 246.94, 293.66
             ];
-            const rockPresets = ['power_chord', 'heavy_riff', 'lead_crunch', 'drop_bass'];
 
             function playRockStudioSound() {
                 if (!soundEnabled || currentView === 'home') return;
@@ -569,81 +569,70 @@
                     if (audioCtx.state === 'suspended') audioCtx.resume();
 
                     const now = audioCtx.currentTime;
-                    let rootFreq = rockPool[Math.floor(Math.random() * rockPool.length)];
-                    let preset = rockPresets[Math.floor(Math.random() * rockPresets.length)];
+                    let rootFreq = rockNotes[Math.floor(Math.random() * rockNotes.length)];
 
-                    let osc1 = audioCtx.createOscillator();
-                    let osc2 = audioCtx.createOscillator();
+                    // --- 1. LEAD-GITARRE (Verzerrt, Power-Chords) ---
+                    let guitarOsc1 = audioCtx.createOscillator();
+                    let guitarOsc2 = audioCtx.createOscillator();
                     let distortion = audioCtx.createWaveShaper();
-                    let filter = audioCtx.createBiquadFilter();
-                    let gain = audioCtx.createGain();
-                    let panner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
+                    let guitarFilter = audioCtx.createBiquadFilter();
+                    let guitarGain = audioCtx.createGain();
 
-                    distortion.curve = makeDistortionCurve(90);
+                    distortion.curve = makeDistortionCurve(100);
                     distortion.oversample = '4x';
 
-                    if (preset === 'power_chord') {
-                        osc1.type = 'sawtooth';
-                        osc2.type = 'square';
-                        osc2.frequency.setValueAtTime(rootFreq * 1.5, now); // Power-Chord Quinte
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(2800, now);
-                        filter.frequency.exponentialRampToValueAtTime(300, now + 0.6);
-                    } else if (preset === 'heavy_riff') {
-                        osc1.type = 'sawtooth';
-                        osc2.type = 'sawtooth';
-                        osc2.frequency.setValueAtTime(rootFreq * 2, now); // Oktave Riff
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(3500, now);
-                        filter.frequency.exponentialRampToValueAtTime(400, now + 0.5);
-                    } else if (preset === 'lead_crunch') {
-                        osc1.type = 'square';
-                        osc2.type = 'sawtooth';
-                        osc2.frequency.setValueAtTime(rootFreq * 1.33, now); // Quart-Lead
-                        filter.type = 'bandpass';
-                        filter.frequency.setValueAtTime(2200, now);
-                        if (filter.Q) filter.Q.setValueAtTime(6, now);
-                    } else { // drop_bass
-                        osc1.type = 'triangle';
-                        osc2.type = 'sawtooth';
-                        osc2.frequency.setValueAtTime(rootFreq * 0.5, now);
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(1000, now);
-                        filter.frequency.exponentialRampToValueAtTime(120, now + 0.8);
-                    }
+                    guitarOsc1.type = 'sawtooth';
+                    guitarOsc2.type = 'square';
+                    guitarOsc1.frequency.setValueAtTime(rootFreq * 2, now);
+                    guitarOsc2.frequency.setValueAtTime(rootFreq * 3, now); // Quinte / Power-Chord
 
-                    osc1.frequency.setValueAtTime(rootFreq, now);
-                    osc1.detune.setValueAtTime(Math.random() * 14 - 7, now);
-                    osc2.detune.setValueAtTime(Math.random() * 20 - 10, now);
+                    guitarOsc1.detune.setValueAtTime(Math.random() * 10 - 5, now);
+                    guitarOsc2.detune.setValueAtTime(Math.random() * 16 - 8, now);
 
-                    if (filter.type !== 'bandpass' && filter.Q) {
-                        filter.Q.setValueAtTime(4, now);
-                    }
+                    guitarFilter.type = 'lowpass';
+                    guitarFilter.frequency.setValueAtTime(3200, now);
+                    guitarFilter.frequency.exponentialRampToValueAtTime(500, now + 0.35);
 
-                    // Knackiger, direkter Rock-Attack ohne Echo
-                    let duration = 0.5 + Math.random() * 0.3;
-                    gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.25, now + 0.015);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+                    let guitarDuration = 0.4;
+                    guitarGain.gain.setValueAtTime(0.0001, now);
+                    guitarGain.gain.linearRampToValueAtTime(0.2, now + 0.01);
+                    guitarGain.gain.exponentialRampToValueAtTime(0.0001, now + guitarDuration);
 
-                    // Direkter Routing-Graph (OHNE Delay/Echo)
-                    osc1.connect(filter);
-                    osc2.connect(filter);
-                    filter.connect(distortion);
-                    distortion.connect(gain);
+                    guitarOsc1.connect(guitarFilter);
+                    guitarOsc2.connect(guitarFilter);
+                    guitarFilter.connect(distortion);
+                    distortion.connect(guitarGain);
+                    guitarGain.connect(audioCtx.destination);
 
-                    if (panner) {
-                        panner.pan.setValueAtTime(Math.random() * 0.6 - 0.3, now);
-                        gain.connect(panner);
-                        panner.connect(audioCtx.destination);
-                    } else {
-                        gain.connect(audioCtx.destination);
-                    }
+                    guitarOsc1.start(now);
+                    guitarOsc2.start(now);
+                    guitarOsc1.stop(now + guitarDuration);
+                    guitarOsc2.stop(now + guitarDuration);
 
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc1.stop(now + duration);
-                    osc2.stop(now + duration);
+                    // --- 2. HEAVY ROCK-BASS (Drückender Sub- & Mid-Bass) ---
+                    let bassOsc = audioCtx.createOscillator();
+                    let bassFilter = audioCtx.createBiquadFilter();
+                    let bassGain = audioCtx.createGain();
+
+                    bassOsc.type = 'sawtooth';
+                    bassOsc.frequency.setValueAtTime(rootFreq * 0.5, now); // Tiefe Bassnote
+
+                    bassFilter.type = 'lowpass';
+                    bassFilter.frequency.setValueAtTime(750, now);
+                    bassFilter.frequency.exponentialRampToValueAtTime(120, now + 0.45);
+
+                    let bassDuration = 0.45;
+                    bassGain.gain.setValueAtTime(0.0001, now);
+                    bassGain.gain.linearRampToValueAtTime(0.26, now + 0.015);
+                    bassGain.gain.exponentialRampToValueAtTime(0.0001, now + bassDuration);
+
+                    bassOsc.connect(bassFilter);
+                    bassFilter.connect(bassGain);
+                    bassGain.connect(audioCtx.destination);
+
+                    bassOsc.start(now);
+                    bassOsc.stop(now + bassDuration);
+
                 } catch (e) {}
             }
 
@@ -854,12 +843,12 @@
                 }
             }, 100);
 
-            // 2. Direkter Rock-Hintergrund-Takt (spielt alle 2,8 Sekunden ein knackiges, trockenes Riff)
+            // 2. Aktiver Rock-Hintergrund-Takt (spielt jetzt alle 1,6 Sekunden fette Gitarren & Bass-Riffs, wenn BPS aktiv ist)
             setInterval(() => {
                 if (loggedInUser && soundEnabled && bps > 0 && currentView === 'game') {
                     playRockStudioSound();
                 }
-            }, 2800);
+            }, 1600);
 
             setInterval(() => { saveGame(); }, 5000);
 
