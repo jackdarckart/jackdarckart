@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | CloudBeats Nexus</title>
+    <title>jackdarckart | CloudBeats Secure Nexus</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.tailwindcss.com https://stream.laut.fm 'unsafe-inline' 'unsafe-eval';">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -30,13 +30,13 @@
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-500 p-0.5 shadow-lg shadow-purple-500/20">
-                    <div class="w-full h-full bg-[#080c14] rounded-[10px] flex items-center justify-center text-base">🎛️</div>
+                    <div class="w-full h-full bg-[#080c14] rounded-[10px] flex items-center justify-center text-base">🛡️</div>
                 </div>
-                <span class="font-black text-sm tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">jackdarckart</span>
+                <span class="font-black text-sm tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">jackdarckart Secure</span>
             </div>
             
             <nav id="navbar-container" class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end">
-                <!-- Dynamisch geladen -->
+                <!-- Dynamisch -->
             </nav>
         </div>
     </header>
@@ -44,53 +44,273 @@
     <!-- Main Content -->
     <main class="max-w-4xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         <div id="views-container">
-            <!-- Startseite -->
+            
+            <!-- 1. STARTSEITE (Öffentlich) -->
             <section id="view-home" class="view-section space-y-6 text-left">
                 <div class="glass-panel p-8 sm:p-10 rounded-[2.5rem] text-center relative overflow-hidden">
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/20 shadow-inner">⚡</span>
-                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Zentrales Steuerungs-Hub • GitHub Pages</p>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Secure Nexus</h1>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Cloud-Portabilität &amp; Anti-Cheat Aktiv</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Wähle eine Sektion aus oder nutze die Navigation oben. Alle Verknüpfungen und Module arbeiten vollständig bereinigt und ressourcensparend.
+                        Willkommen im öffentlichen Portal. Geschützte Bereiche erfordern einen Login. Deine Spielstände kannst du jederzeit in der Cloud-Sektion extern sichern.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
-                        <!-- Dynamisch geladen -->
+                        <!-- Dynamisch -->
                     </div>
                 </div>
             </section>
+
+            <!-- 2. AUTH & ACCOUNT MANAGEMENT -->
+            <section id="view-auth" class="view-section hidden space-y-4 text-left max-w-md mx-auto">
+                <div class="glass-panel p-6 sm:p-8 rounded-[2rem] space-y-4">
+                    <div class="text-center">
+                        <span class="text-3xl mb-1 block">🔐</span>
+                        <h2 id="auth-main-title" class="text-lg font-bold text-purple-300 font-mono">Sicheres Login-Portal</h2>
+                        <p class="text-[11px] text-slate-400">Authentifizierung per E-Mail &amp; PIN erforderlich</p>
+                    </div>
+
+                    <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
+
+                    <!-- Login Form -->
+                    <div id="subform-login" class="space-y-3">
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
+                            <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
+                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="••••">
+                        </div>
+                        <button type="button" id="btn-execute-login" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔓 Einloggen</button>
+                        
+                        <div class="flex justify-between items-center text-[11px] font-mono pt-2">
+                            <button type="button" id="link-to-register" class="text-purple-400 hover:underline cursor-pointer">Konto erstellen</button>
+                            <button type="button" id="link-to-reset" class="text-cyan-400 hover:underline cursor-pointer">PIN vergessen?</button>
+                        </div>
+                    </div>
+
+                    <!-- Register Form -->
+                    <div id="subform-register" class="space-y-3 hidden">
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
+                            <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN (min. 4 Ziffern):</label>
+                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="Sichere PIN">
+                        </div>
+                        <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren</button>
+                        
+                        <div class="text-center pt-2">
+                            <button type="button" id="link-back-to-login" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zum Login</button>
+                        </div>
+                    </div>
+
+                    <!-- PIN Reset Form -->
+                    <div id="subform-reset" class="space-y-3 hidden">
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
+                            <input type="email" id="reset-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN FESTLEGEN:</label>
+                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="Neue PIN">
+                        </div>
+                        <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Zurücksetzen</button>
+                        
+                        <div class="text-center pt-2">
+                            <button type="button" id="link-cancel-reset" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Abbrechen</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="w-full border-t border-purple-500/15 py-3 px-4 bg-[#05070c] text-center">
         <div class="max-w-4xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Bereinigt &amp; Aktiv</span>
-            <span class="text-purple-400/60">jackdarckart • CloudBeats</span>
+            <span id="session-status-badge" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt</span>
+            <span class="text-purple-400/60">jackdarckart • Secure Nexus</span>
         </div>
     </footer>
 
-    <!-- SCRIPT -->
+    <!-- ENGINE & BACKUP SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            /* --- SECURE AUTH & ANTI-CHEAT ENGINE --- */
+            const SecureAuth = {
+                currentUser: localStorage.getItem('secure_nexus_session') || null,
+                
+                getDB() {
+                    try {
+                        return JSON.parse(localStorage.getItem('secure_nexus_users_db')) || {};
+                    } catch(e) { return {}; }
+                },
+                saveDB(db) {
+                    localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
+                },
+                generateChecksum(dataObj) {
+                    const rawString = `${dataObj.beats}_${dataObj.fans}_${dataObj.releasesCount}_JACK_SALT_2026`;
+                    let hash = 0;
+                    for (let i = 0; i < rawString.length; i++) {
+                        hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
+                        hash |= 0;
+                    }
+                    return hash;
+                },
+                register(email, pin) {
+                    email = email.trim().toLowerCase();
+                    if (!email || !email.includes('@') || pin.length < 4) {
+                        return { success: false, msg: '❌ Gültige E-Mail und PIN (min. 4 Ziffern) erforderlich!' };
+                    }
+                    let db = this.getDB();
+                    if (db[email]) {
+                        return { success: false, msg: '❌ E-Mail ist bereits registriert!' };
+                    }
+                    let initialData = { pin: pin, beats: 10, fans: 10, hype: 0, releasesCount: 0, marketingLevel: 0, studioLevel: 0 };
+                    initialData.checksum = this.generateChecksum(initialData);
+                    db[email] = initialData;
+                    this.saveDB(db);
+                    this.currentUser = email;
+                    localStorage.setItem('secure_nexus_session', email);
+                    return { success: true, msg: '✅ Registriert & Eingeloggt!' };
+                },
+                login(email, pin) {
+                    email = email.trim().toLowerCase();
+                    let db = this.getDB();
+                    if (!db[email] || db[email].pin !== pin) {
+                        return { success: false, msg: '❌ Ungültige E-Mail oder PIN!' };
+                    }
+                    let u = db[email];
+                    if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
+                        return { success: false, msg: '⚠️ Manipulierter Spielstand erkannt!' };
+                    }
+                    this.currentUser = email;
+                    localStorage.setItem('secure_nexus_session', email);
+                    return { success: true, msg: '✅ Login erfolgreich!' };
+                },
+                resetPin(email, newPin) {
+                    email = email.trim().toLowerCase();
+                    let db = this.getDB();
+                    if (!db[email]) return { success: false, msg: '❌ E-Mail nicht gefunden!' };
+                    if (!newPin || newPin.length < 4) return { success: false, msg: '❌ PIN min. 4 Ziffern!' };
+                    db[email].pin = newPin;
+                    db[email].checksum = this.generateChecksum(db[email]);
+                    this.saveDB(db);
+                    return { success: true, msg: '✅ PIN aktualisiert! Bitte einloggen.' };
+                },
+                logout() {
+                    this.currentUser = null;
+                    localStorage.removeItem('secure_nexus_session');
+                },
+                getAccountData() {
+                    if (!this.currentUser) return null;
+                    let db = this.getDB();
+                    let u = db[this.currentUser];
+                    if (!u) return null;
+                    if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
+                        alert('⚠️ Anti-Cheat Alarm: Datenintegrität beschädigt!');
+                        return null;
+                    }
+                    return u;
+                },
+                saveAccountData(dataObj) {
+                    if (!this.currentUser) return;
+                    let db = this.getDB();
+                    dataObj.checksum = this.generateChecksum(dataObj);
+                    db[this.currentUser] = dataObj;
+                    this.saveDB(db);
+                }
+            };
+
+            /* --- SECTIONS CONFIGURATION --- */
             const sitePages = [
-                { id: 'home', name: 'Home', icon: '🏠', desc: 'Zentrale Steuerungsübersicht' },
-                { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Audio-Produktion & Workspace' },
-                { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor' },
-                { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix' },
-                { id: 'garden', name: 'Garden', icon: '🌱', desc: 'Landschaft & Webradio Stream' },
-                { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Backup & Datensicherung' },
-                { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'System-Telemetrie & Diagnose' }
+                { id: 'home', name: 'Home', icon: '🏠', desc: 'Öffentliche Startseite', protected: false },
+                { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Release- & Fan-Management', protected: true },
+                { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
+                { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
+                { id: 'garden', name: 'Garden', icon: '🌱', desc: 'Landschaft & Webradio Stream', protected: true },
+                { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
+                { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
 
             const navContainer = document.getElementById('navbar-container');
             const homeGrid = document.getElementById('home-buttons-grid');
             const viewsContainer = document.getElementById('views-container');
 
+            // Sektionen im DOM generieren
             sitePages.forEach(page => {
                 if (page.id !== 'home') {
                     const section = document.createElement('section');
                     section.id = `view-${page.id}`;
                     section.className = 'view-section hidden space-y-4 text-left';
+                    
+                    let innerHTMLContent = `<p class="text-xs text-slate-300 font-mono">Geschützter Bereich für ${page.name}.</p>`;
+                    
+                    if (page.id === 'studio') {
+                        innerHTMLContent = `
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div class="bg-[#030508] p-3 rounded-2xl border border-purple-500/20">
+                                        <p class="text-[10px] font-mono text-purple-300 uppercase">Fans</p>
+                                        <p id="studio-fans" class="text-lg font-black text-white font-mono mt-1">10</p>
+                                    </div>
+                                    <div class="bg-[#030508] p-3 rounded-2xl border border-cyan-500/20">
+                                        <p class="text-[10px] font-mono text-cyan-300 uppercase">Hype</p>
+                                        <p id="studio-hype" class="text-lg font-black text-white font-mono mt-1">0</p>
+                                    </div>
+                                    <div class="bg-[#030508] p-3 rounded-2xl border border-pink-500/20">
+                                        <p class="text-[10px] font-mono text-pink-300 uppercase">Releases</p>
+                                        <p id="studio-releases" class="text-lg font-black text-white font-mono mt-1">0</p>
+                                    </div>
+                                    <div class="bg-[#030508] p-3 rounded-2xl border border-emerald-500/20">
+                                        <p class="text-[10px] font-mono text-emerald-300 uppercase">Wachstum</p>
+                                        <p id="studio-fps" class="text-lg font-black text-emerald-400 font-mono mt-1">+0 /s</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-purple-500/30 space-y-3">
+                                    <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">🎧 Neuen Track veröffentlichen</h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                        <button type="button" id="release-rock-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">🎸 Rock-Single (+15 Fans)</button>
+                                        <button type="button" id="release-hiphop-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">🎤 Hip-Hop Beat (+30 Fans)</button>
+                                        <button type="button" id="release-album-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">💿 Album Drop (+100 Fans)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (page.id === 'cloud') {
+                        innerHTMLContent = `
+                            <div class="space-y-4">
+                                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-cyan-500/30 space-y-4">
+                                    <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase">☁️ Externes Backup &amp; Portabilität</h3>
+                                    <p class="text-xs text-slate-300">Sichere deinen Spielstand als Datei auf deinem Gerät oder lade ein bestehendes Backup auf einem neuen Gerät hoch, um nahtlos weiterzumachen.</p>
+                                    <div class="flex flex-wrap gap-3 pt-2">
+                                        <button type="button" id="btn-export-backup" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow">📥 Spielstand exportieren (.json)</button>
+                                        <label class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow inline-block text-center">
+                                            📤 Spielstand importieren
+                                            <input type="file" id="input-import-backup" accept=".json" class="hidden">
+                                        </label>
+                                    </div>
+                                    <div id="backup-status-msg" class="text-xs font-mono text-emerald-400 min-h-[16px]"></div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (page.id === 'admin') {
+                        innerHTMLContent = `
+                            <div class="space-y-4">
+                                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-amber-500/30 space-y-3">
+                                    <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🔒 Sitzungs- &amp; Account-Sicherheit</h3>
+                                    <p class="text-xs text-slate-300 font-mono">Aktiver Benutzer: <span id="admin-current-email" class="text-purple-400 font-bold"></span></p>
+                                    <button type="button" id="btn-trigger-logout" class="cyber-button bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold py-2.5 px-5 rounded-xl cursor-pointer">🚪 Sicher Abmelden</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
                     section.innerHTML = `
                         <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-4 border-purple-500/30">
                             <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
@@ -100,7 +320,7 @@
                                     <p class="text-xs text-slate-400">${page.desc}</p>
                                 </div>
                             </div>
-                            <p class="text-xs text-slate-300 font-mono">Bereich für ${page.name}.</p>
+                            ${innerHTMLContent}
                             <button type="button" class="back-to-home cyber-button w-full sm:w-auto bg-slate-900 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-mono border border-slate-800 cursor-pointer mt-4">← Zurück zur Startseite</button>
                         </div>
                     `;
@@ -108,15 +328,28 @@
                 }
             });
 
-            sitePages.forEach(page => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'cyber-button nav-link bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0';
-                btn.dataset.target = page.id;
-                btn.innerHTML = `${page.icon} ${page.name}`;
-                navContainer.appendChild(btn);
-            });
+            // Navbar aufbauen
+            function renderNavbar() {
+                navContainer.innerHTML = '';
+                sitePages.forEach(page => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'cyber-button nav-link bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0';
+                    btn.dataset.target = page.id;
+                    btn.innerHTML = `${page.icon} ${page.name}`;
+                    navContainer.appendChild(btn);
+                });
 
+                const authBtn = document.createElement('button');
+                authBtn.type = 'button';
+                authBtn.className = 'cyber-button nav-link bg-purple-600/80 hover:bg-purple-600 text-white px-3 py-2 rounded-xl text-xs font-bold border border-purple-500 cursor-pointer shrink-0 ml-2';
+                authBtn.dataset.target = 'auth';
+                authBtn.innerHTML = SecureAuth.currentUser ? '🔐 Account' : '🔑 Login';
+                navContainer.appendChild(authBtn);
+            }
+            renderNavbar();
+
+            // Home Grid Kacheln
             sitePages.forEach(page => {
                 if (page.id !== 'home') {
                     const card = document.createElement('button');
@@ -125,35 +358,208 @@
                     card.dataset.target = page.id;
                     card.innerHTML = `
                         <div class="text-2xl mb-2">${page.icon}</div>
-                        <div class="text-xs font-bold text-white font-mono">${page.name}</div>
+                        <div class="text-xs font-bold text-white font-mono">${page.name} ${page.protected ? '🔒' : ''}</div>
                         <div class="text-[10px] text-slate-400 mt-1">${page.desc}</div>
                     `;
                     homeGrid.appendChild(card);
                 }
             });
 
+            function updateFooterStatus() {
+                const badge = document.getElementById('session-status-badge');
+                if (badge) {
+                    if (SecureAuth.currentUser) {
+                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Gesichert &amp; Eingeloggt (${SecureAuth.currentUser})`;
+                    } else {
+                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt (Zugriff beschränkt)`;
+                    }
+                }
+            }
+            updateFooterStatus();
+
             function switchView(targetId) {
+                const targetPage = sitePages.find(p => p.id === targetId);
+                if (targetPage && targetPage.protected && !SecureAuth.currentUser) {
+                    targetId = 'auth';
+                    const msg = document.getElementById('auth-feedback-msg');
+                    if (msg) msg.innerText = "🔒 Bitte zuerst einloggen, um diesen Bereich zu betreten!";
+                }
+
                 document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
                 const targetSec = document.getElementById(`view-${targetId}`);
                 if (targetSec) {
                     targetSec.classList.remove('hidden');
-                    localStorage.setItem('nexus_active_page', targetId);
+                    localStorage.setItem('secure_nexus_active_page', targetId);
                     window.scrollTo(0, 0);
+
+                    if (targetId === 'admin') {
+                        const emailSpan = document.getElementById('admin-current-email');
+                        if (emailSpan) emailSpan.innerText = SecureAuth.currentUser || 'Unbekannt';
+                    }
                 }
             }
 
-            document.querySelectorAll('.nav-link').forEach(element => {
-                element.addEventListener('click', () => {
-                    const target = element.dataset.target;
-                    switchView(target);
-                });
+            document.addEventListener('click', function(e) {
+                const navBtn = e.target.closest('.nav-link');
+                if (navBtn) {
+                    switchView(navBtn.dataset.target);
+                }
+                if (e.target && e.target.classList.contains('back-to-home')) {
+                    switchView('home');
+                }
             });
 
-            document.querySelectorAll('.back-to-home').forEach(btn => {
-                btn.addEventListener('click', () => switchView('home'));
+            // Auth Steuerung
+            const subLogin = document.getElementById('subform-login');
+            const subReg = document.getElementById('subform-register');
+            const subReset = document.getElementById('subform-reset');
+            const mainTitle = document.getElementById('auth-main-title');
+            const feedbackMsg = document.getElementById('auth-feedback-msg');
+
+            document.getElementById('link-to-register').addEventListener('click', () => {
+                subLogin.classList.add('hidden'); subReset.classList.add('hidden'); subReg.classList.remove('hidden');
+                mainTitle.innerText = "Konto Registrierung"; feedbackMsg.innerText = "";
+            });
+            document.getElementById('link-to-reset').addEventListener('click', () => {
+                subLogin.classList.add('hidden'); subReg.classList.add('hidden'); subReset.classList.remove('hidden');
+                mainTitle.innerText = "PIN Zurücksetzen"; feedbackMsg.innerText = "";
+            });
+            document.getElementById('link-back-to-login').addEventListener('click', () => {
+                subReg.classList.add('hidden'); subReset.classList.add('hidden'); subLogin.classList.remove('hidden');
+                mainTitle.innerText = "Sicheres Login-Portal"; feedbackMsg.innerText = "";
+            });
+            document.getElementById('link-cancel-reset').addEventListener('click', () => {
+                subReset.classList.add('hidden'); subLogin.classList.remove('hidden');
+                mainTitle.innerText = "Sicheres Login-Portal"; feedbackMsg.innerText = "";
             });
 
-            const savedPage = localStorage.getItem('nexus_active_page') || 'home';
+            document.getElementById('btn-execute-login').addEventListener('click', () => {
+                const res = SecureAuth.login(document.getElementById('login-email').value, document.getElementById('login-pin').value);
+                feedbackMsg.innerText = res.msg;
+                if (res.success) { renderNavbar(); updateFooterStatus(); setTimeout(() => switchView('studio'), 800); }
+            });
+
+            document.getElementById('btn-execute-register').addEventListener('click', () => {
+                const res = SecureAuth.register(document.getElementById('reg-email').value, document.getElementById('reg-pin').value);
+                feedbackMsg.innerText = res.msg;
+                if (res.success) { renderNavbar(); updateFooterStatus(); setTimeout(() => switchView('studio'), 800); }
+            });
+
+            document.getElementById('btn-execute-reset').addEventListener('click', () => {
+                const res = SecureAuth.resetPin(document.getElementById('reset-email').value, document.getElementById('reset-newpin').value);
+                feedbackMsg.innerText = res.msg;
+                if (res.success) { subReset.classList.add('hidden'); subLogin.classList.remove('hidden'); mainTitle.innerText = "Sicheres Login-Portal"; }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'btn-trigger-logout') {
+                    SecureAuth.logout(); renderNavbar(); updateFooterStatus(); switchView('home');
+                }
+            });
+
+            // --- BACKUP EXPORT & IMPORT EVENT LISTENERS ---
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'btn-export-backup') {
+                    if (!SecureAuth.currentUser) return;
+                    let db = SecureAuth.getDB();
+                    let backupData = {
+                        userEmail: SecureAuth.currentUser,
+                        accountData: db[SecureAuth.currentUser],
+                        exportDate: new Date().toISOString(),
+                        version: "4.5"
+                    };
+                    let blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+                    let url = URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    a.download = `CloudBeats_Backup_${SecureAuth.currentUser.replace(/[^a-z0-9]/gi, '_')}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    const status = document.getElementById('backup-status-msg');
+                    if (status) status.innerText = "✅ Backup erfolgreich heruntergeladen!";
+                }
+            });
+
+            document.addEventListener('change', function(e) {
+                if (e.target && e.target.id === 'input-import-backup') {
+                    let file = e.target.files[0];
+                    if (!file) return;
+                    let reader = new FileReader();
+                    reader.onload = function(evt) {
+                        try {
+                            let parsed = JSON.parse(evt.target.result);
+                            if (!parsed.userEmail || !parsed.accountData) {
+                                throw new Error("Ungültiges Format");
+                            }
+                            // Validierung über Checksumme
+                            let testObj = parsed.accountData;
+                            let expectedChecksum = SecureAuth.generateChecksum(testObj);
+                            if (testObj.checksum !== undefined && testObj.checksum !== expectedChecksum) {
+                                alert("⚠️ Warnung: Das Backup scheint manipuliert oder beschädigt zu sein!");
+                                return;
+                            }
+                            let db = SecureAuth.getDB();
+                            db[parsed.userEmail] = testObj;
+                            SecureAuth.saveDB(db);
+                            SecureAuth.currentUser = parsed.userEmail;
+                            localStorage.setItem('secure_nexus_session', parsed.userEmail);
+                            
+                            renderNavbar();
+                            updateFooterStatus();
+                            const status = document.getElementById('backup-status-msg');
+                            if (status) status.innerText = `✅ Backup für ${parsed.userEmail} erfolgreich importiert!`;
+                            setTimeout(() => switchView('studio'), 1000);
+                        } catch (err) {
+                            alert("❌ Fehler beim Importieren der Backup-Datei: " + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            });
+
+            // --- STUDIO GAME LOOP ---
+            setInterval(() => {
+                if (!SecureAuth.currentUser) return;
+                let data = SecureAuth.getAccountData();
+                if (data) {
+                    let fps = (data.marketingLevel * 2) + (data.studioLevel * 5);
+                    if (fps > 0) {
+                        data.fans += fps;
+                        SecureAuth.saveAccountData(data);
+                        updateStudioUI(data);
+                    }
+                }
+            }, 1000);
+
+            function updateStudioUI(data) {
+                const fEl = document.getElementById('studio-fans');
+                const hEl = document.getElementById('studio-hype');
+                const rEl = document.getElementById('studio-releases');
+                const fpsEl = document.getElementById('studio-fps');
+                if (fEl) fEl.innerText = Math.floor(data.fans).toLocaleString('de-DE');
+                if (hEl) hEl.innerText = Math.floor(data.hype).toLocaleString('de-DE');
+                if (rEl) rEl.innerText = data.releasesCount;
+                if (fpsEl) fpsEl.innerText = "+" + ((data.marketingLevel * 2) + (data.studioLevel * 5)) + " /s";
+            }
+
+            document.addEventListener('click', function(e) {
+                if (!SecureAuth.currentUser) return;
+                let data = SecureAuth.getAccountData();
+                if (!data) return;
+
+                if (e.target && e.target.id === 'release-rock-btn') {
+                    data.fans += 15; data.hype += 5; data.releasesCount += 1;
+                } else if (e.target && e.target.id === 'release-hiphop-btn') {
+                    data.fans += 30; data.hype += 12; data.releasesCount += 1;
+                } else if (e.target && e.target.id === 'release-album-btn') {
+                    data.fans += 100; data.hype += 45; data.releasesCount += 1;
+                }
+                SecureAuth.saveAccountData(data);
+                updateStudioUI(data);
+            });
+
+            const savedPage = localStorage.getItem('secure_nexus_active_page') || 'home';
             switchView(savedPage);
         });
     </script>
