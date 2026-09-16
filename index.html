@@ -23,7 +23,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- Globaler Audioplayer mit direkter Server-Adresse -->
+    <!-- Globaler Audioplayer (läuft im Hintergrund ununterbrochen bei internem Seitenwechsel) -->
     <audio id="audio-stream" preload="none" crossorigin="anonymous">
         <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
     </audio>
@@ -58,7 +58,6 @@
                     <span id="play-icon">▶</span> <span id="play-text">Webradio Abspielen</span>
                 </button>
 
-                <!-- Direkter Fallback-Link für blockierende Handy-Browser -->
                 <a href="https://laut.fm/jackdarckart" target="_blank" class="block text-[11px] font-mono text-cyan-400 hover:text-pink-400 underline pt-1">
                     🌐 Alternativ direkt auf laut.fm öffnen ↗
                 </a>
@@ -122,13 +121,29 @@
             </div>
         </section>
 
-        <!-- 3. GAME VIEW -->
+        <!-- 3. GAME VIEW (MIT INTEGRIERTEM WEBRADIO-PLAYER) -->
         <section id="view-game" class="view-section hidden space-y-6">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-6">
                 <div class="flex justify-between items-center border-b border-cyan-500/20 pb-4">
                     <div>
-                        <h2 class="text-lg font-black text-cyan-300 font-mono uppercase">🎮 CyberBeat Tycoon (Hard Mode)</h2>
+                        <h2 class="text-lg font-black text-cyan-300 font-mono uppercase">🎮 CyberBeat Tycoon</h2>
                         <p class="text-[11px] text-slate-400 font-mono">Gesicherter Account: <span id="user-badge" class="text-emerald-400 font-bold">--</span></p>
+                    </div>
+                </div>
+
+                <!-- GUT SICHTBARER IN-GAME RADIO PLAYER -->
+                <div class="bg-[#030712] p-4 sm:p-5 rounded-2xl border border-cyan-500/40 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-inner">
+                    <div class="flex items-center space-x-3 w-full sm:w-auto text-center sm:text-left">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-pink-500 flex items-center justify-center font-bold text-lg shrink-0 mx-auto sm:mx-0">🎧</div>
+                        <div class="truncate">
+                            <span class="text-[9px] font-mono text-cyan-400 uppercase tracking-widest block font-bold">▶ In-Game Webradio Live</span>
+                            <span id="game-track-title" class="text-xs font-mono text-white font-bold truncate block max-w-[260px] sm:max-w-xs">Verbindung wird aufgebaut...</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
+                        <button type="button" id="game-play-btn" class="cyber-button bg-gradient-to-r from-cyan-600 to-pink-500 text-white font-bold py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md flex items-center justify-center gap-2 w-full sm:w-auto">
+                            <span id="game-play-icon">▶</span> <span id="game-play-text">Radio Starten</span>
+                        </button>
                     </div>
                 </div>
 
@@ -227,24 +242,32 @@
                 switchView('home');
             };
 
-            // Audio-Engine mit direkter Server-Domain und Watchdog
+            // Einheitliche Audio-Engine für Home und Game
             const audio = document.getElementById('audio-stream');
+            
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
             const playText = document.getElementById('play-text');
+            
+            const gamePlayBtn = document.getElementById('game-play-btn');
+            const gamePlayIcon = document.getElementById('game-play-icon');
+            const gamePlayText = document.getElementById('game-play-text');
+            const gameTrackTitle = document.getElementById('game-track-title');
+
             const volumeSlider = document.getElementById('volume-slider');
             let playTimeout = null;
 
-            playBtn.addEventListener('click', async () => {
+            async function togglePlay() {
                 if (audio.paused) {
                     playText.textContent = 'Verbinde...';
+                    gamePlayText.textContent = 'Verbinde...';
                     playIcon.textContent = '⏳';
+                    gamePlayIcon.textContent = '⏳';
 
                     if (playTimeout) clearTimeout(playTimeout);
                     playTimeout = setTimeout(() => {
                         if (audio.paused) {
-                            playIcon.textContent = '▶';
-                            playText.textContent = 'Webradio Abspielen';
+                            resetUI();
                         }
                     }, 5000);
 
@@ -253,28 +276,41 @@
                     } catch (err) {
                         console.error("Playback error:", err);
                         if (playTimeout) clearTimeout(playTimeout);
-                        playIcon.textContent = '▶';
-                        playText.textContent = 'Webradio Abspielen';
+                        resetUI();
                     }
                 } else {
                     if (playTimeout) clearTimeout(playTimeout);
                     audio.pause();
-                    playIcon.textContent = '▶';
-                    playText.textContent = 'Webradio Abspielen';
+                    resetUI();
                 }
-            });
+            }
+
+            function resetUI() {
+                playIcon.textContent = '▶';
+                playText.textContent = 'Webradio Abspielen';
+                gamePlayIcon.textContent = '▶';
+                gamePlayText.textContent = 'Radio Starten';
+            }
+
+            playBtn.addEventListener('click', togglePlay);
+            gamePlayBtn.addEventListener('click', togglePlay);
 
             audio.addEventListener('playing', () => {
                 if (playTimeout) clearTimeout(playTimeout);
                 playIcon.textContent = '⏸';
                 playText.textContent = 'Stream Pausieren';
+                gamePlayIcon.textContent = '⏸';
+                gamePlayText.textContent = 'Stream Pausieren';
+            });
+
+            audio.addEventListener('pause', () => {
+                resetUI();
             });
 
             audio.addEventListener('error', (e) => {
                 if (playTimeout) clearTimeout(playTimeout);
                 console.error("Audio error event:", e);
-                playIcon.textContent = '▶';
-                playText.textContent = 'Webradio Abspielen';
+                resetUI();
             });
 
             volumeSlider.addEventListener('input', (e) => { audio.volume = e.target.value; });
@@ -282,7 +318,12 @@
             async function fetchRadio() {
                 try {
                     let r1 = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
-                    if(r1.ok) { let d = await r1.json(); document.getElementById('track-title').textContent = `${d.artist?.name || 'jackdarckart'} – ${d.title || ''}`; }
+                    if(r1.ok) { 
+                        let d = await r1.json(); 
+                        let songText = `${d.artist?.name || 'jackdarckart'} – ${d.title || ''}`;
+                        document.getElementById('track-title').textContent = songText;
+                        gameTrackTitle.textContent = songText;
+                    }
                     let r2 = await fetch('https://api.laut.fm/station/jackdarckart/listeners');
                     if(r2.ok) document.getElementById('listener-count').textContent = await r2.json();
                     let r3 = await fetch('https://api.laut.fm/station/jackdarckart/last_songs');
