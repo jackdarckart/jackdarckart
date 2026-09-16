@@ -11,7 +11,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            // HINWEIS: Trage hier deinen echten EmailJS Public Key ein!
+            // WICHTIG: Trage hier deinen echten EmailJS Public Key ein!
             emailjs.init({ publicKey: "DEIN_EMAILJS_PUBLIC_KEY" });
         })();
     </script>
@@ -212,17 +212,28 @@
                     if (isRegistration && db[email]) {
                         return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
                     }
-                    if (!isRegistration && (!db[email] || db[email].pin !== pin)) {
-                        return { success: false, msg: '❌ E-Mail oder PIN falsch!' };
+                    if (!isRegistration) {
+                        if (!db[email]) {
+                            return { success: false, msg: '❌ E-Mail auf diesem Gerät unbekannt! (Bitte zuerst registrieren)' };
+                        }
+                        if (db[email].pin !== pin) {
+                            return { success: false, msg: '❌ Falsche PIN eingegeben!' };
+                        }
                     }
 
-                    // Prüfen ob die EmailJS Schlüssel noch Platzhalter sind
-                    // Falls du das testen möchtest ohne EmailJS, kommentiere den Block unten aus oder trage deine Daten ein.
+                    // Prüfen ob EmailJS Schlüssel konfiguriert wurden
+                    // HINWEIS: Ersetze "DEIN_SERVICE_ID" und "DEIN_TEMPLATE_ID" mit deinen echten Werten von EmailJS!
+                    const serviceId = "DEIN_SERVICE_ID";
+                    const templateId = "DEIN_TEMPLATE_ID";
+
+                    if (serviceId === "DEIN_SERVICE_ID" || templateId === "DEIN_TEMPLATE_ID") {
+                        return { success: false, msg: '⚠️ Bitte trage deine echten EmailJS Service- & Template-IDs im Code ein!' };
+                    }
+
                     const code = Math.floor(1000 + Math.random() * 9000).toString();
 
                     try {
-                        // HINWEIS: Ersetze "DEIN_SERVICE_ID" und "DEIN_TEMPLATE_ID" mit deinen echten IDs
-                        await emailjs.send("DEIN_SERVICE_ID", "DEIN_TEMPLATE_ID", {
+                        await emailjs.send(serviceId, templateId, {
                             to_email: email,
                             verification_code: code
                         });
@@ -230,10 +241,10 @@
                         this.activeVerificationCode = code;
                         this.pendingEmail = email;
                         this.pendingPin = pin;
-                        return { success: true, needsCode: true, msg: `✉️ E-Mail mit Code an ${email} gesendet!` };
+                        return { success: true, needsCode: true, msg: `✉️ Code erfolgreich an ${email} gesendet!` };
                     } catch (error) {
                         console.error("EmailJS Fehler:", error);
-                        return { success: false, msg: '❌ E-Mail Versand fehlgeschlagen (Schlüssel prüfen).' };
+                        return { success: false, msg: '❌ E-Mail Versand fehlgeschlagen (Prüfe deine EmailJS Daten).' };
                     }
                 },
                 finalizeVerification(enteredCode) {
@@ -555,11 +566,11 @@
                 feedbackMsg.innerText = "❌ Verifizierung abgebrochen.";
             });
 
-            // Login / Code anfordern (Async)
+            // Login / Code anfordern
             document.getElementById('btn-init-login').addEventListener('click', async () => {
                 const email = document.getElementById('login-email').value;
                 const pin = document.getElementById('login-pin').value;
-                feedbackMsg.innerText = "⏳ Sende Code...";
+                feedbackMsg.innerText = "⏳ Prüfe Daten & sende Code...";
                 const res = await SecureAuth.initVerification(email, pin, false);
                 feedbackMsg.innerText = res.msg;
                 if (res.success && res.needsCode) {
@@ -567,11 +578,11 @@
                 }
             });
 
-            // Registrieren / Code anfordern (Async)
+            // Registrieren / Code anfordern
             document.getElementById('btn-execute-register').addEventListener('click', async () => {
                 const email = document.getElementById('reg-email').value;
                 const pin = document.getElementById('reg-pin').value;
-                feedbackMsg.innerText = "⏳ Sende Code...";
+                feedbackMsg.innerText = "⏳ Registriere & sende Code...";
                 const res = await SecureAuth.initVerification(email, pin, true);
                 feedbackMsg.innerText = res.msg;
                 if (res.success && res.needsCode) {
@@ -594,7 +605,7 @@
 
             document.getElementById('btn-execute-reset').addEventListener('click', () => {
                 const email = document.getElementById('reset-email').value;
-                const newPin = document.getElementById('reset-newpin').value;
+                const newPin = document.getElementById('reset-newpin.value') || document.getElementById('reset-newpin').value;
                 const res = SecureAuth.resetPin(email, newPin);
                 feedbackMsg.innerText = res.msg;
                 if (res.success) { subReset.classList.add('hidden'); subLogin.classList.remove('hidden'); mainTitle.innerText = "Sicheres Login-Portal"; }
