@@ -32,13 +32,21 @@
             border-color: rgba(168, 85, 247, 0.6);
         }
         .cyber-button:active { transform: scale(0.98); }
-        .cyber-button:disabled { opacity: 0.3; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; border-color: rgba(255,255,255,0.05) !important; }
+        .cyber-button:disabled { opacity: 0.3; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; border-color: rgba(255,255,255,0.05) !important; animation: none !important; }
         
         @keyframes pulse-glow {
             0%, 100% { opacity: 1; filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.85)); }
             50% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.3)); }
         }
         .neon-pulse { animation: pulse-glow 3.5s infinite ease-in-out; }
+
+        @keyframes affordable-pulse {
+            0%, 100% { box-shadow: 0 0 12px rgba(52, 211, 153, 0.4), inset 0 0 6px rgba(52, 211, 153, 0.2); border-color: rgba(52, 211, 153, 0.7); }
+            50% { box-shadow: 0 0 24px rgba(52, 211, 153, 0.85), inset 0 0 12px rgba(52, 211, 153, 0.4); border-color: rgba(52, 211, 153, 1); }
+        }
+        .affordable-glow {
+            animation: affordable-pulse 2s infinite ease-in-out;
+        }
 
         @keyframes wave {
             0%, 100% { height: 4px; }
@@ -68,7 +76,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Prime Elite v6.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Optimized Elite v7.0</span>
                 </div>
             </div>
 
@@ -100,9 +108,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Ultimate Music Empire &amp; 15 Upgrade Matrix</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Optimized Empire Simulation &amp; Live Glow UI</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Erlebe die ultimative Wirtschaftssimulation mit 15 mächtigen Upgrades, Genre-Spezialisierungen, Live-Events und dem Welt-Tournee-Prestige-System.
+                        Erlebe eine übersichtliche, reaktive Wirtschaftssimulation mit Leucht-Indikatoren für kaufbare Upgrades, 15 Empire-Stufen und Welt-Tournee Prestige.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -233,7 +241,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_SALT_ELITE_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_SALT_OPTIMIZED_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -444,7 +452,7 @@
                                 </div>
 
                                 <!-- Prestige / Welt-Tournee Panel -->
-                                <div class="glass-panel p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-center gap-3 bg-gradient-to-r from-amber-950/30 via-purple-950/20 to-slate-900/40">
+                                <div id="panel-prestige" class="glass-panel p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-center gap-3 bg-gradient-to-r from-amber-950/30 via-purple-950/20 to-slate-900/40">
                                     <div>
                                         <p class="text-xs font-mono text-amber-400 font-bold uppercase flex items-center gap-1.5"><span>🌟</span> Globale Welt-Tournee (Prestige)</p>
                                         <p class="text-[10px] text-slate-300 mt-0.5">Setzt Fans &amp; Upgrades zurück, gibt aber permanent <span class="text-amber-300 font-bold">+25% Ertrag pro Gold-Platte</span>.</p>
@@ -494,7 +502,7 @@
                                 <div class="glass-panel p-5 rounded-2xl border border-purple-500/30 space-y-3">
                                     <div class="flex justify-between items-center">
                                         <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">💿 Musik-Produktion &amp; Releases</h3>
-                                        <span class="text-[10px] font-mono text-amber-400">Taktisches Management</span>
+                                        <span class="text-[10px] font-mono text-amber-400">Leuchtet grün, wenn bereit</span>
                                     </div>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                         <button type="button" id="release-rock-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
@@ -512,144 +520,153 @@
                                     </div>
                                 </div>
 
-                                <!-- Upgrades Matrix (15 Stufen) -->
-                                <div class="glass-panel p-5 rounded-2xl border-slate-800 space-y-3">
-                                    <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">📈 Studio-Upgrades &amp; 15 Empire Stufen</h3>
-                                    <div class="space-y-2.5 max-h-[400px] overflow-y-auto pr-1.5">
+                                <!-- Upgrades Matrix (Übersichtlich nach Kategorien gegliedert & mit Leucht-Effekt) -->
+                                <div class="glass-panel p-5 rounded-2xl border-slate-800 space-y-4">
+                                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                                        <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">📈 Studio-Upgrades &amp; 15 Empire Stufen</h3>
+                                        <span class="text-[9px] font-mono text-emerald-400">💡 Leuchtende Elemente sind kaufbereit!</span>
+                                    </div>
+                                    
+                                    <div class="space-y-4 max-h-[420px] overflow-y-auto pr-1.5">
                                         
-                                        <!-- 1 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">📢 Social-Media Kampagne (Lvl <span id="market-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+1 Fan/s | Kosten: <span id="market-cost">35</span> Fans</p>
+                                        <!-- Kategorie 1: Basis & Studio -->
+                                        <div class="space-y-2">
+                                            <p class="text-[10px] font-mono text-purple-300 uppercase tracking-wider font-bold">1. Basis &amp; Studio</p>
+                                            
+                                            <div id="row-market" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">📢 Social-Media Kampagne (Lvl <span id="market-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+1 Fan/s | Kosten: <span id="market-cost">35</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-market-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
-                                            <button type="button" id="buy-market-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+
+                                            <div id="row-studio" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🎛️ High-End Mastering Suite (Lvl <span id="studio-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+4 Fans/s | Kosten: <span id="studio-cost">150</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-studio-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                            </div>
+
+                                            <div id="row-producer" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🎹 Ghostproducer-Team (Lvl <span id="producer-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+12 Fans/s | Kosten: <span id="producer-cost">600</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-producer-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                            </div>
                                         </div>
 
-                                        <!-- 2 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🎛️ High-End Mastering Suite (Lvl <span id="studio-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+4 Fans/s | Kosten: <span id="studio-cost">150</span> Fans</p>
+                                        <!-- Kategorie 2: Business & Expansion -->
+                                        <div class="space-y-2 pt-2">
+                                            <p class="text-[10px] font-mono text-cyan-300 uppercase tracking-wider font-bold">2. Business &amp; Expansion</p>
+
+                                            <div id="row-pr" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">📰 PR-Agentur &amp; Management (Lvl <span id="pr-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+15% Gesamtwachstum | Kosten: <span id="pr-cost">1200</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-pr-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
-                                            <button type="button" id="buy-studio-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+
+                                            <div id="row-label" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🏢 Eigenes Plattenlabel (Lvl <span id="label-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+45 Fans/s | Kosten: <span id="label-cost">4500</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-label-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                            </div>
+
+                                            <div id="row-merch" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">👕 Merchandising-Linie (Lvl <span id="merch-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+120 Fans/s | Kosten: <span id="merch-cost">18000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-merch-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                            </div>
+
+                                            <div id="row-algo" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🌐 Streaming-Algorithmus (Lvl <span id="algo-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+350 Fans/s | Kosten: <span id="algo-cost">75000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-algo-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                            </div>
                                         </div>
 
-                                        <!-- 3 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🎹 Ghostproducer-Team (Lvl <span id="producer-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+12 Fans/s | Kosten: <span id="producer-cost">600</span> Fans</p>
+                                        <!-- Kategorie 3: High-Tech & Enterprise -->
+                                        <div class="space-y-2 pt-2">
+                                            <p class="text-[10px] font-mono text-pink-300 uppercase tracking-wider font-bold">3. High-Tech &amp; Enterprise</p>
+
+                                            <div id="row-tourbus" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🚌 World Tour Arena Bus (Lvl <span id="tourbus-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+950 Fans/s | Kosten: <span id="tourbus-cost">280000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-tourbus-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
-                                            <button type="button" id="buy-producer-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+
+                                            <div id="row-aineural" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🤖 AI-Mastering Neural Net (Lvl <span id="aineural-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+2800 Fans/s | Kosten: <span id="aineural-cost">1200000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-aineural-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                            </div>
+
+                                            <div id="row-satellite" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🛰️ Global Satellite Uplink (Lvl <span id="satellite-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+9500 Fans/s | Kosten: <span id="satellite-cost">5500000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-satellite-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                            </div>
+
+                                            <div id="row-hologram" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🌌 Interstellar Hologram Tour (Lvl <span id="hologram-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+28,000 Fans/s | Kosten: <span id="hologram-cost">22000000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-hologram-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                            </div>
                                         </div>
 
-                                        <!-- 4 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">📰 PR-Agentur &amp; Management (Lvl <span id="pr-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+15% Gesamtwachstum | Kosten: <span id="pr-cost">1200</span> Fans</p>
-                                            </div>
-                                            <button type="button" id="buy-pr-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
+                                        <!-- Kategorie 4: Kosmische Ära (End-Game) -->
+                                        <div class="space-y-2 pt-2">
+                                            <p class="text-[10px] font-mono text-amber-300 uppercase tracking-wider font-bold">4. Kosmische Ära (End-Game)</p>
 
-                                        <!-- 5 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🏢 Eigenes Plattenlabel (Lvl <span id="label-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+45 Fans/s | Kosten: <span id="label-cost">4500</span> Fans</p>
+                                            <div id="row-quantumsynth" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🧠 Quantum Sound Synthesizer (Lvl <span id="quantumsynth-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+85,000 Fans/s | Kosten: <span id="quantumsynth-cost">90000000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-quantumsynth-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
-                                            <button type="button" id="buy-label-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
 
-                                        <!-- 6 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">👕 Merchandising-Linie (Lvl <span id="merch-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+120 Fans/s | Kosten: <span id="merch-cost">18000</span> Fans</p>
+                                            <div id="row-musicacademy" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-indigo-500/30 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🏛️ Global Music Academy (Lvl <span id="musicacademy-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+250,000 Fans/s | Kosten: <span id="musicacademy-cost">400000000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-musicacademy-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
-                                            <button type="button" id="buy-merch-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
 
-                                        <!-- 7 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🌐 Streaming-Algorithmus (Lvl <span id="algo-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+350 Fans/s | Kosten: <span id="algo-cost">75000</span> Fans</p>
+                                            <div id="row-deepspace" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-indigo-500/30 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">🛸 Deep Space Broadcast Station (Lvl <span id="deepspace-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+800,000 Fans/s | Kosten: <span id="deepspace-cost">1800000000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-deepspace-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
-                                            <button type="button" id="buy-algo-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
 
-                                        <!-- 8 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🚌 World Tour Arena Bus (Lvl <span id="tourbus-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+950 Fans/s | Kosten: <span id="tourbus-cost">280000</span> Fans</p>
+                                            <div id="row-singularity" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-pink-500/40 transition">
+                                                <div>
+                                                    <p class="text-xs font-bold text-white">⚛️ Nexus Singularity Engine (Lvl <span id="singularity-lvl">0</span>)</p>
+                                                    <p class="text-[10px] text-slate-400 font-mono">+3,000,000 Fans/s | Kosten: <span id="singularity-cost">8000000000</span> Fans</p>
+                                                </div>
+                                                <button type="button" id="buy-singularity-btn" class="cyber-button bg-pink-600 hover:bg-pink-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
-                                            <button type="button" id="buy-tourbus-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
-
-                                        <!-- 9 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🤖 AI-Mastering Neural Net (Lvl <span id="aineural-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+2800 Fans/s | Kosten: <span id="aineural-cost">1200000</span> Fans</p>
-                                            </div>
-                                            <button type="button" id="buy-aineural-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
-
-                                        <!-- 10 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🛰️ Global Satellite Uplink (Lvl <span id="satellite-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+9500 Fans/s | Kosten: <span id="satellite-cost">5500000</span> Fans</p>
-                                            </div>
-                                            <button type="button" id="buy-satellite-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
-
-                                        <!-- NEU 11: Interstellar Hologram Tour -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🌌 Interstellar Hologram Tour (Lvl <span id="hologram-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+28,000 Fans/s | Kosten: <span id="hologram-cost">22000000</span> Fans</p>
-                                            </div>
-                                            <button type="button" id="buy-hologram-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
-
-                                        <!-- NEU 12: Quantum Sound Synthesizer -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🧠 Quantum Sound Synthesizer (Lvl <span id="quantumsynth-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+85,000 Fans/s | Kosten: <span id="quantumsynth-cost">90000000</span> Fans</p>
-                                            </div>
-                                            <button type="button" id="buy-quantumsynth-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
-
-                                        <!-- NEU 13: Global Music Academy -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-indigo-500/30">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🏛️ Global Music Academy (Lvl <span id="musicacademy-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+250,000 Fans/s | Kosten: <span id="musicacademy-cost">400000000</span> Fans</p>
-                                            </div>
-                                            <button type="button" id="buy-musicacademy-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
-
-                                        <!-- NEU 14: Deep Space Broadcast Station -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-indigo-500/30">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">🛸 Deep Space Broadcast Station (Lvl <span id="deepspace-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+800,000 Fans/s | Kosten: <span id="deepspace-cost">1800000000</span> Fans</p>
-                                            </div>
-                                            <button type="button" id="buy-deepspace-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                        </div>
-
-                                        <!-- NEU 15: Nexus Singularity Engine -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-pink-500/40">
-                                            <div>
-                                                <p class="text-xs font-bold text-white">⚛️ Nexus Singularity Engine (Lvl <span id="singularity-lvl">0</span>)</p>
-                                                <p class="text-[10px] text-slate-400 font-mono">+3,000,000 Fans/s | Kosten: <span id="singularity-cost">8000000000</span> Fans</p>
-                                            </div>
-                                            <button type="button" id="buy-singularity-btn" class="cyber-button bg-pink-600 hover:bg-pink-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                         </div>
 
                                     </div>
@@ -969,7 +986,7 @@
                 }
             });
 
-            // --- 15 UPGRADES GAME LOGIC & PRESTIGE ---
+            // --- OPTIMIZED GAME LOGIC WITH GLOW INDIKATOREN ---
             
             let eventTimer = 30;
             const liveEventsList = [
@@ -1017,6 +1034,7 @@
                 const gEl = document.getElementById('studio-gold');
                 const fpsEl = document.getElementById('studio-fps');
                 const prestigeBtn = document.getElementById('btn-prestige');
+                const prestigePanel = document.getElementById('panel-prestige');
 
                 if (fEl) fEl.innerText = Math.floor(data.fans).toLocaleString('de-DE');
                 if (hEl) hEl.innerText = Math.floor(data.hype).toLocaleString('de-DE');
@@ -1028,6 +1046,10 @@
                     prestigeBtn.disabled = data.fans < 50000;
                     prestigeBtn.innerText = data.fans >= 50000 ? `🌟 Welt-Tournee Starten (+1 Gold-Platte)` : `🌟 Tournee ab 50k Fans (${Math.floor(data.fans).toLocaleString()}/50k)`;
                 }
+                if (prestigePanel) {
+                    if (data.fans >= 50000) prestigePanel.classList.add('affordable-glow');
+                    else prestigePanel.classList.remove('affordable-glow');
+                }
 
                 document.querySelectorAll('.genre-btn').forEach(btn => {
                     if (btn.dataset.genre === data.genre) {
@@ -1037,32 +1059,43 @@
                     }
                 });
 
-                const upgrades = [
-                    { id: 'market', base: 35, factor: 1.45, lvl: data.marketingLevel },
-                    { id: 'studio', base: 150, factor: 1.50, lvl: data.studioLevel },
-                    { id: 'producer', base: 600, factor: 1.55, lvl: data.producerLevel },
-                    { id: 'pr', base: 1200, factor: 1.60, lvl: data.prLevel },
-                    { id: 'label', base: 4500, factor: 1.65, lvl: data.labelLevel },
-                    { id: 'merch', base: 18000, factor: 1.70, lvl: data.merchLevel },
-                    { id: 'algo', base: 75000, factor: 1.75, lvl: data.algoLevel },
-                    { id: 'tourbus', base: 280000, factor: 1.80, lvl: data.tourBusLevel },
-                    { id: 'aineural', base: 1200000, factor: 1.85, lvl: data.aiNeuralLevel },
-                    { id: 'satellite', base: 5500000, factor: 1.90, lvl: data.satelliteLevel },
-                    { id: 'hologram', base: 22000000, factor: 1.95, lvl: data.hologramTourLevel },
-                    { id: 'quantumsynth', base: 90000000, factor: 2.00, lvl: data.quantumSynthLevel },
-                    { id: 'musicacademy', base: 400000000, factor: 2.05, lvl: data.musicAcademyLevel },
-                    { id: 'deepspace', base: 1800000000, factor: 2.10, lvl: data.deepSpaceLevel },
-                    { id: 'singularity', base: 8000000000, factor: 2.15, lvl: data.singularityLevel }
+                const upgradesConfig = [
+                    { id: 'market', key: 'marketingLevel', base: 35, factor: 1.45 },
+                    { id: 'studio', key: 'studioLevel', base: 150, factor: 1.50 },
+                    { id: 'producer', key: 'producerLevel', base: 600, factor: 1.55 },
+                    { id: 'pr', key: 'prLevel', base: 1200, factor: 1.60 },
+                    { id: 'label', key: 'labelLevel', base: 4500, factor: 1.65 },
+                    { id: 'merch', key: 'merchLevel', base: 18000, factor: 1.70 },
+                    { id: 'algo', key: 'algoLevel', base: 75000, factor: 1.75 },
+                    { id: 'tourbus', key: 'tourBusLevel', base: 280000, factor: 1.80 },
+                    { id: 'aineural', key: 'aiNeuralLevel', base: 1200000, factor: 1.85 },
+                    { id: 'satellite', key: 'satelliteLevel', base: 5500000, factor: 1.90 },
+                    { id: 'hologram', key: 'hologramTourLevel', base: 22000000, factor: 1.95 },
+                    { id: 'quantumsynth', key: 'quantumSynthLevel', base: 90000000, factor: 2.00 },
+                    { id: 'musicacademy', key: 'musicAcademyLevel', base: 400000000, factor: 2.05 },
+                    { id: 'deepspace', key: 'deepSpaceLevel', base: 1800000000, factor: 2.10 },
+                    { id: 'singularity', key: 'singularityLevel', base: 8000000000, factor: 2.15 }
                 ];
 
-                upgrades.forEach(u => {
+                upgradesConfig.forEach(u => {
                     const lvlEl = document.getElementById(`${u.id}-lvl`);
                     const costEl = document.getElementById(`${u.id}-cost`);
-                    if (lvlEl) lvlEl.innerText = u.lvl;
-                    if (costEl) costEl.innerText = getCost(u.base, u.factor, u.lvl, data.genre).toLocaleString('de-DE');
+                    const rowEl = document.getElementById(`row-${u.id}`);
+                    const cost = getCost(u.base, u.factor, data[u.key], data.genre);
+
+                    if (lvlEl) lvlEl.innerText = data[u.key];
+                    if (costEl) costEl.innerText = cost.toLocaleString('de-DE');
+
+                    if (rowEl) {
+                        if (data.fans >= cost) {
+                            rowEl.classList.add('affordable-glow');
+                        } else {
+                            rowEl.classList.remove('affordable-glow');
+                        }
+                    }
                 });
 
-                // Cooldowns & Buttons
+                // Cooldowns & Buttons mit Glow wenn leistbar
                 const now = Date.now();
                 const rockBtn = document.getElementById('release-rock-btn');
                 const hiphopBtn = document.getElementById('release-hiphop-btn');
@@ -1077,10 +1110,13 @@
                     let cdMod = data.genre === 'electro' ? 0.7 : 1;
                     if (timeLeft > 0) {
                         rockBtn.disabled = true;
+                        rockBtn.classList.remove('affordable-glow');
                         document.getElementById('release-rock-txt').innerText = `⏱️ Cooldown: ${Math.ceil(timeLeft * cdMod)}s`;
                     } else {
                         rockBtn.disabled = data.fans < rockCost;
                         document.getElementById('release-rock-txt').innerText = `Kosten: ${rockCost} Fans | +14 Netto`;
+                        if (data.fans >= rockCost) rockBtn.classList.add('affordable-glow');
+                        else rockBtn.classList.remove('affordable-glow');
                     }
                 }
                 if (hiphopBtn) {
@@ -1088,10 +1124,13 @@
                     let cdMod = data.genre === 'electro' ? 0.7 : 1;
                     if (timeLeft > 0) {
                         hiphopBtn.disabled = true;
+                        hiphopBtn.classList.remove('affordable-glow');
                         document.getElementById('release-hiphop-txt').innerText = `⏱️ Cooldown: ${Math.ceil(timeLeft * cdMod)}s`;
                     } else {
                         hiphopBtn.disabled = data.fans < hiphopCost;
                         document.getElementById('release-hiphop-txt').innerText = `Kosten: ${hiphopCost} Fans | +45 Netto`;
+                        if (data.fans >= hiphopCost) hiphopBtn.classList.add('affordable-glow');
+                        else hiphopBtn.classList.remove('affordable-glow');
                     }
                 }
                 if (albumBtn) {
@@ -1099,10 +1138,13 @@
                     let cdMod = data.genre === 'electro' ? 0.7 : 1;
                     if (timeLeft > 0) {
                         albumBtn.disabled = true;
+                        albumBtn.classList.remove('affordable-glow');
                         document.getElementById('release-album-txt').innerText = `⏱️ Cooldown: ${Math.ceil(timeLeft * cdMod)}s`;
                     } else {
                         albumBtn.disabled = data.fans < albumCost;
                         document.getElementById('release-album-txt').innerText = `Kosten: ${albumCost} Fans | +230 Netto`;
+                        if (data.fans >= albumCost) albumBtn.classList.add('affordable-glow');
+                        else albumBtn.classList.remove('affordable-glow');
                     }
                 }
             }
