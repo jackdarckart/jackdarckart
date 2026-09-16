@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Optimized Harmonic Garden v40.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Ultimate Mega Garden v41.0</span>
                 </div>
             </div>
 
@@ -103,9 +103,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Optimierter Symphonie-Garten &amp; Beat-Sync</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Ultimativer Mega-Garten &amp; Beat-Sync</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständig reparierte, optimierte und vergrößerte Parklandschaft ohne Überlappungen — mit seidenweicher Musik-Harmonisierung.
+                        Erlebe den vollständig vergrößerten, hochdetaillierten und lebendigen Symphonie-Garten im vollen Format — seidenweich harmonisiert im Takt der Musik.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -233,7 +233,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_OPTIMIZED_GARDEN_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_ULTIMATE_MEGA_GARDEN_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -430,7 +430,7 @@
                                     </div>
                                 </div>
                                 <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 text-center">
-                                    <p class="text-xs font-mono text-emerald-300">🎸 Studio-Wirtschaftsmatrix aktiv. Besuche den Garten für den Live-Stream &amp; Beat-Sync!</p>
+                                    <p class="text-xs font-mono text-emerald-300">🎸 Studio-Wirtschaftsmatrix aktiv. Besuche den Garten für den Live-Stream &amp; sanften Beat-Sync!</p>
                                 </div>
                             </div>
                         `;
@@ -445,7 +445,7 @@
                                             ← Zum Beat-Lab
                                         </button>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Optimierter Symphonie-Garten aktiv</span>
+                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Ultimativer Mega-Garten aktiv</span>
                                         </div>
                                     </div>
 
@@ -465,8 +465,8 @@
                                         </div>
                                     </div>
 
-                                    <!-- FEHLERFREIER, GROSSER & HARMONISCHER CANVAS CONTAINER -->
-                                    <div id="canvas-container" class="relative w-full aspect-[16/10] sm:aspect-[21/9] rounded-3xl border-2 border-emerald-800/60 overflow-hidden shadow-2xl bg-[#030d06]">
+                                    <!-- GIGANTISCHER, VOLLFLÄCHIGER CANVAS CONTAINER (MASSIV VERGRÖSSERT) -->
+                                    <div id="canvas-container" class="relative w-full h-[520px] sm:h-[680px] rounded-3xl border-2 border-emerald-800/60 overflow-hidden shadow-2xl bg-[#030d06]">
                                         <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
                                     </div>
 
@@ -774,7 +774,7 @@
                             localStorage.setItem('secure_nexus_session', parsed.userEmail);
                             renderNavbar();
                             updateFooterStatus();
-                            document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
+                    document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
                             setTimeout(() => switchView('garden'), 1000);
                         } catch (err) {
                             alert("❌ Import-Fehler: Datei beschädigt oder ungültig.");
@@ -784,7 +784,7 @@
                 }
             });
 
-            // GIGANTISCHER, SEIDENWEICH HARMONISIERTER RETINA-GARTEN OHNE ÜBERLAPPUNGEN
+            // GIGANTISCHER, VOLLFLÄCHIGER RETINA-GARTEN MIT SEIDENWEICHER BEAT-SYNCHRONISIERUNG
             let animationFrameId = null;
             function initGardenScreenCanvas() {
                 const canvas = document.getElementById('garden-canvas');
@@ -818,15 +818,15 @@
                 let smoothBeat = 0;
                 let liliAngle = 0;
 
-                // Sanfte Glühwürmchen-Partikel für lebendige Atmosphäre
+                // Glühwürmchen / Lichtpartikel für lebendige Atmosphäre
                 let fireflies = [];
-                for(let i=0; i<30; i++) {
+                for(let i=0; i<35; i++) {
                     fireflies.push({
-                        x: Math.random() * 1000,
-                        y: Math.random() * 600,
-                        speedX: (Math.random() - 0.5) * 0.3,
-                        speedY: (Math.random() - 0.5) * 0.3,
-                        radius: Math.random() * 2 + 1,
+                        x: Math.random() * 1200,
+                        y: Math.random() * 800,
+                        speedX: (Math.random() - 0.5) * 0.35,
+                        speedY: (Math.random() - 0.5) * 0.35,
+                        radius: Math.random() * 2.5 + 1,
                         alpha: Math.random() * 0.6 + 0.2
                     });
                 }
@@ -864,7 +864,7 @@
                         beatVal = (Math.sin(time * 1.5) + 1) * 0.08;
                     }
 
-                    // Seidenweiche Interpolation für harmonische, nicht-hektische Bewegungen
+                    // Seidenweiche Interpolation für harmonische Reaktivität ohne Ruckeln
                     smoothBeat += (beatVal - smoothBeat) * 0.12;
 
                     const w = displayWidth;
@@ -873,27 +873,27 @@
 
                     // 1. Tiefgrüner, stimmungsvoller Hintergrund
                     const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-                    bgGrad.addColorStop(0, '#031206');
+                    bgGrad.addColorStop(0, '#031406');
                     bgGrad.addColorStop(1, '#010602');
                     ctx.fillStyle = bgGrad;
                     ctx.fillRect(0, 0, w, h);
 
-                    ctx.fillStyle = '#06200d';
+                    ctx.fillStyle = '#07240f';
                     ctx.beginPath();
-                    ctx.roundRect(35 * s, 35 * s, w - (70 * s), h - (70 * s), 28 * s);
+                    ctx.roundRect(40 * s, 40 * s, w - (80 * s), h - (80 * s), 32 * s);
                     ctx.fill();
 
-                    // Sanfte Parkwege
-                    ctx.strokeStyle = '#0a2e15';
-                    ctx.lineWidth = 45 * s;
+                    // Breite, geschwungene Parkwege
+                    ctx.strokeStyle = '#0c381a';
+                    ctx.lineWidth = 55 * s;
                     ctx.lineCap = 'round';
                     ctx.beginPath();
-                    ctx.moveTo(w * 0.25, h - 35);
-                    ctx.quadraticCurveTo(w * 0.4, h * 0.5, w * 0.5, h * 0.45);
-                    ctx.quadraticCurveTo(w * 0.65, h * 0.38, w * 0.78, 35);
+                    ctx.moveTo(w * 0.22, h - 40);
+                    ctx.quadraticCurveTo(w * 0.38, h * 0.52, w * 0.5, h * 0.46);
+                    ctx.quadraticCurveTo(w * 0.68, h * 0.4, w * 0.82, 40);
                     ctx.stroke();
 
-                    // 2. GLÜHWÜRMCHEN / LICHTPARTIKEL (Schweben harmonisch)
+                    // 2. LICHTPARTIKEL / GLÜHWÜRMCHEN
                     fireflies.forEach(f => {
                         f.x += f.speedX;
                         f.y += f.speedY;
@@ -906,124 +906,124 @@
                         ctx.fill();
                     });
 
-                    // 3. BÄUME (Sicher positioniert mit großem Randabstand)
-                    let treeCount = Math.min(10, userAcc.baumeLevel + 4);
+                    // 3. GROSSE, DETAILSREICHE BÄUME (Oberer linker Bereich)
+                    let treeCount = Math.min(12, userAcc.baumeLevel + 5);
                     for (let i = 0; i < treeCount; i++) {
-                        let tx = (105 + (i % 3) * 55) * s;
-                        let ty = (105 + Math.floor(i / 3) * 55) * s;
-                        let treeRadius = (28 + (smoothBeat * 5)) * s;
+                        let tx = (120 + (i % 4) * 65) * s;
+                        let ty = (120 + Math.floor(i / 4) * 65) * s;
+                        let treeRadius = (32 + (smoothBeat * 6)) * s;
 
-                        ctx.fillStyle = `rgba(52, 211, 153, ${0.1 + smoothBeat * 0.2})`;
+                        ctx.fillStyle = `rgba(52, 211, 153, ${0.1 + smoothBeat * 0.25})`;
                         ctx.beginPath();
-                        ctx.arc(tx, ty, treeRadius * 1.4, 0, Math.PI * 2);
+                        ctx.arc(tx, ty, treeRadius * 1.5, 0, Math.PI * 2);
                         ctx.fill();
 
                         ctx.fillStyle = '#451a03';
-                        ctx.fillRect(tx - (3 * s), ty, 6 * s, 26 * s);
+                        ctx.fillRect(tx - (4 * s), ty, 8 * s, 32 * s);
 
                         ctx.fillStyle = '#047857';
                         ctx.beginPath();
-                        ctx.arc(tx, ty, Math.max(10, treeRadius), 0, Math.PI * 2);
+                        ctx.arc(tx, ty, Math.max(12, treeRadius), 0, Math.PI * 2);
                         ctx.fill();
 
                         ctx.fillStyle = '#34d399';
                         ctx.beginPath();
-                        ctx.arc(tx - (4 * s), ty - (4 * s), Math.max(3, treeRadius * 0.4), 0, Math.PI * 2);
+                        ctx.arc(tx - (5 * s), ty - (5 * s), Math.max(4, treeRadius * 0.45), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
-                    // 4. STUDIO & ESSENTIALS GRID (Unten links, perfekt geschützt)
+                    // 4. STUDIO & ESSENTIALS GRID (Unten links, sicher positioniert)
                     ctx.fillStyle = '#061022';
                     ctx.strokeStyle = '#2563eb';
-                    ctx.lineWidth = 2 * s;
+                    ctx.lineWidth = 2.5 * s;
                     ctx.beginPath();
-                    ctx.roundRect(65 * s, h - (195 * s), 135 * s, 110 * s, 14 * s);
+                    ctx.roundRect(70 * s, h - (220 * s), 150 * s, 125 * s, 16 * s);
                     ctx.fill();
                     ctx.stroke();
 
                     for (let gx = 0; gx < 4; gx++) {
                         for (let gy = 0; gy < 3; gy++) {
                             ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1e40af';
-                            ctx.fillRect((76 + gx * 28) * s, (h - 178 + gy * 28) * s, 19 * s, 17 * s);
+                            ctx.fillRect((82 + gx * 31) * s, (h - 200 + gy * 31) * s, 21 * s, 19 * s);
                         }
                     }
 
-                    // 5. MITTE: BLUMENBEET / STAUDEN (Zentriert, größer & harmonisch)
-                    let dotCount = 80 * userAcc.staudenLevel;
+                    // 5. MITTE: RIESIGES, PRÄCHTIGES STAUDEN- & BLUMENBEET (Harmonisch im Takt)
+                    let dotCount = 100 * userAcc.staudenLevel;
                     let centerX = w * 0.52;
                     let centerY = h * 0.52;
                     const colors = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc'];
 
                     for (let d = 0; d < dotCount; d++) {
                         let angle = d * 137.5;
-                        let r = Math.sqrt(d) * 13 * s;
+                        let r = Math.sqrt(d) * 15 * s;
                         let dx = centerX + Math.cos(angle + (smoothBeat * 0.08)) * r;
-                        let dy = centerY + Math.sin(angle) * r * 0.75;
+                        let dy = centerY + Math.sin(angle) * r * 0.78;
 
                         ctx.fillStyle = colors[d % colors.length];
-                        let dotSize = (4.5 + (smoothBeat * 2.2)) * s;
+                        let dotSize = (5 + (smoothBeat * 2.5)) * s;
                         ctx.beginPath();
                         ctx.arc(dx, dy, Math.max(2, dotSize), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
-                    // 6. RECHTS: KLANG-TEICH (Mit sanften, wellenförmigen Ringen)
-                    let pondX = w - (200 * s);
+                    // 6. RECHTS: GROSSER KLANG-TEICH (Mit weiten Wasserwellen)
+                    let pondX = w - (230 * s);
                     let pondY = h * 0.38;
-                    let pondRx = (90 + (smoothBeat * 8)) * s;
-                    let pondRy = (52 + (smoothBeat * 5)) * s;
+                    let pondRx = (110 + (smoothBeat * 10)) * s;
+                    let pondRy = (64 + (smoothBeat * 6)) * s;
 
                     for (let r = 4; r >= 1; r--) {
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.08 * r + smoothBeat * 0.15})`;
-                        ctx.lineWidth = 2 * s;
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.07 * r + smoothBeat * 0.15})`;
+                        ctx.lineWidth = 2.5 * s;
                         ctx.beginPath();
-                        ctx.ellipse(pondX, pondY, pondRx + (r * 15 * smoothBeat * s), pondRy + (r * 10 * smoothBeat * s), 0, 0, Math.PI * 2);
+                        ctx.ellipse(pondX, pondY, pondRx + (r * 18 * smoothBeat * s), pondRy + (r * 12 * smoothBeat * s), 0, 0, Math.PI * 2);
                         ctx.stroke();
                     }
 
                     ctx.fillStyle = '#0284c7';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(22, pondRx), Math.max(13, pondRy), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(26, pondRx), Math.max(15, pondRy), 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#38bdf8';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(11, pondRx * 0.65), Math.max(6, pondRy * 0.65), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(13, pondRx * 0.65), Math.max(7, pondRy * 0.65), 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // 7. LILI (JACK RUSSELL) BEWEGT SICH GANZ SANFT UND GLÜCKLICH
-                    liliAngle += 0.01 * s;
-                    let liliX = centerX + Math.cos(liliAngle) * (230 * s);
-                    let liliY = centerY + Math.sin(liliAngle * 2) * (80 * s) + (30 * s);
+                    // 7. LILI (JACK RUSSELL) SCHWENKT FRÖHLICH DURCH DEN GARTEN
+                    liliAngle += 0.009 * s;
+                    let liliX = centerX + Math.cos(liliAngle) * (270 * s);
+                    let liliY = centerY + Math.sin(liliAngle * 2) * (95 * s) + (35 * s);
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
-                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (8 * smoothBeat * s);
+                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (10 * smoothBeat * s);
                     ctx.translate(0, jumpOffset);
 
-                    ctx.font = `${Math.max(30, 38 * s)}px sans-serif`;
+                    ctx.font = `${Math.max(34, 44 * s)}px sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // 8. UNTEN: LOUNGE & TERRASSE (Absolut überlappungsfrei und edel)
-                    let terraceW = 400 * s;
-                    let terraceH = 90 * s;
+                    // 8. UNTEN: GEMÜTLICHE LOUNGE & TERRASSE
+                    let terraceW = 460 * s;
+                    let terraceH = 100 * s;
                     let terraceX = (w / 2) - (terraceW / 2);
-                    let terraceY = h - terraceH - (40 * s);
+                    let terraceY = h - terraceH - (45 * s);
 
                     ctx.fillStyle = '#78350f';
                     ctx.strokeStyle = '#d97706';
-                    ctx.lineWidth = 2.5 * s;
+                    ctx.lineWidth = 3 * s;
                     ctx.beginPath();
-                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 14 * s);
+                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 16 * s);
                     ctx.fill();
                     ctx.stroke();
 
                     ctx.strokeStyle = '#451a03';
-                    ctx.lineWidth = 1.5 * s;
-                    for (let lx = terraceX + (35 * s); lx < terraceX + terraceW; lx += 35 * s) {
+                    ctx.lineWidth = 1.8 * s;
+                    for (let lx = terraceX + (40 * s); lx < terraceX + terraceW; lx += 40 * s) {
                         ctx.beginPath();
                         ctx.moveTo(lx, terraceY);
                         ctx.lineTo(lx, terraceY + terraceH);
@@ -1032,9 +1032,9 @@
 
                     // Lounge-Möbel Tisch
                     ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (50 * s), terraceY + (terraceH / 2) - (14 * s), 100 * s, 28 * s);
+                    ctx.fillRect(terraceX + (terraceW / 2) - (55 * s), terraceY + (terraceH / 2) - (16 * s), 110 * s, 32 * s);
                     ctx.fillStyle = '#334155';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (40 * s), terraceY + (terraceH / 2) - (10 * s), 80 * s, 20 * s);
+                    ctx.fillRect(terraceX + (terraceW / 2) - (45 * s), terraceY + (terraceH / 2) - (11 * s), 90 * s, 22 * s);
                 }
 
                 renderLoop();
