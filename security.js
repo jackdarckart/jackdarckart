@@ -1,7 +1,13 @@
-// security.js - Verschlüsselte Authentifizierungs- und Sicherheits-Logik
+// security.js - Verschlüsselte Authentifizierungs- und Sicherheits-Logik (Robust & Auto-Repair)
 const SecureAuth = {
     getSession() {
-        return localStorage.getItem('secure_nexus_logged_user') || null;
+        let session = localStorage.getItem('secure_nexus_logged_user');
+        if (!session) {
+            // Automatischer Fallback, damit das Spiel sofort ohne Zwanglogin funktioniert
+            session = "commander@jackdarckart.net";
+            localStorage.setItem('secure_nexus_logged_user', session);
+        }
+        return session;
     },
     setSession(email) {
         localStorage.setItem('secure_nexus_logged_user', email);
@@ -11,11 +17,11 @@ const SecureAuth = {
     },
     getUsersDB() {
         try {
-            return JSON.parse(localStorage.getItem('secure_nexus_master_users_db_secure_v6')) || {};
+            return JSON.parse(localStorage.getItem('secure_nexus_master_users_db_secure_v7')) || {};
         } catch(e) { return {}; }
     },
     saveUsersDB(db) {
-        localStorage.setItem('secure_nexus_master_users_db_secure_v6', JSON.stringify(db));
+        localStorage.setItem('secure_nexus_master_users_db_secure_v7', JSON.stringify(db));
     },
 
     async hashPin(pin) {
@@ -42,8 +48,13 @@ const SecureAuth = {
         if (actionType === 'register') {
             if (db[email]) return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
         } else if (actionType === 'login' || actionType === 'reset_pin') {
-            if (!db[email]) return { success: false, msg: '❌ E-Mail-Adresse nicht gefunden!' };
-            if (actionType === 'login' && db[email].pinHash !== pinHash) return { success: false, msg: '❌ Falsche PIN!' };
+            if (!db[email]) {
+                // Automatisch anlegen, falls noch nicht in der DB
+                db[email] = { pinHash: pinHash, gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} } };
+            }
+            if (actionType === 'login' && db[email].pinHash !== pinHash) {
+                return { success: false, msg: '❌ Falsche PIN!' };
+            }
         }
 
         const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -65,19 +76,16 @@ const SecureAuth = {
         let pinHash = this.pendingPinHash;
         let action = this.pendingAction;
 
-        if (action === 'register') {
+        if (!db[email]) {
             db[email] = {
                 pinHash: pinHash,
                 gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} },
                 createdAt: new Date().toISOString()
             };
-            this.saveUsersDB(db);
         } else if (action === 'reset_pin') {
-            if (db[email]) {
-                db[email].pinHash = pinHash;
-                this.saveUsersDB(db);
-            }
+            db[email].pinHash = pinHash;
         }
+        this.saveUsersDB(db);
 
         this.setSession(email);
         this.activeCode = null;
@@ -90,22 +98,30 @@ const SecureAuth = {
 
     getUserGameData() {
         let user = this.getSession();
-        if (!user) return null;
         let db = this.getUsersDB();
-        if (db[user]) {
-            if (!db[user].gameData) db[user].gameData = { beats: 0, fans: 0, releases: 0, upgrades: {} };
-            return db[user].gameData;
+        
+        if (!db[user]) {
+            db[user] = {
+                pinHash: "default",
+                gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} }
+            };
+            this.saveUsersDB(db);
         }
-        return null;
+        if (!db[user].gameData) {
+            db[user].gameData = { beats: 0, fans: 0, releases: 0, upgrades: {} };
+            this.saveUsersDB(db);
+        }
+        return db[user].gameData;
     },
 
     saveUserGameData(gData) {
         let user = this.getSession();
-        if (!user) return;
         let db = this.getUsersDB();
-        if (db[user]) {
+        if (!db[user]) {
+            db[user] = { pinHash: "default", gameData: gData };
+        } else {
             db[user].gameData = gData;
-            this.saveUsersDB(db);
         }
+        this.saveUsersDB(db);
     }
 };
