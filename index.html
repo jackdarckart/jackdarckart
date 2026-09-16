@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Aerial Architectural Engine v32.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Botanical Beat Engine v33.0</span>
                 </div>
             </div>
 
@@ -101,11 +101,11 @@
                     <div class="absolute -top-12 -right-12 w-72 h-72 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="absolute -bottom-12 -left-12 w-72 h-72 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none"></div>
                     
-                    <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🦅</span>
+                    <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Architektonischer Garten (Vogelperspektive) &amp; Musik-Matrix</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Botanischer Garten &amp; Musik-Matrix im Takt der Musik</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einer exakten, hochauflösenden architektonischen Vogelperspektive des Parks.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem interaktiven Garten, der live im Rhythmus des Webradios pulsiert.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -214,11 +214,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            let releaseCooldowns = { rock: 0, hiphop: 0, album: 0 };
             let audioCtx = null;
             let analyser = null;
             let sourceNode = null;
-            let visualizerAnimationId = null;
 
             const SecureAuth = {
                 currentUser: localStorage.getItem('secure_nexus_session') || null,
@@ -235,7 +233,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_ARCH_AERIAL_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_BEAT_GARDEN_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -313,6 +311,9 @@
                             releasesCount: 0, 
                             genre: 'synthwave', 
                             goldRecords: 0,
+                            staudenLevel: 1,
+                            baumeLevel: 3,
+                            teichLevel: 1,
                             marketingLevel: 0, 
                             studioLevel: 0, 
                             producerLevel: 0, 
@@ -367,24 +368,9 @@
                     let db = this.getDB();
                     let u = db[this.currentUser];
                     if (!u) return null;
-                    if (u.genre === undefined) u.genre = 'synthwave';
-                    if (u.goldRecords === undefined) u.goldRecords = 0;
-                    if (u.tourBusLevel === undefined) u.tourBusLevel = 0;
-                    if (u.aiNeuralLevel === undefined) u.aiNeuralLevel = 0;
-                    if (u.satelliteLevel === undefined) u.satelliteLevel = 0;
-                    if (u.hologramTourLevel === undefined) u.hologramTourLevel = 0;
-                    if (u.quantumSynthLevel === undefined) u.quantumSynthLevel = 0;
-                    if (u.musicAcademyLevel === undefined) u.musicAcademyLevel = 0;
-                    if (u.deepSpaceLevel === undefined) u.deepSpaceLevel = 0;
-                    if (u.singularityLevel === undefined) u.singularityLevel = 0;
-
-                    if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
-                        alert('⚠️ Anti-Cheat Alarm: Manipulierter Spielstand erkannt! Werte wurden zurückgesetzt.');
-                        u.fans = 5; u.goldRecords = 0; u.marketingLevel = 0; u.studioLevel = 0; u.producerLevel = 0; u.prLevel = 0; u.labelLevel = 0; u.merchLevel = 0; u.algoLevel = 0; u.tourBusLevel = 0; u.aiNeuralLevel = 0; u.satelliteLevel = 0; u.hologramTourLevel = 0; u.quantumSynthLevel = 0; u.musicAcademyLevel = 0; u.deepSpaceLevel = 0; u.singularityLevel = 0;
-                        u.checksum = this.generateChecksum(u);
-                        db[this.currentUser] = u;
-                        this.saveDB(db);
-                    }
+                    if (u.staudenLevel === undefined) u.staudenLevel = 1;
+                    if (u.baumeLevel === undefined) u.baumeLevel = 3;
+                    if (u.teichLevel === undefined) u.teichLevel = 1;
                     return u;
                 },
                 saveAccountData(dataObj) {
@@ -401,7 +387,7 @@
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
-                { id: 'garden', name: 'Garden', icon: '🦅', desc: 'Architektonischer Garten (Vogelperspektive)', protected: true },
+                { id: 'garden', name: 'Garten', icon: '🌿', desc: 'Interaktiver Garten & Beat-Lab', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
@@ -443,281 +429,62 @@
                                         <p id="studio-fps" class="text-xl font-black text-teal-400 font-mono mt-1">+0</p>
                                     </div>
                                 </div>
-
-                                <div id="panel-prestige" class="glass-panel p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-center gap-3 bg-gradient-to-r from-amber-950/30 via-emerald-950/20 to-slate-900/40">
-                                    <div>
-                                        <p class="text-xs font-mono text-amber-400 font-bold uppercase flex items-center gap-1.5"><span>🌟</span> Globale Welt-Tournee (Prestige)</p>
-                                        <p class="text-[10px] text-slate-300 mt-0.5">Setzt Fans &amp; Upgrades zurück, gibt aber permanent <span class="text-amber-300 font-bold">+25% Ertrag pro Gold-Platte</span>.</p>
-                                    </div>
-                                    <button type="button" id="btn-prestige" class="cyber-button bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white text-[11px] font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer shrink-0 shadow">🌟 Tournee Starten (Ab 50k Fans)</button>
+                                <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 text-center">
+                                    <p class="text-xs font-mono text-emerald-300">🎸 Studio-Wirtschaftsmatrix aktiv. Besuche den Garten für den Live-Stream &amp; Beat-Sync!</p>
                                 </div>
-
-                                <div class="glass-panel p-4 rounded-2xl border border-emerald-500/30 flex items-center justify-between gap-3 bg-gradient-to-r from-emerald-950/40 via-slate-900/60 to-cyan-950/40">
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-2xl animate-bounce">📡</span>
-                                        <div>
-                                            <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-wider">Live Industrie-Ticker</p>
-                                            <p id="industry-ticker-text" class="text-xs font-mono text-slate-200">Analysiere Musikmarkt... Bereit für Events.</p>
-                                        </div>
-                                    </div>
-                                    <span id="ticker-timer-badge" class="text-[10px] font-mono bg-emerald-900/60 text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-500/40 shrink-0">Nächstes Event in 30s</span>
-                                </div>
-
-                                <div class="glass-panel p-4 rounded-2xl border-slate-800 space-y-2.5">
-                                    <div class="flex justify-between items-center">
-                                        <h3 class="text-xs font-mono text-cyan-300 font-bold uppercase">🎧 Aktiver Musik-Stil (Genre-Fokus)</h3>
-                                        <span class="text-[10px] font-mono text-slate-400">Beeinflusst Boni &amp; Erträge</span>
-                                    </div>
-                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        <button type="button" data-genre="synthwave" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-emerald-500 p-2.5 rounded-xl text-left cursor-pointer transition">
-                                            <p class="text-xs font-bold text-white">🌆 Synthwave</p>
-                                            <p class="text-[9px] font-mono text-emerald-300 mt-0.5">+15% Passiv-Boost</p>
-                                        </button>
-                                        <button type="button" data-genre="hiphop" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-emerald-500 p-2.5 rounded-xl text-left cursor-pointer transition">
-                                            <p class="text-xs font-bold text-white">🎤 Hip-Hop</p>
-                                            <p class="text-[9px] font-mono text-teal-300 mt-0.5">+30% Hype-Zuwachs</p>
-                                        </button>
-                                        <button type="button" data-genre="rock" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-emerald-500 p-2.5 rounded-xl text-left cursor-pointer transition">
-                                            <p class="text-xs font-bold text-white">🎸 Rock / Metal</p>
-                                            <p class="text-[9px] font-mono text-pink-300 mt-0.5">-25% Release-Kosten</p>
-                                        </button>
-                                        <button type="button" data-genre="electro" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-emerald-500 p-2.5 rounded-xl text-left cursor-pointer transition">
-                                            <p class="text-xs font-bold text-white">⚡ Electro Club</p>
-                                            <p class="text-[9px] font-mono text-cyan-300 mt-0.5">-30% Cooldown-Timer</p>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 space-y-3">
-                                    <div class="flex justify-between items-center">
-                                        <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">💿 Musik-Produktion &amp; Releases</h3>
-                                        <span class="text-[10px] font-mono text-amber-400">Leuchtet grün, wenn bereit</span>
-                                    </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                        <button type="button" id="release-rock-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
-                                            <span>🎸 Underground Single</span>
-                                            <span id="release-rock-txt" class="text-[10px] font-light text-emerald-200">Kosten: 6 Fans | +14 Netto (3s)</span>
-                                        </button>
-                                        <button type="button" id="release-hiphop-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
-                                            <span>🎤 Street Beat</span>
-                                            <span id="release-hiphop-txt" class="text-[10px] font-light text-teal-200">Kosten: 25 Fans | +45 Netto (8s)</span>
-                                        </button>
-                                        <button type="button" id="release-album-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
-                                            <span>💿 Studio Album</span>
-                                            <span id="release-album-txt" class="text-[10px] font-light text-cyan-200">Kosten: 120 Fans | +230 Netto (20s)</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="glass-panel p-5 rounded-2xl border-slate-800 space-y-4">
-                                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                                        <h3 class="text-xs font-mono text-teal-300 font-bold uppercase">📈 Studio-Upgrades &amp; 15 Empire Stufen</h3>
-                                        <span class="text-[9px] font-mono text-teal-400">💡 Leuchtende Elemente sind kaufbereit!</span>
-                                    </div>
-                                    
-                                    <div class="space-y-4 max-h-[420px] overflow-y-auto pr-1.5">
-                                        <div class="space-y-2">
-                                            <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-wider font-bold">1. Basis &amp; Studio</p>
-                                            
-                                            <div id="row-market" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">📢 Social-Media Kampagne (Lvl <span id="market-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+1 Fan/s | Kosten: <span id="market-cost">35</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-market-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-studio" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🎛️ High-End Mastering Suite (Lvl <span id="studio-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+4 Fans/s | Kosten: <span id="studio-cost">150</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-studio-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-producer" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🎹 Ghostproducer-Team (Lvl <span id="producer-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+12 Fans/s | Kosten: <span id="producer-cost">600</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-producer-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-                                        </div>
-
-                                        <div class="space-y-2 pt-2">
-                                            <p class="text-[10px] font-mono text-cyan-300 uppercase tracking-wider font-bold">2. Business &amp; Expansion</p>
-
-                                            <div id="row-pr" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">📰 PR-Agentur &amp; Management (Lvl <span id="pr-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+15% Gesamtwachstum | Kosten: <span id="pr-cost">1200</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-pr-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-label" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🏢 Eigenes Plattenlabel (Lvl <span id="label-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+45 Fans/s | Kosten: <span id="label-cost">4500</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-label-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-merch" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">👕 Merchandising-Linie (Lvl <span id="merch-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+120 Fans/s | Kosten: <span id="merch-cost">18000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-merch-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-algo" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🌐 Streaming-Algorithmus (Lvl <span id="algo-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+350 Fans/s | Kosten: <span id="algo-cost">75000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-algo-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-                                        </div>
-
-                                        <div class="space-y-2 pt-2">
-                                            <p class="text-[10px] font-mono text-pink-300 uppercase tracking-wider font-bold">3. High-Tech &amp; Enterprise</p>
-
-                                            <div id="row-tourbus" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-emerald-500/25 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🚌 World Tour Arena Bus (Lvl <span id="tourbus-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+950 Fans/s | Kosten: <span id="tourbus-cost">280000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-tourbus-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-aineural" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-emerald-500/25 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🤖 AI-Mastering Neural Net (Lvl <span id="aineural-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+2800 Fans/s | Kosten: <span id="aineural-cost">1200000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-aineural-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-satellite" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-emerald-500/25 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🛰️ Global Satellite Uplink (Lvl <span id="satellite-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+9500 Fans/s | Kosten: <span id="satellite-cost">5500000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-satellite-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-hologram" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🌌 Interstellar Hologram Tour (Lvl <span id="hologram-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+28,000 Fans/s | Kosten: <span id="hologram-cost">22000000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-hologram-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-                                        </div>
-
-                                        <div class="space-y-2 pt-2">
-                                            <p class="text-[10px] font-mono text-amber-300 uppercase tracking-wider font-bold">4. Kosmische Ära (End-Game)</p>
-
-                                            <div id="row-quantumsynth" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🧠 Quantum Sound Synthesizer (Lvl <span id="quantumsynth-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+85,000 Fans/s | Kosten: <span id="quantumsynth-cost">90000000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-quantumsynth-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-musicacademy" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-indigo-500/30 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🏛️ Global Music Academy (Lvl <span id="musicacademy-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+250,000 Fans/s | Kosten: <span id="musicacademy-cost">400000000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-musicacademy-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-deepspace" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-indigo-500/30 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">🛸 Deep Space Broadcast Station (Lvl <span id="deepspace-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+800,000 Fans/s | Kosten: <span id="deepspace-cost">1800000000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-deepspace-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-
-                                            <div id="row-singularity" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-pink-500/40 transition">
-                                                <div>
-                                                    <p class="text-xs font-bold text-white">⚛️ Nexus Singularity Engine (Lvl <span id="singularity-lvl">0</span>)</p>
-                                                    <p class="text-[10px] text-slate-400 font-mono">+3,000,000 Fans/s | Kosten: <span id="singularity-cost">8000000000</span> Fans</p>
-                                                </div>
-                                                <button type="button" id="buy-singularity-btn" class="cyber-button bg-pink-600 hover:bg-pink-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="glass-panel p-4 rounded-2xl border border-red-500/30 flex flex-col sm:flex-row justify-between items-center gap-3">
-                                    <div>
-                                        <p class="text-xs font-mono text-red-400 font-bold uppercase">⚠️ Spielstand Zurücksetzen</p>
-                                        <p class="text-[10px] text-slate-400">Setzt Fans, Releases &amp; Upgrades auf Anfang zurück.</p>
-                                    </div>
-                                    <button type="button" id="btn-reset-gamestate" class="cyber-button bg-red-600/80 hover:bg-red-600 text-white text-[11px] font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer shrink-0 shadow">🔄 Spielstand Reset</button>
-                                </div>
-
                             </div>
                         `;
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <!-- ARCHITEKTURISCHE VOGELPERSPEKTIVE (CANVAS BLUEPRINT) -->
-                                <div class="p-6 sm:p-10 rounded-[3rem] border-2 border-emerald-600/40 relative overflow-hidden bg-gradient-to-b from-[#05140b] via-[#020a05] to-[#010402] shadow-2xl">
+                                <!-- GARTEN BEREICH EXAKT WIE IM SCREENSHOT -->
+                                <div class="p-6 sm:p-8 rounded-[3rem] border-2 border-emerald-600/40 relative overflow-hidden bg-gradient-to-b from-[#05140b] via-[#020a05] to-[#010402] shadow-2xl">
                                     
-                                    <!-- Kopfbereich -->
-                                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 border-b border-emerald-500/20 pb-5">
-                                        <div class="flex items-center gap-4">
-                                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 p-0.5 shadow-xl shadow-emerald-500/25">
-                                                <div class="w-full h-full bg-[#020a05] rounded-[14px] flex items-center justify-center text-2xl">🦅</div>
-                                            </div>
-                                            <div>
-                                                <h3 class="text-lg sm:text-xl font-black text-white font-mono tracking-wide flex items-center gap-2">
-                                                    Botanischer Garten • Exakte Vogelperspektive
-                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/80 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30">🌿 Autonomer Audio-Sync</span>
-                                                </h3>
-                                                <p class="text-xs text-emerald-200/70 font-mono mt-0.5">Hochdetaillierte architektonische Aufsicht mit Glashaus, Alleen und Teich.</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Tempo-Regler -->
-                                        <div class="flex items-center gap-3 bg-[#020a05]/90 px-4 py-2.5 rounded-2xl border border-emerald-500/25 shadow-inner">
-                                            <span class="text-xs font-mono text-emerald-300">⚡ Puls-Tempo:</span>
-                                            <input type="range" id="garden-speed-range" min="0.5" max="2.0" step="0.1" value="1.0" class="w-20 accent-emerald-500 cursor-pointer">
-                                            <span id="garden-speed-label" class="text-xs font-mono text-emerald-400 font-bold w-8 text-right">1.0x</span>
+                                    <!-- Top Navigation innerhalb des Gartens -->
+                                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-5 border-b border-emerald-500/20 pb-4">
+                                        <button type="button" class="nav-link cyber-button bg-slate-900 text-emerald-300 border border-emerald-500/30 px-4 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer" data-target="studio">
+                                            ← Zum Beat-Lab
+                                        </button>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-mono text-emerald-400">🌿 Live Audio-Beat-Synchronisierung aktiv</span>
                                         </div>
                                     </div>
 
-                                    <!-- HOCHAUFLÖSENDES ARCHITEKTUR-CANVAS -->
-                                    <div class="relative w-full h-[500px] rounded-3xl border-2 border-emerald-800/50 overflow-hidden shadow-2xl bg-[#040f07]">
-                                        <canvas id="garden-map-canvas" class="absolute inset-0 w-full h-full"></canvas>
-                                        <div class="absolute top-4 left-4 z-10 bg-[#020a05]/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/30 text-[10px] font-mono text-emerald-300 shadow">
-                                            🦅 Architectural Top-Down Layout Active
+                                    <!-- STATS LEVEL LEISTE (Stauden, Bäume, Teich) -->
+                                    <div class="grid grid-cols-3 gap-3 mb-5">
+                                        <div class="glass-panel p-3 rounded-2xl border border-emerald-500/30 text-center">
+                                            <p class="text-[10px] font-mono text-emerald-300 uppercase">Stauden Level</p>
+                                            <p id="stat-stauden-lvl" class="text-lg font-black text-white font-mono mt-1">1</p>
                                         </div>
+                                        <div class="glass-panel p-3 rounded-2xl border border-emerald-500/30 text-center">
+                                            <p class="text-[10px] font-mono text-teal-300 uppercase">Bäume Level</p>
+                                            <p id="stat-baume-lvl" class="text-lg font-black text-white font-mono mt-1">3</p>
+                                        </div>
+                                        <div class="glass-panel p-3 rounded-2xl border border-emerald-500/30 text-center">
+                                            <p class="text-[10px] font-mono text-cyan-300 uppercase">Teich Level</p>
+                                            <p id="stat-teich-lvl" class="text-lg font-black text-white font-mono mt-1">1</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- INTERAKTIVES GARTEN-CANVAS (Genau wie im Screenshot) -->
+                                    <div class="relative w-full h-[450px] rounded-3xl border-2 border-emerald-800/60 overflow-hidden shadow-2xl bg-[#040f07]">
+                                        <canvas id="garden-canvas" class="absolute inset-0 w-full h-full cursor-pointer"></canvas>
                                     </div>
 
                                     <!-- WEBRADIO PLAYER -->
-                                    <div class="mt-6 bg-[#020a05]/95 backdrop-blur-2xl p-6 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-4">
-                                        <div class="flex flex-col sm:flex-row justify-between items-center gap-5">
-                                            <div class="flex items-center gap-5 w-full sm:w-auto">
-                                                <button type="button" id="garden-play-btn" class="cyber-button w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center text-2xl shadow-xl shadow-emerald-500/40 cursor-pointer shrink-0">▶</button>
+                                    <div class="mt-6 bg-[#020a05]/95 backdrop-blur-2xl p-5 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-3">
+                                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                            <div class="flex items-center gap-4 w-full sm:w-auto">
+                                                <button type="button" id="garden-play-btn" class="cyber-button w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center text-xl shadow-xl shadow-emerald-500/40 cursor-pointer shrink-0">▶</button>
                                                 <div class="overflow-hidden">
-                                                    <p class="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">Botanischer Garten Live-Stream</p>
-                                                    <p id="radio-track-title" class="text-xs sm:text-sm font-bold text-white font-mono truncate max-w-xs sm:max-w-lg mt-1">Bereit zum Starten...</p>
+                                                    <p class="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">stream-musik.space WebRadio</p>
+                                                    <p id="radio-track-title" class="text-xs sm:text-sm font-bold text-white font-mono truncate max-w-xs sm:max-w-md mt-0.5">Bereit zum Starten...</p>
                                                 </div>
                                             </div>
                                             
-                                            <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
-                                                <div class="flex items-center gap-3 bg-[#010502] px-4 py-2.5 rounded-2xl border border-emerald-500/20 shadow-inner">
-                                                    <span class="text-base">🔊</span>
-                                                    <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-32 accent-emerald-500 cursor-pointer">
-                                                </div>
+                                            <div class="flex items-center gap-3 bg-[#010502] px-4 py-2 rounded-2xl border border-emerald-500/20 shadow-inner w-full sm:w-auto justify-end">
+                                                <span class="text-base">🔊</span>
+                                                <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-28 accent-emerald-500 cursor-pointer">
                                             </div>
                                         </div>
                                         
@@ -883,11 +650,8 @@
                         const emailSpan = document.getElementById('admin-current-email');
                         if (emailSpan) emailSpan.innerText = SecureAuth.currentUser || 'Unbekannt';
                     }
-                    if (targetId === 'studio') {
-                        updateStudioUI(SecureAuth.getAccountData());
-                    }
                     if (targetId === 'garden') {
-                        initGardenAerialMap();
+                        initGardenScreenCanvas();
                     }
                 }
             }
@@ -955,7 +719,7 @@
                         renderNavbar();
                         updateFooterStatus();
                         updateAuthPortalUI();
-                        setTimeout(() => switchView('studio'), 800);
+                        setTimeout(() => switchView('garden'), 800);
                     }
                 }
                 if (e.target && e.target.id === 'btn-execute-reset') {
@@ -1011,8 +775,8 @@
                             localStorage.setItem('secure_nexus_session', parsed.userEmail);
                             renderNavbar();
                             updateFooterStatus();
-                            document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
-                            setTimeout(() => switchView('studio'), 1000);
+    document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
+                            setTimeout(() => switchView('garden'), 1000);
                         } catch (err) {
                             alert("❌ Import-Fehler: Datei beschädigt oder ungültig.");
                         }
@@ -1021,18 +785,23 @@
                 }
             });
 
-            // HOCHPRÄZISE ARCHITEKTUR-VOGELPERSPEKTIVE (CANVAS RENDERER)
-            function initGardenAerialMap() {
-                const canvas = document.getElementById('garden-map-canvas');
+            // GARTEN RENDERER & BEAT-SYNCHRONISIERUNG (EXAKT NACH DEINEM SCREENSHOT)
+            let animationFrameId = null;
+            function initGardenScreenCanvas() {
+                const canvas = document.getElementById('garden-canvas');
                 const audio = document.getElementById('garden-audio');
-                const speedRange = document.getElementById('garden-speed-range');
-                const speedLabel = document.getElementById('garden-speed-label');
                 if (!canvas) return;
 
                 canvas.width = canvas.parentElement.clientWidth || 800;
-                canvas.height = canvas.parentElement.clientHeight || 500;
+                canvas.height = canvas.parentElement.clientHeight || 450;
                 const ctx = canvas.getContext('2d');
 
+                let userAcc = SecureAuth.getAccountData() || { staudenLevel: 1, baumeLevel: 3, teichLevel: 1 };
+                document.getElementById('stat-stauden-lvl').innerText = userAcc.staudenLevel;
+                document.getElementById('stat-baume-lvl').innerText = userAcc.baumeLevel;
+                document.getElementById('stat-teich-lvl').innerText = userAcc.teichLevel;
+
+                // Sichere Audio-Analyse mit Fallback-Taktgeber für Webradio
                 try {
                     if (!audioCtx && audio) {
                         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1044,145 +813,172 @@
                         analyser.connect(audioCtx.destination);
                     }
                 } catch (e) {
-                    console.log("Audio Direkt-Modus aktiv.");
+                    console.log("Audio-Analyse im sicheren Modus aktiv.");
                 }
 
                 const bufferLength = analyser ? analyser.frequencyBinCount : 128;
                 const dataArray = new Uint8Array(bufferLength);
-                let bassSmooth = 0;
-                let liliAngle = 0;
+                let smoothBeat = 0;
 
-                function renderAerialLoop() {
-                    requestAnimationFrame(renderAerialLoop);
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-                    let animSpeed = speedRange ? parseFloat(speedRange.value) : 1.0;
-                    if (speedLabel) speedLabel.innerText = animSpeed.toFixed(1) + 'x';
+                function renderLoop() {
+                    animationFrameId = requestAnimationFrame(renderLoop);
 
-                    let isAudioValid = false;
-                    if (analyser) {
+                    let isPlaying = audio && !audio.paused;
+                    let beatVal = 0;
+
+                    if (analyser && isPlaying) {
                         analyser.getByteFrequencyData(dataArray);
-                        for (let i = 0; i < bufferLength; i++) {
-                            if (dataArray[i] > 0) { isAudioValid = true; break; }
+                        let sum = 0;
+                        for (let i = 0; i < 6; i++) sum += dataArray[i];
+                        beatVal = (sum / 6) / 255;
+                    } else if (isPlaying) {
+                        // Dynamischer Takt-Generator im Rhythmus von 120 BPM, falls Stream-CORS aktiv ist
+                        let time = Date.now() / 1000;
+                        beatVal = Math.max(0, Math.sin(time * Math.PI * 2.2)) > 0.6 ? 0.75 : 0.05;
+                    } else {
+                        let time = Date.now() / 1000;
+                        beatVal = (Math.sin(time * 2) + 1) * 0.03;
+                    }
+
+                    smoothBeat += (beatVal - smoothBeat) * 0.25;
+
+                    const w = canvas.width;
+                    const h = canvas.height;
+
+                    // 1. Garten-Hintergrund (Sattes Dunkelgrün)
+                    ctx.fillStyle = '#061a0d';
+                    ctx.fillRect(0, 0, w, h);
+
+                    // Dezent gefüllter Rasen
+                    ctx.fillStyle = '#082413';
+                    ctx.fillRect(15, 15, w - 30, h - 30);
+
+                    // 2. LINKE SEITE: BÄUME LEVEL (Grüne kugelförmige Baumkronen pulsieren im Takt)
+                    let treeCount = Math.min(6, userAcc.baumeLevel + 2);
+                    for (let i = 0; i < treeCount; i++) {
+                        let tx = 65 + (i % 2) * 45;
+                        let ty = 60 + Math.floor(i / 2) * 45;
+                        let treeRadius = 22 + (smoothBeat * 5);
+
+                        ctx.fillStyle = '#10b981';
+                        ctx.beginPath();
+                        ctx.arc(tx, ty, treeRadius, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Innerer Glanz
+                        ctx.fillStyle = '#34d399';
+                        ctx.beginPath();
+                        ctx.arc(tx - 4, ty - 4, treeRadius * 0.4, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // 3. STUDIO & ESSENTIALS GRID (Linke Box unter Bäumen)
+                    ctx.fillStyle = '#0d1526';
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.roundRect(50, 170, 130, 95, 8);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Mini-Grid Rasterpunkte
+                    for (let gx = 0; gx < 4; gx++) {
+                        for (let gy = 0; gy < 3; gy++) {
+                            ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1e3a8a';
+                            ctx.fillRect(62 + gx * 28, 185 + gy * 25, 18, 16);
                         }
                     }
 
-                    const timeSec = Date.now() / 1000 * animSpeed;
-                    let rawBass = 0;
+                    // 4. MITTE: STAUDEN / GARTEN (Bunte Kreise/Blüten pulsieren im Takt)
+                    let dotCount = 35 * userAcc.staudenLevel;
+                    let centerX = w / 2 - 10;
+                    let centerY = h / 2 - 20;
+                    const colors = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
 
-                    if (isAudioValid) {
-                        let bSum = 0;
-                        for (let i = 0; i < 5; i++) bSum += dataArray[i];
-                        rawBass = (bSum / 5) / 255;
-                    } else if (audio && !audio.paused) {
-                        rawBass = Math.max(0, Math.sin(timeSec * Math.PI * 2.2)) > 0.7 ? 0.7 : 0.05;
-                    } else {
-                        rawBass = (Math.sin(timeSec * 2.0) + 1) * 0.04;
+                    for (let d = 0; d < dotCount; d++) {
+                        // Pseudozufällige Anordnung im Beet
+                        let angle = d * 137.5;
+                        let r = Math.sqrt(d) * 9;
+                        let dx = centerX + Math.cos(angle) * r;
+                        let dy = centerY + Math.sin(angle) * r * 0.7;
+
+                        if (dx > centerX - 60 && dx < centerX + 60 && dy > centerY - 65 && dy < centerY + 65) {
+                            ctx.fillStyle = colors[d % colors.length];
+                            let dotSize = 3.5 + (smoothBeat * 2.5);
+                            ctx.beginPath();
+                            ctx.arc(dx, dy, dotSize, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
                     }
 
-                    if (rawBass > bassSmooth) {
-                        bassSmooth = rawBass;
-                    } else {
-                        bassSmooth += (rawBass - bassSmooth) * 0.2;
-                    }
+                    // Label "Stauden/Garten"
+                    ctx.fillStyle = '#a7f3d0';
+                    ctx.font = '10px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🌸 Stauden/Garten', centerX, centerY - 72);
 
-                    const cx = canvas.width / 2;
-                    const cy = canvas.height / 2;
+                    // 5. RECHTS: KLANG-TEICH (Blauer Ovaler Teich pulsiert und wirft Wellen)
+                    let pondX = w - 160;
+                    let pondY = 140;
+                    let pondRx = 65 + (smoothBeat * 8);
+                    let pondRy = 38 + (smoothBeat * 5);
 
-                    // 1. PARKGRUND & RASENFLÄCHEN (Satte Grün-Töne wie im Referenzfoto)
-                    let bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                    bgGrad.addColorStop(0, '#041208');
-                    bgGrad.addColorStop(1, '#082110');
-                    ctx.fillStyle = bgGrad;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                    // 2. HAUPT-WEGESYSTEM & ALLEEN
-                    ctx.fillStyle = '#1c3022';
-                    // Vertikale Hauptallee
-                    ctx.fillRect(cx - 28, cy - 120, 56, 260);
-                    // Horizontale Querwege
-                    ctx.fillRect(cx - 160, cy - 10, 320, 32);
-
-                    // Feinerer Kiesweg-Belag in der Mitte
-                    ctx.fillStyle = '#26422f';
-                    ctx.fillRect(cx - 16, cy - 120, 32, 260);
-                    ctx.fillRect(cx - 160, cy - 4, 320, 16);
-
-                    // 3. GROSSES HAUPT-GLASHAUS (Zentraler Komplex oben)
-                    ctx.save();
-                    let glassW = 240 + (bassSmooth * 6);
-                    let glassH = 90;
-                    let glassX = cx - glassW / 2;
-                    let glassY = cy - 150;
-
-                    // Glas-Basisstruktur
-                    ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
-                    ctx.strokeStyle = '#34d399';
-                    ctx.lineWidth = 2.5;
+                    ctx.fillStyle = '#0284c7';
                     ctx.beginPath();
-                    ctx.roundRect(glassX, glassY, glassW, glassH, [18, 18, 8, 8]);
+                    ctx.ellipse(pondX, pondY, pondRx, pondRy, 0, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.stroke();
 
-                    // Gewölbtes Glasdach (Zentraler Dome)
-                    ctx.fillStyle = 'rgba(52, 211, 153, 0.35)';
+                    ctx.fillStyle = '#38bdf8';
                     ctx.beginPath();
-                    ctx.ellipse(cx, glassY, glassW * 0.38, 28, 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, pondRx * 0.65, pondRy * 0.65, 0, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.stroke();
 
-                    // Feine Sprossenstruktur auf dem Glasdach
-                    ctx.strokeStyle = '#a7f3d0';
-                    ctx.lineWidth = 1;
-                    for (let lx = glassX + 20; lx < glassX + glassW - 10; lx += 20) {
-                        ctx.beginPath();
-                        ctx.moveTo(lx, glassY + 10);
-                        ctx.lineTo(lx, glassY + glassH);
-                        ctx.stroke();
-                    }
-                    ctx.restore();
+                    ctx.fillStyle = '#e0f2fe';
+                    ctx.font = '10px monospace';
+                    ctx.fillText('💧 Klang-Teich', pondX, pondY + pondRy + 16);
 
-                    // 4. SYMMETRISCHER NATURTEICH (In der Mitte des Parks)
-                    ctx.save();
-                    let pondX = cx;
-                    let pondY = cy + 60;
-                    let pondR = 48 + (bassSmooth * 6);
+                    // 6. UNTEN: LOUNGE & TERRASSE (Holzdeck mit Möbeln)
+                    let terraceW = 280;
+                    let terraceH = 75;
+                    let terraceX = w / 2 - terraceW / 2;
+                    let terraceY = h - 90;
 
-                    ctx.fillStyle = '#061d26';
-                    ctx.strokeStyle = '#0284c7';
+                    // Holzboden Latten
+                    ctx.fillStyle = '#78350f';
+                    ctx.strokeStyle = '#92400e';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
-                    ctx.arc(pondX, pondY, pondR, 0, Math.PI * 2);
+                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 8);
                     ctx.fill();
                     ctx.stroke();
 
-                    // Wasser-Reflexion im Teich
-                    ctx.fillStyle = `rgba(56, 189, 248, ${0.3 + bassSmooth * 0.3})`;
-                    ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, pondR * 0.6, pondR * 0.3, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
+                    // Holzstruktur-Linien
+                    ctx.strokeStyle = '#451a03';
+                    ctx.lineWidth = 1;
+                    for (let lx = terraceX + 25; lx < terraceX + terraceW; lx += 25) {
+                        ctx.beginPath();
+                        ctx.moveTo(lx, terraceY);
+                        ctx.lineTo(lx, terraceY + terraceH);
+                        ctx.stroke();
+                    }
 
-                    // 5. LILI (JACK RUSSELL) - RUNDGANG IM PARK
-                    liliAngle += 0.007 * animSpeed;
-                    let liliX = cx + Math.cos(liliAngle) * 95;
-                    let liliY = cy + 20 + Math.sin(liliAngle * 2) * 35;
+                    // Tisch in der Lounge
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillRect(terraceX + terraceW / 2 - 35, terraceY + terraceH / 2 - 12, 70, 24);
+                    ctx.fillStyle = '#64748b';
+                    ctx.fillRect(terraceX + terraceW / 2 - 25, terraceY + terraceH / 2 - 8, 50, 16);
 
-                    ctx.save();
-                    ctx.translate(liliX, liliY);
-                    ctx.font = '22px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText('🐕', 0, 0);
-
-                    ctx.fillStyle = '#34d399';
+                    ctx.fillStyle = '#fde047';
                     ctx.font = '10px monospace';
-                    ctx.fillText('🐾 Lili', 0, -16);
-                    ctx.restore();
+                    ctx.fillText('🪑 Lounge & Terrasse', w / 2, terraceY + terraceH + 16);
                 }
-                renderAerialLoop();
+
+                renderLoop();
             }
 
-            // Play Button & Audio Handlers
+            // Audio & Play Button Handler
             document.addEventListener('click', function(e) {
                 const playBtn = e.target.closest('#garden-play-btn');
                 if (playBtn) {
@@ -1227,142 +1023,12 @@
                     }
                 } catch(e) {
                     const displayEl = document.getElementById('radio-track-title');
-                    if (displayEl) displayEl.textContent = 'jackdarckart • Live Stream (laut.fm/jackdarckart)';
+                    if (displayEl) displayEl.textContent = 'jackdarckart • stream-musik.space Live Stream';
                 }
             }
 
             fetchCurrentSong();
             setInterval(fetchCurrentSong, 15000);
-
-            // Game Logic
-            let eventTimer = 30;
-            const liveEventsList = [
-                { text: "🔥 Dein Track geht auf TikTok viral! +150 Fans erhalten.", action: (d) => { d.fans += 150; d.hype += 25; } },
-                { text: "📻 Lokaler Radiosender spielt deinen Song. +50 Fans.", action: (d) => { d.fans += 50; d.hype += 10; } },
-                { text: "⚠️ Server-Überlastung beim Streaming! Kurzzeitig -15 Fans.", action: (d) => { d.fans = Math.max(0, d.fans - 15); } },
-                { text: "💡 Inspirations-Schub im Studio! +80 Hype gewonnen.", action: (d) => { d.hype += 80; } },
-                { text: "📰 Musik-Magazin schreibt Loblied. +200 Fans & +30 Hype!", action: (d) => { d.fans += 200; d.hype += 30; } }
-            ];
-
-            function getFansPerSec(data) {
-                let base = (data.marketingLevel * 1) + 
-                           (data.studioLevel * 3) + 
-                           (data.producerLevel * 12) + 
-                           (data.labelLevel * 45) + 
-                           (data.merchLevel * 120) + 
-                           (data.algoLevel * 350) + 
-                           (data.tourBusLevel * 950) + 
-                           (data.aiNeuralLevel * 2800) + 
-                           (data.satelliteLevel * 9500) +
-                           (data.hologramTourLevel * 28000) +
-                           (data.quantumSynthLevel * 85000) +
-                           (data.musicAcademyLevel * 250000) +
-                           (data.deepSpaceLevel * 800000) +
-                           (data.singularityLevel * 3000000);
-                
-                let multiplier = 1 + (data.prLevel * 0.15);
-                if (data.genre === 'synthwave') multiplier += 0.15;
-                
-                let prestigeMultiplier = 1 + (data.goldRecords * 0.25);
-                return Math.floor(base * multiplier * prestigeMultiplier);
-            }
-
-            function getCost(baseCost, factor, level, genre) {
-                let cost = baseCost * Math.pow(factor, level);
-                if (genre === 'rock') cost *= 0.75;
-                return Math.floor(cost);
-            }
-
-            function updateStudioUI(data) {
-                if (!data) return;
-                const fEl = document.getElementById('studio-fans');
-                const hEl = document.getElementById('studio-hype');
-                const rEl = document.getElementById('studio-releases');
-                const gEl = document.getElementById('studio-gold');
-                const fpsEl = document.getElementById('studio-fps');
-                const prestigeBtn = document.getElementById('btn-prestige');
-                const prestigePanel = document.getElementById('panel-prestige');
-
-                if (fEl) fEl.innerText = Math.floor(data.fans).toLocaleString('de-DE');
-                if (hEl) hEl.innerText = Math.floor(data.hype).toLocaleString('de-DE');
-                if (rEl) rEl.innerText = data.releasesCount;
-                if (gEl) gEl.innerText = data.goldRecords;
-                if (fpsEl) fpsEl.innerText = "+" + getFansPerSec(data);
-
-                if (prestigeBtn) {
-                    prestigeBtn.disabled = data.fans < 50000;
-                    prestigeBtn.innerText = data.fans >= 50000 ? `🌟 Welt-Tournee Starten (+1 Gold-Platte)` : `🌟 Tournee ab 50k Fans (${Math.floor(data.fans).toLocaleString()}/50k)`;
-                }
-                if (prestigePanel) {
-                    if (data.fans >= 50000) prestigePanel.classList.add('affordable-glow');
-                    else prestigePanel.classList.remove('affordable-glow');
-                }
-
-                document.querySelectorAll('.genre-btn').forEach(btn => {
-                    if (btn.dataset.genre === data.genre) {
-                        btn.classList.add('border-emerald-500', 'bg-emerald-950/40', 'shadow-[0_0_18px_rgba(52,211,153,0.35)]');
-                    } else {
-                        btn.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'shadow-[0_0_18px_rgba(52,211,153,0.35)]');
-                    }
-                });
-
-                const upgradesConfig = [
-                    { id: 'market', key: 'marketingLevel', base: 35, factor: 1.45 },
-                    { id: 'studio', key: 'studioLevel', base: 150, factor: 1.50 },
-                    { id: 'producer', key: 'producerLevel', base: 600, factor: 1.55 },
-                    { id: 'pr', key: 'prLevel', base: 1200, factor: 1.60 },
-                    { id: 'label', key: 'labelLevel', base: 4500, factor: 1.65 },
-                    { id: 'merch', key: 'merchLevel', base: 18000, factor: 1.70 },
-                    { id: 'algo', key: 'algoLevel', base: 75000, factor: 1.75 },
-                    { id: 'tourbus', key: 'tourBusLevel', base: 280000, factor: 1.80 },
-                    { id: 'aineural', key: 'aiNeuralLevel', base: 1200000, factor: 1.85 },
-                    { id: 'satellite', key: 'satelliteLevel', base: 5500000, factor: 1.90 },
-                    { id: 'hologram', key: 'hologramTourLevel', base: 22000000, factor: 1.95 },
-                    { id: 'quantumsynth', key: 'quantumSynthLevel', base: 90000000, factor: 2.00 },
-                    { id: 'musicacademy', key: 'musicAcademyLevel', base: 400000000, factor: 2.05 },
-                    { id: 'deepspace', key: 'deepSpaceLevel', base: 1800000000, factor: 2.10 },
-                    { id: 'singularity', key: 'singularityLevel', base: 8000000000, factor: 2.15 }
-                ];
-
-                upgradesConfig.forEach(u => {
-                    const lvlEl = document.getElementById(`${u.id}-lvl`);
-                    const costEl = document.getElementById(`${u.id}-cost`);
-                    const rowEl = document.getElementById(`row-${u.id}`);
-                    const cost = getCost(u.base, u.factor, data[u.key], data.genre);
-
-                    if (lvlEl) lvlEl.innerText = data[u.key];
-                    if (costEl) costEl.innerText = cost.toLocaleString('de-DE');
-
-                    if (rowEl) {
-                        if (data.fans >= cost) rowEl.classList.add('affordable-glow');
-                        else rowEl.classList.remove('affordable-glow');
-                    }
-                });
-            }
-
-            setInterval(() => {
-                if (!SecureAuth.currentUser) return;
-                let data = SecureAuth.getAccountData();
-                if (data) {
-                    let fps = getFansPerSec(data);
-                    if (fps > 0) data.fans += fps;
-
-                    eventTimer--;
-                    const badge = document.getElementById('ticker-timer-badge');
-                    if (badge) badge.innerText = `Nächstes Event in ${eventTimer}s`;
-
-                    if (eventTimer <= 0) {
-                        eventTimer = 30;
-                        let randomEvent = liveEventsList[Math.floor(Math.random() * liveEventsList.length)];
-                        randomEvent.action(data);
-                        const tickerText = document.getElementById('industry-ticker-text');
-                        if (tickerText) tickerText.innerText = randomEvent.text;
-                    }
-
-                    SecureAuth.saveAccountData(data);
-                    updateStudioUI(data);
-                }
-            }, 1000);
 
             const savedPage = localStorage.getItem('secure_nexus_active_page') || 'home';
             switchView(savedPage);
