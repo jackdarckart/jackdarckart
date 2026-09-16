@@ -6,8 +6,6 @@
     <title>jackdarckart | CloudBeats Nexus Prime Elite</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js für echtes 3D-Rendering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -74,7 +72,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Aerial 3D Botanical Engine v31.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Aerial Architectural Engine v32.0</span>
                 </div>
             </div>
 
@@ -105,9 +103,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🦅</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Botanischer Garten in der Vogelperspektive &amp; Musik-Matrix</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Architektonischer Garten (Vogelperspektive) &amp; Musik-Matrix</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem echten 3D-Park aus der Vogelperspektive, der autonom auf den Stream reagiert.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einer exakten, hochauflösenden architektonischen Vogelperspektive des Parks.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -237,7 +235,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_AERIAL_GARDEN_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_ARCH_AERIAL_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -403,7 +401,7 @@
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
-                { id: 'garden', name: 'Garden', icon: '🦅', desc: 'Botanischer Garten (Vogelperspektive)', protected: true },
+                { id: 'garden', name: 'Garden', icon: '🦅', desc: 'Architektonischer Garten (Vogelperspektive)', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
@@ -670,7 +668,7 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <!-- BOTANISCHER GARTEN IN DER VOGELPERSPEKTIVE (THREE.JS) -->
+                                <!-- ARCHITEKTURISCHE VOGELPERSPEKTIVE (CANVAS BLUEPRINT) -->
                                 <div class="p-6 sm:p-10 rounded-[3rem] border-2 border-emerald-600/40 relative overflow-hidden bg-gradient-to-b from-[#05140b] via-[#020a05] to-[#010402] shadow-2xl">
                                     
                                     <!-- Kopfbereich -->
@@ -681,25 +679,26 @@
                                             </div>
                                             <div>
                                                 <h3 class="text-lg sm:text-xl font-black text-white font-mono tracking-wide flex items-center gap-2">
-                                                    Botanischer Garten • Vogelperspektive (Drohnen-Ansicht)
-                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/80 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30">🌿 Autonomer Beat-Sync</span>
+                                                    Botanischer Garten • Exakte Vogelperspektive
+                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/80 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30">🌿 Autonomer Audio-Sync</span>
                                                 </h3>
-                                                <p class="text-xs text-emerald-200/70 font-mono mt-0.5">Kompletter Parküberblick von oben mit Glashaus, Alleen, Teich und Lili.</p>
+                                                <p class="text-xs text-emerald-200/70 font-mono mt-0.5">Hochdetaillierte architektonische Aufsicht mit Glashaus, Alleen und Teich.</p>
                                             </div>
                                         </div>
 
-                                        <!-- Kamera / Tempo Regler -->
+                                        <!-- Tempo-Regler -->
                                         <div class="flex items-center gap-3 bg-[#020a05]/90 px-4 py-2.5 rounded-2xl border border-emerald-500/25 shadow-inner">
-                                            <span class="text-xs font-mono text-emerald-300">⚡ 3D-Geschwindigkeit:</span>
+                                            <span class="text-xs font-mono text-emerald-300">⚡ Puls-Tempo:</span>
                                             <input type="range" id="garden-speed-range" min="0.5" max="2.0" step="0.1" value="1.0" class="w-20 accent-emerald-500 cursor-pointer">
                                             <span id="garden-speed-label" class="text-xs font-mono text-emerald-400 font-bold w-8 text-right">1.0x</span>
                                         </div>
                                     </div>
 
-                                    <!-- THREE.JS 3D CONTAINER -->
-                                    <div id="garden-3d-container" class="relative w-full h-[500px] rounded-3xl border-2 border-emerald-800/50 overflow-hidden shadow-2xl bg-[#030a06]">
+                                    <!-- HOCHAUFLÖSENDES ARCHITEKTUR-CANVAS -->
+                                    <div class="relative w-full h-[500px] rounded-3xl border-2 border-emerald-800/50 overflow-hidden shadow-2xl bg-[#040f07]">
+                                        <canvas id="garden-map-canvas" class="absolute inset-0 w-full h-full"></canvas>
                                         <div class="absolute top-4 left-4 z-10 bg-[#020a05]/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/30 text-[10px] font-mono text-emerald-300 shadow">
-                                            🦅 Aerial Drone View Mode Active
+                                            🦅 Architectural Top-Down Layout Active
                                         </div>
                                     </div>
 
@@ -888,7 +887,7 @@
                         updateStudioUI(SecureAuth.getAccountData());
                     }
                     if (targetId === 'garden') {
-                        initGarden3DScene();
+                        initGardenAerialMap();
                     }
                 }
             }
@@ -1022,130 +1021,18 @@
                 }
             });
 
-            // 3D WEBGL GARTEN IN DER VOGELPERSPEKTIVE (DROHNEN-ANSICHT)
-            let threeSceneInstance = null;
-            function initGarden3DScene() {
-                const container = document.getElementById('garden-3d-container');
+            // HOCHPRÄZISE ARCHITEKTUR-VOGELPERSPEKTIVE (CANVAS RENDERER)
+            function initGardenAerialMap() {
+                const canvas = document.getElementById('garden-map-canvas');
                 const audio = document.getElementById('garden-audio');
                 const speedRange = document.getElementById('garden-speed-range');
                 const speedLabel = document.getElementById('garden-speed-label');
-                if (!container) return;
+                if (!canvas) return;
 
-                if (threeSceneInstance) {
-                    cancelAnimationFrame(threeSceneInstance.animId);
-                    container.innerHTML = '';
-                }
+                canvas.width = canvas.parentElement.clientWidth || 800;
+                canvas.height = canvas.parentElement.clientHeight || 500;
+                const ctx = canvas.getContext('2d');
 
-                const width = container.clientWidth || 800;
-                const height = container.clientHeight || 500;
-
-                const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x040e07);
-                scene.fog = new THREE.FogExp2(0x040e07, 0.01);
-
-                const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
-                // VOGELPERSPEKTIVE (Schrägluftbild von oben, analog zum Referenzfoto)
-                camera.position.set(0, 42, 14);
-                camera.lookAt(0, 0, -2);
-
-                const renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(width, height);
-                renderer.shadowMap.enabled = true;
-                container.appendChild(renderer.domElement);
-
-                // Natürliche Beleuchtung für die Vogelperspektive
-                const ambientLight = new THREE.AmbientLight(0x1e3f2b, 1.5);
-                scene.add(ambientLight);
-
-                const dirLight = new THREE.DirectionalLight(0xd1fae5, 1.6);
-                dirLight.position.set(10, 40, 20);
-                dirLight.castShadow = true;
-                scene.add(dirLight);
-
-                const pointLight = new THREE.PointLight(0x34d399, 1.2, 35);
-                pointLight.position.set(0, 10, 0);
-                scene.add(pointLight);
-
-                // 3D Boden / Rasen (Große Parkfläche)
-                const groundGeo = new THREE.PlaneGeometry(60, 60);
-                const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a1f11, roughness: 0.8 });
-                const ground = new THREE.Mesh(groundGeo, groundMat);
-                ground.rotation.x = -Math.PI / 2;
-                ground.receiveShadow = true;
-                scene.add(ground);
-
-                // 3D Symmetrische Hauptalleen & Wege (wie im echten Garten)
-                const pathGeo = new THREE.PlaneGeometry(6, 45);
-                const pathMat = new THREE.MeshStandardMaterial({ color: 0x183020, roughness: 0.9 });
-                const path = new THREE.Mesh(pathGeo, pathMat);
-                path.rotation.x = -Math.PI / 2;
-                path.position.set(0, 0.02, 0);
-                path.receiveShadow = true;
-                scene.add(path);
-
-                // Querweg
-                const pathGeoCross = new THREE.PlaneGeometry(35, 5);
-                const pathCross = new THREE.Mesh(pathGeoCross, pathMat);
-                pathCross.rotation.x = -Math.PI / 2;
-                pathCross.position.set(0, 0.02, -4);
-                pathCross.receiveShadow = true;
-                scene.add(pathCross);
-
-                // 3D Glashaus (Zentrale Gewächshaus-Architektur)
-                const glassGroup = new THREE.Group();
-                const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x059669, transparent: true, opacity: 0.45, roughness: 0.1, transmission: 0.5 });
-
-                const structure = new THREE.Mesh(new THREE.BoxGeometry(14, 8, 18), glassMat);
-                structure.position.set(0, 4, -8);
-                structure.castShadow = true;
-                glassGroup.add(structure);
-
-                const roofGeo = new THREE.ConeGeometry(10, 4, 4);
-                const roof = new THREE.Mesh(roofGeo, glassMat);
-                roof.position.set(0, 10, -8);
-                roof.rotation.y = Math.PI / 4;
-                glassGroup.add(roof);
-                scene.add(glassGroup);
-
-                // 3D Naturteich (Organische Form im Blickfeld)
-                const pondGeo = new THREE.CylinderGeometry(7, 7, 0.4, 32);
-                const pondMat = new THREE.MeshStandardMaterial({ color: 0x081a12, roughness: 0.6 });
-                const pond = new THREE.Mesh(pondGeo, pondMat);
-                pond.position.set(0, 0.2, 5);
-                scene.add(pond);
-
-                const waterGeo = new THREE.PlaneGeometry(10, 10, 16, 16);
-                const waterMat = new THREE.MeshStandardMaterial({ color: 0x0c3344, roughness: 0.2, metalness: 0.3, transparent: true, opacity: 0.85 });
-                const water = new THREE.Mesh(waterGeo, waterMat);
-                water.rotation.x = -Math.PI / 2;
-                water.position.set(0, 0.45, 5);
-                scene.add(water);
-
-                // 3D Lili (Jack Russell) in der Parkanlage
-                const liliGroup = new THREE.Group();
-                const dogMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6 });
-                const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 });
-
-                const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.9, 2.0), dogMat);
-                body.position.y = 0.6;
-                liliGroup.add(body);
-
-                const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), whiteMat);
-                head.position.set(0, 1.3, 0.9);
-                liliGroup.add(head);
-
-                const ear1 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.2), dogMat);
-                ear1.position.set(-0.4, 1.7, 1.0);
-                liliGroup.add(ear1);
-
-                const ear2 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.2), dogMat);
-                ear2.position.set(0.4, 1.7, 1.0);
-                liliGroup.add(ear2);
-
-                liliGroup.position.set(0, 0, 0);
-                scene.add(liliGroup);
-
-                // Audio Setup
                 try {
                     if (!audioCtx && audio) {
                         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1165,9 +1052,8 @@
                 let bassSmooth = 0;
                 let liliAngle = 0;
 
-                function animateScene() {
-                    const animId = requestAnimationFrame(animateScene);
-                    threeSceneInstance = { animId };
+                function renderAerialLoop() {
+                    requestAnimationFrame(renderAerialLoop);
 
                     let animSpeed = speedRange ? parseFloat(speedRange.value) : 1.0;
                     if (speedLabel) speedLabel.innerText = animSpeed.toFixed(1) + 'x';
@@ -1188,9 +1074,9 @@
                         for (let i = 0; i < 5; i++) bSum += dataArray[i];
                         rawBass = (bSum / 5) / 255;
                     } else if (audio && !audio.paused) {
-                        rawBass = Math.max(0, Math.sin(timeSec * Math.PI * 2.2)) > 0.7 ? 0.8 : 0.05;
+                        rawBass = Math.max(0, Math.sin(timeSec * Math.PI * 2.2)) > 0.7 ? 0.7 : 0.05;
                     } else {
-                        rawBass = (Math.sin(timeSec * 2.0) + 1) * 0.05;
+                        rawBass = (Math.sin(timeSec * 2.0) + 1) * 0.04;
                     }
 
                     if (rawBass > bassSmooth) {
@@ -1199,20 +1085,101 @@
                         bassSmooth += (rawBass - bassSmooth) * 0.2;
                     }
 
-                    // Dezent organische Beat-Reaktivität aus der Vogelperspektive
-                    pointLight.intensity = 1.2 + bassSmooth * 2.0;
-                    glassGroup.scale.set(1 + bassSmooth * 0.03, 1 + bassSmooth * 0.05, 1 + bassSmooth * 0.03);
-                    water.position.y = 0.45 + Math.sin(timeSec * 4) * 0.015 * (bassSmooth + 0.2);
+                    const cx = canvas.width / 2;
+                    const cy = canvas.height / 2;
 
-                    // Lili läuft auf den Wegen durch den Park
-                    liliAngle += 0.006 * animSpeed;
-                    liliGroup.position.x = Math.cos(liliAngle) * 8;
-                    liliGroup.position.z = Math.sin(liliAngle) * 6 + 2;
-                    liliGroup.rotation.y = -liliAngle + Math.PI / 2;
+                    // 1. PARKGRUND & RASENFLÄCHEN (Satte Grün-Töne wie im Referenzfoto)
+                    let bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    bgGrad.addColorStop(0, '#041208');
+                    bgGrad.addColorStop(1, '#082110');
+                    ctx.fillStyle = bgGrad;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    renderer.render(scene, camera);
+                    // 2. HAUPT-WEGESYSTEM & ALLEEN
+                    ctx.fillStyle = '#1c3022';
+                    // Vertikale Hauptallee
+                    ctx.fillRect(cx - 28, cy - 120, 56, 260);
+                    // Horizontale Querwege
+                    ctx.fillRect(cx - 160, cy - 10, 320, 32);
+
+                    // Feinerer Kiesweg-Belag in der Mitte
+                    ctx.fillStyle = '#26422f';
+                    ctx.fillRect(cx - 16, cy - 120, 32, 260);
+                    ctx.fillRect(cx - 160, cy - 4, 320, 16);
+
+                    // 3. GROSSES HAUPT-GLASHAUS (Zentraler Komplex oben)
+                    ctx.save();
+                    let glassW = 240 + (bassSmooth * 6);
+                    let glassH = 90;
+                    let glassX = cx - glassW / 2;
+                    let glassY = cy - 150;
+
+                    // Glas-Basisstruktur
+                    ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
+                    ctx.strokeStyle = '#34d399';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.roundRect(glassX, glassY, glassW, glassH, [18, 18, 8, 8]);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Gewölbtes Glasdach (Zentraler Dome)
+                    ctx.fillStyle = 'rgba(52, 211, 153, 0.35)';
+                    ctx.beginPath();
+                    ctx.ellipse(cx, glassY, glassW * 0.38, 28, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Feine Sprossenstruktur auf dem Glasdach
+                    ctx.strokeStyle = '#a7f3d0';
+                    ctx.lineWidth = 1;
+                    for (let lx = glassX + 20; lx < glassX + glassW - 10; lx += 20) {
+                        ctx.beginPath();
+                        ctx.moveTo(lx, glassY + 10);
+                        ctx.lineTo(lx, glassY + glassH);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+
+                    // 4. SYMMETRISCHER NATURTEICH (In der Mitte des Parks)
+                    ctx.save();
+                    let pondX = cx;
+                    let pondY = cy + 60;
+                    let pondR = 48 + (bassSmooth * 6);
+
+                    ctx.fillStyle = '#061d26';
+                    ctx.strokeStyle = '#0284c7';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(pondX, pondY, pondR, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Wasser-Reflexion im Teich
+                    ctx.fillStyle = `rgba(56, 189, 248, ${0.3 + bassSmooth * 0.3})`;
+                    ctx.beginPath();
+                    ctx.ellipse(pondX, pondY, pondR * 0.6, pondR * 0.3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+
+                    // 5. LILI (JACK RUSSELL) - RUNDGANG IM PARK
+                    liliAngle += 0.007 * animSpeed;
+                    let liliX = cx + Math.cos(liliAngle) * 95;
+                    let liliY = cy + 20 + Math.sin(liliAngle * 2) * 35;
+
+                    ctx.save();
+                    ctx.translate(liliX, liliY);
+                    ctx.font = '22px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('🐕', 0, 0);
+
+                    ctx.fillStyle = '#34d399';
+                    ctx.font = '10px monospace';
+                    ctx.fillText('🐾 Lili', 0, -16);
+                    ctx.restore();
                 }
-                animateScene();
+                renderAerialLoop();
             }
 
             // Play Button & Audio Handlers
