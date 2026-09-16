@@ -36,7 +36,7 @@
                     </div>
                     <span id="user-display" class="font-black text-sm tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">jackdarckart</span>
                 </div>
-                <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 sm:hidden">Nexus v4.1</span>
+                <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 sm:hidden">Nexus v4.2</span>
             </div>
             
             <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end">
@@ -61,7 +61,7 @@
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats &amp; Rock-Lab Hub</h1>
                 <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">High-End Audio-Mediathek &amp; Web-Nexus • Meckenheim</p>
                 <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light">
-                    Das vollständige Ökosystem von jackdarckart. Inklusive sicherem Login, Studio-Mining, Lyrics-Editor und Krypto-Matrix.
+                    Das vollständige Ökosystem von jackdarckart. Sicher geschützt, ohne Vorbelegung und mit voller lokaler Datenkontrolle.
                 </p>
                 <div class="mt-8 flex flex-wrap justify-center gap-4">
                     <button type="button" id="home-to-game-btn" class="cyber-button bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 px-7 rounded-2xl shadow-xl text-xs sm:text-sm flex items-center gap-2.5 cursor-pointer">
@@ -74,44 +74,44 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME & VOLLSTÄNDIGES AUTH-SYSTEM) -->
+        <!-- 2. STUDIO-LAB (GESICHERTES AUTH-SYSTEM OHNE HARDCODED DATEN) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
             
-            <!-- Auth Gateway (Login / Register) -->
+            <!-- Auth Gateway -->
             <div id="game-auth-container" class="glass-panel p-6 sm:p-8 rounded-[2rem] text-left space-y-4">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
                     <h2 id="auth-title" class="text-lg font-bold text-purple-300">Studio Secure Gateway</h2>
-                    <p id="auth-subtitle" class="text-[11px] text-slate-400 mt-0.5">E-Mail &amp; PIN Authentifizierung</p>
+                    <p id="auth-subtitle" class="text-[11px] text-slate-400 mt-0.5">Bitte einloggen oder neues Konto erstellen</p>
                 </div>
                 <div id="auth-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
                 
-                <!-- Login Form -->
+                <!-- Login Form (Leer by Default) -->
                 <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                        <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" value="artur.hamm90@gmail.com">
+                        <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
                     </div>
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN-CODE:</label>
-                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" value="1234">
+                        <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="Deine PIN">
                     </div>
                     <button type="button" id="submit-login-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg mt-2">🔓 Studio entsperren</button>
                     
                     <div class="flex justify-between items-center text-[11px] font-mono pt-2">
-                        <button type="button" id="to-register-btn" class="text-purple-400 hover:underline cursor-pointer">Konto registrieren</button>
+                        <button type="button" id="to-register-btn" class="text-purple-400 hover:underline cursor-pointer">Neues Konto registrieren</button>
                     </div>
                 </div>
 
-                <!-- Register Form -->
+                <!-- Register Form (Leer by Default) -->
                 <div id="form-register" class="space-y-3 hidden">
                     <div>
-                        <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE E-MAIL:</label>
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
                         <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
                     </div>
                     <div>
-                        <label class="text-[11px] font-mono text-slate-400 block mb-1">WÄHLE PIN (4-6 Ziffern):</label>
-                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="1234">
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">WÄHLE PIN (min. 4 Ziffern):</label>
+                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="Sichere PIN">
                     </div>
                     <button type="button" id="submit-register-btn" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg mt-2">✨ Registrieren &amp; Starten</button>
                     
@@ -121,7 +121,7 @@
                 </div>
             </div>
 
-            <!-- Main Studio Panel (Nach Login sichtbar) -->
+            <!-- Main Studio Panel -->
             <div id="game-main-container" class="space-y-4 hidden">
                 <div class="glass-panel p-3.5 rounded-2xl flex justify-between items-center text-xs">
                     <span id="logged-user-email" class="text-purple-300 font-mono truncate max-w-[170px]">Session Aktiv</span>
@@ -136,7 +136,7 @@
                 <div class="grid grid-cols-3 gap-2.5 text-left">
                     <div class="glass-panel p-3.5 rounded-2xl border-purple-500/20">
                         <p class="text-[10px] font-mono text-purple-300 uppercase tracking-widest">Beats</p>
-                        <p id="beats-count" class="text-xl font-black text-white font-mono mt-0.5">3.449</p>
+                        <p id="beats-count" class="text-xl font-black text-white font-mono mt-0.5">0</p>
                     </div>
                     <div class="glass-panel p-3.5 rounded-2xl border-emerald-500/20">
                         <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-widest">Boost / Sek</p>
@@ -144,7 +144,7 @@
                     </div>
                     <div class="glass-panel p-3.5 rounded-2xl border-pink-500/20">
                         <p class="text-[10px] font-mono text-pink-300 uppercase tracking-widest">Fans</p>
-                        <p id="fans-count" class="text-xl font-black text-white font-mono mt-0.5">586</p>
+                        <p id="fans-count" class="text-xl font-black text-white font-mono mt-0.5">0</p>
                     </div>
                 </div>
 
@@ -189,23 +189,17 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="text-[11px] font-mono text-purple-400 block mb-1.5">SONG-TITEL:</label>
-                        <input type="text" id="lyric-title-input" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs font-mono outline-none" value="Nacht über Meckenheim (Rock-Mix)">
+                        <input type="text" id="lyric-title-input" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs font-mono outline-none" placeholder="Titel eingeben">
                     </div>
                     <div>
                         <label class="text-[11px] font-mono text-purple-400 block mb-1.5">GENRE / STYLE:</label>
-                        <input type="text" id="lyric-genre-input" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs font-mono outline-none" value="German Rock / Alternative">
+                        <input type="text" id="lyric-genre-input" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs font-mono outline-none" placeholder="Genre eingeben">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-[11px] font-mono text-purple-400 block mb-1.5">LYRICS &amp; STRUKTUR:</label>
-                    <textarea id="lyric-content-input" rows="8" class="w-full bg-[#030508] border border-slate-800 rounded-2xl p-4 text-white text-xs font-mono outline-none leading-relaxed resize-none">[Verse 1]
-Neonlichter spiegeln sich im Asphalt,
-Der Bass drückt schwer, die Nacht ist kalt.
-
-[Chorus]
-Wir bauen das Netz, Stufe für Stufe neu,
-CloudBeats am Start, für immer treu!</textarea>
+                    <textarea id="lyric-content-input" rows="8" class="w-full bg-[#030508] border border-slate-800 rounded-2xl p-4 text-white text-xs font-mono outline-none leading-relaxed resize-none" placeholder="Schreibe hier deine Lyrics..."></textarea>
                 </div>
 
                 <div id="lyrics-save-status" class="text-[11px] font-mono text-emerald-400 min-h-[16px]"></div>
@@ -299,7 +293,7 @@ CloudBeats am Start, für immer treu!</textarea>
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="glass-panel p-6 rounded-[2rem] space-y-3.5 border-amber-500/20">
                 <h2 class="text-lg font-bold text-amber-400 font-mono mb-2">🛠️ Nexus System Hub</h2>
-                <p class="text-xs text-slate-400">Systemdiagnose aktiv. GitHub Pages &amp; Cloudflare Live.</p>
+                <p class="text-xs text-slate-400">Systemdiagnose aktiv. Sichere Auth-Schicht bereitgestellt.</p>
                 <button type="button" id="admin-to-home-btn" class="cyber-button w-full bg-slate-900 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
             </div>
         </div>
@@ -309,7 +303,7 @@ CloudBeats am Start, für immer treu!</textarea>
     <!-- Cyber-Footer -->
     <footer class="w-full border-t border-purple-500/15 py-3 px-4 bg-[#05070c]">
         <div class="max-w-4xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
-            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Auth &amp; Auto-Sync Aktiv</span>
+            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Gesicherte Session Aktiv</span>
             <span class="text-purple-400/60">jackdarckart • CloudBeats</span>
         </div>
     </footer>
@@ -318,26 +312,16 @@ CloudBeats am Start, für immer treu!</textarea>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            /* --- GAME & AUTH ENGINE --- */
+            /* --- GAME & SECURE AUTH ENGINE --- */
             const GameEngine = {
-                beats: 3449,
-                fans: 586,
+                beats: 0,
+                fans: 0,
                 upg1: 0,
                 upg2: 0,
                 loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || null,
                 
                 init() {
-                    let usersDB = {};
-                    try { 
-                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; 
-                    } catch(e) {}
-                    
-                    if (!usersDB['artur.hamm90@gmail.com']) {
-                        usersDB['artur.hamm90@gmail.com'] = { pin: '1234', beats: 3449, fans: 586, u1: 0, u2: 0 };
-                        localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
-                    }
-
-                    if (this.loggedInUser && usersDB[this.loggedInUser]) {
+                    if (this.loggedInUser) {
                         this.load();
                     }
                     this.startAutoBoost();
@@ -348,8 +332,8 @@ CloudBeats am Start, für immer treu!</textarea>
                         let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
                         if (db[this.loggedInUser]) {
                             let u = db[this.loggedInUser];
-                            this.beats = Number(u.beats) || 3449;
-                            this.fans = Number(u.fans) || 586;
+                            this.beats = Number(u.beats) || 0;
+                            this.fans = Number(u.fans) || 0;
                             this.upg1 = Number(u.u1) || 0;
                             this.upg2 = Number(u.u2) || 0;
                         }
@@ -359,7 +343,7 @@ CloudBeats am Start, für immer treu!</textarea>
                     if (!this.loggedInUser) return;
                     try {
                         let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
-                        if (!db[this.loggedInUser]) db[this.loggedInUser] = { pin: '1234' };
+                        if (!db[this.loggedInUser]) return;
                         db[this.loggedInUser] = { 
                             ...db[this.loggedInUser],
                             beats: this.beats, 
@@ -483,7 +467,7 @@ CloudBeats am Start, für immer treu!</textarea>
                         if(authMsg) authMsg.innerText = "❌ E-Mail ist bereits registriert!";
                         return;
                     }
-                    db[email] = { pin: pin, beats: 3449, fans: 586, u1: 0, u2: 0 };
+                    db[email] = { pin: pin, beats: 0, fans: 0, u1: 0, u2: 0 };
                     localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
                     GameEngine.loggedInUser = email;
                     localStorage.setItem('beat_lab_logged_in_user', email);
@@ -498,6 +482,9 @@ CloudBeats am Start, für immer treu!</textarea>
                     GameEngine.save();
                     GameEngine.loggedInUser = null;
                     localStorage.removeItem('beat_lab_logged_in_user');
+                    // Felder beim Logout explizit leeren
+                    document.getElementById('login-email').value = "";
+                    document.getElementById('login-pin').value = "";
                     updateAuthUI();
                 });
             }
