@@ -47,12 +47,13 @@
             animation: affordable-pulse 2s infinite ease-in-out;
         }
 
-        @keyframes garden-beat {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3)); border-color: rgba(16, 185, 129, 0.3); }
-            50% { transform: scale(1.02); filter: drop-shadow(0 0 28px rgba(52, 211, 153, 0.85)); border-color: rgba(52, 211, 153, 0.9); }
+        /* 100% flackerfreier, stabiler Rhythmus-Glow (Kein Layout-Springen mehr!) */
+        @keyframes garden-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.25); border-color: rgba(16, 185, 129, 0.35); }
+            50% { box-shadow: 0 0 35px rgba(52, 211, 153, 0.8); border-color: rgba(52, 211, 153, 0.95); }
         }
         .garden-groove {
-            animation: garden-beat 0.7s infinite ease-in-out;
+            animation: garden-glow 1.2s infinite ease-in-out;
         }
 
         @keyframes wave {
@@ -82,7 +83,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Sanctuary Elite v11.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Sanctuary Elite v12.0</span>
                 </div>
             </div>
 
@@ -113,9 +114,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Standalone Edition &amp; Beat-Synced Garden</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Optimized Edition &amp; Stable Beat-Synced Garden</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und dem interaktiven, beat-synchronisierten Garten mit Lili.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und dem flackerfreien, beat-synchronisierten Garten mit Lili.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -241,7 +242,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_STANDALONE_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_STABLE_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -733,7 +734,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <audio id="garden-audio" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
+                                        <!-- Robuste Audio-Streaming-Elemente mit Direktquellen -->
+                                        <audio id="garden-audio" preload="none">
+                                            <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
+                                            <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
+                                        </audio>
                                     </div>
                                 </div>
                             </div>
@@ -1027,7 +1032,7 @@
                 }
             });
 
-            // Garten Audio Player & Beat Sync mit robuster Play-Logik
+            // Flackerfreier Garten Audio Player mit direktem Stream-Start
             document.addEventListener('click', function(e) {
                 const playBtn = e.target.closest('#garden-play-btn');
                 if (playBtn) {
@@ -1037,6 +1042,7 @@
 
                     if (audio) {
                         if (audio.paused) {
+                            audio.load();
                             audio.play().then(() => {
                                 playBtn.textContent = '⏸';
                                 playBtn.classList.add('affordable-glow');
@@ -1044,7 +1050,7 @@
                                 elements.forEach(el => el.classList.add('garden-groove'));
                             }).catch(err => {
                                 console.error("Stream Playback Error:", err);
-                                alert("⚠️ Stream konnte nicht direkt gestartet werden. Bitte Laut.fm Verbindung prüfen.");
+                                alert("⚠️ Stream konnte nicht gestartet werden. Bitte Laut.fm Verbindung prüfen.");
                             });
                         } else {
                             audio.pause();
