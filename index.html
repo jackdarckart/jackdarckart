@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jackdarckart | Secure Nexus &amp; Cyber Beat Empire</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://api.laut.fm 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.laut.fm https://stream.laut.fm; media-src 'self' https://stream.laut.fm; style-src 'self' https://cdn.tailwindcss.com 'unsafe-inline';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://api.laut.fm 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.laut.fm https://*.laut.fm; media-src 'self' https://*.laut.fm; style-src 'self' https://cdn.tailwindcss.com 'unsafe-inline';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     
@@ -23,8 +23,10 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- Globaler Audioplayer -->
-    <audio id="audio-stream" preload="none"></audio>
+    <!-- Globaler Audioplayer mit direkter Server-Adresse -->
+    <audio id="audio-stream" preload="none" crossorigin="anonymous">
+        <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
+    </audio>
 
     <header class="max-w-4xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center border-b border-cyan-500/20 pb-4 gap-3">
         <div class="flex items-center space-x-3">
@@ -55,6 +57,11 @@
                 <button type="button" id="play-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-pink-500 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-widest cursor-pointer shadow-lg">
                     <span id="play-icon">▶</span> <span id="play-text">Webradio Abspielen</span>
                 </button>
+
+                <!-- Direkter Fallback-Link für blockierende Handy-Browser -->
+                <a href="https://laut.fm/jackdarckart" target="_blank" class="block text-[11px] font-mono text-cyan-400 hover:text-pink-400 underline pt-1">
+                    🌐 Alternativ direkt auf laut.fm öffnen ↗
+                </a>
 
                 <div class="flex items-center justify-between bg-[#030712] px-4 py-2.5 rounded-xl border border-slate-800 text-xs font-mono">
                     <span class="text-slate-400">Lautstärke</span>
@@ -220,28 +227,37 @@
                 switchView('home');
             };
 
-            // Anti-Cache Mobile Audio Engine (verhindert das Hängenbleiben bei "Verbinde...")
+            // Audio-Engine mit direkter Server-Domain und Watchdog
             const audio = document.getElementById('audio-stream');
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
             const playText = document.getElementById('play-text');
             const volumeSlider = document.getElementById('volume-slider');
+            let playTimeout = null;
 
-            playBtn.addEventListener('click', () => {
+            playBtn.addEventListener('click', async () => {
                 if (audio.paused) {
                     playText.textContent = 'Verbinde...';
-                    // Verhindert das Caching des alten Stream-Zustands durch einen variablen Zeitstempel
-                    audio.src = 'https://stream.laut.fm/jackdarckart?cache=' + Date.now();
-                    audio.load();
-                    audio.play().then(() => {
-                        playIcon.textContent = '⏸';
-                        playText.textContent = 'Stream Pausieren';
-                    }).catch(err => {
-                        console.error(err);
+                    playIcon.textContent = '⏳';
+
+                    if (playTimeout) clearTimeout(playTimeout);
+                    playTimeout = setTimeout(() => {
+                        if (audio.paused) {
+                            playIcon.textContent = '▶';
+                            playText.textContent = 'Webradio Abspielen';
+                        }
+                    }, 5000);
+
+                    try {
+                        await audio.play();
+                    } catch (err) {
+                        console.error("Playback error:", err);
+                        if (playTimeout) clearTimeout(playTimeout);
                         playIcon.textContent = '▶';
                         playText.textContent = 'Webradio Abspielen';
-                    });
+                    }
                 } else {
+                    if (playTimeout) clearTimeout(playTimeout);
                     audio.pause();
                     playIcon.textContent = '▶';
                     playText.textContent = 'Webradio Abspielen';
@@ -249,12 +265,16 @@
             });
 
             audio.addEventListener('playing', () => {
+                if (playTimeout) clearTimeout(playTimeout);
                 playIcon.textContent = '⏸';
                 playText.textContent = 'Stream Pausieren';
             });
 
-            audio.addEventListener('stalled', () => {
-                playText.textContent = 'Puffer lädt...';
+            audio.addEventListener('error', (e) => {
+                if (playTimeout) clearTimeout(playTimeout);
+                console.error("Audio error event:", e);
+                playIcon.textContent = '▶';
+                playText.textContent = 'Webradio Abspielen';
             });
 
             volumeSlider.addEventListener('input', (e) => { audio.volume = e.target.value; });
