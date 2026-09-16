@@ -23,7 +23,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- Globaler Audioplayer mit stabilem Source-Tag für Mobilgeräte -->
+    <!-- Globaler Audioplayer mit sauberem Quell-Tag -->
     <audio id="audio-stream" preload="none">
         <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
     </audio>
@@ -222,7 +222,7 @@
                 switchView('home');
             };
 
-            // Robuster Audioplayer mit stabilem Quell-Handling
+            // Event-gesteuerter Audioplayer für stabile Wiedergabe auf Smartphones
             const audio = document.getElementById('audio-stream');
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
@@ -232,26 +232,27 @@
             playBtn.addEventListener('click', () => {
                 if (audio.paused) {
                     playText.textContent = 'Verbinde...';
-                    audio.play().then(() => {
-                        playIcon.textContent = '⏸';
-                        playText.textContent = 'Stream Pausieren';
-                    }).catch(err => {
+                    audio.load();
+                    audio.play().catch(err => {
                         console.error("Playback error:", err);
-                        audio.load();
-                        audio.play().then(() => {
-                            playIcon.textContent = '⏸';
-                            playText.textContent = 'Stream Pausieren';
-                        }).catch(e => {
-                            playIcon.textContent = '▶';
-                            playText.textContent = 'Webradio Abspielen';
-                            alert('⚠️ Stream konnte nicht gestartet werden. Bitte prüfen Sie Ihre Verbindung.');
-                        });
+                        playIcon.textContent = '▶';
+                        playText.textContent = 'Webradio Abspielen';
                     });
                 } else {
                     audio.pause();
                     playIcon.textContent = '▶';
                     playText.textContent = 'Webradio Abspielen';
                 }
+            });
+
+            audio.addEventListener('playing', () => {
+                playIcon.textContent = '⏸';
+                playText.textContent = 'Stream Pausieren';
+            });
+
+            audio.addEventListener('pause', () => {
+                playIcon.textContent = '▶';
+                playText.textContent = 'Webradio Abspielen';
             });
 
             volumeSlider.addEventListener('input', (e) => { audio.volume = e.target.value; });
