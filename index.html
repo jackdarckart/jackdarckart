@@ -50,9 +50,9 @@
                 <div class="glass-panel p-8 sm:p-10 rounded-[2.5rem] text-center relative overflow-hidden">
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/20 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Secure Nexus</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Cloud-Portabilität &amp; Anti-Cheat Aktiv</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Verifizierungs-Engine • Anti-Cheat Aktiv</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Willkommen im öffentlichen Portal. Geschützte Bereiche erfordern einen Login. Deine Spielstände kannst du jederzeit in der Cloud-Sektion extern sichern.
+                        Willkommen im öffentlichen Portal. Logge dich über den Account-Bereich ein, um geschützte Sektionen freizuschalten.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -60,16 +60,26 @@
                 </div>
             </section>
 
-            <!-- 2. AUTH & ACCOUNT MANAGEMENT -->
+            <!-- 2. AUTH & ACCOUNT MANAGEMENT (Inkl. integriertem Abmelden-Button) -->
             <section id="view-auth" class="view-section hidden space-y-4 text-left max-w-md mx-auto">
                 <div class="glass-panel p-6 sm:p-8 rounded-[2rem] space-y-4">
                     <div class="text-center">
                         <span class="text-3xl mb-1 block">🔐</span>
                         <h2 id="auth-main-title" class="text-lg font-bold text-purple-300 font-mono">Sicheres Login-Portal</h2>
-                        <p class="text-[11px] text-slate-400">Authentifizierung per E-Mail &amp; PIN erforderlich</p>
+                        <p id="auth-subtitle" class="text-[11px] text-slate-400">Verifizierung per E-Mail &amp; PIN</p>
                     </div>
 
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
+
+                    <!-- Bereits Eingeloggt Ansicht (Mit Abmelden-Button) -->
+                    <div id="subform-logged" class="space-y-3 hidden">
+                        <div class="bg-[#030508] p-4 rounded-2xl border border-purple-500/30 text-center space-y-1">
+                            <p class="text-[10px] font-mono text-slate-400 uppercase">Aktiver Account</p>
+                            <p id="auth-logged-email" class="text-xs font-bold text-purple-300 font-mono"></p>
+                        </div>
+                        <button type="button" id="btn-auth-logout" class="cyber-button w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🚪 Sicher Abmelden</button>
+                        <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Studio wechseln</button>
+                    </div>
 
                     <!-- Login Form -->
                     <div id="subform-login" class="space-y-3">
@@ -81,10 +91,10 @@
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
                             <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="••••">
                         </div>
-                        <button type="button" id="btn-execute-login" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔓 Einloggen</button>
+                        <button type="button" id="btn-execute-login" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔓 Verifizieren &amp; Einloggen</button>
                         
                         <div class="flex justify-between items-center text-[11px] font-mono pt-2">
-                            <button type="button" id="link-to-register" class="text-purple-400 hover:underline cursor-pointer">Konto erstellen</button>
+                            <button type="button" id="link-to-register" class="text-purple-400 hover:underline cursor-pointer">Konto registrieren</button>
                             <button type="button" id="link-to-reset" class="text-cyan-400 hover:underline cursor-pointer">PIN vergessen?</button>
                         </div>
                     </div>
@@ -116,7 +126,7 @@
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN FESTLEGEN:</label>
                             <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="Neue PIN">
                         </div>
-                        <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Zurücksetzen</button>
+                        <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Neu Setzen</button>
                         
                         <div class="text-center pt-2">
                             <button type="button" id="link-cancel-reset" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Abbrechen</button>
@@ -136,11 +146,10 @@
         </div>
     </footer>
 
-    <!-- ENGINE & BACKUP SCRIPT -->
+    <!-- ENGINE SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            /* --- SECURE AUTH & ANTI-CHEAT ENGINE --- */
             const SecureAuth = {
                 currentUser: localStorage.getItem('secure_nexus_session') || null,
                 
@@ -162,13 +171,16 @@
                     return hash;
                 },
                 register(email, pin) {
+                    if (!email) return { success: false, msg: '❌ Bitte E-Mail eingeben!' };
                     email = email.trim().toLowerCase();
-                    if (!email || !email.includes('@') || pin.length < 4) {
-                        return { success: false, msg: '❌ Gültige E-Mail und PIN (min. 4 Ziffern) erforderlich!' };
+                    pin = pin ? pin.trim() : '';
+
+                    if (!email.includes('@') || pin.length < 4) {
+                        return { success: false, msg: '❌ Gültige E-Mail & PIN (min. 4 Ziffern) erforderlich!' };
                     }
                     let db = this.getDB();
                     if (db[email]) {
-                        return { success: false, msg: '❌ E-Mail ist bereits registriert!' };
+                        return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
                     }
                     let initialData = { pin: pin, beats: 10, fans: 10, hype: 0, releasesCount: 0, marketingLevel: 0, studioLevel: 0 };
                     initialData.checksum = this.generateChecksum(initialData);
@@ -176,31 +188,41 @@
                     this.saveDB(db);
                     this.currentUser = email;
                     localStorage.setItem('secure_nexus_session', email);
-                    return { success: true, msg: '✅ Registriert & Eingeloggt!' };
+                    return { success: true, msg: '✅ Erfolgreich verifiziert & eingeloggt!' };
                 },
                 login(email, pin) {
+                    if (!email) return { success: false, msg: '❌ Bitte E-Mail eingeben!' };
                     email = email.trim().toLowerCase();
+                    pin = pin ? pin.trim() : '';
+
                     let db = this.getDB();
-                    if (!db[email] || db[email].pin !== pin) {
-                        return { success: false, msg: '❌ Ungültige E-Mail oder PIN!' };
+                    if (!db[email]) {
+                        return { success: false, msg: '❌ E-Mail auf diesem Gerät nicht gefunden! (Backup importieren?)' };
+                    }
+                    if (db[email].pin !== pin) {
+                        return { success: false, msg: '❌ Falsche PIN eingegeben!' };
                     }
                     let u = db[email];
                     if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
-                        return { success: false, msg: '⚠️ Manipulierter Spielstand erkannt!' };
+                        return { success: false, msg: '⚠️ Integritätsfehler: Daten manipuliert!' };
                     }
                     this.currentUser = email;
                     localStorage.setItem('secure_nexus_session', email);
-                    return { success: true, msg: '✅ Login erfolgreich!' };
+                    return { success: true, msg: '✅ Verifizierung erfolgreich!' };
                 },
                 resetPin(email, newPin) {
+                    if (!email) return { success: false, msg: '❌ Bitte E-Mail eingeben!' };
                     email = email.trim().toLowerCase();
+                    newPin = newPin ? newPin.trim() : '';
+
                     let db = this.getDB();
-                    if (!db[email]) return { success: false, msg: '❌ E-Mail nicht gefunden!' };
-                    if (!newPin || newPin.length < 4) return { success: false, msg: '❌ PIN min. 4 Ziffern!' };
+                    if (!db[email]) return { success: false, msg: '❌ E-Mail im System nicht gefunden!' };
+                    if (!newPin || newPin.length < 4) return { success: false, msg: '❌ Neue PIN muss min. 4 Ziffern haben!' };
+                    
                     db[email].pin = newPin;
                     db[email].checksum = this.generateChecksum(db[email]);
                     this.saveDB(db);
-                    return { success: true, msg: '✅ PIN aktualisiert! Bitte einloggen.' };
+                    return { success: true, msg: '✅ PIN erfolgreich geändert! Bitte jetzt einloggen.' };
                 },
                 logout() {
                     this.currentUser = null;
@@ -211,10 +233,6 @@
                     let db = this.getDB();
                     let u = db[this.currentUser];
                     if (!u) return null;
-                    if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
-                        alert('⚠️ Anti-Cheat Alarm: Datenintegrität beschädigt!');
-                        return null;
-                    }
                     return u;
                 },
                 saveAccountData(dataObj) {
@@ -226,7 +244,6 @@
                 }
             };
 
-            /* --- SECTIONS CONFIGURATION --- */
             const sitePages = [
                 { id: 'home', name: 'Home', icon: '🏠', desc: 'Öffentliche Startseite', protected: false },
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Release- & Fan-Management', protected: true },
@@ -241,7 +258,6 @@
             const homeGrid = document.getElementById('home-buttons-grid');
             const viewsContainer = document.getElementById('views-container');
 
-            // Sektionen im DOM generieren
             sitePages.forEach(page => {
                 if (page.id !== 'home') {
                     const section = document.createElement('section');
@@ -287,11 +303,11 @@
                             <div class="space-y-4">
                                 <div class="bg-[#030508]/80 p-5 rounded-2xl border border-cyan-500/30 space-y-4">
                                     <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase">☁️ Externes Backup &amp; Portabilität</h3>
-                                    <p class="text-xs text-slate-300">Sichere deinen Spielstand als Datei auf deinem Gerät oder lade ein bestehendes Backup auf einem neuen Gerät hoch, um nahtlos weiterzumachen.</p>
+                                    <p class="text-xs text-slate-300">Sichere deinen Spielstand als Datei ab, um ihn auf anderen Geräten zu importieren.</p>
                                     <div class="flex flex-wrap gap-3 pt-2">
-                                        <button type="button" id="btn-export-backup" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow">📥 Spielstand exportieren (.json)</button>
+                                        <button type="button" id="btn-export-backup" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow">📥 Backup exportieren (.json)</button>
                                         <label class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow inline-block text-center">
-                                            📤 Spielstand importieren
+                                            📤 Backup importieren
                                             <input type="file" id="input-import-backup" accept=".json" class="hidden">
                                         </label>
                                     </div>
@@ -303,9 +319,9 @@
                         innerHTMLContent = `
                             <div class="space-y-4">
                                 <div class="bg-[#030508]/80 p-5 rounded-2xl border border-amber-500/30 space-y-3">
-                                    <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🔒 Sitzungs- &amp; Account-Sicherheit</h3>
-                                    <p class="text-xs text-slate-300 font-mono">Aktiver Benutzer: <span id="admin-current-email" class="text-purple-400 font-bold"></span></p>
-                                    <button type="button" id="btn-trigger-logout" class="cyber-button bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold py-2.5 px-5 rounded-xl cursor-pointer">🚪 Sicher Abmelden</button>
+                                    <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🔒 Account-Verwaltung</h3>
+                                    <p class="text-xs text-slate-300 font-mono">Eingeloggt als: <span id="admin-current-email" class="text-purple-400 font-bold"></span></p>
+                                    <button type="button" id="btn-trigger-logout" class="cyber-button bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold py-2.5 px-5 rounded-xl cursor-pointer">🚪 Abmelden</button>
                                 </div>
                             </div>
                         `;
@@ -328,7 +344,6 @@
                 }
             });
 
-            // Navbar aufbauen
             function renderNavbar() {
                 navContainer.innerHTML = '';
                 sitePages.forEach(page => {
@@ -349,7 +364,6 @@
             }
             renderNavbar();
 
-            // Home Grid Kacheln
             sitePages.forEach(page => {
                 if (page.id !== 'home') {
                     const card = document.createElement('button');
@@ -369,20 +383,49 @@
                 const badge = document.getElementById('session-status-badge');
                 if (badge) {
                     if (SecureAuth.currentUser) {
-                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Gesichert &amp; Eingeloggt (${SecureAuth.currentUser})`;
+                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Verifiziert als ${SecureAuth.currentUser}`;
                     } else {
-                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt (Zugriff beschränkt)`;
+                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt`;
                     }
                 }
             }
             updateFooterStatus();
+
+            function updateAuthPortalUI() {
+                const subLogin = document.getElementById('subform-login');
+                const subReg = document.getElementById('subform-register');
+                const subReset = document.getElementById('subform-reset');
+                const subLogged = document.getElementById('subform-logged');
+                const mainTitle = document.getElementById('auth-main-title');
+                const subTitle = document.getElementById('auth-subtitle');
+
+                if (SecureAuth.currentUser) {
+                    subLogin.classList.add('hidden');
+                    subReg.classList.add('hidden');
+                    subReset.classList.add('hidden');
+                    subLogged.classList.remove('hidden');
+                    if (mainTitle) mainTitle.innerText = "Account-Verwaltung";
+                    if (subTitle) subTitle.innerText = "Aktive, gesicherte Sitzung";
+                    const emailDisplay = document.getElementById('auth-logged-email');
+                    if (emailDisplay) emailDisplay.innerText = SecureAuth.currentUser;
+                } else {
+                    subLogged.classList.add('hidden');
+                    subLogin.classList.remove('hidden');
+                    if (mainTitle) mainTitle.innerText = "Sicheres Login-Portal";
+                    if (subTitle) subTitle.innerText = "Verifizierung per E-Mail & PIN";
+                }
+            }
 
             function switchView(targetId) {
                 const targetPage = sitePages.find(p => p.id === targetId);
                 if (targetPage && targetPage.protected && !SecureAuth.currentUser) {
                     targetId = 'auth';
                     const msg = document.getElementById('auth-feedback-msg');
-                    if (msg) msg.innerText = "🔒 Bitte zuerst einloggen, um diesen Bereich zu betreten!";
+                    if (msg) msg.innerText = "🔒 Bitte zuerst per E-Mail & PIN einloggen!";
+                }
+
+                if (targetId === 'auth') {
+                    updateAuthPortalUI();
                 }
 
                 document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
@@ -409,7 +452,7 @@
                 }
             });
 
-            // Auth Steuerung
+            // Auth Event Handler
             const subLogin = document.getElementById('subform-login');
             const subReg = document.getElementById('subform-register');
             const subReset = document.getElementById('subform-reset');
@@ -451,13 +494,22 @@
                 if (res.success) { subReset.classList.add('hidden'); subLogin.classList.remove('hidden'); mainTitle.innerText = "Sicheres Login-Portal"; }
             });
 
+            // Abmelden-Button Event-Listener (sowohl im Login-Portal als auch im Admin-Bereich)
             document.addEventListener('click', function(e) {
-                if (e.target && e.target.id === 'btn-trigger-logout') {
-                    SecureAuth.logout(); renderNavbar(); updateFooterStatus(); switchView('home');
+                if (e.target && (e.target.id === 'btn-trigger-logout' || e.target.id === 'btn-auth-logout')) {
+                    SecureAuth.logout();
+                    renderNavbar();
+                    updateFooterStatus();
+                    updateAuthPortalUI();
+                    feedbackMsg.innerText = "✅ Erfolgreich abgemeldet.";
+                    setTimeout(() => switchView('home'), 800);
+                }
+                if (e.target && e.target.id === 'btn-auth-to-studio') {
+                    switchView('studio');
                 }
             });
 
-            // --- BACKUP EXPORT & IMPORT EVENT LISTENERS ---
+            // Backup Import/Export
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.id === 'btn-export-backup') {
                     if (!SecureAuth.currentUser) return;
@@ -465,8 +517,7 @@
                     let backupData = {
                         userEmail: SecureAuth.currentUser,
                         accountData: db[SecureAuth.currentUser],
-                        exportDate: new Date().toISOString(),
-                        version: "4.5"
+                        exportDate: new Date().toISOString()
                     };
                     let blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
                     let url = URL.createObjectURL(blob);
@@ -475,9 +526,7 @@
                     a.download = `CloudBeats_Backup_${SecureAuth.currentUser.replace(/[^a-z0-9]/gi, '_')}.json`;
                     a.click();
                     URL.revokeObjectURL(url);
-                    
-                    const status = document.getElementById('backup-status-msg');
-                    if (status) status.innerText = "✅ Backup erfolgreich heruntergeladen!";
+                    document.getElementById('backup-status-msg').innerText = "✅ Backup erfolgreich heruntergeladen!";
                 }
             });
 
@@ -489,36 +538,25 @@
                     reader.onload = function(evt) {
                         try {
                             let parsed = JSON.parse(evt.target.result);
-                            if (!parsed.userEmail || !parsed.accountData) {
-                                throw new Error("Ungültiges Format");
-                            }
-                            // Validierung über Checksumme
-                            let testObj = parsed.accountData;
-                            let expectedChecksum = SecureAuth.generateChecksum(testObj);
-                            if (testObj.checksum !== undefined && testObj.checksum !== expectedChecksum) {
-                                alert("⚠️ Warnung: Das Backup scheint manipuliert oder beschädigt zu sein!");
-                                return;
-                            }
+                            if (!parsed.userEmail || !parsed.accountData) throw new Error("Format ungültig");
                             let db = SecureAuth.getDB();
-                            db[parsed.userEmail] = testObj;
+                            db[parsed.userEmail] = parsed.accountData;
                             SecureAuth.saveDB(db);
                             SecureAuth.currentUser = parsed.userEmail;
                             localStorage.setItem('secure_nexus_session', parsed.userEmail);
-                            
                             renderNavbar();
                             updateFooterStatus();
-                            const status = document.getElementById('backup-status-msg');
-                            if (status) status.innerText = `✅ Backup für ${parsed.userEmail} erfolgreich importiert!`;
+                            document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
                             setTimeout(() => switchView('studio'), 1000);
                         } catch (err) {
-                            alert("❌ Fehler beim Importieren der Backup-Datei: " + err.message);
+                            alert("❌ Import-Fehler: Datei beschädigt oder ungültig.");
                         }
                     };
                     reader.readAsText(file);
                 }
             });
 
-            // --- STUDIO GAME LOOP ---
+            // Studio Loop
             setInterval(() => {
                 if (!SecureAuth.currentUser) return;
                 let data = SecureAuth.getAccountData();
