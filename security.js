@@ -1,13 +1,7 @@
-// security.js - Verschlüsselte Authentifizierungs- und Sicherheits-Logik (Robust & Auto-Repair)
+// security.js - Verschlüsselte Authentifizierungs- und Sicherheits-Logik
 const SecureAuth = {
     getSession() {
-        let session = localStorage.getItem('secure_nexus_logged_user');
-        if (!session) {
-            // Automatischer Fallback, damit das Spiel sofort ohne Zwanglogin funktioniert
-            session = "commander@jackdarckart.net";
-            localStorage.setItem('secure_nexus_logged_user', session);
-        }
-        return session;
+        return localStorage.getItem('secure_nexus_logged_user') || null;
     },
     setSession(email) {
         localStorage.setItem('secure_nexus_logged_user', email);
@@ -48,10 +42,7 @@ const SecureAuth = {
         if (actionType === 'register') {
             if (db[email]) return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
         } else if (actionType === 'login' || actionType === 'reset_pin') {
-            if (!db[email]) {
-                // Automatisch anlegen, falls noch nicht in der DB
-                db[email] = { pinHash: pinHash, gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} } };
-            }
+            if (!db[email]) return { success: false, msg: '❌ E-Mail-Adresse nicht gefunden!' };
             if (actionType === 'login' && db[email].pinHash !== pinHash) {
                 return { success: false, msg: '❌ Falsche PIN!' };
             }
@@ -76,14 +67,16 @@ const SecureAuth = {
         let pinHash = this.pendingPinHash;
         let action = this.pendingAction;
 
-        if (!db[email]) {
+        if (action === 'register') {
             db[email] = {
                 pinHash: pinHash,
                 gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} },
                 createdAt: new Date().toISOString()
             };
         } else if (action === 'reset_pin') {
-            db[email].pinHash = pinHash;
+            if (db[email]) {
+                db[email].pinHash = pinHash;
+            }
         }
         this.saveUsersDB(db);
 
@@ -98,13 +91,11 @@ const SecureAuth = {
 
     getUserGameData() {
         let user = this.getSession();
-        let db = this.getUsersDB();
+        if (!user) return { beats: 0, fans: 0, releases: 0, upgrades: {} };
         
+        let db = this.getUsersDB();
         if (!db[user]) {
-            db[user] = {
-                pinHash: "default",
-                gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} }
-            };
+            db[user] = { pinHash: "default", gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} } };
             this.saveUsersDB(db);
         }
         if (!db[user].gameData) {
@@ -116,12 +107,11 @@ const SecureAuth = {
 
     saveUserGameData(gData) {
         let user = this.getSession();
+        if (!user) return;
         let db = this.getUsersDB();
-        if (!db[user]) {
-            db[user] = { pinHash: "default", gameData: gData };
-        } else {
+        if (db[user]) {
             db[user].gameData = gData;
+            this.saveUsersDB(db);
         }
-        this.saveUsersDB(db);
     }
 };
