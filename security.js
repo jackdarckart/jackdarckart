@@ -1,7 +1,16 @@
-// security.js - Stabiles Authentifizierungs- & Speichersystem
+// security.js - Korrigierte Session-Prüfung (verhindert Geister-Logins)
 const SecureAuth = {
     getSession() {
-        return localStorage.getItem('secure_nexus_logged_user') || null;
+        let email = localStorage.getItem('secure_nexus_logged_user');
+        if (!email) return null;
+        
+        // Strikte Prüfung: Existiert der Account wirklich in der Datenbank?
+        let db = this.getUsersDB();
+        if (!db[email]) {
+            localStorage.removeItem('secure_nexus_logged_user');
+            return null;
+        }
+        return email;
     },
     setSession(email) {
         localStorage.setItem('secure_nexus_logged_user', email);
