@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | CloudBeats Nexus Prime Elite</title>
+    <title>jackdarckart | CloudBeats Quantum Flora Nexus</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS SDK -->
@@ -14,12 +14,16 @@
         })();
     </script>
     <style>
+        :root {
+            --beat-val: 0;
+        }
         .glass-panel {
-            background: linear-gradient(135deg, rgba(13, 19, 35, 0.95) 0%, rgba(5, 8, 15, 0.99) 100%);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border: 1px solid rgba(52, 211, 153, 0.25);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+            background: linear-gradient(135deg, rgba(8, 14, 28, 0.96) 0%, rgba(3, 6, 12, 0.99) 100%);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(52, 211, 153, calc(0.3 + (var(--beat-val) * 0.6)));
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 calc(12px + (var(--beat-val) * 45px)) rgba(52, 211, 153, calc(0.12 + (var(--beat-val) * 0.35))), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: border-color 0.1s ease, box-shadow 0.1s ease;
         }
         .cyber-button {
             position: relative;
@@ -27,27 +31,27 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .cyber-button:hover {
-            box-shadow: 0 0 22px rgba(52, 211, 153, 0.35);
-            border-color: rgba(52, 211, 153, 0.6);
+            box-shadow: 0 0 25px rgba(52, 211, 153, 0.45);
+            border-color: rgba(52, 211, 153, 0.8);
         }
         .cyber-button:active { transform: scale(0.98); }
         .cyber-button:disabled { opacity: 0.3; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; border-color: rgba(255,255,255,0.05) !important; animation: none !important; }
         
         @keyframes pulse-glow {
-            0%, 100% { opacity: 1; filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.7)); }
-            50% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.2)); }
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 14px rgba(52, 211, 153, 0.8)); }
+            50% { opacity: 0.6; filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.3)); }
         }
-        .neon-pulse { animation: pulse-glow 3.5s infinite ease-in-out; }
+        .neon-pulse { animation: pulse-glow 3s infinite ease-in-out; }
 
         @keyframes affordable-pulse {
-            0%, 100% { box-shadow: 0 0 12px rgba(52, 211, 153, 0.4), inset 0 0 6px rgba(52, 211, 153, 0.2); border-color: rgba(52, 211, 153, 0.7); }
-            50% { box-shadow: 0 0 24px rgba(52, 211, 153, 0.85), inset 0 0 12px rgba(52, 211, 153, 0.4); border-color: rgba(52, 211, 153, 1); }
+            0%, 100% { box-shadow: 0 0 15px rgba(52, 211, 153, 0.5), inset 0 0 8px rgba(52, 211, 153, 0.3); border-color: rgba(52, 211, 153, 0.8); }
+            50% { box-shadow: 0 0 30px rgba(52, 211, 153, 0.95), inset 0 0 15px rgba(52, 211, 153, 0.5); border-color: rgba(52, 211, 153, 1); }
         }
         .affordable-glow { animation: affordable-pulse 2s infinite ease-in-out; }
 
         @keyframes wave {
             0%, 100% { height: 4px; }
-            50% { height: 24px; }
+            50% { height: 26px; }
         }
         .wave-bar { animation: wave 1.2s ease-in-out infinite; }
         .wave-bar:nth-child(2) { animation-delay: 0.2s; }
@@ -55,28 +59,42 @@
         .wave-bar:nth-child(4) { animation-delay: 0.6s; }
         .wave-bar:nth-child(5) { animation-delay: 0.8s; }
 
+        /* Vollflächiger, musik-synchroner Ambient-Hintergrund */
+        #page-ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 35%, rgba(10, 60, 35, calc(0.15 + (var(--beat-val) * 0.3))) 0%, rgba(2, 5, 12, 0.96) 80%);
+            transform: scale(calc(1 + (var(--beat-val) * 0.045)));
+            transition: transform 0.1s ease, background 0.1s ease;
+        }
+
         ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(5, 8, 15, 0.5); }
+        ::-webkit-scrollbar-track { background: rgba(3, 6, 12, 0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.4); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(52, 211, 153, 0.7); }
     </style>
 </head>
-<body class="bg-[#030508] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+<body class="bg-[#020408] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white relative overflow-x-hidden">
+
+    <!-- Musik-synchroner Ambient-Hintergrund -->
+    <div id="page-ambient-bg"></div>
 
     <!-- Header -->
-    <header class="w-full border-b border-emerald-500/15 backdrop-blur-2xl sticky top-0 z-50 bg-[#030508]/90 px-4 py-3 shadow-2xl">
+    <header class="w-full border-b border-emerald-500/20 backdrop-blur-2xl sticky top-0 z-50 bg-[#020408]/90 px-4 py-3 shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/25 neon-pulse">
-                    <div class="w-full h-full bg-[#05080f] rounded-[10px] flex items-center justify-center text-base">🌿</div>
+                    <div class="w-full h-full bg-[#03060c] rounded-[10px] flex items-center justify-center text-base">🌿</div>
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Ultimate Mega Garden v41.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Quantum Flora Nexus v50.0</span>
                 </div>
             </div>
 
-            <div class="hidden md:flex items-center gap-1.5 bg-[#05080f] px-3.5 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
+            <div class="hidden md:flex items-center gap-1.5 bg-[#03060c] px-3.5 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
                 <span class="text-[9px] font-mono text-emerald-400 mr-1 tracking-widest">LIVE STREAM</span>
                 <div class="w-1 bg-emerald-500 rounded-full wave-bar"></div>
                 <div class="w-1 bg-teal-500 rounded-full wave-bar"></div>
@@ -85,14 +103,14 @@
                 <div class="w-1 bg-green-500 rounded-full wave-bar"></div>
             </div>
             
-            <nav id="navbar-container" class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end">
+            <nav id="navbar-container" class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end z-10">
                 <!-- Dynamisch -->
             </nav>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-6xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
+    <main class="max-w-6xl mx-auto p-4 sm:p-6 w-full my-auto text-center relative z-10">
         <div id="views-container">
             
             <!-- 1. STARTSEITE -->
@@ -103,9 +121,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Ultimativer Mega-Garten &amp; Beat-Sync</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Quantum Flora Nexus &amp; Vollständiger Beat-Sync</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Erlebe den vollständig vergrößerten, hochdetaillierten und lebendigen Symphonie-Garten im vollen Format — seidenweich harmonisiert im Takt der Musik.
+                        Erlebe die neuentwickelte, botanische Meister-Garten-Engine mit Hunderten von Pflanzen, lebendigen Lichtspielen und butterweicher Musik-Harmonisierung.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -125,7 +143,7 @@
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
                     <div id="subform-logged" class="space-y-3 hidden">
-                        <div class="bg-[#030508] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
+                        <div class="bg-[#03060c] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
                             <p class="text-[10px] font-mono text-slate-400 uppercase">Verifizierter Account</p>
                             <p id="auth-logged-email" class="text-xs font-bold text-emerald-300 font-mono"></p>
                         </div>
@@ -136,11 +154,11 @@
                     <div id="subform-login" class="space-y-3">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="login-email" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
-                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
+                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
                         </div>
                         <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
                         
@@ -156,7 +174,7 @@
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE:</label>
-                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#030508] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
+                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#03060c] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
                         </div>
                         <button type="button" id="btn-execute-verify" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✅ Code bestätigen &amp; Einloggen</button>
                         
@@ -168,11 +186,11 @@
                     <div id="subform-register" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reg-email" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN:</label>
-                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
+                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
                         </div>
                         <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren</button>
                         
@@ -184,11 +202,11 @@
                     <div id="subform-reset" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
-                            <input type="email" id="reset-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reset-email" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
-                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
+                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
                         </div>
                         <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Neu Setzen</button>
                         
@@ -203,7 +221,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full border-t border-emerald-500/15 py-3 px-4 bg-[#030508] text-center">
+    <footer class="w-full border-t border-emerald-500/20 py-3 px-4 bg-[#020408] text-center relative z-10">
         <div class="max-w-6xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
             <span id="session-status-badge" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt</span>
             <span class="text-emerald-400/90 font-bold tracking-wider">jackdarckart • Prime Elite Nexus</span>
@@ -233,7 +251,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_ULTIMATE_MEGA_GARDEN_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_QUANTUM_FLORA_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -430,14 +448,14 @@
                                     </div>
                                 </div>
                                 <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 text-center">
-                                    <p class="text-xs font-mono text-emerald-300">🎸 Studio-Wirtschaftsmatrix aktiv. Besuche den Garten für den Live-Stream &amp; sanften Beat-Sync!</p>
+                                    <p class="text-xs font-mono text-emerald-300">🎸 Studio-Wirtschaftsmatrix aktiv. Besuche den Garten für den Live-Stream &amp; Beat-Sync!</p>
                                 </div>
                             </div>
                         `;
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <div class="p-4 sm:p-8 rounded-[2.5rem] border-2 border-emerald-600/40 relative overflow-hidden bg-gradient-to-b from-[#05140b] via-[#020a05] to-[#010402] shadow-2xl">
+                                <div class="glass-panel p-4 sm:p-8 rounded-[2.5rem] relative overflow-hidden bg-gradient-to-b from-[#06180f]/95 via-[#020a06]/98 to-[#010402] shadow-2xl">
                                     
                                     <!-- Top Navigation innerhalb des Gartens -->
                                     <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4 border-b border-emerald-500/20 pb-3">
@@ -445,7 +463,7 @@
                                             ← Zum Beat-Lab
                                         </button>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Ultimativer Mega-Garten aktiv</span>
+                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Quantum Flora Nexus &amp; Live Beat-Sync aktiv</span>
                                         </div>
                                     </div>
 
@@ -465,13 +483,13 @@
                                         </div>
                                     </div>
 
-                                    <!-- GIGANTISCHER, VOLLFLÄCHIGER CANVAS CONTAINER (MASSIV VERGRÖSSERT) -->
-                                    <div id="canvas-container" class="relative w-full h-[520px] sm:h-[680px] rounded-3xl border-2 border-emerald-800/60 overflow-hidden shadow-2xl bg-[#030d06]">
+                                    <!-- NEU ENTWICKELTER, GIGANTISCHER & HOCHDETAILLIERTER CANVAS CONTAINER -->
+                                    <div id="canvas-container" class="relative w-full h-[540px] sm:h-[720px] rounded-3xl border-2 border-emerald-700/60 overflow-hidden shadow-2xl bg-[#020c06]">
                                         <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
                                     </div>
 
                                     <!-- WEBRADIO PLAYER -->
-                                    <div class="mt-4 bg-[#020a05]/95 backdrop-blur-2xl p-4 sm:p-5 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-3">
+                                    <div class="mt-4 glass-panel p-4 sm:p-5 rounded-3xl space-y-3">
                                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                                             <div class="flex items-center gap-4 w-full sm:w-auto">
                                                 <button type="button" id="garden-play-btn" class="cyber-button w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center text-xl shadow-xl shadow-emerald-500/40 cursor-pointer shrink-0">▶</button>
@@ -481,7 +499,7 @@
                                                 </div>
                                             </div>
                                             
-                                            <div class="flex items-center gap-3 bg-[#010502] px-4 py-2 rounded-2xl border border-emerald-500/20 shadow-inner w-full sm:w-auto justify-end">
+                                            <div class="flex items-center gap-3 bg-[#010408] px-4 py-2 rounded-2xl border border-emerald-500/20 shadow-inner w-full sm:w-auto justify-end">
                                                 <span class="text-base">🔊</span>
                                                 <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-28 accent-emerald-500 cursor-pointer">
                                             </div>
@@ -774,7 +792,7 @@
                             localStorage.setItem('secure_nexus_session', parsed.userEmail);
                             renderNavbar();
                             updateFooterStatus();
-                    document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
+                            document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
                             setTimeout(() => switchView('garden'), 1000);
                         } catch (err) {
                             alert("❌ Import-Fehler: Datei beschädigt oder ungültig.");
@@ -784,7 +802,7 @@
                 }
             });
 
-            // GIGANTISCHER, VOLLFLÄCHIGER RETINA-GARTEN MIT SEIDENWEICHER BEAT-SYNCHRONISIERUNG
+            // QUANTUM FLORA NEXUS CANVAS RENDERING ENGINE
             let animationFrameId = null;
             function initGardenScreenCanvas() {
                 const canvas = document.getElementById('garden-canvas');
@@ -795,9 +813,12 @@
                 const ctx = canvas.getContext('2d');
 
                 let userAcc = SecureAuth.getAccountData() || { staudenLevel: 1, baumeLevel: 3, teichLevel: 1 };
-                document.getElementById('stat-stauden-lvl').innerText = userAcc.staudenLevel;
-                document.getElementById('stat-baume-lvl').innerText = userAcc.baumeLevel;
-                document.getElementById('stat-teich-lvl').innerText = userAcc.teichLevel;
+                const staudenEl = document.getElementById('stat-stauden-lvl');
+                const baumeEl = document.getElementById('stat-baume-lvl');
+                const teichEl = document.getElementById('stat-teich-lvl');
+                if(staudenEl) staudenEl.innerText = userAcc.staudenLevel;
+                if(baumeEl) baumeEl.innerText = userAcc.baumeLevel;
+                if(teichEl) teichEl.innerText = userAcc.teichLevel;
 
                 try {
                     if (!audioCtx && audio) {
@@ -818,16 +839,17 @@
                 let smoothBeat = 0;
                 let liliAngle = 0;
 
-                // Glühwürmchen / Lichtpartikel für lebendige Atmosphäre
-                let fireflies = [];
-                for(let i=0; i<35; i++) {
-                    fireflies.push({
-                        x: Math.random() * 1200,
-                        y: Math.random() * 800,
-                        speedX: (Math.random() - 0.5) * 0.35,
-                        speedY: (Math.random() - 0.5) * 0.35,
-                        radius: Math.random() * 2.5 + 1,
-                        alpha: Math.random() * 0.6 + 0.2
+                // Reichhaltiges Partikelsystem für Glühwürmchen & Blütenstaub
+                let particles = [];
+                for(let i=0; i<50; i++) {
+                    particles.push({
+                        x: Math.random() * 1400,
+                        y: Math.random() * 900,
+                        speedX: (Math.random() - 0.5) * 0.4,
+                        speedY: (Math.random() - 0.5) * 0.4,
+                        radius: Math.random() * 2.8 + 0.8,
+                        alpha: Math.random() * 0.7 + 0.2,
+                        color: Math.random() > 0.5 ? '#34d399' : '#38bdf8'
                     });
                 }
 
@@ -854,187 +876,213 @@
                     if (analyser && isPlaying) {
                         analyser.getByteFrequencyData(dataArray);
                         let sum = 0;
-                        for (let i = 0; i < 6; i++) sum += dataArray[i];
-                        beatVal = (sum / 6) / 255;
+                        for (let i = 0; i < 8; i++) sum += dataArray[i];
+                        beatVal = (sum / 8) / 255;
                     } else if (isPlaying) {
                         let time = Date.now() / 1000;
-                        beatVal = (Math.sin(time * Math.PI * 2) + 1) * 0.35;
+                        beatVal = (Math.sin(time * Math.PI * 2) + 1) * 0.4;
                     } else {
                         let time = Date.now() / 1000;
                         beatVal = (Math.sin(time * 1.5) + 1) * 0.08;
                     }
 
-                    // Seidenweiche Interpolation für harmonische Reaktivität ohne Ruckeln
-                    smoothBeat += (beatVal - smoothBeat) * 0.12;
+                    // Seidenweiche Interpolation für absolut ruckelfreie, harmonische Beat-Synchronisation
+                    smoothBeat += (beatVal - smoothBeat) * 0.14;
+
+                    // Synchronisation der gesamten Website-Oberfläche außerhalb der Grafik
+                    document.documentElement.style.setProperty('--beat-val', smoothBeat.toFixed(3));
 
                     const w = displayWidth;
                     const h = displayHeight;
                     const s = w / 1000;
 
-                    // 1. Tiefgrüner, stimmungsvoller Hintergrund
+                    // 1. Edler, tiefer Symphonie-Garten Hintergrund mit Verlauf
                     const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-                    bgGrad.addColorStop(0, '#031406');
-                    bgGrad.addColorStop(1, '#010602');
+                    bgGrad.addColorStop(0, '#041d11');
+                    bgGrad.addColorStop(0.5, '#020d07');
+                    bgGrad.addColorStop(1, '#010503');
                     ctx.fillStyle = bgGrad;
                     ctx.fillRect(0, 0, w, h);
 
-                    ctx.fillStyle = '#07240f';
+                    // Park-Insel mit sanften Rändern
+                    ctx.fillStyle = '#082b15';
                     ctx.beginPath();
-                    ctx.roundRect(40 * s, 40 * s, w - (80 * s), h - (80 * s), 32 * s);
+                    ctx.roundRect(45 * s, 45 * s, w - (90 * s), h - (90 * s), 36 * s);
                     ctx.fill();
 
-                    // Breite, geschwungene Parkwege
-                    ctx.strokeStyle = '#0c381a';
-                    ctx.lineWidth = 55 * s;
+                    // Geschwungene, detailreiche Parkwege mit Leuchteffekt
+                    ctx.strokeStyle = '#0e4222';
+                    ctx.lineWidth = 60 * s;
                     ctx.lineCap = 'round';
                     ctx.beginPath();
-                    ctx.moveTo(w * 0.22, h - 40);
-                    ctx.quadraticCurveTo(w * 0.38, h * 0.52, w * 0.5, h * 0.46);
-                    ctx.quadraticCurveTo(w * 0.68, h * 0.4, w * 0.82, 40);
+                    ctx.moveTo(w * 0.2, h - 45);
+                    ctx.quadraticCurveTo(w * 0.38, h * 0.55, w * 0.5, h * 0.48);
+                    ctx.quadraticCurveTo(w * 0.7, h * 0.38, w * 0.85, 45);
                     ctx.stroke();
 
-                    // 2. LICHTPARTIKEL / GLÜHWÜRMCHEN
-                    fireflies.forEach(f => {
-                        f.x += f.speedX;
-                        f.y += f.speedY;
-                        if(f.x < 0) f.x = w; if(f.x > w) f.x = 0;
-                        if(f.y < 0) f.y = h; if(f.y > h) f.y = 0;
+                    // 2. Glühwürmchen & Blütenstaub (Atmen im Takt)
+                    particles.forEach(p => {
+                        p.x += p.speedX;
+                        p.y += p.speedY;
+                        if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
+                        if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
 
-                        ctx.fillStyle = `rgba(52, 211, 153, ${f.alpha + smoothBeat * 0.3})`;
+                        ctx.fillStyle = p.color;
+                        ctx.globalAlpha = Math.min(1, p.alpha + smoothBeat * 0.4);
                         ctx.beginPath();
-                        ctx.arc(f.x, f.y, f.radius * s, 0, Math.PI * 2);
+                        ctx.arc(p.x, p.y, (p.radius + smoothBeat * 1.5) * s, 0, Math.PI * 2);
                         ctx.fill();
+                        ctx.globalAlpha = 1.0;
                     });
 
-                    // 3. GROSSE, DETAILSREICHE BÄUME (Oberer linker Bereich)
-                    let treeCount = Math.min(12, userAcc.baumeLevel + 5);
+                    // 3. Üppige, detaillierte Baumgruppen (Obergruppe)
+                    let treeCount = Math.min(14, userAcc.baumeLevel + 6);
                     for (let i = 0; i < treeCount; i++) {
-                        let tx = (120 + (i % 4) * 65) * s;
-                        let ty = (120 + Math.floor(i / 4) * 65) * s;
-                        let treeRadius = (32 + (smoothBeat * 6)) * s;
+                        let tx = (110 + (i % 4) * 70) * s;
+                        let ty = (115 + Math.floor(i / 4) * 65) * s;
+                        let treeRadius = (34 + (smoothBeat * 8)) * s;
 
-                        ctx.fillStyle = `rgba(52, 211, 153, ${0.1 + smoothBeat * 0.25})`;
+                        // Baum-Aura im Takt
+                        ctx.fillStyle = `rgba(52, 211, 153, ${0.12 + smoothBeat * 0.3})`;
                         ctx.beginPath();
-                        ctx.arc(tx, ty, treeRadius * 1.5, 0, Math.PI * 2);
+                        ctx.arc(tx, ty, treeRadius * 1.6, 0, Math.PI * 2);
                         ctx.fill();
 
-                        ctx.fillStyle = '#451a03';
-                        ctx.fillRect(tx - (4 * s), ty, 8 * s, 32 * s);
+                        // Baumstamm
+                        ctx.fillStyle = '#3d1802';
+                        ctx.fillRect(tx - (4.5 * s), ty, 9 * s, 36 * s);
 
-                        ctx.fillStyle = '#047857';
+                        // Baumkrone Schichten
+                        ctx.fillStyle = '#022c14';
                         ctx.beginPath();
-                        ctx.arc(tx, ty, Math.max(12, treeRadius), 0, Math.PI * 2);
+                        ctx.arc(tx, ty, Math.max(14, treeRadius), 0, Math.PI * 2);
+                        ctx.fill();
+
+                        ctx.fillStyle = '#059669';
+                        ctx.beginPath();
+                        ctx.arc(tx, ty - (4 * s), Math.max(11, treeRadius * 0.8), 0, Math.PI * 2);
                         ctx.fill();
 
                         ctx.fillStyle = '#34d399';
                         ctx.beginPath();
-                        ctx.arc(tx - (5 * s), ty - (5 * s), Math.max(4, treeRadius * 0.45), 0, Math.PI * 2);
+                        ctx.arc(tx - (5 * s), ty - (8 * s), Math.max(4, treeRadius * 0.4), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
-                    // 4. STUDIO & ESSENTIALS GRID (Unten links, sicher positioniert)
-                    ctx.fillStyle = '#061022';
-                    ctx.strokeStyle = '#2563eb';
-                    ctx.lineWidth = 2.5 * s;
+                    // 4. Studio & Essentials Matrix (Unten links)
+                    ctx.fillStyle = '#040d1f';
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 3 * s;
                     ctx.beginPath();
-                    ctx.roundRect(70 * s, h - (220 * s), 150 * s, 125 * s, 16 * s);
+                    ctx.roundRect(75 * s, h - (235 * s), 160 * s, 135 * s, 18 * s);
                     ctx.fill();
                     ctx.stroke();
 
                     for (let gx = 0; gx < 4; gx++) {
                         for (let gy = 0; gy < 3; gy++) {
-                            ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1e40af';
-                            ctx.fillRect((82 + gx * 31) * s, (h - 200 + gy * 31) * s, 21 * s, 19 * s);
+                            ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1d4ed8';
+                            ctx.fillRect((90 + gx * 33) * s, (h - 212 + gy * 33) * s, 22 * s, 20 * s);
                         }
                     }
 
-                    // 5. MITTE: RIESIGES, PRÄCHTIGES STAUDEN- & BLUMENBEET (Harmonisch im Takt)
-                    let dotCount = 100 * userAcc.staudenLevel;
+                    // 5. RIESIGES, HOCHDETAILLIERTES STAUDEN- & BLUMENPARADIES (Zentriert)
+                    let dotCount = 120 * userAcc.staudenLevel;
                     let centerX = w * 0.52;
                     let centerY = h * 0.52;
-                    const colors = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc'];
+                    const vibrantColors = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc', '#facc15'];
 
                     for (let d = 0; d < dotCount; d++) {
                         let angle = d * 137.5;
-                        let r = Math.sqrt(d) * 15 * s;
-                        let dx = centerX + Math.cos(angle + (smoothBeat * 0.08)) * r;
+                        let r = Math.sqrt(d) * 16 * s;
+                        let dx = centerX + Math.cos(angle + (smoothBeat * 0.1)) * r;
                         let dy = centerY + Math.sin(angle) * r * 0.78;
 
-                        ctx.fillStyle = colors[d % colors.length];
-                        let dotSize = (5 + (smoothBeat * 2.5)) * s;
+                        ctx.fillStyle = vibrantColors[d % vibrantColors.length];
+                        let flowerSize = (5.5 + (smoothBeat * 3)) * s;
                         ctx.beginPath();
-                        ctx.arc(dx, dy, Math.max(2, dotSize), 0, Math.PI * 2);
+                        ctx.arc(dx, dy, Math.max(2, flowerSize), 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Innerer leuchtender Blütenkern
+                        ctx.fillStyle = '#ffffff';
+                        ctx.beginPath();
+                        ctx.arc(dx, dy, Math.max(1, flowerSize * 0.35), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
-                    // 6. RECHTS: GROSSER KLANG-TEICH (Mit weiten Wasserwellen)
-                    let pondX = w - (230 * s);
+                    // 6. GLänzender KLANG-TEICH (Rechts oben) mit tiefen Wasserwellen
+                    let pondX = w - (240 * s);
                     let pondY = h * 0.38;
-                    let pondRx = (110 + (smoothBeat * 10)) * s;
-                    let pondRy = (64 + (smoothBeat * 6)) * s;
+                    let pondRx = (120 + (smoothBeat * 12)) * s;
+                    let pondRy = (70 + (smoothBeat * 7)) * s;
 
-                    for (let r = 4; r >= 1; r--) {
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.07 * r + smoothBeat * 0.15})`;
-                        ctx.lineWidth = 2.5 * s;
+                    for (let r = 5; r >= 1; r--) {
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * r + smoothBeat * 0.18})`;
+                        ctx.lineWidth = 3 * s;
                         ctx.beginPath();
-                        ctx.ellipse(pondX, pondY, pondRx + (r * 18 * smoothBeat * s), pondRy + (r * 12 * smoothBeat * s), 0, 0, Math.PI * 2);
+                        ctx.ellipse(pondX, pondY, pondRx + (r * 20 * smoothBeat * s), pondRy + (r * 13 * smoothBeat * s), 0, 0, Math.PI * 2);
                         ctx.stroke();
                     }
 
+                    ctx.fillStyle = '#0369a1';
+                    ctx.beginPath();
+                    ctx.ellipse(pondX, pondY, Math.max(28, pondRx), Math.max(16, pondRy), 0, 0, Math.PI * 2);
+                    ctx.fill();
+
                     ctx.fillStyle = '#0284c7';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(26, pondRx), Math.max(15, pondRy), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(20, pondRx * 0.8), Math.max(11, pondRy * 0.8), 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#38bdf8';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(13, pondRx * 0.65), Math.max(7, pondRy * 0.65), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(10, pondRx * 0.45), Math.max(5, pondRy * 0.45), 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // 7. LILI (JACK RUSSELL) SCHWENKT FRÖHLICH DURCH DEN GARTEN
+                    // 7. LILI (JACK RUSSELL) HÜPFT FRÖHLICH UND GESCHMEIDIG IM TAKT
                     liliAngle += 0.009 * s;
-                    let liliX = centerX + Math.cos(liliAngle) * (270 * s);
-                    let liliY = centerY + Math.sin(liliAngle * 2) * (95 * s) + (35 * s);
+                    let liliX = centerX + Math.cos(liliAngle) * (290 * s);
+                    let liliY = centerY + Math.sin(liliAngle * 2) * (100 * s) + (40 * s);
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
-                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (10 * smoothBeat * s);
+                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (12 * smoothBeat * s);
                     ctx.translate(0, jumpOffset);
 
-                    ctx.font = `${Math.max(34, 44 * s)}px sans-serif`;
+                    ctx.font = `${Math.max(38, 48 * s)}px sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // 8. UNTEN: GEMÜTLICHE LOUNGE & TERRASSE
-                    let terraceW = 460 * s;
-                    let terraceH = 100 * s;
+                    // 8. UNTEN: Edle Holz-Terrasse & Lounge
+                    let terraceW = 500 * s;
+                    let terraceH = 110 * s;
                     let terraceX = (w / 2) - (terraceW / 2);
-                    let terraceY = h - terraceH - (45 * s);
+                    let terraceY = h - terraceH - (50 * s);
 
-                    ctx.fillStyle = '#78350f';
-                    ctx.strokeStyle = '#d97706';
-                    ctx.lineWidth = 3 * s;
+                    ctx.fillStyle = '#5c2c16';
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 3.5 * s;
                     ctx.beginPath();
-                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 16 * s);
+                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 18 * s);
                     ctx.fill();
                     ctx.stroke();
 
-                    ctx.strokeStyle = '#451a03';
-                    ctx.lineWidth = 1.8 * s;
-                    for (let lx = terraceX + (40 * s); lx < terraceX + terraceW; lx += 40 * s) {
+                    ctx.strokeStyle = '#38170b';
+                    ctx.lineWidth = 2 * s;
+                    for (let lx = terraceX + (45 * s); lx < terraceX + terraceW; lx += 45 * s) {
                         ctx.beginPath();
                         ctx.moveTo(lx, terraceY);
                         ctx.lineTo(lx, terraceY + terraceH);
                         ctx.stroke();
                     }
 
-                    // Lounge-Möbel Tisch
-                    ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (55 * s), terraceY + (terraceH / 2) - (16 * s), 110 * s, 32 * s);
-                    ctx.fillStyle = '#334155';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (45 * s), terraceY + (terraceH / 2) - (11 * s), 90 * s, 22 * s);
+                    // Designer Lounge-Tisch
+                    ctx.fillStyle = '#030712';
+                    ctx.fillRect(terraceX + (terraceW / 2) - (60 * s), terraceY + (terraceH / 2) - (18 * s), 120 * s, 36 * s);
+                    ctx.fillStyle = '#1e293b';
+                    ctx.fillRect(terraceX + (terraceW / 2) - (50 * s), terraceY + (terraceH / 2) - (12 * s), 100 * s, 24 * s);
                 }
 
                 renderLoop();
