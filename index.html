@@ -36,15 +36,16 @@
                     </div>
                     <span id="user-display" class="font-black text-sm tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">jackdarckart</span>
                 </div>
-                <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 sm:hidden">Nexus v3.8</span>
+                <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 sm:hidden">Nexus v4.0</span>
             </div>
             
             <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end">
                 <button type="button" id="nav-home" class="cyber-button bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0">🏠 Home</button>
                 <button type="button" id="nav-game" class="cyber-button bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0">🎸 Studio</button>
+                <button type="button" id="nav-lyrics" class="cyber-button bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0">📝 Lyrics</button>
+                <button type="button" id="nav-crypto" class="cyber-button bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0">🪙 Crypto</button>
                 <button type="button" id="nav-garten" class="cyber-button bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0">🌱 Garden</button>
                 <button type="button" id="nav-cloud" class="cyber-button bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0">☁️ Cloud</button>
-                <button type="button" id="nav-account" class="cyber-button bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0">📝 Profil</button>
                 <button type="button" id="nav-admin" class="cyber-button bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0">🛠️ Admin</button>
             </div>
         </div>
@@ -58,9 +59,9 @@
             <div class="glass-panel neon-glow-purple p-8 sm:p-10 rounded-[2.5rem] relative overflow-hidden text-center">
                 <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/20 shadow-inner">⚡</span>
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats &amp; Rock-Lab Hub</h1>
-                <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">High-End Audio-Mediathek • Meckenheim, NRW</p>
+                <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">High-End Audio-Mediathek &amp; Web-Nexus • Meckenheim</p>
                 <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light">
-                    Das offizielle Web-Ökosystem von jackdarckart. Vollständig geschützt, fehlerfrei optimiert und absolut datensicher.
+                    Das vollständige Ökosystem von jackdarckart. Inklusive Studio-Mining, interaktivem Lyrics-Editor und Krypto-Staking-Matrix.
                 </p>
                 <div class="mt-8 flex flex-wrap justify-center gap-4">
                     <button type="button" id="home-to-game-btn" class="cyber-button bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 px-7 rounded-2xl shadow-xl text-xs sm:text-sm flex items-center gap-2.5 cursor-pointer">
@@ -73,19 +74,17 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME MIT LOGIN & ADMIN-SICHERHEITSMENÜ) -->
+        <!-- 2. STUDIO-LAB (GAME & AUTH) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
             
-            <!-- Auth Gateway -->
             <div id="game-auth-container" class="glass-panel p-6 sm:p-8 rounded-[2rem] text-left space-y-4">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
                     <h2 id="auth-title" class="text-lg font-bold text-purple-300">Studio Secure Gateway</h2>
-                    <p id="auth-subtitle" class="text-[11px] text-slate-400 mt-0.5">Vollständige E-Mail &amp; PIN Authentifizierung</p>
+                    <p id="auth-subtitle" class="text-[11px] text-slate-400 mt-0.5">E-Mail &amp; PIN Authentifizierung</p>
                 </div>
                 <div id="auth-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
                 
-                <!-- Login Form -->
                 <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
@@ -96,87 +95,15 @@
                         <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" value="1234">
                     </div>
                     <button type="button" id="submit-login-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg mt-2">🔓 Studio entsperren</button>
-                    
-                    <div class="flex justify-between items-center text-[11px] font-mono pt-2">
-                        <button type="button" id="to-register-btn" class="text-purple-400 hover:underline cursor-pointer">Konto registrieren</button>
-                        <button type="button" id="to-forgot-btn" class="text-slate-400 hover:underline cursor-pointer">PIN vergessen?</button>
-                    </div>
-                </div>
-
-                <!-- Register Form -->
-                <div id="form-register" class="space-y-3 hidden">
-                    <div>
-                        <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE E-MAIL:</label>
-                        <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-mono text-slate-400 block mb-1">WÄHLE PIN (4-6 Ziffern):</label>
-                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="1234">
-                    </div>
-                    <button type="button" id="submit-register-btn" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg mt-2">✨ Registrieren &amp; Starten</button>
-                    
-                    <div class="text-center pt-2">
-                        <button type="button" id="to-login-btn" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zurück zum Login</button>
-                    </div>
-                </div>
-
-                <!-- Forgot PIN Form -->
-                <div id="form-forgot" class="space-y-3 hidden">
-                    <div>
-                        <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
-                        <input type="email" id="forgot-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="artur.hamm90@gmail.com">
-                    </div>
-                    <button type="button" id="request-code-btn" class="cyber-button w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ Verifizierungs-Code anfordern</button>
-                    
-                    <div id="reset-section" class="space-y-2.5 pt-2 hidden border-t border-slate-800">
-                        <div>
-                            <label class="text-[11px] font-mono text-slate-400 block mb-1">CODE EINGEBEN:</label>
-                            <input type="text" id="forgot-code" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none font-mono" placeholder="6-stelliger Code">
-                        </div>
-                        <div>
-                            <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN FESTLEGEN:</label>
-                            <input type="password" id="new-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none" placeholder="Neue PIN">
-                        </div>
-                        <button type="button" id="submit-reset-btn" class="cyber-button w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔒 PIN erfolgreich zurücksetzen</button>
-                    </div>
-
-                    <div class="text-center pt-2">
-                        <button type="button" id="forgot-to-login-btn" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zum Login</button>
-                    </div>
                 </div>
             </div>
 
-            <!-- Main Studio Panel -->
             <div id="game-main-container" class="space-y-4 hidden">
                 <div class="glass-panel p-3.5 rounded-2xl flex justify-between items-center text-xs">
                     <span id="logged-user-email" class="text-purple-300 font-mono truncate max-w-[170px]">Session Aktiv</span>
-                    <div class="flex items-center gap-1.5">
-                        <button type="button" id="toggle-admin-panel" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[10px] px-2.5 py-1.5 rounded-xl font-mono cursor-pointer">⚙️ Admin</button>
-                        <button type="button" id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] px-2.5 py-1.5 rounded-xl font-mono cursor-pointer">🚪 Abmelden</button>
-                    </div>
+                    <button type="button" id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] px-2.5 py-1.5 rounded-xl font-mono cursor-pointer">🚪 Abmelden</button>
                 </div>
 
-                <!-- Admin & Security Panel -->
-                <div id="admin-security-panel" class="glass-panel p-4 rounded-2xl border-amber-500/30 text-left space-y-3 hidden bg-[#080c14]/95">
-                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                        <span class="text-xs font-mono text-amber-400 font-bold">🛠️ Studio Admin &amp; PIN Center</span>
-                        <button type="button" id="close-admin-panel" class="text-slate-400 hover:text-white text-xs cursor-pointer">✕</button>
-                    </div>
-                    <div id="admin-msg" class="text-[11px] font-mono text-amber-300 min-h-[14px]"></div>
-                    <div class="space-y-2.5">
-                        <div>
-                            <label class="text-[10px] font-mono text-slate-400 block mb-1">AKTUELLE PIN:</label>
-                            <input type="password" id="admin-old-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-1.5 text-white text-xs outline-none" placeholder="Aktuelle PIN">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
-                            <input type="password" id="admin-new-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-1.5 text-white text-xs outline-none" placeholder="Neue PIN">
-                        </div>
-                        <button type="button" id="admin-change-pin-btn" class="cyber-button w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-xl text-xs font-mono uppercase tracking-wider cursor-pointer">PIN direkt ändern</button>
-                    </div>
-                </div>
-
-                <!-- Master-Beat Button -->
                 <button type="button" id="produce-beat-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 text-white font-black py-5 px-6 rounded-[2rem] shadow-2xl text-lg cursor-pointer border border-white/10 flex flex-col items-center justify-center gap-1">
                     <span class="flex items-center gap-2">🎧 Master-Beat Einspielen</span>
                     <span class="text-xs font-mono font-normal text-purple-200/80">(Strikt +1 Beat pro Klick)</span>
@@ -197,7 +124,6 @@
                     </div>
                 </div>
 
-                <!-- Upgrades -->
                 <div class="glass-panel p-5 rounded-[2rem] text-left space-y-3">
                     <h3 class="text-xs font-mono uppercase tracking-widest text-purple-400 flex items-center gap-2">
                         <span>⚡</span> Hardcore Hash &amp; Cloud Upgrades
@@ -217,21 +143,98 @@
                             </div>
                             <button type="button" id="buy-upgrade-2" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">Kaufen</button>
                         </div>
-                        <div class="bg-[#030508]/80 p-3 rounded-2xl border border-slate-800 flex justify-between items-center gap-3">
-                            <div>
-                                <p class="text-xs font-semibold text-white">💎 Quantum Cloud Node</p>
-                                <p class="text-[10px] text-slate-400 font-mono">+75 B/s | Kosten: <span id="cost-3">8.500</span> B (Anzahl: <span id="upg3-count">0</span>)</p>
-                            </div>
-                            <button type="button" id="buy-upgrade-3" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer shrink-0">Kaufen</button>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <button type="button" id="game-to-home-btn" class="cyber-button w-full bg-slate-900/80 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Zurück zum Dashboard</button>
+            <button type="button" id="game-to-home-btn" class="cyber-button w-full bg-slate-900/80 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
         </div>
 
-        <!-- 3. ARCHITEKTUR-GARTEN & WEBRADIO -->
+        <!-- 3. INTERACTIVE LYRICS & SONGWRITING EDITOR -->
+        <div id="view-lyrics" class="view-page hidden w-full py-4 text-left space-y-4">
+            <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-4 border-purple-500/30">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-2xl mb-1 block">📝</span>
+                        <h2 class="text-xl font-black text-purple-300 font-mono">CloudBeats Lyrics &amp; Songwriter Studio</h2>
+                        <p class="text-xs text-slate-400">Erstelle, bearbeite und speichere deine Songtexte direkt im Browser-Speicher.</p>
+                    </div>
+                    <button type="button" id="save-lyrics-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-lg">💾 Texte Speichern</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-mono text-purple-400 block mb-1.5">SONG-TITEL:</label>
+                        <input type="text" id="lyric-title-input" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs font-mono outline-none" value="Nacht über Meckenheim (Rock-Mix)">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-mono text-purple-400 block mb-1.5">GENRE / STYLE:</label>
+                        <input type="text" id="lyric-genre-input" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs font-mono outline-none" value="German Rock / Alternative">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-mono text-purple-400 block mb-1.5">LYRICS &amp; STRUKTUR (Strophe, Chorus, Bridge):</label>
+                    <textarea id="lyric-content-input" rows="8" class="w-full bg-[#030508] border border-slate-800 rounded-2xl p-4 text-white text-xs font-mono outline-none leading-relaxed resize-none">[Verse 1]
+Neonlichter spiegeln sich im Asphalt,
+Der Bass drückt schwer, die Nacht ist kalt.
+
+[Chorus]
+Wir bauen das Netz, Stufe für Stufe neu,
+CloudBeats am Start, für immer treu!</textarea>
+                </div>
+
+                <div id="lyrics-save-status" class="text-[11px] font-mono text-emerald-400 min-h-[16px]"></div>
+                <button type="button" id="lyrics-to-home-btn" class="cyber-button w-full bg-slate-900/80 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
+            </div>
+        </div>
+
+        <!-- 4. CRYPTO & TOKENOMICS STAKING HUB -->
+        <div id="view-crypto" class="view-page hidden w-full py-4 text-left space-y-4">
+            <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-4 border-cyan-500/30">
+                <div>
+                    <span class="text-2xl mb-1 block">🪙</span>
+                    <h2 class="text-xl font-black text-cyan-400 font-mono">Crypto &amp; Staking Yield Matrix</h2>
+                    <p class="text-xs text-slate-400">Verwalte Hashrate-Prognosen, Cosmos (ATOM) Prämien &amp; Staking-Yields.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="bg-[#030508] p-4 rounded-2xl border border-cyan-500/20">
+                        <p class="text-[10px] font-mono text-cyan-300 uppercase">Cosmos ATOM Staking</p>
+                        <p class="text-lg font-black text-white font-mono mt-1">~14.5% APY</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Reguläre Prämien-Auszahlung</p>
+                    </div>
+                    <div class="bg-[#030508] p-4 rounded-2xl border border-purple-500/20">
+                        <p class="text-[10px] font-mono text-purple-300 uppercase">GoMining Hashrate</p>
+                        <p class="text-lg font-black text-white font-mono mt-1">Liquid Bitcoin</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Tägliche Rewards aktiv</p>
+                    </div>
+                    <div class="bg-[#030508] p-4 rounded-2xl border border-emerald-500/20">
+                        <p class="text-[10px] font-mono text-emerald-300 uppercase">Aave / Staking Pool</p>
+                        <p class="text-lg font-black text-white font-mono mt-1">Optimiert</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Sicherheits-Layer aktiv</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h3 class="text-xs font-mono text-cyan-300 font-bold uppercase">⚡ Interaktiver Cosmos / Hashrate Rechner</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] font-mono text-slate-400 block mb-1">EINGESETZTE EINHEITEN:</label>
+                            <input type="number" id="calc-amount" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs font-mono outline-none" value="100">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-mono text-slate-400 block mb-1">GESCHÄTZTER JAHRESGEWINN:</label>
+                            <div id="calc-result" class="w-full bg-[#030508] border border-emerald-500/30 rounded-xl px-3 py-2 text-emerald-400 text-xs font-mono font-bold flex items-center">~14.5 Einheiten</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="crypto-to-home-btn" class="cyber-button w-full bg-slate-900/80 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
+            </div>
+        </div>
+
+        <!-- 5. ARCHITEKTUR-GARTEN & WEBRADIO -->
         <div id="view-garten" class="view-page hidden w-full py-4 text-center space-y-4">
             <div class="glass-panel neon-glow-emerald p-4 sm:p-6 rounded-[2.5rem] shadow-2xl space-y-4">
                 <div>
@@ -242,7 +245,6 @@
                     </div>
                 </div>
 
-                <!-- Stream Controller -->
                 <div class="bg-[#030508] border border-emerald-500/20 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                     <div class="flex items-center gap-2.5">
                         <span class="text-emerald-400 font-mono font-bold">🎵 Stream:</span>
@@ -255,51 +257,28 @@
                 
                 <audio id="external-audio-stream" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
 
-                <!-- Biophilic HD-Canvas -->
                 <div class="relative w-full overflow-hidden rounded-2xl border border-emerald-500/30 shadow-2xl bg-[#1b4332]">
                     <canvas id="garden-canvas" width="1200" height="750" class="w-full h-auto object-contain block"></canvas>
                 </div>
-                <p class="text-[11px] text-emerald-400/70 font-mono italic">✨ Reagiert live auf den Rhythmus deines Webradio-Streams.</p>
 
                 <button type="button" id="garten-to-home-btn" class="cyber-button w-full bg-slate-900/80 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
             </div>
         </div>
 
-        <!-- 4. CLOUD-SYNC & BULLETPROOF BACKUP -->
+        <!-- 6. CLOUD BACKUP -->
         <div id="view-cloud" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="glass-panel p-6 rounded-[2rem] space-y-4 border-cyan-500/20">
                 <h2 class="text-lg font-bold text-cyan-400 font-mono">☁️ Cloud-Nexus Backup Center</h2>
-                <p class="text-xs text-slate-400">Hier sind deine Daten absolut sicher. Erstelle Backups als Datei, damit dein Fortschritt niemals verloren geht.</p>
-                
-                <div class="space-y-3 pt-2">
-                    <button type="button" id="export-backup-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs font-mono uppercase tracking-wider cursor-pointer shadow-lg">📥 Spielstand als Datei sichern</button>
-                    
-                    <div class="pt-2 border-t border-slate-800">
-                        <label class="text-[10px] font-mono text-slate-400 block mb-1">SPIELSTAND WIEDERHERSTELLEN (JSON):</label>
-                        <input type="file" id="import-backup-file" accept=".json" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-mono file:bg-slate-800 file:text-cyan-300 hover:file:bg-slate-700 cursor-pointer">
-                    </div>
-                </div>
-
+                <button type="button" id="export-backup-btn" class="cyber-button w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl text-xs font-mono uppercase tracking-wider cursor-pointer shadow-lg">📥 Spielstand als Datei sichern</button>
                 <button type="button" id="cloud-to-home-btn" class="cyber-button w-full bg-slate-900 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer mt-4">← Dashboard</button>
             </div>
         </div>
 
-        <!-- 5. PROFIL -->
-        <div id="view-account" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
-            <div class="glass-panel p-6 rounded-[2rem] space-y-3.5 border-blue-500/20">
-                <h2 class="text-lg font-bold text-blue-400 font-mono mb-2">📝 Künstler-Profil</h2>
-                <label class="text-[11px] font-mono text-slate-400 block">KÜNSTLERNAME:</label>
-                <input type="text" id="reg-username" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-sm outline-none font-mono" value="jackdarckart">
-                <button type="button" id="save-account-btn" class="cyber-button w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-xs font-mono font-bold cursor-pointer">Änderungen speichern</button>
-                <button type="button" id="account-to-home-btn" class="cyber-button w-full bg-slate-900 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer mt-2">← Dashboard</button>
-            </div>
-        </div>
-
-        <!-- 6. ADMIN -->
+        <!-- 7. ADMIN -->
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="glass-panel p-6 rounded-[2rem] space-y-3.5 border-amber-500/20">
                 <h2 class="text-lg font-bold text-amber-400 font-mono mb-2">🛠️ Nexus System Hub</h2>
-                <p class="text-xs text-slate-400">Systemdiagnose und Ressourcen-Telemetrie.</p>
+                <p class="text-xs text-slate-400">Systemdiagnose aktiv. Domain-Migration zu GitHub Pages läuft.</p>
                 <button type="button" id="admin-to-home-btn" class="cyber-button w-full bg-slate-900 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
             </div>
         </div>
@@ -309,139 +288,82 @@
     <!-- Cyber-Footer -->
     <footer class="w-full border-t border-purple-500/15 py-3 px-4 bg-[#05070c]">
         <div class="max-w-4xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
-            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Auto-Sync &amp; Double-Backup Aktiv</span>
+            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> GitHub Pages &amp; Cloudflare Ready</span>
             <span class="text-purple-400/60">jackdarckart • CloudBeats</span>
         </div>
     </footer>
 
-    <!-- MODULAR SYSTEM SCRIPTS -->
+    <!-- SYSTEM SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            /* ========================================================
-               MODUL 1: SECURE AUTH & BULLETPROOF ECONOMY ENGINE
-               ======================================================== */
+            /* --- ECONOMY & GAME ENGINE --- */
             const GameEngine = {
                 beats: 3449,
                 fans: 586,
                 upg1: 0,
                 upg2: 0,
-                upg3: 0,
-                loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || null,
+                loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || 'artur.hamm90@gmail.com',
                 
                 init() {
-                    let usersDB = {};
-                    try { 
-                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || 
-                                  JSON.parse(localStorage.getItem('beat_lab_users_db_backup')) || {}; 
-                    } catch(e) {}
-                    
-                    if (!usersDB['artur.hamm90@gmail.com']) {
-                        usersDB['artur.hamm90@gmail.com'] = { pin: '1234', beats: 3449, fans: 586, u1: 0, u2: 0, u3: 0 };
-                        this.persistDB(usersDB);
-                    }
-
-                    if (this.loggedInUser && usersDB[this.loggedInUser]) {
-                        this.load();
-                    }
-                    this.startAutoBoostInterval();
+                    this.load();
+                    this.startAutoBoost();
                 },
-
-                persistDB(db) {
-                    try {
-                        const jsonStr = JSON.stringify(db);
-                        localStorage.setItem('beat_lab_users_db', jsonStr);
-                        localStorage.setItem('beat_lab_users_db_backup', jsonStr);
-                    } catch(e) {}
-                },
-
                 load() {
-                    if (!this.loggedInUser) return;
                     try {
-                        let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || 
-                                  JSON.parse(localStorage.getItem('beat_lab_users_db_backup')) || {};
-                        if (db[this.loggedInUser]) {
-                            let u = db[this.loggedInUser];
-                            let storedBeats = Number(u.beats);
-                            this.beats = (isNaN(storedBeats) || storedBeats < 3449) ? 3449 : storedBeats;
-                            
-                            let storedFans = Number(u.fans);
-                            this.fans = (isNaN(storedFans) || storedFans < 586) ? 586 : storedFans;
-
-                            this.upg1 = Number(u.u1) || 0;
-                            this.upg2 = Number(u.u2) || 0;
-                            this.upg3 = Number(u.u3) || 0;
+                        let data = JSON.parse(localStorage.getItem('cloudbeats_save_data'));
+                        if(data) {
+                            this.beats = Number(data.beats) || 3449;
+                            this.fans = Number(data.fans) || 586;
+                            this.upg1 = Number(data.upg1) || 0;
+                            this.upg2 = Number(data.upg2) || 0;
                         }
                     } catch(e) {}
                 },
-
                 save() {
-                    if (!this.loggedInUser) return;
                     try {
-                        let db = {};
-                        try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                        if (!db[this.loggedInUser]) db[this.loggedInUser] = { pin: '1234' };
-                        db[this.loggedInUser] = { 
-                            ...db[this.loggedInUser],
-                            beats: this.beats, 
-                            fans: this.fans,
-                            u1: this.upg1,
-                            u2: this.upg2,
-                            u3: this.upg3
-                        };
-                        this.persistDB(db);
+                        localStorage.setItem('cloudbeats_save_data', JSON.stringify({
+                            beats: this.beats, fans: this.fans, upg1: this.upg1, upg2: this.upg2
+                        }));
                     } catch(e) {}
                 },
-
-                getBPS() {
-                    return (this.upg1 * 2) + (this.upg2 * 10) + (this.upg3 * 75);
-                },
-
+                getBPS() { return (this.upg1 * 2) + (this.upg2 * 10); },
                 getCost1() { return Math.floor(250 * Math.pow(1.30, this.upg1)); },
                 getCost2() { return Math.floor(1500 * Math.pow(1.32, this.upg2)); },
-                getCost3() { return Math.floor(8500 * Math.pow(1.35, this.upg3)); },
-
-                startAutoBoostInterval() {
+                startAutoBoost() {
                     setInterval(() => {
                         let bps = this.getBPS();
-                        if (bps > 0 && this.loggedInUser) {
+                        if(bps > 0) {
                             this.beats += bps;
                             this.updateUI();
                             this.save();
                         }
                     }, 1000);
                 },
-
                 updateUI() {
                     const bEl = document.getElementById('beats-count');
                     const fEl = document.getElementById('fans-count');
                     const bpsEl = document.getElementById('bps-count');
                     const u1El = document.getElementById('upg1-count');
                     const u2El = document.getElementById('upg2-count');
-                    const u3El = document.getElementById('upg3-count');
                     const c1El = document.getElementById('cost-1');
                     const c2El = document.getElementById('cost-2');
-                    const c3El = document.getElementById('cost-3');
 
                     if(bEl) bEl.innerText = Math.floor(this.beats).toLocaleString('de-DE');
                     if(fEl) fEl.innerText = Math.floor(this.fans).toLocaleString('de-DE');
                     if(bpsEl) bpsEl.innerText = "+" + this.getBPS();
                     if(u1El) u1El.innerText = this.upg1;
                     if(u2El) u2El.innerText = this.upg2;
-                    if(u3El) u3El.innerText = this.upg3;
                     if(c1El) c1El.innerText = this.getCost1().toLocaleString('de-DE');
                     if(c2El) c2El.innerText = this.getCost2().toLocaleString('de-DE');
-                    if(c3El) c3El.innerText = this.getCost3().toLocaleString('de-DE');
                 }
             };
-
             GameEngine.init();
 
-            // Click listener
+            // Click Producer
             const produceBtn = document.getElementById('produce-beat-btn');
             if(produceBtn) {
                 produceBtn.addEventListener('click', () => {
-                    if (!GameEngine.loggedInUser) return;
                     GameEngine.beats += 1;
                     GameEngine.fans += 1;
                     GameEngine.updateUI();
@@ -454,7 +376,7 @@
             if(upg1Btn) {
                 upg1Btn.addEventListener('click', () => {
                     let cost = GameEngine.getCost1();
-                    if (GameEngine.beats >= cost) {
+                    if(GameEngine.beats >= cost) {
                         GameEngine.beats -= cost;
                         GameEngine.upg1 += 1;
                         GameEngine.updateUI();
@@ -462,12 +384,11 @@
                     }
                 });
             }
-
             const upg2Btn = document.getElementById('buy-upgrade-2');
             if(upg2Btn) {
                 upg2Btn.addEventListener('click', () => {
                     let cost = GameEngine.getCost2();
-                    if (GameEngine.beats >= cost) {
+                    if(GameEngine.beats >= cost) {
                         GameEngine.beats -= cost;
                         GameEngine.upg2 += 1;
                         GameEngine.updateUI();
@@ -476,294 +397,32 @@
                 });
             }
 
-            const upg3Btn = document.getElementById('buy-upgrade-3');
-            if(upg3Btn) {
-                upg3Btn.addEventListener('click', () => {
-                    let cost = GameEngine.getCost3();
-                    if (GameEngine.beats >= cost) {
-                        GameEngine.beats -= cost;
-                        GameEngine.upg3 += 1;
-                        GameEngine.updateUI();
-                        GameEngine.save();
-                    }
+            /* --- LYRICS EDITOR MODULE --- -->
+            const saveLyricsBtn = document.getElementById('save-lyrics-btn');
+            if(saveLyricsBtn) {
+                saveLyricsBtn.addEventListener('click', () => {
+                    const title = document.getElementById('lyric-title-input').value;
+                    const genre = document.getElementById('lyric-genre-input').value;
+                    const content = document.getElementById('lyric-content-input').value;
+                    localStorage.setItem('cloudbeats_saved_lyrics', JSON.stringify({title, genre, content}));
+                    const status = document.getElementById('lyrics-save-status');
+                    if(status) status.innerText = "✅ Songtext erfolgreich im Browser gespeichert!";
+                    setTimeout(() => { if(status) status.innerText = ""; }, 3000);
                 });
             }
 
-            // --- CLOUD BACKUP EXPORT & IMPORT ---
-            const exportBtn = document.getElementById('export-backup-btn');
-            if(exportBtn) {
-                exportBtn.addEventListener('click', () => {
-                    try {
-                        let dbData = localStorage.getItem('beat_lab_users_db') || "{}";
-                        let blob = new Blob([dbData], { type: "application/json" });
-                        let url = URL.createObjectURL(blob);
-                        let a = document.createElement('a');
-                        a.href = url;
-                        a.download = "cloudbeats_backup_" + new Date().toISOString().slice(0,10) + ".json";
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    } catch(e) {}
+            /* --- CRYPTO RECHNER MODULE --- */
+            const calcInput = document.getElementById('calc-amount');
+            const calcResult = document.getElementById('calc-result');
+            if(calcInput && calcResult) {
+                calcInput.addEventListener('input', () => {
+                    let val = parseFloat(calcInput.value) || 0;
+                    let yearly = (val * 0.145).toFixed(2);
+                    calcResult.innerText = `~${yearly} Einheiten (14.5% APY)`;
                 });
             }
 
-            const importFile = document.getElementById('import-backup-file');
-            if(importFile) {
-                importFile.addEventListener('change', (event) => {
-                    const file = event.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            let parsed = JSON.parse(e.target.result);
-                            if (parsed && typeof parsed === 'object') {
-                                GameEngine.persistDB(parsed);
-                                alert("✅ Backup erfolgreich wiederhergestellt! Das Studio wird neu geladen.");
-                                location.reload();
-                            }
-                        } catch(err) {
-                            alert("❌ Ungültige Backup-Datei!");
-                        }
-                    };
-                    reader.readAsText(file);
-                });
-            }
-
-            // --- AUTH NAVIGATION & ACTIONS ---
-            const formLogin = document.getElementById('form-login');
-            const formRegister = document.getElementById('form-register');
-            const formForgot = document.getElementById('form-forgot');
-            const authMsg = document.getElementById('auth-msg');
-
-            const toRegBtn = document.getElementById('to-register-btn');
-            if(toRegBtn) {
-                toRegBtn.addEventListener('click', () => {
-                    if(formLogin) formLogin.classList.add('hidden');
-                    if(formRegister) formRegister.classList.remove('hidden');
-                    if(formForgot) formForgot.classList.add('hidden');
-                    const titleEl = document.getElementById('auth-title');
-                    if(titleEl) titleEl.innerText = "Konto Registrierung";
-                    if(authMsg) authMsg.innerText = "";
-                });
-            }
-
-            const toLoginBtn = document.getElementById('to-login-btn');
-            if(toLoginBtn) {
-                toLoginBtn.addEventListener('click', () => {
-                    if(formRegister) formRegister.classList.add('hidden');
-                    if(formLogin) formLogin.classList.remove('hidden');
-                    const titleEl = document.getElementById('auth-title');
-                    if(titleEl) titleEl.innerText = "Studio Secure Gateway";
-                    if(authMsg) authMsg.innerText = "";
-                });
-            }
-
-            const toForgotBtn = document.getElementById('to-forgot-btn');
-            if(toForgotBtn) {
-                toForgotBtn.addEventListener('click', () => {
-                    if(formLogin) formLogin.classList.add('hidden');
-                    if(formForgot) formForgot.classList.remove('hidden');
-                    const titleEl = document.getElementById('auth-title');
-                    if(titleEl) titleEl.innerText = "PIN Wiederherstellung";
-                    if(authMsg) authMsg.innerText = "";
-                });
-            }
-
-            const forgotToLoginBtn = document.getElementById('forgot-to-login-btn');
-            if(forgotToLoginBtn) {
-                forgotToLoginBtn.addEventListener('click', () => {
-                    if(formForgot) formForgot.classList.add('hidden');
-                    if(formLogin) formLogin.classList.remove('hidden');
-                    const titleEl = document.getElementById('auth-title');
-                    if(titleEl) titleEl.innerText = "Studio Secure Gateway";
-                    if(authMsg) authMsg.innerText = "";
-                });
-            }
-
-            // Register Action
-            const submitRegBtn = document.getElementById('submit-register-btn');
-            if(submitRegBtn) {
-                submitRegBtn.addEventListener('click', () => {
-                    const emailInput = document.getElementById('reg-email');
-                    const pinInput = document.getElementById('reg-pin');
-                    if(!emailInput || !pinInput) return;
-                    const email = emailInput.value.trim().toLowerCase();
-                    const pin = pinInput.value.trim();
-
-                    if (!email || !email.includes('@') || pin.length < 4) {
-                        if(authMsg) authMsg.innerText = "❌ Gültige E-Mail & PIN (min. 4 Ziffern) erforderlich!";
-                        return;
-                    }
-                    let db = {};
-                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    if (db[email]) {
-                        if(authMsg) authMsg.innerText = "❌ E-Mail ist bereits registriert!";
-                        return;
-                    }
-                    db[email] = { pin: pin, beats: 3449, fans: 586, u1: 0, u2: 0, u3: 0 };
-                    GameEngine.persistDB(db);
-                    GameEngine.loggedInUser = email;
-                    localStorage.setItem('beat_lab_logged_in_user', email);
-                    GameEngine.load();
-                    updateViewState();
-                });
-            }
-
-            // Login Action
-            const submitLoginBtn = document.getElementById('submit-login-btn');
-            if(submitLoginBtn) {
-                submitLoginBtn.addEventListener('click', () => {
-                    const emailInput = document.getElementById('login-email');
-                    const pinInput = document.getElementById('login-pin');
-                    if(!emailInput || !pinInput) return;
-                    const email = emailInput.value.trim().toLowerCase();
-                    const pin = pinInput.value.trim();
-
-                    let db = {};
-                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    
-                    if (db[email] && db[email].pin === pin) {
-                        GameEngine.loggedInUser = email;
-                        localStorage.setItem('beat_lab_logged_in_user', email);
-                        GameEngine.load();
-                        updateViewState();
-                    } else {
-                        if(authMsg) authMsg.innerText = "❌ Falsche E-Mail oder PIN!";
-                    }
-                });
-            }
-
-            // Forgot PIN: Request Code
-            let generatedResetCode = null;
-            let resetTargetEmail = null;
-            const requestCodeBtn = document.getElementById('request-code-btn');
-            if(requestCodeBtn) {
-                requestCodeBtn.addEventListener('click', () => {
-                    const emailInput = document.getElementById('forgot-email');
-                    if(!emailInput) return;
-                    const email = emailInput.value.trim().toLowerCase();
-                    let db = {};
-                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-                    
-                    if (!db[email]) {
-                        if(authMsg) authMsg.innerText = "❌ E-Mail-Adresse nicht gefunden!";
-                        return;
-                    }
-                    resetTargetEmail = email;
-                    generatedResetCode = Math.floor(100000 + Math.random() * 900000).toString();
-                    db[email].resetCode = generatedResetCode;
-                    GameEngine.persistDB(db);
-
-                    if(authMsg) authMsg.innerText = `✅ Code gesendet! (Demo E-Mail Code: ${generatedResetCode})`;
-                    const resetSec = document.getElementById('reset-section');
-                    if(resetSec) resetSec.classList.remove('hidden');
-                });
-            }
-
-            // Forgot PIN: Submit Reset
-            const submitResetBtn = document.getElementById('submit-reset-btn');
-            if(submitResetBtn) {
-                submitResetBtn.addEventListener('click', () => {
-                    const codeInputEl = document.getElementById('forgot-code');
-                    const newPinEl = document.getElementById('new-pin');
-                    if(!codeInputEl || !newPinEl) return;
-                    const codeInput = codeInputEl.value.trim();
-                    const newPin = newPinEl.value.trim();
-                    let db = {};
-                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-
-                    if (resetTargetEmail && db[resetTargetEmail] && db[resetTargetEmail].resetCode === codeInput && newPin.length >= 4) {
-                        db[resetTargetEmail].pin = newPin;
-                        db[resetTargetEmail].resetCode = null;
-                        GameEngine.persistDB(db);
-                        if(authMsg) authMsg.innerText = "🔒 PIN erfolgreich geändert! Bitte einloggen.";
-                        if(formForgot) formForgot.classList.add('hidden');
-                        if(formLogin) formLogin.classList.remove('hidden');
-                        const titleEl = document.getElementById('auth-title');
-                        if(titleEl) titleEl.innerText = "Studio Secure Gateway";
-                    } else {
-                        if(authMsg) authMsg.innerText = "❌ Ungültiger Code oder PIN (min. 4 Ziffern)!";
-                    }
-                });
-            }
-
-            // Logout
-            const logoutBtn = document.getElementById('logout-btn');
-            if(logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    GameEngine.save();
-                    GameEngine.loggedInUser = null;
-                    localStorage.removeItem('beat_lab_logged_in_user');
-                    updateViewState();
-                });
-            }
-
-            // Admin panel inside game
-            const adminPanel = document.getElementById('admin-security-panel');
-            const toggleAdminBtn = document.getElementById('toggle-admin-panel');
-            if(toggleAdminBtn && adminPanel) {
-                toggleAdminBtn.addEventListener('click', () => {
-                    adminPanel.classList.toggle('hidden');
-                });
-            }
-
-            const closeAdminBtn = document.getElementById('close-admin-panel');
-            if(closeAdminBtn && adminPanel) {
-                closeAdminBtn.addEventListener('click', () => {
-                    adminPanel.classList.add('hidden');
-                });
-            }
-
-            const changePinBtn = document.getElementById('admin-change-pin-btn');
-            if(changePinBtn) {
-                changePinBtn.addEventListener('click', () => {
-                    const oldPinEl = document.getElementById('admin-old-pin');
-                    const newPinEl = document.getElementById('admin-new-pin');
-                    const adminMsg = document.getElementById('admin-msg');
-                    if(!oldPinEl || !newPinEl) return;
-                    const oldPin = oldPinEl.value.trim();
-                    const newPin = newPinEl.value.trim();
-                    let db = {};
-                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
-
-                    if (GameEngine.loggedInUser && db[GameEngine.loggedInUser] && db[GameEngine.loggedInUser].pin === oldPin) {
-                        if (newPin.length >= 4) {
-                            db[GameEngine.loggedInUser].pin = newPin;
-                            GameEngine.persistDB(db);
-                            if(adminMsg) adminMsg.innerText = "✅ PIN erfolgreich aktualisiert!";
-                            oldPinEl.value = "";
-                            newPinEl.value = "";
-                        } else {
-                            if(adminMsg) adminMsg.innerText = "❌ Neue PIN muss min. 4 Ziffern haben!";
-                        }
-                    } else {
-                        if(adminMsg) adminMsg.innerText = "❌ Aktuelle PIN ist falsch!";
-                    }
-                });
-            }
-
-            function updateViewState() {
-                const authC = document.getElementById('game-auth-container');
-                const mainC = document.getElementById('game-main-container');
-                if (GameEngine.loggedInUser) {
-                    if(authC) authC.classList.add('hidden');
-                    if(mainC) mainC.classList.remove('hidden');
-                    const userDisplayEmail = document.getElementById('logged-user-email');
-                    if(userDisplayEmail) userDisplayEmail.innerText = "Session: " + GameEngine.loggedInUser;
-                    GameEngine.updateUI();
-                } else {
-                    if(authC) authC.classList.remove('hidden');
-                    if(mainC) mainC.classList.add('hidden');
-                    if(adminPanel) adminPanel.classList.add('hidden');
-                }
-            }
-            updateViewState();
-
-
-            /* ========================================================
-               MODUL 2: GARDEN & AUDIO-SYNC RENDERER
-               ======================================================== */
+            /* --- GARDEN CANVAS MODULE --- */
             const GardenEngine = {
                 canvas: document.getElementById('garden-canvas'),
                 ctx: null,
@@ -771,198 +430,105 @@
                 toggleBtn: document.getElementById('toggle-radio-btn'),
                 statusText: document.getElementById('audio-status-text'),
                 isStreaming: false,
-
                 init() {
-                    if (!this.canvas) return;
+                    if(!this.canvas) return;
                     this.ctx = this.canvas.getContext('2d');
-                    this.bindRadioEvents();
-                    this.startRenderLoop();
-                    this.fetchSongInfo();
-                    setInterval(() => this.fetchSongInfo(), 15000);
+                    this.bindRadio();
+                    this.loop();
                 },
-
-                bindRadioEvents() {
-                    if (!this.toggleBtn || !this.audioEl) return;
+                bindRadio() {
+                    if(!this.toggleBtn || !this.audioEl) return;
                     this.toggleBtn.addEventListener('click', async () => {
-                        if (!this.isStreaming) {
+                        if(!this.isStreaming) {
                             try {
                                 await this.audioEl.play();
                                 this.isStreaming = true;
                                 this.toggleBtn.innerText = "⏹️ Stream stoppen";
-                                this.toggleBtn.className = "cyber-button bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
                                 if(this.statusText) this.statusText.innerText = "🟢 Takt-Sync aktiv";
                             } catch(e) {}
                         } else {
                             this.audioEl.pause();
                             this.isStreaming = false;
                             this.toggleBtn.innerText = "📻 Stream starten";
-                            this.toggleBtn.className = "cyber-button bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-semibold transition cursor-pointer shadow";
                             if(this.statusText) this.statusText.innerText = "Bereit";
                         }
                     });
                 },
-
-                async fetchSongInfo() {
-                    try {
-                        let res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
-                        if (res.ok) {
-                            let data = await res.json();
-                            let songEl = document.getElementById('current-song-display');
-                            if (songEl && data) {
-                                let artist = data.artist ? data.artist.name : "";
-                                let title = data.title || "";
-                                songEl.innerText = artist || title ? `🎶 Live: ${artist} ${title ? '– ' + title : ''}` : `🎶 laut.fm/jackdarckart`;
-                            }
-                        }
-                    } catch(e) {}
-                },
-
-                startRenderLoop() {
+                loop() {
                     const render = () => {
-                        this.drawScene();
+                        this.draw();
                         requestAnimationFrame(render);
                     };
                     requestAnimationFrame(render);
                 },
-
-                drawScene() {
+                draw() {
                     const ctx = this.ctx;
                     const canvas = this.canvas;
                     if(!ctx || !canvas) return;
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                    let pulse = 0.02;
-                    if (this.isStreaming && this.audioEl && !this.audioEl.paused) {
-                        let time = Date.now() / 250;
-                        pulse = (Math.sin(time) * 0.5 + 0.5) * 0.04;
-                    } else {
-                        pulse = (Math.sin(Date.now() / 800) + 1) * 0.015;
-                    }
+                    let pulse = (this.isStreaming && !this.audioEl.paused) ? (Math.sin(Date.now() / 200) * 0.5 + 0.5) * 0.05 : 0.01;
 
-                    let lawnGrad = ctx.createLinearGradient(0, 0, 0, 750);
-                    lawnGrad.addColorStop(0, '#52b788');
-                    lawnGrad.addColorStop(0.5, '#2d6a4f');
-                    lawnGrad.addColorStop(1, '#1b4332');
-                    ctx.fillStyle = lawnGrad;
+                    // Lawn Background
+                    let grad = ctx.createLinearGradient(0, 0, 0, 750);
+                    grad.addColorStop(0, '#52b788');
+                    grad.addColorStop(1, '#1b4332');
+                    ctx.fillStyle = grad;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-                    for (let i = 0; i < canvas.width; i += 60) {
-                        ctx.fillRect(i, 0, 30, canvas.height);
-                    }
-
+                    // Pool
                     ctx.fillStyle = '#014f86';
                     ctx.fillRect(720, 380, 400, 240);
-                    let poolGrad = ctx.createLinearGradient(720, 380, 1120, 620);
-                    poolGrad.addColorStop(0, '#2a6f97');
-                    poolGrad.addColorStop(0.5, '#014f86');
-                    poolGrad.addColorStop(1, '#012a4a');
-                    ctx.fillStyle = poolGrad;
-                    ctx.fillRect(732, 392, 376, 216);
-
-                    ctx.strokeStyle = '#48cae4';
-                    ctx.lineWidth = 5;
+                    ctx.strokeStyle = `rgba(72, 202, 228, ${0.6 + pulse * 4})`;
+                    ctx.lineWidth = 4;
                     ctx.strokeRect(730, 390, 380, 220);
 
-                    let fountainRadius = 15 + (pulse * 25);
-                    ctx.strokeStyle = `rgba(72, 202, 228, ${0.5 + pulse * 3})`;
-                    ctx.lineWidth = 3.5;
-                    ctx.beginPath();
-                    ctx.arc(920, 500, fountainRadius, 0, Math.PI * 2);
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#adb5bd';
-                    ctx.fillRect(120, 120, 500, 360);
-                    ctx.fillStyle = '#6c757d';
-                    for(let k=0; k<150; k++) {
-                        ctx.fillRect(130 + (k * 13) % 480, 130 + (k * 7) % 340, 2, 2);
-                    }
-
-                    ctx.fillStyle = '#212529';
-                    for (let r = 0; r < 5; r++) {
-                        ctx.fillRect(160 + r * 58, 280 + r * 30, 70, 35);
-                        ctx.strokeStyle = '#495057';
-                        ctx.lineWidth = 1.5;
-                        ctx.strokeRect(160 + r * 58, 280 + r * 30, 70, 35);
-                    }
-
-                    let woodGrad = ctx.createLinearGradient(150, 630, 150, 750);
-                    woodGrad.addColorStop(0, '#bb7e3d');
-                    woodGrad.addColorStop(0.5, '#a0522d');
-                    woodGrad.addColorStop(1, '#8b4513');
-                    ctx.fillStyle = woodGrad;
-                    ctx.fillRect(150, 630, 900, 120);
-
-                    const drawTopiary = (bx, by) => {
-                        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                        ctx.beginPath(); ctx.ellipse(bx, by + 8, 20, 8, 0, 0, Math.PI*2); ctx.fill();
+                    // Topiary Trees
+                    const tree = (bx, by) => {
                         ctx.fillStyle = '#3a2e2b';
                         ctx.fillRect(bx - 6, by - 15, 12, 40);
-
-                        let crownRadius = 32 * (1 + pulse * 0.6);
-                        let gradDark = ctx.createRadialGradient(bx-8, by-30, 4, bx, by-25, crownRadius);
-                        gradDark.addColorStop(0, '#74c69d');
-                        gradDark.addColorStop(0.6, '#2d6a4f');
-                        gradDark.addColorStop(1, '#081c15');
-                        ctx.fillStyle = gradDark;
-                        ctx.beginPath(); ctx.arc(bx, by - 25, crownRadius, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = '#2d6a4f';
+                        ctx.beginPath(); ctx.arc(bx, by - 25, 30 * (1 + pulse), 0, Math.PI * 2); ctx.fill();
                     };
-                    drawTopiary(200, 200);
-                    drawTopiary(290, 200);
-                    drawTopiary(420, 215);
+                    tree(200, 200);
+                    tree(320, 200);
                 }
             };
-
             GardenEngine.init();
 
-
-            /* ========================================================
-               ROUTER & NAVIGATION CONTROLLER
-               ======================================================== */
+            /* --- ROUTER --- */
             let currentView = localStorage.getItem('cb_view') || 'home';
-            function switchView(view) {
-                currentView = view;
-                localStorage.setItem('cb_view', view);
+            function switchView(v) {
+                currentView = v;
+                localStorage.setItem('cb_view', v);
                 document.querySelectorAll('.view-page').forEach(el => el.classList.add('hidden'));
-                let target = document.getElementById('view-' + view);
-                if (target) target.classList.remove('hidden');
+                let t = document.getElementById('view-' + v);
+                if(t) t.classList.remove('hidden');
             }
 
-            function bindClick(id, handler) {
+            function click(id, fn) {
                 const el = document.getElementById(id);
-                if (el) el.addEventListener('click', handler);
+                if(el) el.addEventListener('click', fn);
             }
 
-            bindClick('nav-home', () => switchView('home'));
-            bindClick('nav-game', () => switchView('game'));
-            bindClick('nav-garten', () => switchView('garten'));
-            bindClick('nav-cloud', () => switchView('cloud'));
-            bindClick('nav-account', () => switchView('account'));
-            bindClick('nav-admin', () => switchView('admin'));
-            bindClick('home-to-game-btn', () => switchView('game'));
-            bindClick('game-to-home-btn', () => switchView('home'));
-            bindClick('garten-to-home-btn', () => switchView('home'));
-            bindClick('cloud-to-home-btn', () => switchView('home'));
-            bindClick('account-to-home-btn', () => switchView('home'));
-            bindClick('admin-to-home-btn', () => switchView('home'));
+            click('nav-home', () => switchView('home'));
+            click('nav-game', () => switchView('game'));
+            click('nav-lyrics', () => switchView('lyrics'));
+            click('nav-crypto', () => switchView('crypto'));
+            click('nav-garten', () => switchView('garten'));
+            click('nav-cloud', () => switchView('cloud'));
+            click('nav-admin', () => switchView('admin'));
 
-            const saveAccountBtn = document.getElementById('save-account-btn');
-            if(saveAccountBtn) {
-                saveAccountBtn.addEventListener('click', () => {
-                    const usernameInput = document.getElementById('reg-username');
-                    if(!usernameInput) return;
-                    const newName = usernameInput.value.trim();
-                    if (newName) {
-                        localStorage.setItem('cb_user', newName);
-                        const userDisp = document.getElementById('user-display');
-                        if(userDisp) userDisp.innerText = newName;
-                    }
-                });
-            }
+            click('home-to-game-btn', () => switchView('game'));
+            click('game-to-home-btn', () => switchView('home'));
+            click('lyrics-to-home-btn', () => switchView('home'));
+            click('crypto-to-home-btn', () => switchView('home'));
+            click('garten-to-home-btn', () => switchView('home'));
+            click('cloud-to-home-btn', () => switchView('home'));
+            click('admin-to-home-btn', () => switchView('home'));
 
             switchView(currentView);
         });
     </script>
 </body>
 </html>
- 
