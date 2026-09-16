@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jackdarckart | Login &amp; Registrierung</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #010309; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif; }
+        .glass-panel { background: linear-gradient(135deg, rgba(13, 22, 42, 0.88) 0%, rgba(5, 10, 22, 0.96) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(56, 189, 248, 0.2); }
+        .cyber-button:hover { box-shadow: 0 0 25px rgba(56, 189, 248, 0.4); border-color: rgba(56, 189, 248, 0.8); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-center items-center p-4">
+
+    <div class="max-w-md w-full glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-5">
+        <div class="text-center space-y-1">
+            <span class="text-4xl block mb-2">🔐</span>
+            <h1 id="auth-title" class="text-base font-black text-cyan-300 font-mono uppercase">Sicheres Login-Portal</h1>
+            <p class="text-[11px] text-slate-400">Zugang zu Cyber Beat Empire &amp; Cloud</p>
+        </div>
+
+        <div id="auth-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
+
+        <!-- Login Form -->
+        <div id="form-login" class="space-y-4">
+            <input type="email" id="login-email" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="E-Mail-Adresse">
+            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="PIN (z.B. 1234)">
+            <button type="button" id="btn-login" class="cyber-button w-full bg-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase cursor-pointer">Code anfordern &amp; Einloggen</button>
+            <div class="flex justify-between text-[11px] font-mono pt-2">
+                <button type="button" id="to-reg" class="text-cyan-400 hover:underline">Konto registrieren</button>
+                <button type="button" id="to-reset" class="text-pink-400 hover:underline">PIN vergessen?</button>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="form-register" class="space-y-4 hidden">
+            <input type="email" id="reg-email" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="E-Mail-Adresse (einmalig)">
+            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="Sichere PIN wählen">
+            <button type="button" id="btn-register" class="cyber-button w-full bg-pink-600 text-white font-bold py-3 rounded-xl text-xs uppercase cursor-pointer">Registrierung starten</button>
+            <div class="text-center pt-2">
+                <button type="button" id="back-login-1" class="text-[11px] font-mono text-cyan-400 hover:underline">← Zum Login</button>
+            </div>
+        </div>
+
+        <!-- Reset PIN Form -->
+        <div id="form-reset" class="space-y-4 hidden">
+            <input type="email" id="reset-email" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="Registrierte E-Mail">
+            <input type="password" id="reset-pin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="Neue PIN wählen">
+            <button type="button" id="btn-reset" class="cyber-button w-full bg-amber-600 text-white font-bold py-3 rounded-xl text-xs uppercase cursor-pointer">Code anfordern &amp; Ändern</button>
+            <div class="text-center pt-2">
+                <button type="button" id="back-login-2" class="text-[11px] font-mono text-cyan-400 hover:underline">← Zum Login</button>
+            </div>
+        </div>
+
+        <!-- Verify Code Form -->
+        <div id="form-verify" class="space-y-4 hidden">
+            <div class="bg-cyan-950/50 p-4 rounded-xl border border-cyan-500/40 text-center space-y-2">
+                <p class="text-[11px] font-mono text-cyan-200">📨 Ihr Sicherheitscode:</p>
+                <div id="display-code" class="text-2xl font-black text-amber-400 font-mono tracking-widest bg-[#010309] py-2 rounded-lg border border-amber-500/30">----</div>
+            </div>
+            <input type="text" id="verify-input" maxlength="4" class="w-full bg-[#030712] border border-cyan-500 rounded-xl px-3.5 py-3 text-white text-center text-xl font-mono tracking-widest outline-none" placeholder="4-stelligen Code eingeben">
+            <button type="button" id="btn-verify" class="cyber-button w-full bg-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase cursor-pointer">Code Bestätigen &amp; Starten</button>
+            <div class="text-center pt-2">
+                <button type="button" id="cancel-verify" class="text-[11px] font-mono text-slate-400 hover:underline">← Abbrechen</button>
+            </div>
+        </div>
+
+        <div class="text-center pt-4 border-t border-slate-800">
+            <a href="index.html" class="text-[11px] font-mono text-slate-400 hover:text-cyan-400">← Zurück zur Webradio Startseite</a>
+        </div>
+    </div>
+
+    <script>
+        let pending = { email: null, pin: null, action: null, code: null };
+
+        function showForm(id) {
+            ['form-login', 'form-register', 'form-reset', 'form-verify'].forEach(f => document.getElementById(f).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById('auth-msg').textContent = '';
+        }
+
+        document.getElementById('to-reg').onclick = () => showForm('form-register');
+        document.getElementById('to-reset').onclick = () => showForm('form-reset');
+        document.getElementById('back-login-1').onclick = () => showForm('form-login');
+        document.getElementById('back-login-2').onclick = () => showForm('form-login');
+        document.getElementById('cancel-verify').onclick = () => showForm('form-login');
+
+        function processAuth(email, pin, action) {
+            if (!email || !email.includes('@')) return '❌ Ungültige E-Mail!';
+            if (!pin || pin.length < 4) return '❌ PIN muss min. 4 Ziffern haben!';
+            email = email.trim().toLowerCase(); pin = pin.trim();
+            
+            let db = JSON.parse(localStorage.getItem('secure_nexus_master_users_db_v4')) || {};
+            if (action === 'register' && db[email]) return '❌ E-Mail bereits vergeben!';
+            if ((action === 'login' || action === 'reset') && !db[email]) return '❌ E-Mail nicht gefunden!';
+            if (action === 'login' && db[email].pin !== pin) return '❌ Falsche PIN!';
+
+            let code = Math.floor(1000 + Math.random() * 9000).toString();
+            pending = { email, pin, action, code };
+            document.getElementById('display-code').textContent = code;
+            showForm('form-verify');
+            return null;
+        }
+
+        document.getElementById('btn-login').onclick = () => {
+            let err = processAuth(document.getElementById('login-email').value, document.getElementById('login-pin').value, 'login');
+            if(err) document.getElementById('auth-msg').textContent = err;
+        };
+        document.getElementById('btn-register').onclick = () => {
+            let err = processAuth(document.getElementById('reg-email').value, document.getElementById('reg-pin').value, 'register');
+            if(err) document.getElementById('auth-msg').textContent = err;
+        };
+        document.getElementById('btn-reset').onclick = () => {
+            let err = processAuth(document.getElementById('reset-email').value, document.getElementById('reset-pin').value, 'reset');
+            if(err) document.getElementById('auth-msg').textContent = err;
+        };
+
+        document.getElementById('btn-verify').onclick = () => {
+            let input = document.getElementById('verify-input').value.trim();
+            if (input !== pending.code) {
+                document.getElementById('auth-msg').textContent = '❌ Falscher Code!';
+                showForm('form-login');
+                return;
+            }
+            let db = JSON.parse(localStorage.getItem('secure_nexus_master_users_db_v4')) || {};
+            if (pending.action === 'register') {
+                db[pending.email] = { pin: pending.pin, gameData: { beats: 0, fans: 0, releases: 0, upgrades: { mic: 0, studio: 0, producer: 0, rig: 0, ai: 0 } } };
+            } else if (pending.action === 'reset') {
+                db[pending.email].pin = pending.pin;
+            }
+            localStorage.setItem('secure_nexus_master_users_db_v4', JSON.stringify(db));
+            localStorage.setItem('secure_nexus_logged_user', pending.email);
+            window.location.href = 'game.html';
+        };
+    </script>
+</body>
+</html>
