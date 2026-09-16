@@ -11,7 +11,6 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            // Optional: Trage hier deinen EmailJS Public Key ein (oder leer lassen für den internen Sicherheits-Modus)
             emailjs.init({ publicKey: "DEIN_EMAILJS_PUBLIC_KEY" });
         })();
     </script>
@@ -58,9 +57,9 @@
                 <div class="glass-panel p-8 sm:p-10 rounded-[2.5rem] text-center relative overflow-hidden">
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/20 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Secure Nexus</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Verifizierungs-Engine • Anti-Cheat Aktiv</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Hardcore Studio-Simulation • Anti-Cheat Aktiv</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Öffentliches Portal. Geschützte Sektionen erfordern eine erfolgreiche E-Mail-Code-Bestätigung.
+                        Öffentliches Portal. Das Studio verlangt knallhartes Management und strategische Upgrades. Logge dich ein, um zu starten.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -79,14 +78,14 @@
 
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
-                    <!-- Bereits Eingeloggt Ansicht (Inkl. Abmelden-Button) -->
+                    <!-- Bereits Eingeloggt Ansicht -->
                     <div id="subform-logged" class="space-y-3 hidden">
                         <div class="bg-[#030508] p-4 rounded-2xl border border-purple-500/30 text-center space-y-1">
                             <p class="text-[10px] font-mono text-slate-400 uppercase">Verifizierter Account</p>
                             <p id="auth-logged-email" class="text-xs font-bold text-purple-300 font-mono"></p>
                         </div>
                         <button type="button" id="btn-auth-logout" class="cyber-button w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🚪 Sicher Abmelden</button>
-                        <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Studio wechseln</button>
+                        <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Hardcore Studio</button>
                     </div>
 
                     <!-- Login Form -->
@@ -109,8 +108,8 @@
 
                     <!-- Code Eingabe (Pflichtfeld) -->
                     <div id="subform-verify" class="space-y-3 hidden">
-                        <div id="verify-info-box" class="bg-purple-950/40 p-3 rounded-xl border border-purple-500/30 text-[11px] font-mono text-purple-200">
-                            📨 Ein Bestätigungscode wurde an Ihre E-Mail gesendet. Bitte geben Sie ihn hier ein.
+                        <div class="bg-purple-950/40 p-3 rounded-xl border border-purple-500/30 text-[11px] font-mono text-purple-200">
+                            📨 Ein Bestätigungscode wurde gesendet. Bitte geben Sie ihn hier ein, um den Zugang freizuschalten.
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE (PFLICHT):</label>
@@ -189,7 +188,8 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.beats}_${dataObj.fans}_${dataObj.releasesCount}_JACK_SALT_2026`;
+                    // Strenges Anti-Cheat: Bezieht alle Spielwerte und Upgrades in die Signatur ein
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_JACK_SALT_HARDCORE_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -225,12 +225,10 @@
                     const serviceId = "DEIN_SERVICE_ID";
                     const templateId = "DEIN_TEMPLATE_ID";
 
-                    // Intelligentes Fallback: Wenn EmailJS nicht konfiguriert ist, direkt Code im System aktiv schalten
                     if (serviceId === "DEIN_SERVICE_ID" || templateId === "DEIN_TEMPLATE_ID") {
                         this.activeVerificationCode = code;
                         this.pendingEmail = email;
                         this.pendingPin = pin;
-                        // Zeigt den Code für Testzwecke an, wenn keine API-Keys hinterlegt sind
                         return { success: true, needsCode: true, msg: `⚠️ (Test-Modus) Ihr Code lautet: ${code}` };
                     }
 
@@ -246,7 +244,7 @@
                         return { success: true, needsCode: true, msg: `✉️ Bestätigungscode an ${email} gesendet!` };
                     } catch (error) {
                         console.error("EmailJS Fehler:", error);
-                        return { success: false, msg: '❌ E-Mail Versand fehlgeschlagen. Bitte prüfen Sie Ihre Verbindung.' };
+                        return { success: false, msg: '❌ E-Mail Versand fehlgeschlagen.' };
                     }
                 },
                 finalizeVerification(enteredCode) {
@@ -262,7 +260,20 @@
                     let pin = this.pendingPin;
 
                     if (!db[email]) {
-                        let initialData = { pin: pin, beats: 10, fans: 10, hype: 0, releasesCount: 0, marketingLevel: 0, studioLevel: 0 };
+                        // Hardcore-Modus Startwerte: Deutlich weniger Start-Fans (5 statt 10)
+                        let initialData = { 
+                            pin: pin, 
+                            fans: 5, 
+                            hype: 0, 
+                            releasesCount: 0, 
+                            marketingLevel: 0, 
+                            studioLevel: 0, 
+                            producerLevel: 0, 
+                            prLevel: 0, 
+                            labelLevel: 0, 
+                            merchLevel: 0, 
+                            algoLevel: 0 
+                        };
                         initialData.checksum = this.generateChecksum(initialData);
                         db[email] = initialData;
                         this.saveDB(db);
@@ -301,6 +312,14 @@
                     let db = this.getDB();
                     let u = db[this.currentUser];
                     if (!u) return null;
+                    // Anti-Cheat Integritätsprüfung
+                    if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
+                        alert('⚠️ Anti-Cheat Alarm: Manipulierter Spielstand erkannt! Werte wurden zurückgesetzt.');
+                        u.fans = 5; u.marketingLevel = 0; u.studioLevel = 0; u.producerLevel = 0; u.prLevel = 0; u.labelLevel = 0; u.merchLevel = 0; u.algoLevel = 0;
+                        u.checksum = this.generateChecksum(u);
+                        db[this.currentUser] = u;
+                        this.saveDB(db);
+                    }
                     return u;
                 },
                 saveAccountData(dataObj) {
@@ -314,7 +333,7 @@
 
             const sitePages = [
                 { id: 'home', name: 'Home', icon: '🏠', desc: 'Öffentliche Startseite', protected: false },
-                { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Release- & Fan-Management', protected: true },
+                { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Hardcore Studio-Management', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
                 { id: 'garden', name: 'Garden', icon: '🌱', desc: 'Landschaft & Webradio Stream', protected: true },
@@ -337,10 +356,11 @@
                     if (page.id === 'studio') {
                         innerHTMLContent = `
                             <div class="space-y-4">
+                                <!-- Statistik-Leiste -->
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     <div class="bg-[#030508] p-3 rounded-2xl border border-purple-500/20">
                                         <p class="text-[10px] font-mono text-purple-300 uppercase">Fans</p>
-                                        <p id="studio-fans" class="text-lg font-black text-white font-mono mt-1">10</p>
+                                        <p id="studio-fans" class="text-lg font-black text-white font-mono mt-1">5</p>
                                     </div>
                                     <div class="bg-[#030508] p-3 rounded-2xl border border-cyan-500/20">
                                         <p class="text-[10px] font-mono text-cyan-300 uppercase">Hype</p>
@@ -351,17 +371,89 @@
                                         <p id="studio-releases" class="text-lg font-black text-white font-mono mt-1">0</p>
                                     </div>
                                     <div class="bg-[#030508] p-3 rounded-2xl border border-emerald-500/20">
-                                        <p class="text-[10px] font-mono text-emerald-300 uppercase">Wachstum</p>
-                                        <p id="studio-fps" class="text-lg font-black text-emerald-400 font-mono mt-1">+0 /s</p>
+                                        <p class="text-[10px] font-mono text-emerald-300 uppercase">Wachstum /s</p>
+                                        <p id="studio-fps" class="text-lg font-black text-emerald-400 font-mono mt-1">+0</p>
                                     </div>
                                 </div>
 
+                                <!-- Releases (Aktive Produktion mit harten Kosten/Ertrags-Verhältnissen) -->
                                 <div class="bg-[#030508]/80 p-5 rounded-2xl border border-purple-500/30 space-y-3">
-                                    <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">🎧 Neuen Track veröffentlichen</h3>
+                                    <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">🎧 Musik-Releases (Manuell)</h3>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                        <button type="button" id="release-rock-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">🎸 Rock-Single (+15 Fans)</button>
-                                        <button type="button" id="release-hiphop-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">🎤 Hip-Hop Beat (+30 Fans)</button>
-                                        <button type="button" id="release-album-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">💿 Album Drop (+100 Fans)</button>
+                                        <button type="button" id="release-rock-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">🎸 Underground Single (+8 Fans)</button>
+                                        <button type="button" id="release-hiphop-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">🎤 Street Beat (+20 Fans)</button>
+                                        <button type="button" id="release-album-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">💿 Studio Album (+75 Fans)</button>
+                                    </div>
+                                </div>
+
+                                <!-- Upgrades Matrix (Schwer & Viele Möglichkeiten mit exponentieller Kostensteigerung) -->
+                                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                                    <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">📈 Studio-Upgrades &amp; Expansion</h3>
+                                    <div class="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
+                                        
+                                        <!-- Upgrade 1 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">📢 Social-Media Kampagne (Lvl <span id="market-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+1 Fan/s | Kosten: <span id="market-cost">35</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-market-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- Upgrade 2 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🎛️ High-End Mastering Suite (Lvl <span id="studio-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+4 Fans/s | Kosten: <span id="studio-cost">150</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-studio-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- Upgrade 3 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🎹 Ghostproducer-Team (Lvl <span id="producer-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+12 Fans/s | Kosten: <span id="producer-cost">600</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-producer-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- Upgrade 4 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">📰 PR-Agentur &amp; Management (Lvl <span id="pr-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+15% Gesamtwachstum | Kosten: <span id="pr-cost">1200</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-pr-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- Upgrade 5 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🏢 Eigenes Plattenlabel (Lvl <span id="label-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+45 Fans/s | Kosten: <span id="label-cost">4500</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-label-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- Upgrade 6 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">👕 Merchandising-Linie (Lvl <span id="merch-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+120 Fans/s | Kosten: <span id="merch-cost">18000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-merch-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- Upgrade 7 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🌐 Streaming-Algorithmus (Lvl <span id="algo-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+350 Fans/s | Kosten: <span id="algo-cost">75000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-algo-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -371,7 +463,7 @@
                             <div class="space-y-4">
                                 <div class="bg-[#030508]/80 p-5 rounded-2xl border border-cyan-500/30 space-y-4">
                                     <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase">☁️ Externes Backup &amp; Portabilität</h3>
-                                    <p class="text-xs text-slate-300">Sichere deinen Spielstand als Datei ab, um ihn auf anderen Geräten zu importieren.</p>
+                                    <p class="text-xs text-slate-300">Sichere deinen harten Fortschritt als Datei ab, um ihn auf anderen Geräten fortzusetzen.</p>
                                     <div class="flex flex-wrap gap-3 pt-2">
                                         <button type="button" id="btn-export-backup" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow">📥 Backup exportieren (.json)</button>
                                         <label class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow inline-block text-center">
@@ -520,6 +612,9 @@
                         const emailSpan = document.getElementById('admin-current-email');
                         if (emailSpan) emailSpan.innerText = SecureAuth.currentUser || 'Unbekannt';
                     }
+                    if (targetId === 'studio') {
+                        updateStudioUI(SecureAuth.getAccountData());
+                    }
                 }
             }
 
@@ -563,7 +658,6 @@
                 feedbackMsg.innerText = "❌ Verifizierung abgebrochen.";
             });
 
-            // Login / Code anfordern
             document.getElementById('btn-init-login').addEventListener('click', async () => {
                 const email = document.getElementById('login-email').value;
                 const pin = document.getElementById('login-pin').value;
@@ -575,7 +669,6 @@
                 }
             });
 
-            // Registrieren / Code anfordern
             document.getElementById('btn-execute-register').addEventListener('click', async () => {
                 const email = document.getElementById('reg-email').value;
                 const pin = document.getElementById('reg-pin').value;
@@ -587,7 +680,6 @@
                 }
             });
 
-            // Code Bestätigen
             document.getElementById('btn-execute-verify').addEventListener('click', () => {
                 const code = document.getElementById('verify-code-input').value;
                 const res = SecureAuth.finalizeVerification(code);
@@ -669,12 +761,64 @@
                 }
             });
 
-            // Studio Loop
+            // --- HARDCORE STUDIO GAME LOGIC ---
+            
+            // Berechnet das automatische Wachstum pro Sekunde inklusive PR-Multiplikator
+            function getFansPerSec(data) {
+                let base = (data.marketingLevel * 1) + 
+                           (data.studioLevel * 3) + 
+                           (data.producerLevel * 12) + 
+                           (data.labelLevel * 45) + 
+                           (data.merchLevel * 120) + 
+                           (data.algoLevel * 350);
+                
+                // PR-Agentur gibt +15% Boost pro Level
+                let multiplier = 1 + (data.prLevel * 0.15);
+                return Math.floor(base * multiplier);
+            }
+
+            // Kostenberechnungen mit steileren Exponenten (Schwerer!)
+            function getCost(baseCost, factor, level) {
+                return Math.floor(baseCost * Math.pow(factor, level));
+            }
+
+            function updateStudioUI(data) {
+                if (!data) return;
+                const fEl = document.getElementById('studio-fans');
+                const hEl = document.getElementById('studio-hype');
+                const rEl = document.getElementById('studio-releases');
+                const fpsEl = document.getElementById('studio-fps');
+
+                if (fEl) fEl.innerText = Math.floor(data.fans).toLocaleString('de-DE');
+                if (hEl) hEl.innerText = Math.floor(data.hype).toLocaleString('de-DE');
+                if (rEl) rEl.innerText = data.releasesCount;
+                if (fpsEl) fpsEl.innerText = "+" + getFansPerSec(data);
+
+                // Update Levels & Costs
+                const upgrades = [
+                    { id: 'market', base: 35, factor: 1.45, lvl: data.marketingLevel },
+                    { id: 'studio', base: 150, factor: 1.50, lvl: data.studioLevel },
+                    { id: 'producer', base: 600, factor: 1.55, lvl: data.producerLevel },
+                    { id: 'pr', base: 1200, factor: 1.60, lvl: data.prLevel },
+                    { id: 'label', base: 4500, factor: 1.65, lvl: data.labelLevel },
+                    { id: 'merch', base: 18000, factor: 1.70, lvl: data.merchLevel },
+                    { id: 'algo', base: 75000, factor: 1.75, lvl: data.algoLevel }
+                ];
+
+                upgrades.forEach(u => {
+                    const lvlEl = document.getElementById(`${u.id}-lvl`);
+                    const costEl = document.getElementById(`${u.id}-cost`);
+                    if (lvlEl) lvlEl.innerText = u.lvl;
+                    if (costEl) costEl.innerText = getCost(u.base, u.factor, u.lvl).toLocaleString('de-DE');
+                });
+            }
+
+            // Game Loop (jede Sekunde)
             setInterval(() => {
                 if (!SecureAuth.currentUser) return;
                 let data = SecureAuth.getAccountData();
                 if (data) {
-                    let fps = (data.marketingLevel * 2) + (data.studioLevel * 5);
+                    let fps = getFansPerSec(data);
                     if (fps > 0) {
                         data.fans += fps;
                         SecureAuth.saveAccountData(data);
@@ -683,31 +827,49 @@
                 }
             }, 1000);
 
-            function updateStudioUI(data) {
-                const fEl = document.getElementById('studio-fans');
-                const hEl = document.getElementById('studio-hype');
-                const rEl = document.getElementById('studio-releases');
-                const fpsEl = document.getElementById('studio-fps');
-                if (fEl) fEl.innerText = Math.floor(data.fans).toLocaleString('de-DE');
-                if (hEl) hEl.innerText = Math.floor(data.hype).toLocaleString('de-DE');
-                if (rEl) rEl.innerText = data.releasesCount;
-                if (fpsEl) fpsEl.innerText = "+" + ((data.marketingLevel * 2) + (data.studioLevel * 5)) + " /s";
-            }
-
+            // Event-Listener für Releases und Upgrades
             document.addEventListener('click', function(e) {
                 if (!SecureAuth.currentUser) return;
                 let data = SecureAuth.getAccountData();
                 if (!data) return;
 
+                let updated = false;
+
+                // Releases (Manuelle Erträge)
                 if (e.target && e.target.id === 'release-rock-btn') {
-                    data.fans += 15; data.hype += 5; data.releasesCount += 1;
+                    data.fans += 8; data.hype += 2; data.releasesCount += 1; updated = true;
                 } else if (e.target && e.target.id === 'release-hiphop-btn') {
-                    data.fans += 30; data.hype += 12; data.releasesCount += 1;
+                    data.fans += 20; data.hype += 6; data.releasesCount += 1; updated = true;
                 } else if (e.target && e.target.id === 'release-album-btn') {
-                    data.fans += 100; data.hype += 45; data.releasesCount += 1;
+                    data.fans += 75; data.hype += 22; data.releasesCount += 1; updated = true;
                 }
-                SecureAuth.saveAccountData(data);
-                updateStudioUI(data);
+
+                // Upgrades Kauf-Logik
+                const upgradeActions = [
+                    { btn: 'buy-market-btn', key: 'marketingLevel', base: 35, factor: 1.45 },
+                    { btn: 'buy-studio-btn', key: 'studioLevel', base: 150, factor: 1.50 },
+                    { btn: 'buy-producer-btn', key: 'producerLevel', base: 600, factor: 1.55 },
+                    { btn: 'buy-pr-btn', key: 'prLevel', base: 1200, factor: 1.60 },
+                    { btn: 'buy-label-btn', key: 'labelLevel', base: 4500, factor: 1.65 },
+                    { btn: 'buy-merch-btn', key: 'merchLevel', base: 18000, factor: 1.70 },
+                    { btn: 'buy-algo-btn', key: 'algoLevel', base: 75000, factor: 1.75 }
+                ];
+
+                upgradeActions.forEach(act => {
+                    if (e.target && e.target.id === act.btn) {
+                        let cost = getCost(act.base, act.factor, data[act.key]);
+                        if (data.fans >= cost) {
+                            data.fans -= cost;
+                            data[act.key] += 1;
+                            updated = true;
+                        }
+                    }
+                });
+
+                if (updated) {
+                    SecureAuth.saveAccountData(data);
+                    updateStudioUI(data);
+                }
             });
 
             const savedPage = localStorage.getItem('secure_nexus_active_page') || 'home';
