@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | CloudBeats Hyper-Realistic Eco-Nexus</title>
+    <title>jackdarckart | CloudBeats Living Eco-Nexus</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS SDK -->
@@ -18,11 +18,11 @@
             --beat-val: 0;
         }
         .glass-panel {
-            background: linear-gradient(135deg, rgba(6, 12, 24, 0.97) 0%, rgba(2, 4, 10, 0.99) 100%);
+            background: linear-gradient(135deg, rgba(5, 14, 25, 0.97) 0%, rgba(2, 5, 12, 0.99) 100%);
             backdrop-filter: blur(36px);
             -webkit-backdrop-filter: blur(36px);
             border: 1px solid rgba(52, 211, 153, calc(0.35 + (var(--beat-val) * 0.55)));
-            box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.95), 0 0 calc(15px + (var(--beat-val) * 40px)) rgba(52, 211, 153, calc(0.15 + (var(--beat-val) * 0.3))), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.95), 0 0 calc(15px + (var(--beat-val) * 45px)) rgba(52, 211, 153, calc(0.15 + (var(--beat-val) * 0.35))), inset 0 1px 0 rgba(255, 255, 255, 0.12);
             transition: border-color 0.08s ease, box-shadow 0.08s ease;
         }
         .cyber-button {
@@ -65,7 +65,7 @@
             top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none;
             z-index: 0;
-            background: radial-gradient(circle at 50% 35%, rgba(12, 65, 38, calc(0.18 + (var(--beat-val) * 0.32))) 0%, rgba(2, 4, 10, 0.97) 82%);
+            background: radial-gradient(circle at 50% 35%, rgba(10, 60, 35, calc(0.18 + (var(--beat-val) * 0.35))) 0%, rgba(2, 4, 10, 0.97) 82%);
             transform: scale(calc(1 + (var(--beat-val) * 0.05)));
             transition: transform 0.08s ease, background 0.08s ease;
         }
@@ -90,7 +90,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Hyper-Realistic Eco-Engine v60.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Living Eco-Meadow Engine v70.0</span>
                 </div>
             </div>
 
@@ -121,9 +121,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Hyper-Realistic Eco-Sync &amp; Kristallklare Grafik</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Living Eco-Meadow &amp; Vollständiger Beat-Sync</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Erlebe die fotorealistisch erweiterte Garten-Engine mit gestochen scharfen Details, üppiger Flora und absoluter Harmonie im Takt der Musik.
+                        Erlebe die lebendige Wiesen-Engine mit schwingendem Gras, üppiger Flora und absoluter Harmonie im Takt der Musik.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -251,7 +251,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_HYPER_REALISTIC_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_LIVING_MEADOW_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -463,7 +463,7 @@
                                             ← Zum Beat-Lab
                                         </button>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Hyper-Realistic Eco-Sync aktiv</span>
+                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Living Eco-Meadow &amp; Live Beat-Sync aktiv</span>
                                         </div>
                                     </div>
 
@@ -483,8 +483,8 @@
                                         </div>
                                     </div>
 
-                                    <!-- HOCHAUFLÖSENDES, FOTOREALISTISCHES CANVAS -->
-                                    <div id="canvas-container" class="relative w-full h-[560px] sm:h-[750px] rounded-3xl border-2 border-emerald-700/60 overflow-hidden shadow-2xl bg-[#020a05]">
+                                    <!-- GIGANTISCHER, RESPONSIVER CANVAS CONTAINER -->
+                                    <div id="canvas-container" class="relative w-full h-[580px] sm:h-[780px] rounded-3xl border-2 border-emerald-700/60 overflow-hidden shadow-2xl bg-[#020a05]">
                                         <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
                                     </div>
 
@@ -802,7 +802,7 @@
                 }
             });
 
-            // HYPER-REALISTIC ECO-SYNC CANVAS ENGINE
+            // LIVING ECO-MEADOW CANVAS RENDERING ENGINE
             let animationFrameId = null;
             function initGardenScreenCanvas() {
                 const canvas = document.getElementById('garden-canvas');
@@ -839,17 +839,27 @@
                 let smoothBeat = 0;
                 let liliAngle = 0;
 
-                // Feine Naturpartikel (Glühwürmchen & Pollen)
+                // Lebendige Grashalme für den Rasen
+                let grassBlades = [];
+                for(let i=0; i<120; i++) {
+                    grassBlades.push({
+                        xOffsetRatio: Math.random(),
+                        yOffsetRatio: 0.5 + Math.random() * 0.45,
+                        height: 15 + Math.random() * 25,
+                        swaySpeed: 2 + Math.random() * 3
+                    });
+                }
+
+                // Glühwürmchen & Pollen
                 let particles = [];
-                for(let i=0; i<60; i++) {
+                for(let i=0; i<45; i++) {
                     particles.push({
-                        x: Math.random() * 1500,
+                        x: Math.random() * 1000,
                         y: Math.random() * 1000,
-                        speedX: (Math.random() - 0.5) * 0.35,
-                        speedY: (Math.random() - 0.5) * 0.35,
-                        radius: Math.random() * 2.5 + 0.6,
-                        alpha: Math.random() * 0.7 + 0.2,
-                        color: Math.random() > 0.4 ? '#34d399' : '#67e8f9'
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        speedY: (Math.random() - 0.5) * 0.3,
+                        radius: Math.random() * 2.2 + 0.6,
+                        alpha: Math.random() * 0.6 + 0.2
                     });
                 }
 
@@ -886,213 +896,201 @@
                         beatVal = (Math.sin(time * 1.5) + 1) * 0.07;
                     }
 
-                    // Seidenweiche Interpolation für absolut ruckelfreie Harmonie
                     smoothBeat += (beatVal - smoothBeat) * 0.15;
-
-                    // Synchronisation der gesamten Website-Oberfläche
                     document.documentElement.style.setProperty('--beat-val', smoothBeat.toFixed(3));
 
                     const w = displayWidth;
                     const h = displayHeight;
                     const s = w / 1000;
+                    const timeSec = Date.now() / 1000;
 
-                    // 1. Fotorealistischer Tiefengrund
+                    // 1. Tiefgrüner, lebendiger Wiesen-Hintergrund
                     const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-                    bgGrad.addColorStop(0, '#03170e');
-                    bgGrad.addColorStop(0.5, '#020b06');
-                    bgGrad.addColorStop(1, '#010402');
+                    bgGrad.addColorStop(0, '#041f11');
+                    bgGrad.addColorStop(0.6, '#020d06');
+                    bgGrad.addColorStop(1, '#010502');
                     ctx.fillStyle = bgGrad;
                     ctx.fillRect(0, 0, w, h);
 
-                    // Park-Insel mit sanfter Kantenabtönung
-                    ctx.fillStyle = '#062412';
+                    // Park-Rasenfläche mit sanften Kurven
+                    ctx.fillStyle = '#072e17';
                     ctx.beginPath();
-                    ctx.roundRect(50 * s, 50 * s, w - (100 * s), h - (100 * s), 40 * s);
+                    ctx.roundRect(30 * s, 30 * s, w - (60 * s), h - (60 * s), 30 * s);
                     ctx.fill();
 
-                    // Natürliche Parkwege
-                    ctx.strokeStyle = '#0b3819';
-                    ctx.lineWidth = 65 * s;
+                    // Organisch geschwungene Parkwege (für Hoch- und Querformat optimiert)
+                    ctx.strokeStyle = '#0b3d1f';
+                    ctx.lineWidth = 45 * s;
                     ctx.lineCap = 'round';
                     ctx.beginPath();
-                    ctx.moveTo(w * 0.18, h - 50);
-                    ctx.quadraticCurveTo(w * 0.36, h * 0.58, w * 0.5, h * 0.5);
-                    ctx.quadraticCurveTo(w * 0.72, h * 0.36, w * 0.88, 50);
+                    ctx.moveTo(w * 0.25, h - 30);
+                    ctx.bezierCurveTo(w * 0.25, h * 0.5, w * 0.75, h * 0.5, w * 0.75, 30);
                     ctx.stroke();
 
-                    // 2. Glühwürmchen & Pollen
+                    // 2. LEBENDIGES GRAS (Schwingt im Wind & Takt)
+                    grassBlades.forEach(g => {
+                        let gx = g.xOffsetRatio * w;
+                        let gy = g.yOffsetRatio * h;
+                        let windSway = Math.sin(timeSec * g.swaySpeed + gx) * (4 + smoothBeat * 8);
+                        
+                        ctx.strokeStyle = '#10b981';
+                        ctx.lineWidth = 1.8 * s;
+                        ctx.beginPath();
+                        ctx.moveTo(gx, gy);
+                        ctx.quadraticCurveTo(gx + windSway, gy - (g.height * s * 0.5), gx + (windSway * 1.5), gy - (g.height * s));
+                        ctx.stroke();
+                    });
+
+                    // 3. Glühwürmchen
                     particles.forEach(p => {
                         p.x += p.speedX;
                         p.y += p.speedY;
                         if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
                         if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
 
-                        ctx.fillStyle = p.color;
-                        ctx.globalAlpha = Math.min(1, p.alpha + smoothBeat * 0.35);
+                        ctx.fillStyle = `rgba(52, 211, 153, ${Math.min(1, p.alpha + smoothBeat * 0.4)})`;
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, (p.radius + smoothBeat * 1.2) * s, 0, Math.PI * 2);
                         ctx.fill();
-                        ctx.globalAlpha = 1.0;
                     });
 
-                    // 3. Fotorealistische Baumgruppen mit Schattierung
-                    let treeCount = Math.min(15, userAcc.baumeLevel + 6);
+                    // 4. Bäume & üppige Baumkronen
+                    let treeCount = Math.min(14, userAcc.baumeLevel + 5);
                     for (let i = 0; i < treeCount; i++) {
-                        let tx = (120 + (i % 4) * 72) * s;
-                        let ty = (120 + Math.floor(i / 4) * 68) * s;
-                        let treeRadius = (36 + (smoothBeat * 7)) * s;
+                        let tx = (90 + (i % 3) * 120) * s;
+                        let ty = (80 + Math.floor(i / 3) * 90) * s;
+                        let treeRadius = (28 + (smoothBeat * 6)) * s;
 
-                        // Ambient Baumschatten
-                        ctx.fillStyle = `rgba(3, 15, 8, ${0.4 + smoothBeat * 0.2})`;
-                        ctx.beginPath();
-                        ctx.arc(tx + (5 * s), ty + (15 * s), treeRadius * 1.3, 0, Math.PI * 2);
-                        ctx.fill();
-
-                        // Baum-Aura im Takt
                         ctx.fillStyle = `rgba(52, 211, 153, ${0.1 + smoothBeat * 0.25})`;
                         ctx.beginPath();
-                        ctx.arc(tx, ty, treeRadius * 1.65, 0, Math.PI * 2);
+                        ctx.arc(tx, ty, treeRadius * 1.5, 0, Math.PI * 2);
                         ctx.fill();
 
-                        // Stamm
                         ctx.fillStyle = '#2c1202';
-                        ctx.fillRect(tx - (5 * s), ty, 10 * s, 40 * s);
-
-                        // Blattwerk-Schichten
-                        ctx.fillStyle = '#022610';
-                        ctx.beginPath();
-                        ctx.arc(tx, ty, Math.max(15, treeRadius), 0, Math.PI * 2);
-                        ctx.fill();
+                        ctx.fillRect(tx - (4 * s), ty, 8 * s, 30 * s);
 
                         ctx.fillStyle = '#047857';
                         ctx.beginPath();
-                        ctx.arc(tx, ty - (5 * s), Math.max(12, treeRadius * 0.8), 0, Math.PI * 2);
+                        ctx.arc(tx, ty, Math.max(12, treeRadius), 0, Math.PI * 2);
                         ctx.fill();
 
                         ctx.fillStyle = '#34d399';
                         ctx.beginPath();
-                        ctx.arc(tx - (4 * s), ty - (8 * s), Math.max(4, treeRadius * 0.4), 0, Math.PI * 2);
+                        ctx.arc(tx - (3 * s), ty - (4 * s), Math.max(3, treeRadius * 0.4), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
-                    // 4. Studio & Essentials Matrix (Unten links)
+                    // 5. Studio Matrix (Unten links)
                     ctx.fillStyle = '#030a17';
                     ctx.strokeStyle = '#2563eb';
-                    ctx.lineWidth = 3 * s;
+                    ctx.lineWidth = 2.5 * s;
                     ctx.beginPath();
-                    ctx.roundRect(80 * s, h - (250 * s), 170 * s, 140 * s, 20 * s);
+                    ctx.roundRect(50 * s, h - (175 * s), 130 * s, 110 * s, 14 * s);
                     ctx.fill();
                     ctx.stroke();
 
                     for (let gx = 0; gx < 4; gx++) {
                         for (let gy = 0; gy < 3; gy++) {
                             ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1d4ed8';
-                            ctx.fillRect((95 + gx * 35) * s, (h - 225 + gy * 35) * s, 23 * s, 21 * s);
+                            ctx.fillRect((60 + gx * 27) * s, (h - 158 + gy * 27) * s, 18 * s, 16 * s);
                         }
                     }
 
-                    // 5. HOCHDETAILLIERTES STAUDEN- & BLUMENPARADIES (Zentriert)
-                    let dotCount = 140 * userAcc.staudenLevel;
-                    let centerX = w * 0.52;
+                    // 6. BLUMENPARADIES / STAUDEN (Zentriert im perfekten Einklang mit der Musik)
+                    let dotCount = 100 * userAcc.staudenLevel;
+                    let centerX = w * 0.5;
                     let centerY = h * 0.52;
-                    const colorPalette = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc', '#34d399', '#facc15'];
+                    const colorPalette = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc', '#34d399'];
 
                     for (let d = 0; d < dotCount; d++) {
                         let angle = d * 137.5;
-                        let r = Math.sqrt(d) * 17 * s;
-                        let dx = centerX + Math.cos(angle + (smoothBeat * 0.09)) * r;
-                        let dy = centerY + Math.sin(angle) * r * 0.78;
+                        let r = Math.sqrt(d) * 12 * s;
+                        let dx = centerX + Math.cos(angle + (smoothBeat * 0.1)) * r;
+                        let dy = centerY + Math.sin(angle) * r * 0.75;
 
                         ctx.fillStyle = colorPalette[d % colorPalette.length];
-                        let flowerSize = (5.8 + (smoothBeat * 2.8)) * s;
+                        let flowerSize = (4.5 + (smoothBeat * 2.5)) * s;
                         ctx.beginPath();
                         ctx.arc(dx, dy, Math.max(2, flowerSize), 0, Math.PI * 2);
                         ctx.fill();
 
-                        // Leuchtender Blütenkern
                         ctx.fillStyle = '#ffffff';
                         ctx.beginPath();
-                        ctx.arc(dx, dy, Math.max(1, flowerSize * 0.32), 0, Math.PI * 2);
+                        ctx.arc(dx, dy, Math.max(1, flowerSize * 0.3), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
-                    // 6. KRISTALLKLARER KLANG-TEICH (Mit Seerosen & Wellen)
-                    let pondX = w - (260 * s);
-                    let pondY = h * 0.38;
-                    let pondRx = (130 + (smoothBeat * 14)) * s;
-                    let pondRy = (75 + (smoothBeat * 8)) * s;
+                    // 7. KLANG-TEICH (Rechts oben) mit Seerosen
+                    let pondX = w - (170 * s);
+                    let pondY = h * 0.35;
+                    let pondRx = (85 + (smoothBeat * 10)) * s;
+                    let pondRy = (50 + (smoothBeat * 6)) * s;
 
-                    for (let r = 5; r >= 1; r--) {
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * r + smoothBeat * 0.16})`;
-                        ctx.lineWidth = 3 * s;
+                    for (let r = 4; r >= 1; r--) {
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.07 * r + smoothBeat * 0.15})`;
+                        ctx.lineWidth = 2.5 * s;
                         ctx.beginPath();
-                        ctx.ellipse(pondX, pondY, pondRx + (r * 22 * smoothBeat * s), pondRy + (r * 14 * smoothBeat * s), 0, 0, Math.PI * 2);
+                        ctx.ellipse(pondX, pondY, pondRx + (r * 15 * smoothBeat * s), pondRy + (r * 10 * smoothBeat * s), 0, 0, Math.PI * 2);
                         ctx.stroke();
                     }
 
                     ctx.fillStyle = '#0284c7';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(30, pondRx), Math.max(17, pondRy), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(22, pondRx), Math.max(12, pondRy), 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#38bdf8';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(14, pondRx * 0.65), Math.max(8, pondRy * 0.65), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(10, pondRx * 0.65), Math.max(6, pondRy * 0.65), 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Seerosenblätter auf dem Teich
+                    // Seerosenblatt
                     ctx.fillStyle = '#065f46';
                     ctx.beginPath();
-                    ctx.arc(pondX - (30 * s), pondY - (10 * s), 10 * s, 0, Math.PI * 1.5);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(pondX + (25 * s), pondY + (12 * s), 8 * s, 0.5, Math.PI * 2);
+                    ctx.arc(pondX - (20 * s), pondY - (5 * s), 7 * s, 0, Math.PI * 1.5);
                     ctx.fill();
 
-                    // 7. LILI (JACK RUSSELL) HÜPFT GESCHMEIDIG & LEBENDIG IM TAKT
+                    // 8. LILI (JACK RUSSELL) SCHWENKT LEBENDIG IM TAKT
                     liliAngle += 0.009 * s;
-                    let liliX = centerX + Math.cos(liliAngle) * (310 * s);
-                    let liliY = centerY + Math.sin(liliAngle * 2) * (110 * s) + (45 * s);
+                    let liliX = centerX + Math.cos(liliAngle) * (200 * s);
+                    let liliY = centerY + Math.sin(liliAngle * 2) * (70 * s) + (30 * s);
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
-                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (14 * smoothBeat * s);
+                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (10 * smoothBeat * s);
                     ctx.translate(0, jumpOffset);
 
-                    ctx.font = `${Math.max(40, 52 * s)}px sans-serif`;
+                    ctx.font = `${Math.max(34, 44 * s)}px sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // 8. UNTEN: Edle Designer-Terrasse
-                    let terraceW = 540 * s;
-                    let terraceH = 120 * s;
+                    // 9. TERRASSE & LOUNGE (Unten)
+                    let terraceW = 380 * s;
+                    let terraceH = 85 * s;
                     let terraceX = (w / 2) - (terraceW / 2);
-                    let terraceY = h - terraceH - (55 * s);
+                    let terraceY = h - terraceH - (35 * s);
 
                     ctx.fillStyle = '#4a2210';
                     ctx.strokeStyle = '#f59e0b';
-                    ctx.lineWidth = 4 * s;
+                    ctx.lineWidth = 3 * s;
                     ctx.beginPath();
-                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 20 * s);
+                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 16 * s);
                     ctx.fill();
                     ctx.stroke();
 
                     ctx.strokeStyle = '#281106';
-                    ctx.lineWidth = 2 * s;
-                    for (let lx = terraceX + (48 * s); lx < terraceX + terraceW; lx += 48 * s) {
+                    ctx.lineWidth = 1.5 * s;
+                    for (let lx = terraceX + (35 * s); lx < terraceX + terraceW; lx += 35 * s) {
                         ctx.beginPath();
                         ctx.moveTo(lx, terraceY);
                         ctx.lineTo(lx, terraceY + terraceH);
                         ctx.stroke();
                     }
 
-                    // Moderner Lounge-Tisch
                     ctx.fillStyle = '#020617';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (65 * s), terraceY + (terraceH / 2) - (20 * s), 130 * s, 40 * s);
-                    ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (55 * s), terraceY + (terraceH / 2) - (14 * s), 110 * s, 28 * s);
+                    ctx.fillRect(terraceX + (terraceW / 2) - (45 * s), terraceY + (terraceH / 2) - (12 * s), 90 * s, 24 * s);
                 }
 
                 renderLoop();
