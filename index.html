@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>jackdarckart | Nexus v103.0</title>
+    <title>jackdarckart | Quantum Nexus v104.0</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS SDK -->
@@ -101,7 +101,7 @@
                     </div>
                     <div>
                         <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-cyan-400 via-teal-300 to-pink-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                        <span class="text-[9px] font-mono text-slate-400 tracking-wider">Cybernetic Player v103.0</span>
+                        <span class="text-[9px] font-mono text-slate-400 tracking-wider">Cybernetic Player v104.0</span>
                     </div>
                 </div>
                 <button type="button" id="btn-toggle-nav-bar" class="cyber-button sm:hidden bg-slate-900 text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded-lg text-[10px] font-mono cursor-pointer">👁️ Menü</button>
@@ -127,23 +127,68 @@
 
     <!-- Main Content -->
     <main class="w-full flex-grow p-2 sm:p-6 my-auto text-center relative z-10">
-        <div id="views-container" class="w-full h-full">
+        <div id="views-container" class="w-full h-full flex items-center justify-center">
             
-            <!-- 1. STARTSEITE -->
-            <section id="view-home" class="view-section space-y-6 text-left w-full max-w-7xl mx-auto">
-                <div class="glass-panel p-6 sm:p-12 rounded-[2.5rem] text-center relative overflow-hidden w-full">
-                    <div class="absolute -top-16 -right-16 w-80 h-80 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="absolute -bottom-16 -left-16 w-80 h-80 bg-pink-600/15 rounded-full blur-3xl pointer-events-none"></div>
+            <!-- 1. STARTSEITE MIT INTEGRIERTEM WEBRADIO PLAYER -->
+            <section id="view-home" class="view-section space-y-6 text-left w-full max-w-3xl mx-auto">
+                <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden bg-gradient-to-b from-[#020c14]/98 via-[#01050a]/99 to-[#000103] shadow-2xl w-full flex flex-col space-y-6">
                     
-                    <span class="inline-block text-5xl p-5 bg-gradient-to-tr from-cyan-600/20 to-pink-600/20 rounded-3xl mb-5 border border-cyan-500/40 shadow-inner neon-pulse">🌐</span>
-                    <h1 class="text-3xl sm:text-6xl font-black tracking-tight mb-4 bg-gradient-to-r from-white via-cyan-200 to-pink-300 bg-clip-text text-transparent">Quantum Cybernetic Sphere</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Integrierter Webplayer &amp; Empire Studio Matrix</p>
-                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-3xl mx-auto font-light mb-8">
-                        Erlebe den exklusiven, eingebetteten Quanten-Webplayer im Garten-Bereich mit Echtzeit-Visualisierung im Takt der Musik.
-                    </p>
-                    <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-                        <!-- Dynamisch -->
+                    <div class="absolute -top-20 -right-20 w-60 h-60 bg-cyan-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <!-- Header & Live Indicator -->
+                    <div class="flex justify-between items-center border-b border-cyan-500/20 pb-3 w-full relative z-10">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/25 neon-pulse">
+                                <div class="w-full h-full bg-[#010206] rounded-[10px] flex items-center justify-center text-sm">🎧</div>
+                            </div>
+                            <div>
+                                <span class="font-black text-[11px] tracking-widest uppercase bg-gradient-to-r from-cyan-400 via-teal-300 to-pink-400 bg-clip-text text-transparent block">jackdarckart</span>
+                                <span class="text-[8px] font-mono text-slate-400 tracking-wider">laut.fm/jackdarckart</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 bg-[#010206] px-3 py-1 rounded-xl border border-cyan-500/20 shadow-inner">
+                            <span class="text-[8px] font-mono text-cyan-400 mr-1 tracking-widest">LIVE</span>
+                            <div class="w-1 bg-cyan-500 rounded-full wave-bar"></div>
+                            <div class="w-1 bg-teal-500 rounded-full wave-bar"></div>
+                            <div class="w-1 bg-pink-500 rounded-full wave-bar"></div>
+                        </div>
                     </div>
+
+                    <!-- Live Track Titel -->
+                    <div class="text-center space-y-1 relative z-10">
+                        <span class="text-[9px] font-mono text-cyan-400 uppercase tracking-widest font-bold">Aktueller Song im Webradio</span>
+                        <h2 id="radio-track-title" class="text-sm sm:text-base font-bold text-white font-mono tracking-wide truncate px-2">Verbindung wird aufgebaut...</h2>
+                    </div>
+
+                    <!-- LIVE 3D VISUALIZER CANVAS -->
+                    <div id="canvas-container" class="relative w-full h-[320px] sm:h-[400px] rounded-3xl border border-cyan-500/50 overflow-hidden shadow-2xl bg-[#010307]">
+                        <canvas id="home-canvas" class="w-full h-full block cursor-pointer"></canvas>
+                        <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                            <span class="text-[9px] font-mono text-cyan-400/30 uppercase tracking-widest">Quantum Audio Matrix</span>
+                        </div>
+                    </div>
+
+                    <!-- Controls & Volume -->
+                    <div class="space-y-3 relative z-10">
+                        <button type="button" id="home-play-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-500 text-white font-black py-3.5 px-6 rounded-2xl text-xs sm:text-sm uppercase tracking-widest cursor-pointer shadow-xl shadow-cyan-500/40 flex items-center justify-center gap-3">
+                            <span id="play-icon" class="text-base">▶</span> <span id="play-text">Stream Abspielen</span>
+                        </button>
+
+                        <div class="flex items-center justify-between bg-[#010206]/80 px-4 py-2.5 rounded-2xl border border-cyan-500/20 shadow-inner">
+                            <div class="flex items-center gap-2 text-[11px] font-mono text-slate-300">
+                                <span>🔊</span> <span>Lautstärke</span>
+                            </div>
+                            <input type="range" id="home-volume" min="0" max="1" step="0.05" value="0.8" class="w-32 sm:w-40 accent-cyan-500 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <audio id="home-audio" crossorigin="anonymous" preload="auto">
+                        <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
+                        <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
+                    </audio>
+
                 </div>
             </section>
 
@@ -164,7 +209,7 @@
                             <p id="auth-logged-email" class="text-xs font-bold text-cyan-300 font-mono"></p>
                         </div>
                         <button type="button" id="btn-auth-logout" class="cyber-button w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🚪 Sicher Abmelden</button>
-                        <button type="button" id="btn-auth-to-garden" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🌐 Zum Webplayer</button>
+                        <button type="button" id="btn-auth-to-home" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎧 Zum Webplayer</button>
                     </div>
 
                     <div id="subform-login" class="space-y-3">
@@ -240,7 +285,7 @@
     <footer class="w-full border-t border-cyan-500/20 py-3 px-4 bg-[#010206] text-center relative z-10">
         <div class="w-full max-w-7xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
             <span id="session-status-badge" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt</span>
-            <span class="text-cyan-400/90 font-bold tracking-wider">jackdarckart • Prime Elite Nexus</span>
+            <span class="text-cyan-400/90 font-bold tracking-wider">jackdarckart • laut.fm/jackdarckart</span>
         </div>
     </footer>
 
@@ -284,11 +329,11 @@
                 
                 getDB() {
                     try {
-                        return JSON.parse(localStorage.getItem('secure_nexus_users_db_v103')) || {};
+                        return JSON.parse(localStorage.getItem('secure_nexus_users_db_v104')) || {};
                     } catch(e) { return {}; }
                 },
                 saveDB(db) {
-                    localStorage.setItem('secure_nexus_users_db_v103', JSON.stringify(db));
+                    localStorage.setItem('secure_nexus_users_db_v104', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
                     const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.goldRecords}_JACK_PLAYER_NEXUS_2026`;
@@ -397,23 +442,21 @@
             };
 
             const sitePages = [
-                { id: 'home', name: 'Home', icon: '🏠', desc: 'Öffentliche Startseite', protected: false },
-                { id: 'studio', name: 'Empire Studio', icon: '🎸', desc: 'Schwereres Idle-Game & Upgrades', protected: true },
-                { id: 'garden', name: '3D Audio-Sphere', icon: '🌐', desc: 'Quantum Web Player', protected: true },
+                { id: 'home', name: 'Home / Player', icon: '🎧', desc: 'Quantum Web Player & Live Stream', protected: false },
+                { id: 'studio', name: 'Empire Studio', icon: '🎸', desc: 'Idle-Game & Upgrades', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
 
             const navContainer = document.getElementById('navbar-container');
-            const homeGrid = document.getElementById('home-buttons-grid');
             const viewsContainer = document.getElementById('views-container');
 
             sitePages.forEach(page => {
                 if (page.id !== 'home') {
                     const section = document.createElement('section');
                     section.id = `view-${page.id}`;
-                    section.className = 'view-section hidden space-y-4 text-left w-full h-full';
+                    section.className = 'view-section hidden space-y-4 text-left w-full h-full max-w-4xl mx-auto';
                     
                     let innerHTMLContent = `<p class="text-xs text-slate-300 font-mono">Geschützter Bereich für ${page.name}.</p>`;
                     
@@ -452,68 +495,6 @@
                                     <div id="upgrades-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
                                         <!-- Dynamisch -->
                                     </div>
-                                </div>
-                            </div>
-                        `;
-                    } else if (page.id === 'garden') {
-                        // EXKLUSIV NUR DER NEUE WEBPLAYER IM GARTEN-BEREICH (ALLES ALTE GELÖSCHT)
-                        innerHTMLContent = `
-                            <div class="space-y-6 w-full h-full flex flex-col max-w-3xl mx-auto">
-                                <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden bg-gradient-to-b from-[#020c14]/98 via-[#01050a]/99 to-[#000103] shadow-2xl w-full flex-grow flex flex-col space-y-6">
-                                    
-                                    <!-- Header Info & Live Indicator -->
-                                    <div class="flex justify-between items-center border-b border-cyan-500/20 pb-3 w-full">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/25 neon-pulse">
-                                                <div class="w-full h-full bg-[#010206] rounded-[10px] flex items-center justify-center text-sm">🎧</div>
-                                            </div>
-                                            <div>
-                                                <span class="font-black text-[11px] tracking-widest uppercase bg-gradient-to-r from-cyan-400 via-teal-300 to-pink-400 bg-clip-text text-transparent block">Quantum Player</span>
-                                                <span class="text-[8px] font-mono text-slate-400 tracking-wider">Realtime Sync Matrix</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="flex items-center gap-1.5 bg-[#010206] px-3 py-1 rounded-xl border border-cyan-500/20 shadow-inner">
-                                            <span class="text-[8px] font-mono text-cyan-400 mr-1 tracking-widest">LIVE</span>
-                                            <div class="w-1 bg-cyan-500 rounded-full wave-bar"></div>
-                                            <div class="w-1 bg-teal-500 rounded-full wave-bar"></div>
-                                            <div class="w-1 bg-pink-500 rounded-full wave-bar"></div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Live Track Titel -->
-                                    <div class="text-center space-y-1 relative z-10">
-                                        <span class="text-[9px] font-mono text-cyan-400 uppercase tracking-widest font-bold">stream-musik.space WebRadio</span>
-                                        <h2 id="radio-track-title" class="text-sm sm:text-base font-bold text-white font-mono tracking-wide truncate px-2">Verbindung wird aufgebaut...</h2>
-                                    </div>
-
-                                    <!-- LIVE 3D VISUALIZER CANVAS (Im Garten-Player) -->
-                                    <div id="canvas-container" class="relative w-full h-[320px] sm:h-[380px] rounded-3xl border border-cyan-500/50 overflow-hidden shadow-2xl bg-[#010307]">
-                                        <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
-                                        <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
-                                            <span class="text-[9px] font-mono text-cyan-400/30 uppercase tracking-widest">Quantum Audio Matrix</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Controls & Volume -->
-                                    <div class="space-y-3 relative z-10">
-                                        <button type="button" id="garden-play-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-500 text-white font-black py-3.5 px-6 rounded-2xl text-xs sm:text-sm uppercase tracking-widest cursor-pointer shadow-xl shadow-cyan-500/40 flex items-center justify-center gap-3">
-                                            <span id="play-icon" class="text-base">▶</span> <span id="play-text">Stream Abspielen</span>
-                                        </button>
-
-                                        <div class="flex items-center justify-between bg-[#010206]/80 px-4 py-2.5 rounded-2xl border border-cyan-500/20 shadow-inner">
-                                            <div class="flex items-center gap-2 text-[11px] font-mono text-slate-300">
-                                                <span>🔊</span> <span>Lautstärke</span>
-                                            </div>
-                                            <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-32 sm:w-40 accent-cyan-500 cursor-pointer">
-                                        </div>
-                                    </div>
-
-                                    <audio id="garden-audio" crossorigin="anonymous" preload="auto">
-                                        <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
-                                        <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
-                                    </audio>
-
                                 </div>
                             </div>
                         `;
@@ -565,7 +546,7 @@
                                 </div>
                             </div>
                             ${innerHTMLContent}
-                            <button type="button" class="back-to-home cyber-button w-full sm:w-auto bg-slate-900 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-mono border border-slate-800 cursor-pointer mt-4">← Zurück zur Startseite</button>
+                            <button type="button" class="back-to-home cyber-button w-full sm:w-auto bg-slate-900 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-mono border border-slate-800 cursor-pointer mt-4">← Zum Webplayer (Home)</button>
                         </div>
                     `;
                     viewsContainer.appendChild(section);
@@ -591,26 +572,6 @@
                 navContainer.appendChild(authBtn);
             }
             renderNavbar();
-
-            sitePages.forEach(page => {
-                if (page.id !== 'home') {
-                    const card = document.createElement('button');
-                    card.type = 'button';
-                    card.className = 'cyber-button nav-link glass-panel p-6 rounded-3xl border border-cyan-500/20 text-left hover:border-cyan-500/60 cursor-pointer transition flex flex-col justify-between group w-full';
-                    card.dataset.target = page.id;
-                    card.innerHTML = `
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-4xl p-3 bg-cyan-600/10 rounded-2xl border border-cyan-500/20 group-hover:scale-110 transition">${page.icon}</span>
-                            <span class="text-xs font-mono text-cyan-400 uppercase tracking-widest">${page.protected ? '🔒 Aktiv' : '🌐 Öffentlich'}</span>
-                        </div>
-                        <div>
-                            <div class="text-sm font-bold text-white font-mono">${page.name}</div>
-                            <div class="text-[11px] text-slate-400 mt-1">${page.desc}</div>
-                        </div>
-                    `;
-                    homeGrid.appendChild(card);
-                }
-            });
 
             function updateFooterStatus() {
                 const badge = document.getElementById('session-status-badge');
@@ -672,7 +633,7 @@
                         if (emailSpan) emailSpan.innerText = SecureAuth.currentUser || 'Unbekannt';
                     }
                     if (targetId === 'studio') updateStudioUI();
-                    if (targetId === 'garden') initGardenScreenCanvas();
+                    if (targetId === 'home') initHomeScreenCanvas();
                 }
             }
 
@@ -846,7 +807,7 @@
                         renderNavbar();
                         updateFooterStatus();
                         updateAuthPortalUI();
-                        setTimeout(() => switchView('garden'), 800);
+                        setTimeout(() => switchView('home'), 800);
                     }
                 }
                 if (e.target && e.target.id === 'btn-execute-reset') {
@@ -864,8 +825,8 @@
                     feedbackMsg.innerText = "✅ Erfolgreich abgemeldet.";
                     setTimeout(() => switchView('home'), 800);
                 }
-                if (e.target && e.target.id === 'btn-auth-to-garden') {
-                    switchView('garden');
+                if (e.target && e.target.id === 'btn-auth-to-home') {
+                    switchView('home');
                 }
                 if (e.target && e.target.id === 'btn-export-backup') {
                     if (!SecureAuth.currentUser) return;
@@ -899,19 +860,19 @@
                             renderNavbar();
                             updateFooterStatus();
                             document.getElementById('backup-status-msg').innerText = `✅ Backup importiert!`;
-                            setTimeout(() => switchView('garden'), 1000);
+                            setTimeout(() => switchView('home'), 1000);
                         } catch (err) { alert("❌ Import-Fehler."); }
                     };
                     reader.readAsText(file);
                 }
             });
 
-            // QUANTUM CYBERNETIC EMBEDDED GARDEN PLAYER ENGINE
+            // QUANTUM CYBERNETIC HOME WEBPLAYER ENGINE
             let animationFrameId = null;
-            function initGardenScreenCanvas() {
-                const canvas = document.getElementById('garden-canvas');
+            function initHomeScreenCanvas() {
+                const canvas = document.getElementById('home-canvas');
                 const container = document.getElementById('canvas-container');
-                const audio = document.getElementById('garden-audio');
+                const audio = document.getElementById('home-audio');
                 if (!canvas || !container) return;
 
                 const ctx = canvas.getContext('2d');
@@ -1110,9 +1071,9 @@
             }
 
             document.addEventListener('click', function(e) {
-                const playBtn = e.target.closest('#garden-play-btn');
+                const playBtn = e.target.closest('#home-play-btn');
                 if (playBtn) {
-                    const audio = document.getElementById('garden-audio');
+                    const audio = document.getElementById('home-audio');
                     const playIcon = document.getElementById('play-icon');
                     const playText = document.getElementById('play-text');
                     if (audio) {
@@ -1134,8 +1095,8 @@
             });
 
             document.addEventListener('input', function(e) {
-                if (e.target && e.target.id === 'garden-volume') {
-                    const audio = document.getElementById('garden-audio');
+                if (e.target && e.target.id === 'home-volume') {
+                    const audio = document.getElementById('home-audio');
                     if (audio) audio.volume = e.target.value;
                 }
             });
@@ -1152,7 +1113,7 @@
                     }
                 } catch(e) {
                     const displayEl = document.getElementById('radio-track-title');
-                    if (displayEl) displayEl.textContent = 'jackdarckart • stream-musik.space Live Stream';
+                    if (displayEl) displayEl.textContent = 'jackdarckart • laut.fm/jackdarckart';
                 }
             }
 
