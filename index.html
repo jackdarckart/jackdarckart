@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | CloudBeats Living Eco-Nexus</title>
+    <title>jackdarckart | CloudBeats Quantum Eco-Nexus</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS SDK -->
@@ -18,11 +18,11 @@
             --beat-val: 0;
         }
         .glass-panel {
-            background: linear-gradient(135deg, rgba(5, 14, 25, 0.97) 0%, rgba(2, 5, 12, 0.99) 100%);
-            backdrop-filter: blur(36px);
-            -webkit-backdrop-filter: blur(36px);
-            border: 1px solid rgba(52, 211, 153, calc(0.35 + (var(--beat-val) * 0.55)));
-            box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.95), 0 0 calc(15px + (var(--beat-val) * 45px)) rgba(52, 211, 153, calc(0.15 + (var(--beat-val) * 0.35))), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            background: linear-gradient(135deg, rgba(4, 12, 22, 0.98) 0%, rgba(1, 4, 10, 0.99) 100%);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(52, 211, 153, calc(0.35 + (var(--beat-val) * 0.6)));
+            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.96), 0 0 calc(18px + (var(--beat-val) * 50px)) rgba(52, 211, 153, calc(0.15 + (var(--beat-val) * 0.4))), inset 0 1px 0 rgba(255, 255, 255, 0.14);
             transition: border-color 0.08s ease, box-shadow 0.08s ease;
         }
         .cyber-button {
@@ -31,27 +31,27 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .cyber-button:hover {
-            box-shadow: 0 0 28px rgba(52, 211, 153, 0.5);
-            border-color: rgba(52, 211, 153, 0.9);
+            box-shadow: 0 0 30px rgba(52, 211, 153, 0.55);
+            border-color: rgba(52, 211, 153, 0.95);
         }
         .cyber-button:active { transform: scale(0.98); }
         .cyber-button:disabled { opacity: 0.3; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; border-color: rgba(255,255,255,0.05) !important; animation: none !important; }
         
         @keyframes pulse-glow {
-            0%, 100% { opacity: 1; filter: drop-shadow(0 0 16px rgba(52, 211, 153, 0.85)); }
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 18px rgba(52, 211, 153, 0.9)); }
             50% { opacity: 0.6; filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.3)); }
         }
         .neon-pulse { animation: pulse-glow 3s infinite ease-in-out; }
 
         @keyframes affordable-pulse {
-            0%, 100% { box-shadow: 0 0 16px rgba(52, 211, 153, 0.55), inset 0 0 8px rgba(52, 211, 153, 0.35); border-color: rgba(52, 211, 153, 0.85); }
-            50% { box-shadow: 0 0 35px rgba(52, 211, 153, 0.98), inset 0 0 16px rgba(52, 211, 153, 0.6); border-color: rgba(52, 211, 153, 1); }
+            0%, 100% { box-shadow: 0 0 18px rgba(52, 211, 153, 0.6), inset 0 0 10px rgba(52, 211, 153, 0.4); border-color: rgba(52, 211, 153, 0.9); }
+            50% { box-shadow: 0 0 40px rgba(52, 211, 153, 0.99), inset 0 0 18px rgba(52, 211, 153, 0.65); border-color: rgba(52, 211, 153, 1); }
         }
         .affordable-glow { animation: affordable-pulse 2s infinite ease-in-out; }
 
         @keyframes wave {
             0%, 100% { height: 4px; }
-            50% { height: 28px; }
+            50% { height: 30px; }
         }
         .wave-bar { animation: wave 1.2s ease-in-out infinite; }
         .wave-bar:nth-child(2) { animation-delay: 0.2s; }
@@ -65,36 +65,36 @@
             top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none;
             z-index: 0;
-            background: radial-gradient(circle at 50% 35%, rgba(10, 60, 35, calc(0.18 + (var(--beat-val) * 0.35))) 0%, rgba(2, 4, 10, 0.97) 82%);
-            transform: scale(calc(1 + (var(--beat-val) * 0.05)));
+            background: radial-gradient(circle at 50% 35%, rgba(8, 55, 30, calc(0.2 + (var(--beat-val) * 0.38))) 0%, rgba(1, 3, 8, 0.98) 85%);
+            transform: scale(calc(1 + (var(--beat-val) * 0.055)));
             transition: transform 0.08s ease, background 0.08s ease;
         }
 
         ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(2, 4, 10, 0.5); }
+        ::-webkit-scrollbar-track { background: rgba(1, 3, 8, 0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.4); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(52, 211, 153, 0.7); }
     </style>
 </head>
-<body class="bg-[#020307] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white relative overflow-x-hidden">
+<body class="bg-[#010307] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white relative overflow-x-hidden">
 
     <!-- Musik-synchroner Ambient-Hintergrund -->
     <div id="page-ambient-bg"></div>
 
     <!-- Header -->
-    <header class="w-full border-b border-emerald-500/20 backdrop-blur-2xl sticky top-0 z-50 bg-[#020307]/90 px-4 py-3 shadow-2xl">
+    <header class="w-full border-b border-emerald-500/20 backdrop-blur-2xl sticky top-0 z-50 bg-[#010307]/90 px-4 py-3 shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/25 neon-pulse">
-                    <div class="w-full h-full bg-[#020307] rounded-[10px] flex items-center justify-center text-base">🌿</div>
+                    <div class="w-full h-full bg-[#010307] rounded-[10px] flex items-center justify-center text-base">🌿</div>
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Living Eco-Meadow Engine v70.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Quantum Eco-Nexus v80.0</span>
                 </div>
             </div>
 
-            <div class="hidden md:flex items-center gap-1.5 bg-[#020307] px-3.5 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
+            <div class="hidden md:flex items-center gap-1.5 bg-[#010307] px-3.5 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
                 <span class="text-[9px] font-mono text-emerald-400 mr-1 tracking-widest">LIVE STREAM</span>
                 <div class="w-1 bg-emerald-500 rounded-full wave-bar"></div>
                 <div class="w-1 bg-teal-500 rounded-full wave-bar"></div>
@@ -121,9 +121,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Living Eco-Meadow &amp; Vollständiger Beat-Sync</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Quantum Eco-Meadow &amp; Vollständiger Beat-Sync</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Erlebe die lebendige Wiesen-Engine mit schwingendem Gras, üppiger Flora und absoluter Harmonie im Takt der Musik.
+                        Erlebe die vollständig erweiterte, ressourcenschonende Web-Architektur mit lebendiger Flora, schwingendem Gras und absolutem Musik-Einklang.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -143,22 +143,22 @@
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
                     <div id="subform-logged" class="space-y-3 hidden">
-                        <div class="bg-[#020307] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
+                        <div class="bg-[#010307] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
                             <p class="text-[10px] font-mono text-slate-400 uppercase">Verifizierter Account</p>
                             <p id="auth-logged-email" class="text-xs font-bold text-emerald-300 font-mono"></p>
                         </div>
                         <button type="button" id="btn-auth-logout" class="cyber-button w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🚪 Sicher Abmelden</button>
-                        <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Elite Studio</button>
+                        <button type="button" id="btn-auth-to-garden" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🌿 Zum Quantum Garten</button>
                     </div>
 
                     <div id="subform-login" class="space-y-3">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="login-email" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="login-email" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
-                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
+                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
                         </div>
                         <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
                         
@@ -174,7 +174,7 @@
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE:</label>
-                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#020307] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
+                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#010307] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
                         </div>
                         <button type="button" id="btn-execute-verify" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✅ Code bestätigen &amp; Einloggen</button>
                         
@@ -186,11 +186,11 @@
                     <div id="subform-register" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="reg-email" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reg-email" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN:</label>
-                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
+                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
                         </div>
                         <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren</button>
                         
@@ -202,11 +202,11 @@
                     <div id="subform-reset" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
-                            <input type="email" id="reset-email" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reset-email" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
-                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
+                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
                         </div>
                         <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Neu Setzen</button>
                         
@@ -221,7 +221,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full border-t border-emerald-500/20 py-3 px-4 bg-[#020307] text-center relative z-10">
+    <footer class="w-full border-t border-emerald-500/20 py-3 px-4 bg-[#010307] text-center relative z-10">
         <div class="max-w-6xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
             <span id="session-status-badge" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt</span>
             <span class="text-emerald-400/90 font-bold tracking-wider">jackdarckart • Prime Elite Nexus</span>
@@ -251,7 +251,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_LIVING_MEADOW_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_QUANTUM_ECO_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -400,12 +400,12 @@
                 }
             };
 
+            // LYRICS ENTFERNT – GARTEN NEU AN DIESER STELLE INTEGRATED
             const sitePages = [
                 { id: 'home', name: 'Home', icon: '🏠', desc: 'Öffentliche Startseite', protected: false },
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
-                { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
+                { id: 'garden', name: 'Garten', icon: '🌿', desc: 'Living Eco-Meadow & Beat-Lab', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
-                { id: 'garden', name: 'Garten', icon: '🌿', desc: 'Interaktiver Garten & Beat-Lab', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
@@ -463,7 +463,7 @@
                                             ← Zum Beat-Lab
                                         </button>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Living Eco-Meadow &amp; Live Beat-Sync aktiv</span>
+                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Quantum Eco-Meadow &amp; Live Beat-Sync aktiv</span>
                                         </div>
                                     </div>
 
@@ -510,6 +510,15 @@
                                             <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
                                         </audio>
                                     </div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (page.id === 'crypto') {
+                        innerHTMLContent = `
+                            <div class="space-y-4">
+                                <div class="glass-panel p-5 rounded-2xl border border-amber-500/30 space-y-4">
+                                    <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🪙 Crypto Staking &amp; Tokenomics Matrix</h3>
+                                    <p class="text-xs text-slate-300">Verwalte deine Hashrates, Cosmos (ATOM) Prämien und Staking-Renditen im Takt.</p>
                                 </div>
                             </div>
                         `;
@@ -754,8 +763,8 @@
                     feedbackMsg.innerText = "✅ Erfolgreich abgemeldet.";
                     setTimeout(() => switchView('home'), 800);
                 }
-                if (e.target && e.target.id === 'btn-auth-to-studio') {
-                    switchView('studio');
+                if (e.target && e.target.id === 'btn-auth-to-garden') {
+                    switchView('garden');
                 }
                 if (e.target && e.target.id === 'btn-export-backup') {
                     if (!SecureAuth.currentUser) return;
@@ -802,7 +811,7 @@
                 }
             });
 
-            // LIVING ECO-MEADOW CANVAS RENDERING ENGINE
+            // QUANTUM ECO-MEADOW CANVAS RENDERING ENGINE
             let animationFrameId = null;
             function initGardenScreenCanvas() {
                 const canvas = document.getElementById('garden-canvas');
@@ -839,26 +848,26 @@
                 let smoothBeat = 0;
                 let liliAngle = 0;
 
-                // Lebendige Grashalme für den Rasen
+                // Lebendige Grashalme
                 let grassBlades = [];
-                for(let i=0; i<120; i++) {
+                for(let i=0; i<130; i++) {
                     grassBlades.push({
                         xOffsetRatio: Math.random(),
-                        yOffsetRatio: 0.5 + Math.random() * 0.45,
-                        height: 15 + Math.random() * 25,
+                        yOffsetRatio: 0.45 + Math.random() * 0.5,
+                        height: 16 + Math.random() * 26,
                         swaySpeed: 2 + Math.random() * 3
                     });
                 }
 
                 // Glühwürmchen & Pollen
                 let particles = [];
-                for(let i=0; i<45; i++) {
+                for(let i=0; i<50; i++) {
                     particles.push({
                         x: Math.random() * 1000,
                         y: Math.random() * 1000,
                         speedX: (Math.random() - 0.5) * 0.3,
                         speedY: (Math.random() - 0.5) * 0.3,
-                        radius: Math.random() * 2.2 + 0.6,
+                        radius: Math.random() * 2.3 + 0.6,
                         alpha: Math.random() * 0.6 + 0.2
                     });
                 }
@@ -906,20 +915,20 @@
 
                     // 1. Tiefgrüner, lebendiger Wiesen-Hintergrund
                     const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-                    bgGrad.addColorStop(0, '#041f11');
-                    bgGrad.addColorStop(0.6, '#020d06');
+                    bgGrad.addColorStop(0, '#042213');
+                    bgGrad.addColorStop(0.6, '#020f07');
                     bgGrad.addColorStop(1, '#010502');
                     ctx.fillStyle = bgGrad;
                     ctx.fillRect(0, 0, w, h);
 
                     // Park-Rasenfläche mit sanften Kurven
-                    ctx.fillStyle = '#072e17';
+                    ctx.fillStyle = '#08331a';
                     ctx.beginPath();
-                    ctx.roundRect(30 * s, 30 * s, w - (60 * s), h - (60 * s), 30 * s);
+                    ctx.roundRect(30 * s, 30 * s, w - (60 * s), h - (60 * s), 32 * s);
                     ctx.fill();
 
-                    // Organisch geschwungene Parkwege (für Hoch- und Querformat optimiert)
-                    ctx.strokeStyle = '#0b3d1f';
+                    // Organisch geschwungene Parkwege
+                    ctx.strokeStyle = '#0d4523';
                     ctx.lineWidth = 45 * s;
                     ctx.lineCap = 'round';
                     ctx.beginPath();
@@ -931,17 +940,17 @@
                     grassBlades.forEach(g => {
                         let gx = g.xOffsetRatio * w;
                         let gy = g.yOffsetRatio * h;
-                        let windSway = Math.sin(timeSec * g.swaySpeed + gx) * (4 + smoothBeat * 8);
+                        let windSway = Math.sin(timeSec * g.swaySpeed + gx) * (4.5 + smoothBeat * 9);
                         
                         ctx.strokeStyle = '#10b981';
-                        ctx.lineWidth = 1.8 * s;
+                        ctx.lineWidth = 1.9 * s;
                         ctx.beginPath();
                         ctx.moveTo(gx, gy);
                         ctx.quadraticCurveTo(gx + windSway, gy - (g.height * s * 0.5), gx + (windSway * 1.5), gy - (g.height * s));
                         ctx.stroke();
                     });
 
-                    // 3. Glühwürmchen
+                    // 3. Glühwürmchen & Partikel
                     particles.forEach(p => {
                         p.x += p.speedX;
                         p.y += p.speedY;
@@ -955,28 +964,28 @@
                     });
 
                     // 4. Bäume & üppige Baumkronen
-                    let treeCount = Math.min(14, userAcc.baumeLevel + 5);
+                    let treeCount = Math.min(15, userAcc.baumeLevel + 6);
                     for (let i = 0; i < treeCount; i++) {
-                        let tx = (90 + (i % 3) * 120) * s;
-                        let ty = (80 + Math.floor(i / 3) * 90) * s;
-                        let treeRadius = (28 + (smoothBeat * 6)) * s;
+                        let tx = (95 + (i % 3) * 125) * s;
+                        let ty = (85 + Math.floor(i / 3) * 95) * s;
+                        let treeRadius = (30 + (smoothBeat * 7)) * s;
 
                         ctx.fillStyle = `rgba(52, 211, 153, ${0.1 + smoothBeat * 0.25})`;
                         ctx.beginPath();
-                        ctx.arc(tx, ty, treeRadius * 1.5, 0, Math.PI * 2);
+                        ctx.arc(tx, ty, treeRadius * 1.55, 0, Math.PI * 2);
                         ctx.fill();
 
                         ctx.fillStyle = '#2c1202';
-                        ctx.fillRect(tx - (4 * s), ty, 8 * s, 30 * s);
+                        ctx.fillRect(tx - (4.5 * s), ty, 9 * s, 34 * s);
 
                         ctx.fillStyle = '#047857';
                         ctx.beginPath();
-                        ctx.arc(tx, ty, Math.max(12, treeRadius), 0, Math.PI * 2);
+                        ctx.arc(tx, ty, Math.max(13, treeRadius), 0, Math.PI * 2);
                         ctx.fill();
 
                         ctx.fillStyle = '#34d399';
                         ctx.beginPath();
-                        ctx.arc(tx - (3 * s), ty - (4 * s), Math.max(3, treeRadius * 0.4), 0, Math.PI * 2);
+                        ctx.arc(tx - (3 * s), ty - (4 * s), Math.max(3.5, treeRadius * 0.4), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
@@ -997,19 +1006,19 @@
                     }
 
                     // 6. BLUMENPARADIES / STAUDEN (Zentriert im perfekten Einklang mit der Musik)
-                    let dotCount = 100 * userAcc.staudenLevel;
+                    let dotCount = 110 * userAcc.staudenLevel;
                     let centerX = w * 0.5;
                     let centerY = h * 0.52;
                     const colorPalette = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc', '#34d399'];
 
                     for (let d = 0; d < dotCount; d++) {
                         let angle = d * 137.5;
-                        let r = Math.sqrt(d) * 12 * s;
+                        let r = Math.sqrt(d) * 13 * s;
                         let dx = centerX + Math.cos(angle + (smoothBeat * 0.1)) * r;
                         let dy = centerY + Math.sin(angle) * r * 0.75;
 
                         ctx.fillStyle = colorPalette[d % colorPalette.length];
-                        let flowerSize = (4.5 + (smoothBeat * 2.5)) * s;
+                        let flowerSize = (4.8 + (smoothBeat * 2.8)) * s;
                         ctx.beginPath();
                         ctx.arc(dx, dy, Math.max(2, flowerSize), 0, Math.PI * 2);
                         ctx.fill();
@@ -1021,10 +1030,10 @@
                     }
 
                     // 7. KLANG-TEICH (Rechts oben) mit Seerosen
-                    let pondX = w - (170 * s);
+                    let pondX = w - (175 * s);
                     let pondY = h * 0.35;
-                    let pondRx = (85 + (smoothBeat * 10)) * s;
-                    let pondRy = (50 + (smoothBeat * 6)) * s;
+                    let pondRx = (90 + (smoothBeat * 11)) * s;
+                    let pondRy = (52 + (smoothBeat * 7)) * s;
 
                     for (let r = 4; r >= 1; r--) {
                         ctx.strokeStyle = `rgba(56, 189, 248, ${0.07 * r + smoothBeat * 0.15})`;
@@ -1047,28 +1056,28 @@
                     // Seerosenblatt
                     ctx.fillStyle = '#065f46';
                     ctx.beginPath();
-                    ctx.arc(pondX - (20 * s), pondY - (5 * s), 7 * s, 0, Math.PI * 1.5);
+                    ctx.arc(pondX - (20 * s), pondY - (5 * s), 7.5 * s, 0, Math.PI * 1.5);
                     ctx.fill();
 
                     // 8. LILI (JACK RUSSELL) SCHWENKT LEBENDIG IM TAKT
                     liliAngle += 0.009 * s;
-                    let liliX = centerX + Math.cos(liliAngle) * (200 * s);
-                    let liliY = centerY + Math.sin(liliAngle * 2) * (70 * s) + (30 * s);
+                    let liliX = centerX + Math.cos(liliAngle) * (210 * s);
+                    let liliY = centerY + Math.sin(liliAngle * 2) * (75 * s) + (30 * s);
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
-                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (10 * smoothBeat * s);
+                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (11 * smoothBeat * s);
                     ctx.translate(0, jumpOffset);
 
-                    ctx.font = `${Math.max(34, 44 * s)}px sans-serif`;
+                    ctx.font = `${Math.max(36, 46 * s)}px sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
                     // 9. TERRASSE & LOUNGE (Unten)
-                    let terraceW = 380 * s;
-                    let terraceH = 85 * s;
+                    let terraceW = 400 * s;
+                    let terraceH = 90 * s;
                     let terraceX = (w / 2) - (terraceW / 2);
                     let terraceY = h - terraceH - (35 * s);
 
@@ -1082,7 +1091,7 @@
 
                     ctx.strokeStyle = '#281106';
                     ctx.lineWidth = 1.5 * s;
-                    for (let lx = terraceX + (35 * s); lx < terraceX + terraceW; lx += 35 * s) {
+                    for (let lx = terraceX + (36 * s); lx < terraceX + terraceW; lx += 36 * s) {
                         ctx.beginPath();
                         ctx.moveTo(lx, terraceY);
                         ctx.lineTo(lx, terraceY + terraceH);
@@ -1090,7 +1099,7 @@
                     }
 
                     ctx.fillStyle = '#020617';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (45 * s), terraceY + (terraceH / 2) - (12 * s), 90 * s, 24 * s);
+                    ctx.fillRect(terraceX + (terraceW / 2) - (48 * s), terraceY + (terraceH / 2) - (13 * s), 96 * s, 26 * s);
                 }
 
                 renderLoop();
