@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jackdarckart | Secure Nexus &amp; Cyber Beat Empire</title>
-    <!-- Strenge Sicherheits-Header gegen XSS, Clickjacking und Injektionen -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://api.laut.fm https://stream.laut.fm 'unsafe-inline' 'unsafe-eval';">
+    <!-- Optimierte CSP-Sicherheitsheader inklusive Media-Stream-Freigabe -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://api.laut.fm 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://api.laut.fm https://stream.laut.fm; media-src 'self' https://stream.laut.fm; style-src 'self' https://cdn.tailwindcss.com 'unsafe-inline';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     
@@ -24,7 +24,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- Globaler Audioplayer - Läuft absolut ununterbrochen im Hintergrund -->
+    <!-- Globaler Audioplayer für ununterbrochenen Stream -->
     <audio id="audio-stream" preload="auto">
         <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
     </audio>
@@ -223,7 +223,7 @@
                 switchView('home');
             };
 
-            // Globaler Audioplayer
+            // Globaler Audioplayer mit robustem Mobile-Handling
             const audio = document.getElementById('audio-stream');
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
@@ -232,10 +232,14 @@
 
             playBtn.addEventListener('click', () => {
                 if (audio.paused) {
+                    audio.load(); // Lädt den Stream für mobile Browser neu
                     audio.play().then(() => {
                         playIcon.textContent = '⏸';
                         playText.textContent = 'Stream Pausieren';
-                    }).catch(err => alert('⚠️ Stream konnte nicht gestartet werden.'));
+                    }).catch(err => {
+                        console.error(err);
+                        alert('⚠️ Stream konnte nicht gestartet werden. Bitte prüfen Sie Ihre Verbindung.');
+                    });
                 } else {
                     audio.pause();
                     playIcon.textContent = '▶';
