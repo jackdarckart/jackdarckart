@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Harmonic Symphony Garden v39.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Optimized Harmonic Garden v40.0</span>
                 </div>
             </div>
 
@@ -103,9 +103,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Harmonisch sanfter Symphonie-Garten</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Optimierter Symphonie-Garten &amp; Beat-Sync</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Erlebe eine erweiterte, detailreiche Parklandschaft mit seidenweicher, musikalischer Harmonisierung — absolut harmonisch, flüssig und entspannend im Takt der Musik.
+                        Vollständig reparierte, optimierte und vergrößerte Parklandschaft ohne Überlappungen — mit seidenweicher Musik-Harmonisierung.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -233,7 +233,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_HARMONIC_SYMPHONY_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_OPTIMIZED_GARDEN_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -430,7 +430,7 @@
                                     </div>
                                 </div>
                                 <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 text-center">
-                                    <p class="text-xs font-mono text-emerald-300">🎸 Studio-Wirtschaftsmatrix aktiv. Besuche den Garten für den Live-Stream &amp; sanften Beat-Sync!</p>
+                                    <p class="text-xs font-mono text-emerald-300">🎸 Studio-Wirtschaftsmatrix aktiv. Besuche den Garten für den Live-Stream &amp; Beat-Sync!</p>
                                 </div>
                             </div>
                         `;
@@ -445,7 +445,7 @@
                                             ← Zum Beat-Lab
                                         </button>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Harmonischer Symphonie-Garten aktiv</span>
+                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Optimierter Symphonie-Garten aktiv</span>
                                         </div>
                                     </div>
 
@@ -465,7 +465,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- GROSSER, GIGANTISCHER & HARMONISCHER CANVAS CONTAINER -->
+                                    <!-- FEHLERFREIER, GROSSER & HARMONISCHER CANVAS CONTAINER -->
                                     <div id="canvas-container" class="relative w-full aspect-[16/10] sm:aspect-[21/9] rounded-3xl border-2 border-emerald-800/60 overflow-hidden shadow-2xl bg-[#030d06]">
                                         <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
                                     </div>
@@ -820,12 +820,12 @@
 
                 // Sanfte Glühwürmchen-Partikel für lebendige Atmosphäre
                 let fireflies = [];
-                for(let i=0; i<25; i++) {
+                for(let i=0; i<30; i++) {
                     fireflies.push({
                         x: Math.random() * 1000,
                         y: Math.random() * 600,
-                        speedX: (Math.random() - 0.5) * 0.4,
-                        speedY: (Math.random() - 0.5) * 0.4,
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        speedY: (Math.random() - 0.5) * 0.3,
                         radius: Math.random() * 2 + 1,
                         alpha: Math.random() * 0.6 + 0.2
                     });
@@ -880,7 +880,7 @@
 
                     ctx.fillStyle = '#06200d';
                     ctx.beginPath();
-                    ctx.roundRect(30 * s, 30 * s, w - (60 * s), h - (60 * s), 28 * s);
+                    ctx.roundRect(35 * s, 35 * s, w - (70 * s), h - (70 * s), 28 * s);
                     ctx.fill();
 
                     // Sanfte Parkwege
@@ -888,9 +888,9 @@
                     ctx.lineWidth = 45 * s;
                     ctx.lineCap = 'round';
                     ctx.beginPath();
-                    ctx.moveTo(w * 0.25, h - 30);
+                    ctx.moveTo(w * 0.25, h - 35);
                     ctx.quadraticCurveTo(w * 0.4, h * 0.5, w * 0.5, h * 0.45);
-                    ctx.quadraticCurveTo(w * 0.65, h * 0.38, w * 0.78, 30);
+                    ctx.quadraticCurveTo(w * 0.65, h * 0.38, w * 0.78, 35);
                     ctx.stroke();
 
                     // 2. GLÜHWÜRMCHEN / LICHTPARTIKEL (Schweben harmonisch)
@@ -906,12 +906,12 @@
                         ctx.fill();
                     });
 
-                    // 3. BÄUME (Sicher positioniert, sanft atmend im Takt)
+                    // 3. BÄUME (Sicher positioniert mit großem Randabstand)
                     let treeCount = Math.min(10, userAcc.baumeLevel + 4);
                     for (let i = 0; i < treeCount; i++) {
-                        let tx = (95 + (i % 3) * 50) * s;
-                        let ty = (95 + Math.floor(i / 3) * 50) * s;
-                        let treeRadius = (26 + (smoothBeat * 5)) * s;
+                        let tx = (105 + (i % 3) * 55) * s;
+                        let ty = (105 + Math.floor(i / 3) * 55) * s;
+                        let treeRadius = (28 + (smoothBeat * 5)) * s;
 
                         ctx.fillStyle = `rgba(52, 211, 153, ${0.1 + smoothBeat * 0.2})`;
                         ctx.beginPath();
@@ -919,7 +919,7 @@
                         ctx.fill();
 
                         ctx.fillStyle = '#451a03';
-                        ctx.fillRect(tx - (3 * s), ty, 6 * s, 25 * s);
+                        ctx.fillRect(tx - (3 * s), ty, 6 * s, 26 * s);
 
                         ctx.fillStyle = '#047857';
                         ctx.beginPath();
@@ -937,41 +937,41 @@
                     ctx.strokeStyle = '#2563eb';
                     ctx.lineWidth = 2 * s;
                     ctx.beginPath();
-                    ctx.roundRect(55 * s, h - (185 * s), 130 * s, 105 * s, 14 * s);
+                    ctx.roundRect(65 * s, h - (195 * s), 135 * s, 110 * s, 14 * s);
                     ctx.fill();
                     ctx.stroke();
 
                     for (let gx = 0; gx < 4; gx++) {
                         for (let gy = 0; gy < 3; gy++) {
                             ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1e40af';
-                            ctx.fillRect((66 + gx * 27) * s, (h - 168 + gy * 27) * s, 18 * s, 16 * s);
+                            ctx.fillRect((76 + gx * 28) * s, (h - 178 + gy * 28) * s, 19 * s, 17 * s);
                         }
                     }
 
-                    // 5. MITTE: BLUMENBEET / STAUDEN (Wunderschön harmonisiert und fließend)
-                    let dotCount = 70 * userAcc.staudenLevel;
+                    // 5. MITTE: BLUMENBEET / STAUDEN (Zentriert, größer & harmonisch)
+                    let dotCount = 80 * userAcc.staudenLevel;
                     let centerX = w * 0.52;
                     let centerY = h * 0.52;
                     const colors = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc'];
 
                     for (let d = 0; d < dotCount; d++) {
                         let angle = d * 137.5;
-                        let r = Math.sqrt(d) * 12 * s;
+                        let r = Math.sqrt(d) * 13 * s;
                         let dx = centerX + Math.cos(angle + (smoothBeat * 0.08)) * r;
                         let dy = centerY + Math.sin(angle) * r * 0.75;
 
                         ctx.fillStyle = colors[d % colors.length];
-                        let dotSize = (4 + (smoothBeat * 2.2)) * s;
+                        let dotSize = (4.5 + (smoothBeat * 2.2)) * s;
                         ctx.beginPath();
                         ctx.arc(dx, dy, Math.max(2, dotSize), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
                     // 6. RECHTS: KLANG-TEICH (Mit sanften, wellenförmigen Ringen)
-                    let pondX = w - (190 * s);
+                    let pondX = w - (200 * s);
                     let pondY = h * 0.38;
-                    let pondRx = (85 + (smoothBeat * 8)) * s;
-                    let pondRy = (50 + (smoothBeat * 5)) * s;
+                    let pondRx = (90 + (smoothBeat * 8)) * s;
+                    let pondRy = (52 + (smoothBeat * 5)) * s;
 
                     for (let r = 4; r >= 1; r--) {
                         ctx.strokeStyle = `rgba(56, 189, 248, ${0.08 * r + smoothBeat * 0.15})`;
@@ -983,35 +983,35 @@
 
                     ctx.fillStyle = '#0284c7';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(20, pondRx), Math.max(12, pondRy), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(22, pondRx), Math.max(13, pondRy), 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#38bdf8';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(10, pondRx * 0.65), Math.max(6, pondRy * 0.65), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(11, pondRx * 0.65), Math.max(6, pondRy * 0.65), 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     // 7. LILI (JACK RUSSELL) BEWEGT SICH GANZ SANFT UND GLÜCKLICH
                     liliAngle += 0.01 * s;
-                    let liliX = centerX + Math.cos(liliAngle) * (220 * s);
-                    let liliY = centerY + Math.sin(liliAngle * 2) * (75 * s) + (30 * s);
+                    let liliX = centerX + Math.cos(liliAngle) * (230 * s);
+                    let liliY = centerY + Math.sin(liliAngle * 2) * (80 * s) + (30 * s);
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
                     let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (8 * smoothBeat * s);
                     ctx.translate(0, jumpOffset);
 
-                    ctx.font = `${Math.max(28, 36 * s)}px sans-serif`;
+                    ctx.font = `${Math.max(30, 38 * s)}px sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
                     // 8. UNTEN: LOUNGE & TERRASSE (Absolut überlappungsfrei und edel)
-                    let terraceW = 380 * s;
-                    let terraceH = 85 * s;
+                    let terraceW = 400 * s;
+                    let terraceH = 90 * s;
                     let terraceX = (w / 2) - (terraceW / 2);
-                    let terraceY = h - terraceH - (38 * s);
+                    let terraceY = h - terraceH - (40 * s);
 
                     ctx.fillStyle = '#78350f';
                     ctx.strokeStyle = '#d97706';
@@ -1032,9 +1032,9 @@
 
                     // Lounge-Möbel Tisch
                     ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (48 * s), terraceY + (terraceH / 2) - (13 * s), 96 * s, 26 * s);
+                    ctx.fillRect(terraceX + (terraceW / 2) - (50 * s), terraceY + (terraceH / 2) - (14 * s), 100 * s, 28 * s);
                     ctx.fillStyle = '#334155';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (38 * s), terraceY + (terraceH / 2) - (9 * s), 76 * s, 18 * s);
+                    ctx.fillRect(terraceX + (terraceW / 2) - (40 * s), terraceY + (terraceH / 2) - (10 * s), 80 * s, 20 * s);
                 }
 
                 renderLoop();
@@ -1074,8 +1074,6 @@
 
             async function fetchCurrentSong() {
                 try {
-                    const res = varFetch('https://api.laut.fm/station/jackdarckart/current_song');
-                    // standard fetch fallback
                     const response = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
                     if (response.ok) {
                         const data = await response.json();
