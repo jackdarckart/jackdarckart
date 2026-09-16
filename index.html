@@ -82,7 +82,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Sanctuary Elite v10.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Sanctuary Elite v11.0</span>
                 </div>
             </div>
 
@@ -733,7 +733,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <audio id="garden-audio" src="https://stream.laut.fm/jackdarckart" crossorigin="anonymous" preload="none"></audio>
+                                        <audio id="garden-audio" src="https://stream.laut.fm/jackdarckart" preload="none"></audio>
                                     </div>
                                 </div>
                             </div>
@@ -1027,7 +1027,7 @@
                 }
             });
 
-            // Garten Audio Player & Beat Sync
+            // Garten Audio Player & Beat Sync mit robuster Play-Logik
             document.addEventListener('click', function(e) {
                 const playBtn = e.target.closest('#garden-play-btn');
                 if (playBtn) {
@@ -1043,7 +1043,8 @@
                                 if (sanctuaryBox) sanctuaryBox.classList.add('garden-groove');
                                 elements.forEach(el => el.classList.add('garden-groove'));
                             }).catch(err => {
-                                console.error("Playback error:", err);
+                                console.error("Stream Playback Error:", err);
+                                alert("⚠️ Stream konnte nicht direkt gestartet werden. Bitte Laut.fm Verbindung prüfen.");
                             });
                         } else {
                             audio.pause();
