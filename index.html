@@ -2,97 +2,248 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | Webradio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>jackdarckart | Webradio &amp; Hub</title>
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-[#0b0f19] text-white min-h-screen flex items-center justify-center p-4">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #010309;
+            font-family: ui-sans-serif, system-ui, sans-serif;
+            color: #f8fafc;
+        }
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(13, 22, 42, 0.85) 0%, rgba(5, 10, 22, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+        .cyber-button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cyber-button:hover {
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+            border-color: rgba(56, 189, 248, 0.8);
+        }
+        .cyber-button:active { transform: scale(0.98); }
+        
+        @keyframes pulse-live {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.95); }
+        }
+        .live-dot { animation: pulse-live 2s infinite ease-in-out; }
 
-    <div class="w-full max-w-md bg-[#131b2e] border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
-        <!-- Header -->
-        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(1, 3, 9, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="w-full border-b border-cyan-500/20 bg-[#010309]/90 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-8 py-4">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-cyan-500/20 text-cyan-400 rounded-xl flex items-center justify-center font-bold text-lg">🎧</div>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/20">
+                    <div class="w-full h-full bg-[#010309] rounded-[10px] flex items-center justify-center text-sm">🎧</div>
+                </div>
                 <div>
-                    <h1 class="font-bold text-sm tracking-wide">jackdarckart</h1>
-                    <p class="text-[11px] text-slate-400">laut.fm/jackdarckart</p>
+                    <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-cyan-400 via-teal-300 to-pink-400 bg-clip-text text-transparent block">jackdarckart</span>
+                    <a href="https://laut.fm/jackdarckart" target="_blank" class="text-[10px] font-mono text-slate-400 hover:text-cyan-400 transition">laut.fm/jackdarckart ↗</a>
                 </div>
             </div>
-            <div class="flex items-center space-x-1.5 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-full">
-                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                <span class="text-[10px] font-mono text-red-400 font-bold uppercase tracking-wider">LIVE</span>
+
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-[#050b18] px-3.5 py-1.5 rounded-xl border border-cyan-500/20">
+                    <span class="w-2 h-2 rounded-full bg-red-500 live-dot"></span>
+                    <span class="text-[10px] font-mono text-cyan-400 tracking-wider uppercase font-bold">Hörer: <span id="listener-count">--</span></span>
+                </div>
             </div>
         </div>
+    </header>
 
-        <!-- Aktueller Titel Anzeige -->
-        <div class="bg-[#0b0f19] border border-slate-800/80 rounded-2xl p-4 text-center space-y-1">
-            <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Aktueller Titel</p>
-            <div id="track-info" class="text-sm font-semibold text-cyan-300 truncate px-2">Verbindung wird aufgebaut...</div>
-        </div>
+    <!-- Hauptinhalt -->
+    <main class="w-full max-w-4xl mx-auto p-4 sm:p-8 flex-grow space-y-6 my-auto">
+        
+        <!-- Webplayer Hauptbox -->
+        <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden space-y-6">
+            <div class="absolute -top-24 -right-24 w-60 h-60 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-60 h-60 bg-pink-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-        <!-- Player Controls -->
-        <div class="space-y-4">
-            <button id="play-btn" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 px-6 rounded-2xl text-xs uppercase tracking-widest transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-cyan-500/20">
-                <span id="play-icon" class="text-base">▶</span> 
-                <span id="play-text">Stream Abspielen</span>
-            </button>
-
-            <div class="flex items-center justify-between bg-[#0b0f19] px-4 py-2.5 rounded-xl border border-slate-800">
-                <span class="text-xs text-slate-400">Lautstärke</span>
-                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.8" class="w-32 accent-cyan-500 cursor-pointer">
+            <!-- Aktueller Titel -->
+            <div class="text-center space-y-2 relative z-10">
+                <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">▶ Sendung Läuft Live</span>
+                <h1 id="track-title" class="text-lg sm:text-2xl font-black text-white font-mono tracking-wide px-2">Verbindung wird aufgebaut...</h1>
             </div>
+
+            <!-- Player Steuerung & Lautstärke -->
+            <div class="space-y-4 relative z-10 pt-2">
+                <button type="button" id="play-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-500 text-white font-black py-4 px-6 rounded-2xl text-xs sm:text-sm uppercase tracking-widest cursor-pointer shadow-xl shadow-cyan-500/30 flex items-center justify-center gap-3">
+                    <span id="play-icon" class="text-base">▶</span> <span id="play-text">Webradio Abspielen</span>
+                </button>
+
+                <div class="flex items-center justify-between bg-[#050b18]/80 px-5 py-3 rounded-2xl border border-cyan-500/20 shadow-inner">
+                    <div class="flex items-center gap-2 text-xs font-mono text-slate-300">
+                        <span>🔊</span> <span>Lautstärke</span>
+                    </div>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.8" class="w-36 sm:w-48 accent-cyan-500 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Versteckter Audio Stream -->
+            <audio id="audio-stream" preload="none">
+                <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
+            </audio>
         </div>
 
-        <!-- Audio Element -->
-        <audio id="audio-stream" preload="none">
-            <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
-        </audio>
-    </div>
+        <!-- Grid: Song-Historie & Ideen-Notizblock -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Letzte Songs -->
+            <div class="glass-panel p-6 rounded-[2rem] space-y-4">
+                <div class="flex items-center justify-between border-b border-cyan-500/20 pb-3">
+                    <h2 class="text-xs font-mono text-cyan-300 uppercase font-bold tracking-wider">📜 Zuletzt gespielt</h2>
+                    <span class="text-[10px] font-mono text-slate-400">Live Historie</span>
+                </div>
+                <div id="last-songs-container" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-400 font-mono italic">Lade Historie...</p>
+                </div>
+            </div>
 
-    <!-- Script für Stream & Song-Abruf -->
+            <!-- Songwriter & Vibe Notizblock -->
+            <div class="glass-panel p-6 rounded-[2rem] space-y-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-cyan-500/20 pb-3 mb-3">
+                        <h2 class="text-xs font-mono text-pink-300 uppercase font-bold tracking-wider">📝 Vibe &amp; Song Ideen</h2>
+                        <span id="save-status" class="text-[10px] font-mono text-teal-400">Automatisch gespeichert</span>
+                    </div>
+                    <textarea id="idea-notepad" rows="5" class="w-full bg-[#030712] border border-cyan-500/20 rounded-xl p-3 text-xs text-slate-200 outline-none focus:border-cyan-500 transition resize-none font-mono" placeholder="Schreibe hier deine Song-Ideen, Lyrics oder Notizen..."></textarea>
+                </div>
+                <button type="button" id="btn-clear-notes" class="cyber-button w-full bg-slate-900 text-slate-400 hover:text-white border border-slate-800 py-2 rounded-xl text-[11px] font-mono cursor-pointer">Notizblock leeren</button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-cyan-500/20 py-4 px-4 bg-[#010309] text-center">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center text-[11px] font-mono text-slate-400 gap-2">
+            <span>© 2026 jackdarckart • Alle Rechte vorbehalten</span>
+            <a href="https://laut.fm/jackdarckart" target="_blank" class="text-cyan-400 hover:underline">Offizieller Sender auf laut.fm</a>
+        </div>
+    </footer>
+
+    <!-- Logik & API Script -->
     <script>
-        const audio = document.getElementById('audio-stream');
-        const playBtn = document.getElementById('play-btn');
-        const playIcon = document.getElementById('play-icon');
-        const playText = document.getElementById('play-text');
-        const volumeSlider = document.getElementById('volume-slider');
-        const trackInfo = document.getElementById('track-info');
+        document.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('audio-stream');
+            const playBtn = document.getElementById('play-btn');
+            const playIcon = document.getElementById('play-icon');
+            const playText = document.getElementById('play-text');
+            const volumeSlider = document.getElementById('volume-slider');
+            const trackTitle = document.getElementById('track-title');
+            const listenerCount = document.getElementById('listener-count');
+            const lastSongsContainer = document.getElementById('last-songs-container');
+            const notepad = document.getElementById('idea-notepad');
+            const saveStatus = document.getElementById('save-status');
+            const clearNotesBtn = document.getElementById('btn-clear-notes');
 
-        playBtn.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play().then(() => {
-                    playIcon.textContent = '⏸';
-                    playText.textContent = 'Stream Pausieren';
-                }).catch(err => {
-                    alert('Stream konnte nicht gestartet werden.');
-                });
-            } else {
-                audio.pause();
-                playIcon.textContent = '▶';
-                playText.textContent = 'Stream Abspielen';
-            }
-        });
-
-        volumeSlider.addEventListener('input', (e) => {
-            audio.volume = e.target.value;
-        });
-
-        async function updateCurrentSong() {
-            try {
-                const res = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
-                if (res.ok) {
-                    const data = await res.json();
-                    const artist = data.artist?.name || 'jackdarckart';
-                    const title = data.title || 'Live Stream';
-                    trackInfo.textContent = `${artist} – ${title}`;
+            // Play / Pause Steuerung
+            playBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play().then(() => {
+                        playIcon.textContent = '⏸';
+                        playText.textContent = 'Stream Pausieren';
+                    }).catch(err => {
+                        alert('⚠️ Stream konnte nicht gestartet werden.');
+                    });
+                } else {
+                    audio.pause();
+                    playIcon.textContent = '▶';
+                    playText.textContent = 'Webradio Abspielen';
                 }
-            } catch (e) {
-                trackInfo.textContent = 'jackdarckart Webradio';
-            }
-        }
+            });
 
-        updateCurrentSong();
-        setInterval(updateCurrentSong, 15000);
+            // Lautstärke
+            volumeSlider.addEventListener('input', (e) => {
+                audio.volume = e.target.value;
+            });
+
+            // API Daten abrufen (Aktueller Song, Hörer, Historie)
+            async function fetchStationData() {
+                try {
+                    // Aktueller Song
+                    const resSong = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
+                    if (resSong.ok) {
+                        const data = await resSong.json();
+                        const artist = data.artist?.name || 'jackdarckart';
+                        const title = data.title || 'Live Stream';
+                        trackTitle.textContent = `${artist} – ${title}`;
+                    }
+                } catch (e) {
+                    trackTitle.textContent = 'jackdarckart Webradio';
+                }
+
+                try {
+                    // Höreranzahl
+                    const resListeners = await fetch('https://api.laut.fm/station/jackdarckart/listeners');
+                    if (resListeners.ok) {
+                        const listeners = await resListeners.json();
+                        listenerCount.textContent = listeners !== undefined ? listeners : '0';
+                    }
+                } catch (e) {
+                    listenerCount.textContent = '•';
+                }
+
+                try {
+                    // Letzte Songs
+                    const resLast = await fetch('https://api.laut.fm/station/jackdarckart/last_songs');
+                    if (resLast.ok) {
+                        const songs = await resLast.json();
+                        if (Array.isArray(songs) && songs.length > 0) {
+                            lastSongsContainer.innerHTML = '';
+                            songs.slice(0, 5).forEach(song => {
+                                const artistName = song.artist?.name || 'Unbekannt';
+                                const songTitle = song.title || '';
+                                const div = document.createElement('div');
+                                div.className = 'bg-[#030712] p-2.5 rounded-xl border border-cyan-500/10 flex justify-between items-center text-xs font-mono';
+                                div.innerHTML = `
+                                    <span class="text-slate-200 truncate pr-2">🎵 ${artistName} – ${songTitle}</span>
+                                `;
+                                lastSongsContainer.appendChild(div);
+                            });
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            fetchStationData();
+            setInterval(fetchStationData, 15000);
+
+            // Notizblock LocalStorage
+            const savedNote = localStorage.getItem('jack_notepad_ideas');
+            if (savedNote) notepad.value = savedNote;
+
+            notepad.addEventListener('input', () => {
+                localStorage.setItem('jack_notepad_ideas', notepad.value);
+                saveStatus.textContent = 'Gespeichert ✓';
+                setTimeout(() => { saveStatus.textContent = 'Automatisch gespeichert'; }, 2000);
+            });
+
+            clearNotesBtn.addEventListener('click', () => {
+                if (confirm('Möchtest du den Notizblock wirklich leeren?')) {
+                    notepad.value = '';
+                    localStorage.removeItem('jack_notepad_ideas');
+                    saveStatus.textContent = 'Geleert';
+                }
+            });
+        });
     </script>
 </body>
 </html>
