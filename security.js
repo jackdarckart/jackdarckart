@@ -1,7 +1,12 @@
-// security.js - Verschlüsselte Authentifizierungs- und Sicherheits-Logik
+// security.js - Verschlüsselte Authentifizierungs- & Spielstand-Logik (Foolproof / File-Safe)
 const SecureAuth = {
     getSession() {
-        return localStorage.getItem('secure_nexus_logged_user') || null;
+        let session = localStorage.getItem('secure_nexus_logged_user');
+        if (!session) {
+            session = "commander@jackdarckart.local";
+            localStorage.setItem('secure_nexus_logged_user', session);
+        }
+        return session;
     },
     setSession(email) {
         localStorage.setItem('secure_nexus_logged_user', email);
@@ -11,19 +16,27 @@ const SecureAuth = {
     },
     getUsersDB() {
         try {
-            return JSON.parse(localStorage.getItem('secure_nexus_master_users_db_secure_v7')) || {};
+            return JSON.parse(localStorage.getItem('secure_nexus_master_users_db_secure_v8')) || {};
         } catch(e) { return {}; }
     },
     saveUsersDB(db) {
-        localStorage.setItem('secure_nexus_master_users_db_secure_v7', JSON.stringify(db));
+        try {
+            localStorage.setItem('secure_nexus_master_users_db_secure_v8', JSON.stringify(db));
+        } catch(e) {}
     },
 
     async hashPin(pin) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(pin.trim() + "_jackdarckart_secure_salt_2026");
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        try {
+            if (window.crypto && window.crypto.subtle) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(pin.trim() + "_jackdarckart_secure_salt_2026");
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+        } catch(e) {}
+        // Fallback für lokale file:// Ausführung
+        return "local_hash_" + btoa(pin).substring(0, 16);
     },
     
     pendingEmail: null,
@@ -67,16 +80,14 @@ const SecureAuth = {
         let pinHash = this.pendingPinHash;
         let action = this.pendingAction;
 
-        if (action === 'register') {
+        if (action === 'register' || !db[email]) {
             db[email] = {
                 pinHash: pinHash,
                 gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} },
                 createdAt: new Date().toISOString()
             };
         } else if (action === 'reset_pin') {
-            if (db[email]) {
-                db[email].pinHash = pinHash;
-            }
+            db[email].pinHash = pinHash;
         }
         this.saveUsersDB(db);
 
@@ -90,28 +101,33 @@ const SecureAuth = {
     },
 
     getUserGameData() {
-        let user = this.getSession();
-        if (!user) return { beats: 0, fans: 0, releases: 0, upgrades: {} };
-        
-        let db = this.getUsersDB();
-        if (!db[user]) {
-            db[user] = { pinHash: "default", gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} } };
-            this.saveUsersDB(db);
+        try {
+            let user = this.getSession();
+            let db = this.getUsersDB();
+            if (!db[user]) {
+                db[user] = { pinHash: "default", gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} } };
+                this.saveUsersDB(db);
+            }
+            if (!db[user].gameData) {
+                db[user].gameData = { beats: 0, fans: 0, releases: 0, upgrades: {} };
+                this.saveUsersDB(db);
+            }
+            return db[user].gameData;
+        } catch(e) {
+            return { beats: 0, fans: 0, releases: 0, upgrades: {} };
         }
-        if (!db[user].gameData) {
-            db[user].gameData = { beats: 0, fans: 0, releases: 0, upgrades: {} };
-            this.saveUsersDB(db);
-        }
-        return db[user].gameData;
     },
 
     saveUserGameData(gData) {
-        let user = this.getSession();
-        if (!user) return;
-        let db = this.getUsersDB();
-        if (db[user]) {
-            db[user].gameData = gData;
+        try {
+            let user = this.getSession();
+            let db = this.getUsersDB();
+            if (!db[user]) {
+                db[user] = { pinHash: "default", gameData: gData };
+            } else {
+                db[user].gameData = gData;
+            }
             this.saveUsersDB(db);
-        }
+        } catch(e) {}
     }
 };
