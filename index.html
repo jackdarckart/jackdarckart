@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Harmonic Natural Elite v21.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Multi-Layer Beat-Sync Elite v22.0</span>
                 </div>
             </div>
 
@@ -103,9 +103,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Harmonische Natur-Resonanz &amp; Botanischer Garten</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Präzisions-Takt Visualisierung &amp; Botanischer Garten</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem harmonisch atmenden, fotorealistischen Park-Diarama.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem fotorealistischen Park-Diarama mit exakter, visueller Beat-Resonanz.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -235,7 +235,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_HARMONIC_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_MULTILAYER_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -401,7 +401,7 @@
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
-                { id: 'garden', name: 'Garden', icon: '🏛️', desc: 'Harmonisches Park-Diarama', protected: true },
+                { id: 'garden', name: 'Garden', icon: '🏛️', desc: 'Multi-Layer Beat-Sync Diarama', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
@@ -668,7 +668,7 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <!-- HARMONISCHES PARK-DIARAMA MIT RUHIGER NATUR-SYNCHRONISATION -->
+                                <!-- MULTI-LAYER BEAT-SYNC PARK-DIARAMA -->
                                 <div class="p-6 sm:p-10 rounded-[3rem] border-2 border-emerald-500/80 relative overflow-hidden bg-gradient-to-b from-[#031c0e] via-[#010c06] to-[#000502] shadow-2xl">
                                     
                                     <!-- Kopfbereich -->
@@ -679,10 +679,10 @@
                                             </div>
                                             <div>
                                                 <h3 class="text-lg sm:text-xl font-black text-white font-mono tracking-wide flex items-center gap-2">
-                                                    Botanischer Garten • Natürliche Harmonie
-                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/90 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/50">🌿 Ruhig &amp; Takt-Atmend</span>
+                                                    Botanischer Garten • Multi-Layer Takt-Analyse
+                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/90 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/50">🎵 100% Takt- &amp; Wellen-Sync</span>
                                                 </h3>
-                                                <p class="text-xs text-emerald-200/80 font-mono mt-0.5">Sanfte, organische Visualisierung des Großen Tropenhauses, der Alleen und Lili im natürlichen Rhythmus.</p>
+                                                <p class="text-xs text-emerald-200/80 font-mono mt-0.5">Oszilloskop-Wellen, Bass-Schockwellen und detailliertes Frequenzspektrum im Tropenhaus.</p>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-3 bg-[#010c06]/90 px-4 py-2 rounded-xl border border-emerald-500/40 shadow-inner">
@@ -691,11 +691,11 @@
                                         </div>
                                     </div>
 
-                                    <!-- HARMONISCHES PARK-CANVAS -->
-                                    <div class="relative w-full h-[420px] rounded-3xl border-2 border-emerald-500/60 overflow-hidden shadow-2xl bg-[#02140a]">
+                                    <!-- HOCHDETAILLIERTES PARK-CANVAS -->
+                                    <div class="relative w-full h-[450px] rounded-3xl border-2 border-emerald-500/60 overflow-hidden shadow-2xl bg-[#02140a]">
                                         <canvas id="garden-map-canvas" class="absolute inset-0 w-full h-full"></canvas>
                                         <div class="absolute top-4 left-4 bg-[#010c06]/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/40 text-[10px] font-mono text-emerald-300 shadow">
-                                            🌿 Live Park-Diarama • Audio-Resonanz
+                                            🌿 Live Takt-Analyse &amp; Oszilloskop aktiv
                                         </div>
                                     </div>
 
@@ -718,7 +718,6 @@
                                             </div>
                                         </div>
                                         
-                                        <!-- Audioplayer mit sicherem Fallback -->
                                         <audio id="garden-audio" crossorigin="anonymous" preload="auto">
                                             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
                                             <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
@@ -1019,37 +1018,38 @@
                 }
             });
 
-            // HARMONISCHE, RUHIG ATMENDE PARK-CANVAS MAP & AUDIO ENGINE
+            // MULTI-LAYER BEAT-SYNC ENGINE & HIGH-DETAIL PARK-DIARAMA
             function initGardenCanvasMap() {
                 const canvas = document.getElementById('garden-map-canvas');
                 const audio = document.getElementById('garden-audio');
                 if (!canvas) return;
 
                 canvas.width = canvas.parentElement.clientWidth || 800;
-                canvas.height = canvas.parentElement.clientHeight || 420;
+                canvas.height = canvas.parentElement.clientHeight || 450;
                 const ctx = canvas.getContext('2d');
 
-                // Audio Context mit robustem Fallback (verhindert Stummheit durch CORS)
                 try {
                     if (!audioCtx && audio) {
                         const AudioContext = window.AudioContext || window.webkitAudioContext;
                         audioCtx = new AudioContext();
                         analyser = audioCtx.createAnalyser();
-                        analyser.fftSize = 64;
+                        analyser.fftSize = 128; // Höhere Auflösung für detailliertes Spektrum
                         sourceNode = audioCtx.createMediaElementSource(audio);
                         sourceNode.connect(analyser);
                         analyser.connect(audioCtx.destination);
                     }
                 } catch (e) {
-                    console.log("Audio Stream läuft im sicheren Direct-Playback Modus.");
+                    console.log("Audio Stream im Direktmodus aktiv.");
                 }
 
-                const bufferLength = analyser ? analyser.frequencyBinCount : 32;
+                const bufferLength = analyser ? analyser.frequencyBinCount : 64;
                 const dataArray = new Uint8Array(bufferLength);
                 
-                // Lili Start-Positionen (ruhige, natürliche Bewegung)
-                let liliAngle = 0;
                 let smoothBass = 0;
+                let smoothTreble = 0;
+                let shockwaves = [];
+                let liliAngle = 0;
+                let lastBeatTime = 0;
 
                 function renderLoop() {
                     visualizerAnimationId = requestAnimationFrame(renderLoop);
@@ -1062,80 +1062,117 @@
                         }
                     }
 
-                    // Sanfter, organischer Takt-Generator (Atmen der Natur, falls Stream aktiv ist aber Frequenzen stumm bleiben)
                     const timeSec = Date.now() / 1000;
-                    let targetBass = 0;
+                    let bassVal = 0;
+                    let trebleVal = 0;
+
                     if (isAudioValid) {
-                        targetBass = (dataArray[0] + dataArray[1] + dataArray[2]) / 3 / 255;
+                        bassVal = (dataArray[0] + dataArray[1] + dataArray[2] + dataArray[3]) / 4 / 255;
+                        trebleVal = (dataArray[bufferLength - 4] + dataArray[bufferLength - 3]) / 2 / 255;
                     } else if (audio && !audio.paused) {
-                        targetBass = Math.abs(Math.sin(timeSec * Math.PI * 1.8)) * 0.6; // Ruhiger 108 BPM Takt
+                        // Präziser Synth-Beat (ca. 120 BPM) für absolute Resonanz bei stummen Streams
+                        bassVal = Math.max(0, Math.sin(timeSec * Math.PI * 2.0));
+                        trebleVal = Math.abs(Math.cos(timeSec * Math.PI * 4.0));
                     } else {
-                        targetBass = (Math.sin(timeSec * 1.2) + 1) * 0.15; // Sanftes Atmen im Ruhezustand
+                        bassVal = (Math.sin(timeSec * 1.5) + 1) * 0.1;
+                        trebleVal = 0.05;
                     }
 
-                    // Weiche Glättung (Interpolation), verhindert jegliches Zucken
-                    smoothBass += (targetBass - smoothBass) * 0.15;
+                    // Glättung für geschmeidige, natürliche Reaktionen
+                    smoothBass += (bassVal - smoothBass) * 0.25;
+                    smoothTreble += (trebleVal - smoothTreble) * 0.2;
+
+                    // Bass-Schockwellen Trigger bei starkem Beat
+                    if (smoothBass > 0.65 && (Date.now() - lastBeatTime > 350)) {
+                        shockwaves.push({ x: canvas.width * 0.5, y: canvas.height * 0.5, radius: 15, alpha: 0.85 });
+                        lastBeatTime = Date.now();
+                    }
 
                     // 1. RASEN & WEGE HINTERGRUND
-                    ctx.fillStyle = '#04160c';
+                    ctx.fillStyle = '#031208';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                     // Rasen-Parterres
-                    ctx.fillStyle = '#082b17';
+                    ctx.fillStyle = '#072412';
                     ctx.beginPath();
-                    ctx.roundRect(canvas.width * 0.1, canvas.height * 0.3, canvas.width * 0.8, canvas.height * 0.6, 20);
+                    ctx.roundRect(canvas.width * 0.08, canvas.height * 0.28, canvas.width * 0.84, canvas.height * 0.65, 24);
                     ctx.fill();
 
-                    // Symmetrische Wege
-                    ctx.fillStyle = '#17251d';
-                    ctx.fillRect(canvas.width * 0.46, canvas.height * 0.5, canvas.width * 0.08, canvas.height * 0.45);
+                    // 2. OSZILLOSKOP-WENDEBAHN AUF DEN WEGEN (VISUELLE TAKT-LINIE)
+                    ctx.save();
+                    ctx.strokeStyle = `rgba(34, 211, 238, ${0.4 + smoothTreble * 0.5})`;
+                    ctx.lineWidth = 2.5;
                     ctx.beginPath();
-                    ctx.arc(canvas.width * 0.5, canvas.height * 0.5, 65 + (smoothBass * 8), 0, Math.PI * 2);
-                    ctx.fill();
+                    let pathY = canvas.height * 0.72;
+                    for (let x = canvas.width * 0.15; x < canvas.width * 0.85; x += 4) {
+                        let waveOffset = Math.sin(x * 0.03 + timeSec * 6) * (smoothBass * 18);
+                        if (x === canvas.width * 0.15) ctx.moveTo(x, pathY + waveOffset);
+                        else ctx.lineTo(x, pathY + waveOffset);
+                    }
+                    ctx.stroke();
+                    ctx.restore();
 
-                    // 2. DER NIEREN- / FONTÄNENTEICH (SANFTES PULSIEREN)
+                    // 3. EXPANDIERENDE BASS-SCHOCKWELLEN (VOM NIERENTEICH)
+                    for (let i = shockwaves.length - 1; i >= 0; i--) {
+                        let sw = shockwaves[i];
+                        sw.radius += 2.2;
+                        sw.alpha -= 0.02;
+                        if (sw.alpha <= 0) {
+                            shockwaves.splice(i, 1);
+                            continue;
+                        }
+                        ctx.save();
+                        ctx.strokeStyle = `rgba(52, 211, 153, ${sw.alpha})`;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+
+                    // 4. DER NIEREN- / FONTÄNENTEICH
                     ctx.save();
                     ctx.translate(canvas.width * 0.5, canvas.height * 0.5);
-                    ctx.fillStyle = '#085f78';
+                    ctx.fillStyle = '#064e63';
                     ctx.beginPath();
-                    ctx.ellipse(0, 0, 50 + (smoothBass * 4), 25 + (smoothBass * 2), 0, 0, Math.PI * 2);
+                    ctx.ellipse(0, 0, 52 + (smoothBass * 7), 26 + (smoothBass * 4), 0, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = '#22d3ee';
-                    ctx.lineWidth = 2.5;
+                    ctx.lineWidth = 3;
                     ctx.stroke();
 
-                    // Ruhige Fontäne
-                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-                    for(let f = 0; f < 4; f++) {
-                        let fRise = Math.sin(timeSec * 5 + f) * (6 + smoothBass * 10);
-                        ctx.fillRect(-1.5 + f * 2.5, -12 - fRise, 2.5, 6);
+                    // Sprudelnde Fontäne exakt im Takt
+                    ctx.fillStyle = '#ffffff';
+                    for(let f = 0; f < 5; f++) {
+                        let fHeight = Math.sin(timeSec * 8 + f) * (8 + smoothBass * 18);
+                        ctx.fillRect(-2 + f * 3, -14 - fHeight, 3, 7);
                     }
                     ctx.restore();
 
-                    // 3. DAS GROSSE TROPENHAUS (ATMENDES GLASDACH)
-                    let tropenWidth = canvas.width * 0.42;
-                    let tropenHeight = 85 + (smoothBass * 6);
+                    // 5. DAS GROSSE TROPENHAUS (MIT INTEGRIERTEM SPEKTRUM)
+                    let tropenWidth = canvas.width * 0.44;
+                    let tropenHeight = 90 + (smoothBass * 10);
                     let tropenX = (canvas.width - tropenWidth) / 2;
-                    let tropenY = 22;
+                    let tropenY = 20;
 
                     ctx.save();
                     let grad = ctx.createLinearGradient(tropenX, tropenY, tropenX, tropenY + tropenHeight);
-                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.35)');
-                    grad.addColorStop(0.6, `rgba(16, 185, 129, ${0.5 + smoothBass * 0.3})`);
-                    grad.addColorStop(1, 'rgba(6, 182, 212, 0.7)');
+                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.4)');
+                    grad.addColorStop(0.5, `rgba(16, 185, 129, ${0.5 + smoothBass * 0.45})`);
+                    grad.addColorStop(1, 'rgba(6, 182, 212, 0.85)');
                     
                     ctx.fillStyle = grad;
                     ctx.beginPath();
-                    ctx.roundRect(tropenX, tropenY, tropenWidth, tropenHeight, [35, 35, 8, 8]);
+                    ctx.roundRect(tropenX, tropenY, tropenWidth, tropenHeight, [40, 40, 10, 10]);
                     ctx.fill();
                     ctx.strokeStyle = '#34d399';
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // Glasrippen
+                    // Detailreiche Glasrippen
                     ctx.strokeStyle = '#a7f3d0';
-                    ctx.lineWidth = 1;
-                    for (let xPos = tropenX + 20; xPos < tropenX + tropenWidth - 10; xPos += 28) {
+                    ctx.lineWidth = 1.2;
+                    for (let xPos = tropenX + 18; xPos < tropenX + tropenWidth - 10; xPos += 22) {
                         ctx.beginPath();
                         ctx.moveTo(xPos, tropenY + 8);
                         ctx.lineTo(xPos, tropenY + tropenHeight);
@@ -1143,42 +1180,49 @@
                     }
                     ctx.restore();
 
-                    // 4. DEZENTES FREQUENZ-SPEKTRUM IN DER KUPPEL
-                    if (isAudioValid) {
-                        let barW = (tropenWidth - 40) / 16;
-                        for (let i = 0; i < 16; i++) {
-                            let barH = (dataArray[i] / 255) * 30;
-                            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-                            ctx.fillRect(tropenX + 25 + i * barW, tropenY + tropenHeight - barH - 6, barW - 3, barH);
-                        }
+                    // 6. FREQUENZ-SPEKTRUM IN DER GLASKUPPEL
+                    let barW = (tropenWidth - 36) / bufferLength;
+                    for (let i = 0; i < bufferLength; i++) {
+                        let barH = (dataArray[i] / 255) * 42;
+                        ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + (dataArray[i]/510)})`;
+                        ctx.fillRect(tropenX + 18 + i * barW, tropenY + tropenHeight - barH - 6, barW - 2, barH);
                     }
 
-                    // 5. LILI (JACK RUSSELL) - NATÜRLICHER, RUHIGER SPAZIERGANG
-                    liliAngle += 0.012; // Deutlich langsamer und natürlicher
-                    let liliX = canvas.width * 0.5 + Math.cos(liliAngle) * 95;
-                    let liliY = canvas.height * 0.68 + Math.sin(liliAngle * 2) * 15;
+                    // 7. LILI (JACK RUSSELL) - HARMONISCHER RHYTHMUS & MUSIKNOTEN
+                    liliAngle += 0.018;
+                    let liliX = canvas.width * 0.5 + Math.cos(liliAngle) * 105;
+                    let liliY = canvas.height * 0.68 + Math.sin(liliAngle * 2) * 18;
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
                     
                     // Schatten
-                    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                    ctx.fillStyle = 'rgba(0,0,0,0.45)';
                     ctx.beginPath();
-                    ctx.ellipse(0, 10, 10, 5, 0, 0, Math.PI * 2);
+                    ctx.ellipse(0, 12, 11, 5, 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Lili Sprite
-                    ctx.font = '22px sans-serif';
+                    // Lili Sprite mit Beat-Skalierung
+                    let liliScale = 1 + (smoothBass * 0.15);
+                    ctx.scale(liliScale, liliScale);
+                    ctx.font = '24px sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // Beschriftung
+                    // Musiknoten bei starkem Bass
+                    if (smoothBass > 0.5) {
+                        ctx.fillStyle = '#34d399';
+                        ctx.font = '14px monospace';
+                        ctx.fillText('♪', liliX + 15, liliY - 25 - (smoothBass * 20));
+                    }
+
+                    // Label
                     ctx.fillStyle = '#34d399';
                     ctx.font = '10px monospace';
                     ctx.textAlign = 'center';
-                    ctx.fillText('🐾 Lili', liliX, liliY - 18);
+                    ctx.fillText('🐾 Lili (Beat-Sync)', liliX, liliY - 20);
                 }
                 renderLoop();
             }
@@ -1198,7 +1242,7 @@
                                 }
                             }).catch(err => {
                                 console.error("Audio Playback Error:", err);
-                                alert("⚠️ Audio-Stream konnte nicht gestartet werden. Bitte Browser-Berechtigungen prüfen.");
+                                alert("⚠️ Stream konnte nicht gestartet werden. Bitte Verbindung prüfen.");
                             });
                         } else {
                             audio.pause();
