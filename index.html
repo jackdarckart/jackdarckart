@@ -472,7 +472,7 @@
                         </div>`;
                 });
 
-                // Attach robust event listeners to shop container (CSP-compliant)
+                // Direktes Event-Binding für jeden Button mit visuellem Feedback
                 shop.querySelectorAll('.shop-buy-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const id = e.currentTarget.getAttribute('data-id');
@@ -505,7 +505,7 @@
                     upgrades.forEach(u => {
                         let lvl = gData.upgrades[u.id] || 0;
                         let cost = getCost(u, lvl);
-                        let can = gData.beats >= cost;
+                        let can = Number(gData.beats) >= Number(cost);
 
                         let titleEl = document.getElementById(`shop-title-${u.id}`);
                         let btnEl = document.getElementById(`shop-btn-${u.id}`);
@@ -515,17 +515,16 @@
                         if(btnEl) {
                             btnEl.textContent = `⚡ ${cost.toLocaleString()}`;
                             if(can) {
-                                btnEl.classList.remove('opacity-45', 'pointer-events-none');
+                                btnEl.style.opacity = "1";
+                                btnEl.style.cursor = "pointer";
                             } else {
-                                btnEl.classList.add('opacity-45');
+                                btnEl.style.opacity = "0.45";
                             }
                         }
                         if(cardEl) {
-                            if(can) {
-                                cardEl.className = "bg-[#030712] p-3 rounded-xl border border-cyan-500/40 flex justify-between items-center text-xs font-mono";
-                            } else {
-                                cardEl.className = "bg-[#030712] p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono";
-                            }
+                            cardEl.className = can 
+                                ? "bg-[#030712] p-3 rounded-xl border border-cyan-500/40 flex justify-between items-center text-xs font-mono"
+                                : "bg-[#030712] p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono";
                         }
                     });
 
@@ -535,13 +534,18 @@
 
             window.buyUpgrade = function(id) {
                 let gData = SecureAuth.getUserGameData();
+                if (!gData) return;
                 let u = upgrades.find(x => x.id === id);
                 let lvl = gData.upgrades[id] || 0;
                 let cost = getCost(u, lvl);
-                if (gData.beats >= cost) {
-                    gData.beats -= cost;
+                
+                if (Number(gData.beats) >= Number(cost)) {
+                    gData.beats = Number(gData.beats) - Number(cost);
                     gData.upgrades[id] = lvl + 1;
+                    SecureAuth.saveUserGameData(gData);
                     updateGameUI();
+                } else {
+                    alert("Noch nicht genug Beats! Du brauchst " + cost);
                 }
             };
 
