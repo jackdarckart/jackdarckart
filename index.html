@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | CloudBeats Secure Nexus</title>
+    <title>jackdarckart | CloudBeats Nexus Prime Elite</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.tailwindcss.com https://stream.laut.fm https://api.emailjs.com 'unsafe-inline' 'unsafe-eval';">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,30 +16,70 @@
     </script>
     <style>
         .glass-panel {
-            background: linear-gradient(135deg, rgba(19, 27, 46, 0.85) 0%, rgba(10, 15, 28, 0.95) 100%);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(168, 85, 247, 0.25);
-            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.6);
+            background: linear-gradient(135deg, rgba(13, 19, 35, 0.94) 0%, rgba(5, 8, 15, 0.99) 100%);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.07);
         }
         .cyber-button {
             position: relative;
             overflow: hidden;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .cyber-button:active { transform: scale(0.97); }
+        .cyber-button:hover {
+            box-shadow: 0 0 22px rgba(168, 85, 247, 0.45);
+            border-color: rgba(168, 85, 247, 0.6);
+        }
+        .cyber-button:active { transform: scale(0.98); }
+        .cyber-button:disabled { opacity: 0.3; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; border-color: rgba(255,255,255,0.05) !important; }
+        
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.85)); }
+            50% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.3)); }
+        }
+        .neon-pulse { animation: pulse-glow 3.5s infinite ease-in-out; }
+
+        @keyframes wave {
+            0%, 100% { height: 4px; }
+            50% { height: 22px; }
+        }
+        .wave-bar { animation: wave 1.2s ease-in-out infinite; }
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.6s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.8s; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(5, 8, 15, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.4); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.7); }
     </style>
 </head>
-<body class="bg-[#05070c] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+<body class="bg-[#030508] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
     <!-- Header -->
-    <header class="w-full border-b border-purple-500/15 backdrop-blur-xl sticky top-0 z-50 bg-[#05070c]/90 px-4 py-3">
+    <header class="w-full border-b border-purple-500/15 backdrop-blur-2xl sticky top-0 z-50 bg-[#030508]/90 px-4 py-3 shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-500 p-0.5 shadow-lg shadow-purple-500/20">
-                    <div class="w-full h-full bg-[#080c14] rounded-[10px] flex items-center justify-center text-base">🛡️</div>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-pink-600 to-cyan-400 p-0.5 shadow-lg shadow-purple-500/25 neon-pulse">
+                    <div class="w-full h-full bg-[#05080f] rounded-[10px] flex items-center justify-center text-base">🛡️</div>
                 </div>
-                <span class="font-black text-sm tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">jackdarckart Secure</span>
+                <div>
+                    <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Prime Elite v6.0</span>
+                </div>
+            </div>
+
+            <!-- Audio Visualizer in Header -->
+            <div class="hidden md:flex items-center gap-1.5 bg-[#05080f] px-3.5 py-1.5 rounded-xl border border-purple-500/20 shadow-inner">
+                <span class="text-[9px] font-mono text-purple-400 mr-1 tracking-widest">LIVE STREAM</span>
+                <div class="w-1 bg-purple-500 rounded-full wave-bar"></div>
+                <div class="w-1 bg-pink-500 rounded-full wave-bar"></div>
+                <div class="w-1 bg-cyan-400 rounded-full wave-bar"></div>
+                <div class="w-1 bg-purple-500 rounded-full wave-bar"></div>
+                <div class="w-1 bg-indigo-500 rounded-full wave-bar"></div>
             </div>
             
             <nav id="navbar-container" class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end">
@@ -54,14 +94,17 @@
             
             <!-- 1. STARTSEITE (Öffentlich) -->
             <section id="view-home" class="view-section space-y-6 text-left">
-                <div class="glass-panel p-8 sm:p-10 rounded-[2.5rem] text-center relative overflow-hidden">
-                    <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/20 shadow-inner">⚡</span>
-                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Secure Nexus</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Hardcore Studio-Simulation • Anti-Cheat Aktiv</p>
+                <div class="glass-panel p-8 sm:p-12 rounded-[2.5rem] text-center relative overflow-hidden">
+                    <div class="absolute -top-12 -right-12 w-72 h-72 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-12 -left-12 w-72 h-72 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Ultimate Music Empire &amp; 15 Upgrade Matrix</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Öffentliches Portal. Das Studio verlangt knallhartes Management und strategische Upgrades. Logge dich ein, um zu starten.
+                        Erlebe die ultimative Wirtschaftssimulation mit 15 mächtigen Upgrades, Genre-Spezialisierungen, Live-Events und dem Welt-Tournee-Prestige-System.
                     </p>
-                    <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
+                    <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
                     </div>
                 </div>
@@ -85,18 +128,18 @@
                             <p id="auth-logged-email" class="text-xs font-bold text-purple-300 font-mono"></p>
                         </div>
                         <button type="button" id="btn-auth-logout" class="cyber-button w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🚪 Sicher Abmelden</button>
-                        <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Hardcore Studio</button>
+                        <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Elite Studio</button>
                     </div>
 
                     <!-- Login Form -->
                     <div id="subform-login" class="space-y-3">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
+                            <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
-                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="••••">
+                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="••••">
                         </div>
                         <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
                         
@@ -126,11 +169,11 @@
                     <div id="subform-register" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
+                            <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN (min. 4 Ziffern):</label>
-                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="Sichere PIN">
+                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="Sichere PIN">
                         </div>
                         <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren &amp; Code senden</button>
                         
@@ -143,11 +186,11 @@
                     <div id="subform-reset" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
-                            <input type="email" id="reset-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
+                            <input type="email" id="reset-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN FESTLEGEN:</label>
-                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="Neue PIN">
+                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="Neue PIN">
                         </div>
                         <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Neu Setzen</button>
                         
@@ -162,16 +205,18 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full border-t border-purple-500/15 py-3 px-4 bg-[#05070c] text-center">
+    <footer class="w-full border-t border-purple-500/15 py-3 px-4 bg-[#030508] text-center">
         <div class="max-w-4xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
             <span id="session-status-badge" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt</span>
-            <span class="text-purple-400/60">jackdarckart • Secure Nexus</span>
+            <span class="text-purple-400/90 font-bold tracking-wider">jackdarckart • Prime Elite Nexus</span>
         </div>
     </footer>
 
     <!-- ENGINE SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            let releaseCooldowns = { rock: 0, hiphop: 0, album: 0 };
 
             const SecureAuth = {
                 currentUser: localStorage.getItem('secure_nexus_session') || null,
@@ -188,7 +233,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_JACK_SALT_HARDCORE_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_SALT_ELITE_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -264,13 +309,23 @@
                             fans: 5, 
                             hype: 0, 
                             releasesCount: 0, 
+                            genre: 'synthwave', 
+                            goldRecords: 0,
                             marketingLevel: 0, 
                             studioLevel: 0, 
                             producerLevel: 0, 
                             prLevel: 0, 
                             labelLevel: 0, 
                             merchLevel: 0, 
-                            algoLevel: 0 
+                            algoLevel: 0,
+                            tourBusLevel: 0,
+                            aiNeuralLevel: 0,
+                            satelliteLevel: 0,
+                            hologramTourLevel: 0,
+                            quantumSynthLevel: 0,
+                            musicAcademyLevel: 0,
+                            deepSpaceLevel: 0,
+                            singularityLevel: 0
                         };
                         initialData.checksum = this.generateChecksum(initialData);
                         db[email] = initialData;
@@ -310,9 +365,20 @@
                     let db = this.getDB();
                     let u = db[this.currentUser];
                     if (!u) return null;
+                    if (u.genre === undefined) u.genre = 'synthwave';
+                    if (u.goldRecords === undefined) u.goldRecords = 0;
+                    if (u.tourBusLevel === undefined) u.tourBusLevel = 0;
+                    if (u.aiNeuralLevel === undefined) u.aiNeuralLevel = 0;
+                    if (u.satelliteLevel === undefined) u.satelliteLevel = 0;
+                    if (u.hologramTourLevel === undefined) u.hologramTourLevel = 0;
+                    if (u.quantumSynthLevel === undefined) u.quantumSynthLevel = 0;
+                    if (u.musicAcademyLevel === undefined) u.musicAcademyLevel = 0;
+                    if (u.deepSpaceLevel === undefined) u.deepSpaceLevel = 0;
+                    if (u.singularityLevel === undefined) u.singularityLevel = 0;
+
                     if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
                         alert('⚠️ Anti-Cheat Alarm: Manipulierter Spielstand erkannt! Werte wurden zurückgesetzt.');
-                        u.fans = 5; u.marketingLevel = 0; u.studioLevel = 0; u.producerLevel = 0; u.prLevel = 0; u.labelLevel = 0; u.merchLevel = 0; u.algoLevel = 0;
+                        u.fans = 5; u.goldRecords = 0; u.marketingLevel = 0; u.studioLevel = 0; u.producerLevel = 0; u.prLevel = 0; u.labelLevel = 0; u.merchLevel = 0; u.algoLevel = 0; u.tourBusLevel = 0; u.aiNeuralLevel = 0; u.satelliteLevel = 0; u.hologramTourLevel = 0; u.quantumSynthLevel = 0; u.musicAcademyLevel = 0; u.deepSpaceLevel = 0; u.singularityLevel = 0;
                         u.checksum = this.generateChecksum(u);
                         db[this.currentUser] = u;
                         this.saveDB(db);
@@ -330,7 +396,7 @@
 
             const sitePages = [
                 { id: 'home', name: 'Home', icon: '🏠', desc: 'Öffentliche Startseite', protected: false },
-                { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Hardcore Studio-Management', protected: true },
+                { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
                 { id: 'garden', name: 'Garden', icon: '🌱', desc: 'Landschaft & Webradio Stream', protected: true },
@@ -354,42 +420,105 @@
                         innerHTMLContent = `
                             <div class="space-y-4">
                                 <!-- Statistik-Leiste -->
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                    <div class="bg-[#030508] p-3 rounded-2xl border border-purple-500/20">
-                                        <p class="text-[10px] font-mono text-purple-300 uppercase">Fans</p>
-                                        <p id="studio-fans" class="text-lg font-black text-white font-mono mt-1">5</p>
+                                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                    <div class="glass-panel p-3.5 rounded-2xl border border-purple-500/20">
+                                        <p class="text-[10px] font-mono text-purple-300 uppercase tracking-wider">Fans</p>
+                                        <p id="studio-fans" class="text-xl font-black text-white font-mono mt-1">5</p>
                                     </div>
-                                    <div class="bg-[#030508] p-3 rounded-2xl border border-cyan-500/20">
-                                        <p class="text-[10px] font-mono text-cyan-300 uppercase">Hype</p>
-                                        <p id="studio-hype" class="text-lg font-black text-white font-mono mt-1">0</p>
+                                    <div class="glass-panel p-3.5 rounded-2xl border border-cyan-500/20">
+                                        <p class="text-[10px] font-mono text-cyan-300 uppercase tracking-wider">Hype</p>
+                                        <p id="studio-hype" class="text-xl font-black text-white font-mono mt-1">0</p>
                                     </div>
-                                    <div class="bg-[#030508] p-3 rounded-2xl border border-pink-500/20">
-                                        <p class="text-[10px] font-mono text-pink-300 uppercase">Releases</p>
-                                        <p id="studio-releases" class="text-lg font-black text-white font-mono mt-1">0</p>
+                                    <div class="glass-panel p-3.5 rounded-2xl border border-pink-500/20">
+                                        <p class="text-[10px] font-mono text-pink-300 uppercase tracking-wider">Releases</p>
+                                        <p id="studio-releases" class="text-xl font-black text-white font-mono mt-1">0</p>
                                     </div>
-                                    <div class="bg-[#030508] p-3 rounded-2xl border border-emerald-500/20">
-                                        <p class="text-[10px] font-mono text-emerald-300 uppercase">Wachstum /s</p>
-                                        <p id="studio-fps" class="text-lg font-black text-emerald-400 font-mono mt-1">+0</p>
+                                    <div class="glass-panel p-3.5 rounded-2xl border border-amber-500/20">
+                                        <p class="text-[10px] font-mono text-amber-300 uppercase tracking-wider">Gold Platten</p>
+                                        <p id="studio-gold" class="text-xl font-black text-amber-400 font-mono mt-1">0</p>
+                                    </div>
+                                    <div class="glass-panel p-3.5 rounded-2xl border border-emerald-500/20 col-span-2 sm:col-span-1">
+                                        <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-wider">Wachstum /s</p>
+                                        <p id="studio-fps" class="text-xl font-black text-emerald-400 font-mono mt-1">+0</p>
                                     </div>
                                 </div>
 
-                                <!-- Releases (Manuell) -->
-                                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-purple-500/30 space-y-3">
-                                    <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">🎧 Musik-Releases (Manuell)</h3>
+                                <!-- Prestige / Welt-Tournee Panel -->
+                                <div class="glass-panel p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-center gap-3 bg-gradient-to-r from-amber-950/30 via-purple-950/20 to-slate-900/40">
+                                    <div>
+                                        <p class="text-xs font-mono text-amber-400 font-bold uppercase flex items-center gap-1.5"><span>🌟</span> Globale Welt-Tournee (Prestige)</p>
+                                        <p class="text-[10px] text-slate-300 mt-0.5">Setzt Fans &amp; Upgrades zurück, gibt aber permanent <span class="text-amber-300 font-bold">+25% Ertrag pro Gold-Platte</span>.</p>
+                                    </div>
+                                    <button type="button" id="btn-prestige" class="cyber-button bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white text-[11px] font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer shrink-0 shadow">🌟 Tournee Starten (Ab 50k Fans)</button>
+                                </div>
+
+                                <!-- Live Industry Event Ticker -->
+                                <div class="glass-panel p-4 rounded-2xl border border-purple-500/30 flex items-center justify-between gap-3 bg-gradient-to-r from-purple-950/40 via-slate-900/60 to-cyan-950/40">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-2xl animate-bounce">📡</span>
+                                        <div>
+                                            <p class="text-[10px] font-mono text-purple-300 uppercase tracking-wider">Live Industrie-Ticker</p>
+                                            <p id="industry-ticker-text" class="text-xs font-mono text-slate-200">Analysiere Musikmarkt... Bereit für Events.</p>
+                                        </div>
+                                    </div>
+                                    <span id="ticker-timer-badge" class="text-[10px] font-mono bg-purple-900/60 text-purple-300 px-2.5 py-1 rounded-lg border border-purple-500/40 shrink-0">Nächstes Event in 30s</span>
+                                </div>
+
+                                <!-- Genre-Spezialisierungs-Matrix -->
+                                <div class="glass-panel p-4 rounded-2xl border-slate-800 space-y-2.5">
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="text-xs font-mono text-cyan-300 font-bold uppercase">🎧 Aktiver Musik-Stil (Genre-Fokus)</h3>
+                                        <span class="text-[10px] font-mono text-slate-400">Beeinflusst Boni &amp; Erträge</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                        <button type="button" data-genre="synthwave" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-purple-500 p-2.5 rounded-xl text-left cursor-pointer transition">
+                                            <p class="text-xs font-bold text-white">🌆 Synthwave</p>
+                                            <p class="text-[9px] font-mono text-purple-300 mt-0.5">+15% Passiv-Boost</p>
+                                        </button>
+                                        <button type="button" data-genre="hiphop" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-purple-500 p-2.5 rounded-xl text-left cursor-pointer transition">
+                                            <p class="text-xs font-bold text-white">🎤 Hip-Hop</p>
+                                            <p class="text-[9px] font-mono text-indigo-300 mt-0.5">+30% Hype-Zuwachs</p>
+                                        </button>
+                                        <button type="button" data-genre="rock" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-purple-500 p-2.5 rounded-xl text-left cursor-pointer transition">
+                                            <p class="text-xs font-bold text-white">🎸 Rock / Metal</p>
+                                            <p class="text-[9px] font-mono text-pink-300 mt-0.5">-25% Release-Kosten</p>
+                                        </button>
+                                        <button type="button" data-genre="electro" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-purple-500 p-2.5 rounded-xl text-left cursor-pointer transition">
+                                            <p class="text-xs font-bold text-white">⚡ Electro Club</p>
+                                            <p class="text-[9px] font-mono text-cyan-300 mt-0.5">-30% Cooldown-Timer</p>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Hardcore Releases mit Cooldowns -->
+                                <div class="glass-panel p-5 rounded-2xl border border-purple-500/30 space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">💿 Musik-Produktion &amp; Releases</h3>
+                                        <span class="text-[10px] font-mono text-amber-400">Taktisches Management</span>
+                                    </div>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                        <button type="button" id="release-rock-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">🎸 Underground Single (+8 Fans)</button>
-                                        <button type="button" id="release-hiphop-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">🎤 Street Beat (+20 Fans)</button>
-                                        <button type="button" id="release-album-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow">💿 Studio Album (+75 Fans)</button>
+                                        <button type="button" id="release-rock-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
+                                            <span>🎸 Underground Single</span>
+                                            <span id="release-rock-txt" class="text-[10px] font-light text-purple-200">Kosten: 6 Fans | +14 Netto (3s)</span>
+                                        </button>
+                                        <button type="button" id="release-hiphop-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
+                                            <span>🎤 Street Beat</span>
+                                            <span id="release-hiphop-txt" class="text-[10px] font-light text-indigo-200">Kosten: 25 Fans | +45 Netto (8s)</span>
+                                        </button>
+                                        <button type="button" id="release-album-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
+                                            <span>💿 Studio Album</span>
+                                            <span id="release-album-txt" class="text-[10px] font-light text-cyan-200">Kosten: 120 Fans | +230 Netto (20s)</span>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- Upgrades Matrix -->
-                                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-slate-800 space-y-3">
-                                    <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">📈 Studio-Upgrades &amp; Expansion</h3>
-                                    <div class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                                <!-- Upgrades Matrix (15 Stufen) -->
+                                <div class="glass-panel p-5 rounded-2xl border-slate-800 space-y-3">
+                                    <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">📈 Studio-Upgrades &amp; 15 Empire Stufen</h3>
+                                    <div class="space-y-2.5 max-h-[400px] overflow-y-auto pr-1.5">
                                         
-                                        <!-- Upgrade 1 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                        <!-- 1 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
                                             <div>
                                                 <p class="text-xs font-bold text-white">📢 Social-Media Kampagne (Lvl <span id="market-lvl">0</span>)</p>
                                                 <p class="text-[10px] text-slate-400 font-mono">+1 Fan/s | Kosten: <span id="market-cost">35</span> Fans</p>
@@ -397,8 +526,8 @@
                                             <button type="button" id="buy-market-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                         </div>
 
-                                        <!-- Upgrade 2 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                        <!-- 2 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
                                             <div>
                                                 <p class="text-xs font-bold text-white">🎛️ High-End Mastering Suite (Lvl <span id="studio-lvl">0</span>)</p>
                                                 <p class="text-[10px] text-slate-400 font-mono">+4 Fans/s | Kosten: <span id="studio-cost">150</span> Fans</p>
@@ -406,8 +535,8 @@
                                             <button type="button" id="buy-studio-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                         </div>
 
-                                        <!-- Upgrade 3 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                        <!-- 3 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
                                             <div>
                                                 <p class="text-xs font-bold text-white">🎹 Ghostproducer-Team (Lvl <span id="producer-lvl">0</span>)</p>
                                                 <p class="text-[10px] text-slate-400 font-mono">+12 Fans/s | Kosten: <span id="producer-cost">600</span> Fans</p>
@@ -415,8 +544,8 @@
                                             <button type="button" id="buy-producer-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                         </div>
 
-                                        <!-- Upgrade 4 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                        <!-- 4 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
                                             <div>
                                                 <p class="text-xs font-bold text-white">📰 PR-Agentur &amp; Management (Lvl <span id="pr-lvl">0</span>)</p>
                                                 <p class="text-[10px] text-slate-400 font-mono">+15% Gesamtwachstum | Kosten: <span id="pr-cost">1200</span> Fans</p>
@@ -424,8 +553,8 @@
                                             <button type="button" id="buy-pr-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                         </div>
 
-                                        <!-- Upgrade 5 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                        <!-- 5 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
                                             <div>
                                                 <p class="text-xs font-bold text-white">🏢 Eigenes Plattenlabel (Lvl <span id="label-lvl">0</span>)</p>
                                                 <p class="text-[10px] text-slate-400 font-mono">+45 Fans/s | Kosten: <span id="label-cost">4500</span> Fans</p>
@@ -433,8 +562,8 @@
                                             <button type="button" id="buy-label-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                         </div>
 
-                                        <!-- Upgrade 6 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                        <!-- 6 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
                                             <div>
                                                 <p class="text-xs font-bold text-white">👕 Merchandising-Linie (Lvl <span id="merch-lvl">0</span>)</p>
                                                 <p class="text-[10px] text-slate-400 font-mono">+120 Fans/s | Kosten: <span id="merch-cost">18000</span> Fans</p>
@@ -442,8 +571,8 @@
                                             <button type="button" id="buy-merch-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                         </div>
 
-                                        <!-- Upgrade 7 -->
-                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
+                                        <!-- 7 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80">
                                             <div>
                                                 <p class="text-xs font-bold text-white">🌐 Streaming-Algorithmus (Lvl <span id="algo-lvl">0</span>)</p>
                                                 <p class="text-[10px] text-slate-400 font-mono">+350 Fans/s | Kosten: <span id="algo-cost">75000</span> Fans</p>
@@ -451,11 +580,83 @@
                                             <button type="button" id="buy-algo-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                         </div>
 
+                                        <!-- 8 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🚌 World Tour Arena Bus (Lvl <span id="tourbus-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+950 Fans/s | Kosten: <span id="tourbus-cost">280000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-tourbus-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- 9 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🤖 AI-Mastering Neural Net (Lvl <span id="aineural-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+2800 Fans/s | Kosten: <span id="aineural-cost">1200000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-aineural-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- 10 -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🛰️ Global Satellite Uplink (Lvl <span id="satellite-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+9500 Fans/s | Kosten: <span id="satellite-cost">5500000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-satellite-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- NEU 11: Interstellar Hologram Tour -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🌌 Interstellar Hologram Tour (Lvl <span id="hologram-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+28,000 Fans/s | Kosten: <span id="hologram-cost">22000000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-hologram-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- NEU 12: Quantum Sound Synthesizer -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🧠 Quantum Sound Synthesizer (Lvl <span id="quantumsynth-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+85,000 Fans/s | Kosten: <span id="quantumsynth-cost">90000000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-quantumsynth-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- NEU 13: Global Music Academy -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-indigo-500/30">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🏛️ Global Music Academy (Lvl <span id="musicacademy-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+250,000 Fans/s | Kosten: <span id="musicacademy-cost">400000000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-musicacademy-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- NEU 14: Deep Space Broadcast Station -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-indigo-500/30">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">🛸 Deep Space Broadcast Station (Lvl <span id="deepspace-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+800,000 Fans/s | Kosten: <span id="deepspace-cost">1800000000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-deepspace-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
+                                        <!-- NEU 15: Nexus Singularity Engine -->
+                                        <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-pink-500/40">
+                                            <div>
+                                                <p class="text-xs font-bold text-white">⚛️ Nexus Singularity Engine (Lvl <span id="singularity-lvl">0</span>)</p>
+                                                <p class="text-[10px] text-slate-400 font-mono">+3,000,000 Fans/s | Kosten: <span id="singularity-cost">8000000000</span> Fans</p>
+                                            </div>
+                                            <button type="button" id="buy-singularity-btn" class="cyber-button bg-pink-600 hover:bg-pink-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                        </div>
+
                                     </div>
                                 </div>
 
-                                <!-- NEU: Spielstand Reset (Account bleibt erhalten) -->
-                                <div class="bg-[#030508]/80 p-4 rounded-2xl border border-red-500/30 flex flex-col sm:flex-row justify-between items-center gap-3">
+                                <!-- Spielstand Reset (Account bleibt erhalten) -->
+                                <div class="glass-panel p-4 rounded-2xl border border-red-500/30 flex flex-col sm:flex-row justify-between items-center gap-3">
                                     <div>
                                         <p class="text-xs font-mono text-red-400 font-bold uppercase">⚠️ Spielstand Zurücksetzen</p>
                                         <p class="text-[10px] text-slate-400">Setzt Fans, Releases &amp; Upgrades auf Anfang zurück (E-Mail &amp; PIN bleiben aktiv).</p>
@@ -468,7 +669,7 @@
                     } else if (page.id === 'cloud') {
                         innerHTMLContent = `
                             <div class="space-y-4">
-                                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-cyan-500/30 space-y-4">
+                                <div class="glass-panel p-5 rounded-2xl border border-cyan-500/30 space-y-4">
                                     <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase">☁️ Externes Backup &amp; Portabilität</h3>
                                     <p class="text-xs text-slate-300">Sichere deinen harten Fortschritt als Datei ab, um ihn auf anderen Geräten fortzusetzen.</p>
                                     <div class="flex flex-wrap gap-3 pt-2">
@@ -485,7 +686,7 @@
                     } else if (page.id === 'admin') {
                         innerHTMLContent = `
                             <div class="space-y-4">
-                                <div class="bg-[#030508]/80 p-5 rounded-2xl border border-amber-500/30 space-y-3">
+                                <div class="glass-panel p-5 rounded-2xl border border-amber-500/30 space-y-3">
                                     <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🔒 Account-Verwaltung</h3>
                                     <p class="text-xs text-slate-300 font-mono">Eingeloggt als: <span id="admin-current-email" class="text-purple-400 font-bold"></span></p>
                                     <button type="button" id="btn-trigger-logout" class="cyber-button bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold py-2.5 px-5 rounded-xl cursor-pointer">🚪 Abmelden</button>
@@ -535,10 +736,10 @@
                 if (page.id !== 'home') {
                     const card = document.createElement('button');
                     card.type = 'button';
-                    card.className = 'cyber-button nav-link glass-panel p-4 rounded-2xl border border-purple-500/20 text-left hover:border-purple-500/50 cursor-pointer transition flex flex-col justify-between';
+                    card.className = 'cyber-button nav-link glass-panel p-5 rounded-2xl border border-purple-500/20 text-left hover:border-purple-500/50 cursor-pointer transition flex flex-col justify-between';
                     card.dataset.target = page.id;
                     card.innerHTML = `
-                        <div class="text-2xl mb-2">${page.icon}</div>
+                        <div class="text-3xl mb-3">${page.icon}</div>
                         <div class="text-xs font-bold text-white font-mono">${page.name} ${page.protected ? '🔒' : ''}</div>
                         <div class="text-[10px] text-slate-400 mt-1">${page.desc}</div>
                     `;
@@ -768,22 +969,44 @@
                 }
             });
 
-            // --- HARDCORE STUDIO GAME LOGIC ---
+            // --- 15 UPGRADES GAME LOGIC & PRESTIGE ---
             
+            let eventTimer = 30;
+            const liveEventsList = [
+                { text: "🔥 Dein Track geht auf TikTok viral! +150 Fans erhalten.", action: (d) => { d.fans += 150; d.hype += 25; } },
+                { text: "📻 Lokaler Radiosender spielt deinen Song. +50 Fans.", action: (d) => { d.fans += 50; d.hype += 10; } },
+                { text: "⚠️ Server-Überlastung beim Streaming! Kurzzeitig -15 Fans.", action: (d) => { d.fans = Math.max(0, d.fans - 15); } },
+                { text: "💡 Inspirations-Schub im Studio! +80 Hype gewonnen.", action: (d) => { d.hype += 80; } },
+                { text: "📰 Musik-Magazin schreibt Loblied. +200 Fans & +30 Hype!", action: (d) => { d.fans += 200; d.hype += 30; } }
+            ];
+
             function getFansPerSec(data) {
                 let base = (data.marketingLevel * 1) + 
                            (data.studioLevel * 3) + 
                            (data.producerLevel * 12) + 
                            (data.labelLevel * 45) + 
                            (data.merchLevel * 120) + 
-                           (data.algoLevel * 350);
+                           (data.algoLevel * 350) + 
+                           (data.tourBusLevel * 950) + 
+                           (data.aiNeuralLevel * 2800) + 
+                           (data.satelliteLevel * 9500) +
+                           (data.hologramTourLevel * 28000) +
+                           (data.quantumSynthLevel * 85000) +
+                           (data.musicAcademyLevel * 250000) +
+                           (data.deepSpaceLevel * 800000) +
+                           (data.singularityLevel * 3000000);
                 
                 let multiplier = 1 + (data.prLevel * 0.15);
-                return Math.floor(base * multiplier);
+                if (data.genre === 'synthwave') multiplier += 0.15;
+                
+                let prestigeMultiplier = 1 + (data.goldRecords * 0.25);
+                return Math.floor(base * multiplier * prestigeMultiplier);
             }
 
-            function getCost(baseCost, factor, level) {
-                return Math.floor(baseCost * Math.pow(factor, level));
+            function getCost(baseCost, factor, level, genre) {
+                let cost = baseCost * Math.pow(factor, level);
+                if (genre === 'rock') cost *= 0.75;
+                return Math.floor(cost);
             }
 
             function updateStudioUI(data) {
@@ -791,12 +1014,28 @@
                 const fEl = document.getElementById('studio-fans');
                 const hEl = document.getElementById('studio-hype');
                 const rEl = document.getElementById('studio-releases');
+                const gEl = document.getElementById('studio-gold');
                 const fpsEl = document.getElementById('studio-fps');
+                const prestigeBtn = document.getElementById('btn-prestige');
 
                 if (fEl) fEl.innerText = Math.floor(data.fans).toLocaleString('de-DE');
                 if (hEl) hEl.innerText = Math.floor(data.hype).toLocaleString('de-DE');
                 if (rEl) rEl.innerText = data.releasesCount;
+                if (gEl) gEl.innerText = data.goldRecords;
                 if (fpsEl) fpsEl.innerText = "+" + getFansPerSec(data);
+
+                if (prestigeBtn) {
+                    prestigeBtn.disabled = data.fans < 50000;
+                    prestigeBtn.innerText = data.fans >= 50000 ? `🌟 Welt-Tournee Starten (+1 Gold-Platte)` : `🌟 Tournee ab 50k Fans (${Math.floor(data.fans).toLocaleString()}/50k)`;
+                }
+
+                document.querySelectorAll('.genre-btn').forEach(btn => {
+                    if (btn.dataset.genre === data.genre) {
+                        btn.classList.add('border-purple-500', 'bg-purple-950/40', 'shadow-[0_0_18px_rgba(168,85,247,0.35)]');
+                    } else {
+                        btn.classList.remove('border-purple-500', 'bg-purple-950/40', 'shadow-[0_0_18px_rgba(168,85,247,0.35)]');
+                    }
+                });
 
                 const upgrades = [
                     { id: 'market', base: 35, factor: 1.45, lvl: data.marketingLevel },
@@ -805,18 +1044,70 @@
                     { id: 'pr', base: 1200, factor: 1.60, lvl: data.prLevel },
                     { id: 'label', base: 4500, factor: 1.65, lvl: data.labelLevel },
                     { id: 'merch', base: 18000, factor: 1.70, lvl: data.merchLevel },
-                    { id: 'algo', base: 75000, factor: 1.75, lvl: data.algoLevel }
+                    { id: 'algo', base: 75000, factor: 1.75, lvl: data.algoLevel },
+                    { id: 'tourbus', base: 280000, factor: 1.80, lvl: data.tourBusLevel },
+                    { id: 'aineural', base: 1200000, factor: 1.85, lvl: data.aiNeuralLevel },
+                    { id: 'satellite', base: 5500000, factor: 1.90, lvl: data.satelliteLevel },
+                    { id: 'hologram', base: 22000000, factor: 1.95, lvl: data.hologramTourLevel },
+                    { id: 'quantumsynth', base: 90000000, factor: 2.00, lvl: data.quantumSynthLevel },
+                    { id: 'musicacademy', base: 400000000, factor: 2.05, lvl: data.musicAcademyLevel },
+                    { id: 'deepspace', base: 1800000000, factor: 2.10, lvl: data.deepSpaceLevel },
+                    { id: 'singularity', base: 8000000000, factor: 2.15, lvl: data.singularityLevel }
                 ];
 
                 upgrades.forEach(u => {
                     const lvlEl = document.getElementById(`${u.id}-lvl`);
                     const costEl = document.getElementById(`${u.id}-cost`);
                     if (lvlEl) lvlEl.innerText = u.lvl;
-                    if (costEl) costEl.innerText = getCost(u.base, u.factor, u.lvl).toLocaleString('de-DE');
+                    if (costEl) costEl.innerText = getCost(u.base, u.factor, u.lvl, data.genre).toLocaleString('de-DE');
                 });
+
+                // Cooldowns & Buttons
+                const now = Date.now();
+                const rockBtn = document.getElementById('release-rock-btn');
+                const hiphopBtn = document.getElementById('release-hiphop-btn');
+                const albumBtn = document.getElementById('release-album-btn');
+
+                let rockCost = getCost(6, 1, 0, data.genre);
+                let hiphopCost = getCost(25, 1, 0, data.genre);
+                let albumCost = getCost(120, 1, 0, data.genre);
+
+                if (rockBtn) {
+                    let timeLeft = Math.ceil((releaseCooldowns.rock - now) / 1000);
+                    let cdMod = data.genre === 'electro' ? 0.7 : 1;
+                    if (timeLeft > 0) {
+                        rockBtn.disabled = true;
+                        document.getElementById('release-rock-txt').innerText = `⏱️ Cooldown: ${Math.ceil(timeLeft * cdMod)}s`;
+                    } else {
+                        rockBtn.disabled = data.fans < rockCost;
+                        document.getElementById('release-rock-txt').innerText = `Kosten: ${rockCost} Fans | +14 Netto`;
+                    }
+                }
+                if (hiphopBtn) {
+                    let timeLeft = Math.ceil((releaseCooldowns.hiphop - now) / 1000);
+                    let cdMod = data.genre === 'electro' ? 0.7 : 1;
+                    if (timeLeft > 0) {
+                        hiphopBtn.disabled = true;
+                        document.getElementById('release-hiphop-txt').innerText = `⏱️ Cooldown: ${Math.ceil(timeLeft * cdMod)}s`;
+                    } else {
+                        hiphopBtn.disabled = data.fans < hiphopCost;
+                        document.getElementById('release-hiphop-txt').innerText = `Kosten: ${hiphopCost} Fans | +45 Netto`;
+                    }
+                }
+                if (albumBtn) {
+                    let timeLeft = Math.ceil((releaseCooldowns.album - now) / 1000);
+                    let cdMod = data.genre === 'electro' ? 0.7 : 1;
+                    if (timeLeft > 0) {
+                        albumBtn.disabled = true;
+                        document.getElementById('release-album-txt').innerText = `⏱️ Cooldown: ${Math.ceil(timeLeft * cdMod)}s`;
+                    } else {
+                        albumBtn.disabled = data.fans < albumCost;
+                        document.getElementById('release-album-txt').innerText = `Kosten: ${albumCost} Fans | +230 Netto`;
+                    }
+                }
             }
 
-            // Game Loop (jede Sekunde)
+            // Game Loop & Live Event Trigger
             setInterval(() => {
                 if (!SecureAuth.currentUser) return;
                 let data = SecureAuth.getAccountData();
@@ -824,26 +1115,75 @@
                     let fps = getFansPerSec(data);
                     if (fps > 0) {
                         data.fans += fps;
-                        SecureAuth.saveAccountData(data);
-                        updateStudioUI(data);
                     }
+
+                    eventTimer--;
+                    const badge = document.getElementById('ticker-timer-badge');
+                    if (badge) badge.innerText = `Nächstes Event in ${eventTimer}s`;
+
+                    if (eventTimer <= 0) {
+                        eventTimer = 30;
+                        let randomEvent = liveEventsList[Math.floor(Math.random() * liveEventsList.length)];
+                        randomEvent.action(data);
+                        const tickerText = document.getElementById('industry-ticker-text');
+                        if (tickerText) tickerText.innerText = randomEvent.text;
+                    }
+
+                    SecureAuth.saveAccountData(data);
+                    updateStudioUI(data);
                 }
             }, 1000);
 
-            // Event-Listener für Releases, Upgrades und Game-Reset
+            // Event-Listener
             document.addEventListener('click', function(e) {
                 if (!SecureAuth.currentUser) return;
                 let data = SecureAuth.getAccountData();
                 if (!data) return;
 
                 let updated = false;
+                const now = Date.now();
 
-                // Spielstand Reset Button
-                if (e.target && e.target.id === 'btn-reset-gamestate') {
-                    if (confirm("⚠️ Bist du sicher, dass du deinen Spielstand zurücksetzen möchtest? Dein Account und deine PIN bleiben erhalten, aber alle Fans und Upgrades werden gelöscht!")) {
+                // Prestige
+                if (e.target && e.target.closest('#btn-prestige')) {
+                    if (data.fans >= 50000) {
+                        if (confirm("🌟 Bist du bereit für eine globale Welt-Tournee? Deine Fans und Upgrades werden zurückgesetzt, aber du erhältst +1 Goldene Schallplatte (+25% permanenter Boost)!")) {
+                            data.goldRecords += 1;
+                            data.fans = 5;
+                            data.hype = 0;
+                            data.marketingLevel = 0;
+                            data.studioLevel = 0;
+                            data.producerLevel = 0;
+                            data.prLevel = 0;
+                            data.labelLevel = 0;
+                            data.merchLevel = 0;
+                            data.algoLevel = 0;
+                            data.tourBusLevel = 0;
+                            data.aiNeuralLevel = 0;
+                            data.satelliteLevel = 0;
+                            data.hologramTourLevel = 0;
+                            data.quantumSynthLevel = 0;
+                            data.musicAcademyLevel = 0;
+                            data.deepSpaceLevel = 0;
+                            data.singularityLevel = 0;
+                            updated = true;
+                        }
+                    }
+                }
+
+                // Genre Auswahl
+                const genreBtn = e.target.closest('.genre-btn');
+                if (genreBtn) {
+                    data.genre = genreBtn.dataset.genre;
+                    updated = true;
+                }
+
+                // Spielstand Reset
+                if (e.target && e.target.closest('#btn-reset-gamestate')) {
+                    if (confirm("⚠️ Bist du sicher, dass du deinen Spielstand zurücksetzen möchtest? Dein Account bleibt erhalten, aber alle Fans, Platten und Upgrades werden gelöscht!")) {
                         data.fans = 5;
                         data.hype = 0;
                         data.releasesCount = 0;
+                        data.goldRecords = 0;
                         data.marketingLevel = 0;
                         data.studioLevel = 0;
                         data.producerLevel = 0;
@@ -851,20 +1191,63 @@
                         data.labelLevel = 0;
                         data.merchLevel = 0;
                         data.algoLevel = 0;
+                        data.tourBusLevel = 0;
+                        data.aiNeuralLevel = 0;
+                        data.satelliteLevel = 0;
+                        data.hologramTourLevel = 0;
+                        data.quantumSynthLevel = 0;
+                        data.musicAcademyLevel = 0;
+                        data.deepSpaceLevel = 0;
+                        data.singularityLevel = 0;
                         updated = true;
                     }
                 }
 
-                // Releases (Manuelle Erträge)
-                if (e.target && e.target.id === 'release-rock-btn') {
-                    data.fans += 8; data.hype += 2; data.releasesCount += 1; updated = true;
-                } else if (e.target && e.target.id === 'release-hiphop-btn') {
-                    data.fans += 20; data.hype += 6; data.releasesCount += 1; updated = true;
-                } else if (e.target && e.target.id === 'release-album-btn') {
-                    data.fans += 75; data.hype += 22; data.releasesCount += 1; updated = true;
+                let cdMod = data.genre === 'electro' ? 0.7 : 1;
+                let rockCost = getCost(6, 1, 0, data.genre);
+                let hiphopCost = getCost(25, 1, 0, data.genre);
+                let albumCost = getCost(120, 1, 0, data.genre);
+
+                const rockTarget = e.target.closest('#release-rock-btn');
+                if (rockTarget && !rockTarget.disabled) {
+                    if (now >= releaseCooldowns.rock && data.fans >= rockCost) {
+                        data.fans -= rockCost;
+                        let hypeGain = data.genre === 'hiphop' ? 5 : 3;
+                        data.fans += 20; 
+                        data.hype += hypeGain; 
+                        data.releasesCount += 1;
+                        releaseCooldowns.rock = now + (3000 * cdMod);
+                        updated = true;
+                    }
                 }
 
-                // Upgrades Kauf-Logik
+                const hiphopTarget = e.target.closest('#release-hiphop-btn');
+                if (hiphopTarget && !hiphopTarget.disabled) {
+                    if (now >= releaseCooldowns.hiphop && data.fans >= hiphopCost) {
+                        data.fans -= hiphopCost;
+                        let hypeGain = data.genre === 'hiphop' ? 18 : 10;
+                        data.fans += 70; 
+                        data.hype += hypeGain; 
+                        data.releasesCount += 1;
+                        releaseCooldowns.hiphop = now + (8000 * cdMod);
+                        updated = true;
+                    }
+                }
+
+                const albumTarget = e.target.closest('#release-album-btn');
+                if (albumTarget && !albumTarget.disabled) {
+                    if (now >= releaseCooldowns.album && data.fans >= albumCost) {
+                        data.fans -= albumCost;
+                        let hypeGain = data.genre === 'hiphop' ? 65 : 40;
+                        data.fans += 350; 
+                        data.hype += hypeGain; 
+                        data.releasesCount += 1;
+                        releaseCooldowns.album = now + (20000 * cdMod);
+                        updated = true;
+                    }
+                }
+
+                // Upgrades (Alle 15 Stufen)
                 const upgradeActions = [
                     { btn: 'buy-market-btn', key: 'marketingLevel', base: 35, factor: 1.45 },
                     { btn: 'buy-studio-btn', key: 'studioLevel', base: 150, factor: 1.50 },
@@ -872,12 +1255,20 @@
                     { btn: 'buy-pr-btn', key: 'prLevel', base: 1200, factor: 1.60 },
                     { btn: 'buy-label-btn', key: 'labelLevel', base: 4500, factor: 1.65 },
                     { btn: 'buy-merch-btn', key: 'merchLevel', base: 18000, factor: 1.70 },
-                    { btn: 'buy-algo-btn', key: 'algoLevel', base: 75000, factor: 1.75 }
+                    { btn: 'buy-algo-btn', key: 'algoLevel', base: 75000, factor: 1.75 },
+                    { btn: 'buy-tourbus-btn', key: 'tourBusLevel', base: 280000, factor: 1.80 },
+                    { btn: 'buy-aineural-btn', key: 'aiNeuralLevel', base: 1200000, factor: 1.85 },
+                    { btn: 'buy-satellite-btn', key: 'satelliteLevel', base: 5500000, factor: 1.90 },
+                    { btn: 'buy-hologram-btn', key: 'hologramTourLevel', base: 22000000, factor: 1.95 },
+                    { btn: 'buy-quantumsynth-btn', key: 'quantumSynthLevel', base: 90000000, factor: 2.00 },
+                    { btn: 'buy-musicacademy-btn', key: 'musicAcademyLevel', base: 400000000, factor: 2.05 },
+                    { btn: 'buy-deepspace-btn', key: 'deepSpaceLevel', base: 1800000000, factor: 2.10 },
+                    { btn: 'buy-singularity-btn', key: 'singularityLevel', base: 8000000000, factor: 2.15 }
                 ];
 
                 upgradeActions.forEach(act => {
                     if (e.target && e.target.id === act.btn) {
-                        let cost = getCost(act.base, act.factor, data[act.key]);
+                        let cost = getCost(act.base, act.factor, data[act.key], data.genre);
                         if (data.fans >= cost) {
                             data.fans -= cost;
                             data[act.key] += 1;
