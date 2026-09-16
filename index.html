@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>jackdarckart | Nexus v101.0</title>
+    <title>jackdarckart | Nexus v103.0</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS SDK -->
@@ -101,7 +101,7 @@
                     </div>
                     <div>
                         <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-cyan-400 via-teal-300 to-pink-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                        <span class="text-[9px] font-mono text-slate-400 tracking-wider">Cybernetic Sphere v101.0</span>
+                        <span class="text-[9px] font-mono text-slate-400 tracking-wider">Cybernetic Player v103.0</span>
                     </div>
                 </div>
                 <button type="button" id="btn-toggle-nav-bar" class="cyber-button sm:hidden bg-slate-900 text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded-lg text-[10px] font-mono cursor-pointer">👁️ Menü</button>
@@ -284,11 +284,11 @@
                 
                 getDB() {
                     try {
-                        return JSON.parse(localStorage.getItem('secure_nexus_users_db_v101')) || {};
+                        return JSON.parse(localStorage.getItem('secure_nexus_users_db_v103')) || {};
                     } catch(e) { return {}; }
                 },
                 saveDB(db) {
-                    localStorage.setItem('secure_nexus_users_db_v101', JSON.stringify(db));
+                    localStorage.setItem('secure_nexus_users_db_v103', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
                     const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.goldRecords}_JACK_PLAYER_NEXUS_2026`;
@@ -456,46 +456,56 @@
                             </div>
                         `;
                     } else if (page.id === 'garden') {
-                        // NUR DER EINGEBETTETE QUANTEN-WEBPLAYER (ALLES ANDERE IM GARTEN WURDE ENTFERNT)
+                        // EXKLUSIV NUR DER NEUE WEBPLAYER IM GARTEN-BEREICH (ALLES ALTE GELÖSCHT)
                         innerHTMLContent = `
-                            <div class="space-y-6 w-full h-full flex flex-col max-w-4xl mx-auto">
+                            <div class="space-y-6 w-full h-full flex flex-col max-w-3xl mx-auto">
                                 <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden bg-gradient-to-b from-[#020c14]/98 via-[#01050a]/99 to-[#000103] shadow-2xl w-full flex-grow flex flex-col space-y-6">
                                     
-                                    <!-- Top Bar -->
+                                    <!-- Header Info & Live Indicator -->
                                     <div class="flex justify-between items-center border-b border-cyan-500/20 pb-3 w-full">
-                                        <button type="button" class="nav-link cyber-button bg-slate-900 text-cyan-300 border border-cyan-500/30 px-4 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer" data-target="studio">
-                                            ← Zum Empire Studio
-                                        </button>
-                                        <span class="text-[11px] font-mono text-cyan-400 font-bold tracking-widest">QUANTUM CYBERNETIC PLAYER</span>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/25 neon-pulse">
+                                                <div class="w-full h-full bg-[#010206] rounded-[10px] flex items-center justify-center text-sm">🎧</div>
+                                            </div>
+                                            <div>
+                                                <span class="font-black text-[11px] tracking-widest uppercase bg-gradient-to-r from-cyan-400 via-teal-300 to-pink-400 bg-clip-text text-transparent block">Quantum Player</span>
+                                                <span class="text-[8px] font-mono text-slate-400 tracking-wider">Realtime Sync Matrix</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-1.5 bg-[#010206] px-3 py-1 rounded-xl border border-cyan-500/20 shadow-inner">
+                                            <span class="text-[8px] font-mono text-cyan-400 mr-1 tracking-widest">LIVE</span>
+                                            <div class="w-1 bg-cyan-500 rounded-full wave-bar"></div>
+                                            <div class="w-1 bg-teal-500 rounded-full wave-bar"></div>
+                                            <div class="w-1 bg-pink-500 rounded-full wave-bar"></div>
+                                        </div>
                                     </div>
 
-                                    <!-- Live Track Info Header -->
+                                    <!-- Live Track Titel -->
                                     <div class="text-center space-y-1 relative z-10">
-                                        <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">stream-musik.space WebRadio</span>
-                                        <h2 id="radio-track-title" class="text-sm sm:text-lg font-bold text-white font-mono tracking-wide truncate px-4">Verbindung wird aufgebaut...</h2>
+                                        <span class="text-[9px] font-mono text-cyan-400 uppercase tracking-widest font-bold">stream-musik.space WebRadio</span>
+                                        <h2 id="radio-track-title" class="text-sm sm:text-base font-bold text-white font-mono tracking-wide truncate px-2">Verbindung wird aufgebaut...</h2>
                                     </div>
 
-                                    <!-- LIVE 3D VISUALIZER CANVAS (Im eingebetteten Webplayer) -->
-                                    <div id="canvas-container" class="relative w-full h-[360px] sm:h-[460px] rounded-3xl border border-cyan-500/50 overflow-hidden shadow-2xl bg-[#010307]">
+                                    <!-- LIVE 3D VISUALIZER CANVAS (Im Garten-Player) -->
+                                    <div id="canvas-container" class="relative w-full h-[320px] sm:h-[380px] rounded-3xl border border-cyan-500/50 overflow-hidden shadow-2xl bg-[#010307]">
                                         <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
                                         <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
-                                            <span class="text-[10px] font-mono text-cyan-400/40 uppercase tracking-widest">Quantum Audio Matrix</span>
+                                            <span class="text-[9px] font-mono text-cyan-400/30 uppercase tracking-widest">Quantum Audio Matrix</span>
                                         </div>
                                     </div>
 
-                                    <!-- Player Controls & Volume -->
-                                    <div class="space-y-4 relative z-10">
-                                        <div class="flex items-center justify-between gap-4">
-                                            <button type="button" id="garden-play-btn" class="cyber-button flex-grow bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-500 text-white font-black py-4 px-6 rounded-2xl text-xs sm:text-sm uppercase tracking-widest cursor-pointer shadow-xl shadow-cyan-500/40 flex items-center justify-center gap-3">
-                                                <span id="play-icon" class="text-base">▶</span> <span id="play-text">Stream Abspielen</span>
-                                            </button>
-                                        </div>
+                                    <!-- Controls & Volume -->
+                                    <div class="space-y-3 relative z-10">
+                                        <button type="button" id="garden-play-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-500 text-white font-black py-3.5 px-6 rounded-2xl text-xs sm:text-sm uppercase tracking-widest cursor-pointer shadow-xl shadow-cyan-500/40 flex items-center justify-center gap-3">
+                                            <span id="play-icon" class="text-base">▶</span> <span id="play-text">Stream Abspielen</span>
+                                        </button>
 
-                                        <div class="flex items-center justify-between bg-[#010206]/80 px-5 py-3 rounded-2xl border border-cyan-500/20 shadow-inner">
-                                            <div class="flex items-center gap-2 text-xs font-mono text-slate-300">
+                                        <div class="flex items-center justify-between bg-[#010206]/80 px-4 py-2.5 rounded-2xl border border-cyan-500/20 shadow-inner">
+                                            <div class="flex items-center gap-2 text-[11px] font-mono text-slate-300">
                                                 <span>🔊</span> <span>Lautstärke</span>
                                             </div>
-                                            <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-36 sm:w-48 accent-cyan-500 cursor-pointer">
+                                            <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-32 sm:w-40 accent-cyan-500 cursor-pointer">
                                         </div>
                                     </div>
 
@@ -896,7 +906,7 @@
                 }
             });
 
-            // QUANTUM CYBERNETIC EMBEDDED PLAYER ENGINE
+            // QUANTUM CYBERNETIC EMBEDDED GARDEN PLAYER ENGINE
             let animationFrameId = null;
             function initGardenScreenCanvas() {
                 const canvas = document.getElementById('garden-canvas');
@@ -935,16 +945,16 @@
                 });
 
                 let shards = [];
-                for(let i=0; i<110; i++) {
+                for(let i=0; i<100; i++) {
                     let theta = Math.random() * Math.PI * 2;
                     let costheta = Math.random() * 2 - 1;
                     let u = Math.random();
-                    let r = 85 + u * 170;
+                    let r = 75 + u * 150;
                     shards.push({
                         x: Math.cos(theta) * r,
                         y: costheta * r,
-                        z: (Math.random() - 0.5) * 140,
-                        size: Math.random() * 12 + 4,
+                        z: (Math.random() - 0.5) * 120,
+                        size: Math.random() * 11 + 4,
                         color: Math.random() > 0.5 ? '#38bdf8' : '#ec4899',
                         angle: Math.random() * Math.PI
                     });
@@ -1003,33 +1013,33 @@
 
                     const w = displayWidth;
                     const h = displayHeight;
-                    const s = Math.min(w, h) / 750;
+                    const s = Math.min(w, h) / 720;
 
-                    let bgGrad = ctx.createRadialGradient(w/2, h/2, 10, w/2, h/2, Math.max(w, h) * 0.75);
-                    bgGrad.addColorStop(0, `rgba(14, 116, 144, ${0.3 + smoothBass * 0.4})`);
-                    bgGrad.addColorStop(0.5, '#01050c');
+                    let bgGrad = ctx.createRadialGradient(w/2, h/2, 10, w/2, h/2, Math.max(w, h) * 0.7);
+                    bgGrad.addColorStop(0, `rgba(14, 116, 144, ${0.35 + smoothBass * 0.45})`);
+                    bgGrad.addColorStop(0.5, '#010610');
                     bgGrad.addColorStop(1, '#000103');
                     ctx.fillStyle = bgGrad;
                     ctx.fillRect(0, 0, w, h);
 
-                    rotX += 0.007 + (smoothBass * 0.018);
-                    rotY += 0.010 + (smoothBass * 0.022);
+                    rotX += 0.008 + (smoothBass * 0.02);
+                    rotY += 0.012 + (smoothBass * 0.025);
 
                     let centerX = w / 2;
                     let centerY = h / 2;
-                    let sphereRadius = (110 + smoothBass * 55) * s;
+                    let sphereRadius = (95 + smoothBass * 48) * s;
 
                     if (smoothBass > 0.25) {
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${smoothBass * 0.6})`;
-                        ctx.lineWidth = 2.5 * s;
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${smoothBass * 0.65})`;
+                        ctx.lineWidth = 2.2 * s;
                         ctx.beginPath();
-                        ctx.arc(centerX, centerY, (sphereRadius + smoothBass * 180), 0, Math.PI * 2);
+                        ctx.arc(centerX, centerY, (sphereRadius + smoothBass * 150), 0, Math.PI * 2);
                         ctx.stroke();
 
                         ctx.strokeStyle = `rgba(236, 72, 153, ${smoothBass * 0.5})`;
-                        ctx.lineWidth = 1.6 * s;
+                        ctx.lineWidth = 1.4 * s;
                         ctx.beginPath();
-                        ctx.arc(centerX, centerY, (sphereRadius + smoothBass * 240), 0, Math.PI * 2);
+                        ctx.arc(centerX, centerY, (sphereRadius + smoothBass * 210), 0, Math.PI * 2);
                         ctx.stroke();
                     }
 
@@ -1044,7 +1054,7 @@
                         let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
 
                         let distance = 3.5;
-                        let fov = 360 * s;
+                        let fov = 340 * s;
                         let alpha = fov / (distance + z2);
 
                         return {
@@ -1061,8 +1071,8 @@
                             let dist3D = Math.sqrt(Math.pow(baseSpherePoints[i][0]-baseSpherePoints[j][0], 2) + Math.pow(baseSpherePoints[i][1]-baseSpherePoints[j][1], 2) + Math.pow(baseSpherePoints[i][2]-baseSpherePoints[j][2], 2));
                             
                             if (dist3D < 1.3) {
-                                ctx.strokeStyle = (i % 2 === 0) ? `rgba(56, 189, 248, ${0.5 + smoothBeat * 0.5})` : `rgba(236, 72, 153, ${0.5 + smoothBass * 0.5})`;
-                                ctx.lineWidth = 1.8 * s;
+                                ctx.strokeStyle = (i % 2 === 0) ? `rgba(56, 189, 248, ${0.55 + smoothBeat * 0.45})` : `rgba(236, 72, 153, ${0.55 + smoothBass * 0.45})`;
+                                ctx.lineWidth = 1.6 * s;
                                 ctx.beginPath();
                                 ctx.moveTo(p1.x, p1.y);
                                 ctx.lineTo(p2.x, p2.y);
@@ -1072,8 +1082,8 @@
                     }
 
                     shards.forEach(sh => {
-                        sh.angle += 0.025 * (1 + smoothBass);
-                        let currentR = (130 + smoothBass * 95) + Math.sin(sh.angle) * 35;
+                        sh.angle += 0.028 * (1 + smoothBass);
+                        let currentR = (110 + smoothBass * 85) + Math.sin(sh.angle) * 28;
                         let sx = centerX + Math.cos(sh.angle + rotY) * currentR;
                         let sy = centerY + Math.sin(sh.angle * 1.5 + rotX) * currentR * 0.8;
 
@@ -1082,8 +1092,8 @@
                         ctx.rotate(sh.angle);
 
                         ctx.strokeStyle = sh.color;
-                        ctx.lineWidth = 2 * s;
-                        ctx.fillStyle = sh.color === '#38bdf8' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(236, 72, 153, 0.3)';
+                        ctx.lineWidth = 1.8 * s;
+                        ctx.fillStyle = sh.color === '#38bdf8' ? 'rgba(56, 189, 248, 0.35)' : 'rgba(236, 72, 153, 0.35)';
                         
                         ctx.beginPath();
                         ctx.moveTo(0, -sh.size * (1 + smoothBeat));
