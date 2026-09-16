@@ -6,13 +6,6 @@
     <title>jackdarckart | Secure Nexus &amp; Webradio</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- EmailJS SDK für echte E-Mail Codes -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function() {
-            emailjs.init({ publicKey: "DEIN_EMAILJS_PUBLIC_KEY" });
-        })();
-    </script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -52,7 +45,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
 
-    <!-- Header mit dynamischer Sicherheits-Navigation -->
+    <!-- Header mit Navigation -->
     <header class="w-full border-b border-cyan-500/20 bg-[#010309]/95 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-8 py-4">
         <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
@@ -72,9 +65,8 @@
                 </div>
             </div>
 
-            <!-- Navigation (Dynamisch je nach Login-Status) -->
             <nav id="navbar-container" class="flex items-center gap-2 flex-wrap justify-center">
-                <!-- Wird per JavaScript gerendert -->
+                <!-- Dynamisch -->
             </nav>
 
             <div class="hidden sm:flex items-center gap-2 bg-[#050b18] px-3.5 py-1.5 rounded-xl border border-cyan-500/20">
@@ -84,10 +76,10 @@
         </div>
     </header>
 
-    <!-- Hauptinhalt Container -->
+    <!-- Hauptinhalt -->
     <main class="w-full max-w-4xl mx-auto p-4 sm:p-8 flex-grow my-auto">
         
-        <!-- 1. ÖFFENTLICHE WEBRADIO STARTSEITE (HOME) -->
+        <!-- 1. STARTSEITE (Öffentlich) -->
         <section id="view-home" class="view-section space-y-6">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden space-y-6">
                 <div class="absolute -top-24 -right-24 w-60 h-60 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none"></div>
@@ -116,7 +108,6 @@
                 </audio>
             </div>
 
-            <!-- Song-Historie -->
             <div class="glass-panel p-6 rounded-[2rem] space-y-4">
                 <div class="flex items-center justify-between border-b border-cyan-500/20 pb-3">
                     <h2 class="text-xs font-mono text-cyan-300 uppercase font-bold tracking-wider">📜 Zuletzt gespielt</h2>
@@ -128,7 +119,7 @@
             </div>
         </section>
 
-        <!-- 2. GESICHERTES LOGIN- & REGISTRIERUNGS-PORTAL -->
+        <!-- 2. LOGIN & REGISTRIERUNGS PORTAL -->
         <section id="view-auth" class="view-section hidden space-y-4 max-w-md mx-auto">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-5">
                 <div class="text-center space-y-1">
@@ -139,7 +130,7 @@
 
                 <div id="auth-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
-                <!-- A) LOGIN FORMULAR -->
+                <!-- A) LOGIN -->
                 <div id="sub-login" class="space-y-4">
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
@@ -149,7 +140,7 @@
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
                         <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500 transition" placeholder="••••">
                     </div>
-                    <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
+                    <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ Verifizierungscode Anfordern</button>
                     
                     <div class="flex justify-between items-center text-[11px] font-mono pt-2">
                         <button type="button" id="link-to-register" class="text-cyan-400 hover:underline cursor-pointer">Konto registrieren</button>
@@ -157,27 +148,29 @@
                     </div>
                 </div>
 
-                <!-- B) REGISTRIERUNGS FORMULAR -->
+                <!-- B) REGISTRIERUNG -->
                 <div id="sub-register" class="space-y-4 hidden">
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL (Einmalig):</label>
                         <input type="email" id="reg-email" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500 transition" placeholder="name@domain.com">
                     </div>
                     <div>
-                        <label class="text-[11px] font-mono text-slate-400 block mb-1">SICHHERE PIN (min. 4 Ziffern):</label>
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN (min. 4 Ziffern):</label>
                         <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500 transition" placeholder="Sichere PIN">
                     </div>
-                    <button type="button" id="btn-init-register" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-pink-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrierung starten</button>
+                    <button type="button" id="btn-init-register" class="cyber-button w-full bg-gradient-to-r from-cyan-600 to-pink-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrierung Starten</button>
                     
                     <div class="text-center pt-2">
                         <button type="button" id="link-back-to-login" class="text-[11px] font-mono text-cyan-400 hover:underline cursor-pointer">← Zum Login</button>
                     </div>
                 </div>
 
-                <!-- C) VERIFIZIERUNGS CODE EINGABE -->
+                <!-- C) VERIFIZIERUNGS CODE (HIER WIRD DER CODE JETZT DIREKT ANGEZEIGT) -->
                 <div id="sub-verify" class="space-y-4 hidden">
-                    <div class="bg-cyan-950/40 p-3 rounded-xl border border-cyan-500/30 text-[11px] font-mono text-cyan-200 text-center">
-                        📨 Ein Verifizierungscode wurde an Ihre E-Mail gesendet. Bitte geben Sie ihn ein.
+                    <div class="bg-cyan-950/50 p-4 rounded-xl border border-cyan-500/40 text-center space-y-2">
+                        <p class="text-[11px] font-mono text-cyan-200">📨 Ihr Sicherheitscode wurde generiert:</p>
+                        <div id="debug-code-view" class="text-2xl font-black text-amber-400 font-mono tracking-widest bg-[#010309] py-2 rounded-lg border border-amber-500/30">----</div>
+                        <p class="text-[9px] font-mono text-slate-400">Geben Sie diesen Code unten ein, um fortzufahren.</p>
                     </div>
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1 text-center">4-STELLIGER CODE:</label>
@@ -190,7 +183,7 @@
                     </div>
                 </div>
 
-                <!-- D) PIN WIEDERHERSTELLEN FORMULAR -->
+                <!-- D) PIN ZURÜCKSETZEN -->
                 <div id="sub-reset" class="space-y-4 hidden">
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
@@ -200,7 +193,7 @@
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
                         <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500 transition" placeholder="Neue PIN">
                     </div>
-                    <button type="button" id="btn-init-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 Code anfordern &amp; PIN ändern</button>
+                    <button type="button" id="btn-init-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 Code Anfordern &amp; Ändern</button>
                     
                     <div class="text-center pt-2">
                         <button type="button" id="link-cancel-reset" class="text-[11px] font-mono text-cyan-400 hover:underline cursor-pointer">← Zum Login</button>
@@ -209,13 +202,13 @@
             </div>
         </section>
 
-        <!-- 3. GESICHERTES GAME: CYBER BEAT EMPIRE -->
+        <!-- 3. CYBER BEAT EMPIRE GAME (Geschützt) -->
         <section id="view-game" class="view-section hidden space-y-6">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-center border-b border-cyan-500/20 pb-4 gap-2">
                     <div>
                         <h2 class="text-lg font-black text-cyan-300 font-mono uppercase tracking-wider">🎮 CyberBeat Tycoon</h2>
-                        <p class="text-[11px] text-slate-400 font-mono">Ihr persönlicher, verschlüsselter Spielstand ist sicher.</p>
+                        <p class="text-[11px] text-slate-400 font-mono">Ihr persönlicher, verschlüsselter Spielstand.</p>
                     </div>
                     <div class="bg-[#030712] px-4 py-2 rounded-xl border border-cyan-500/30 text-right">
                         <span class="text-[9px] font-mono text-teal-400 block uppercase">Account</span>
@@ -255,7 +248,7 @@
             </div>
         </section>
 
-        <!-- 4. GESICHERTES CLOUD BACKUP -->
+        <!-- 4. CLOUD BACKUP (Geschützt) -->
         <section id="view-cloud" class="view-section hidden space-y-6">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-6">
                 <div class="border-b border-cyan-500/20 pb-4">
@@ -289,7 +282,7 @@
             </div>
         </section>
 
-        <!-- 5. GESICHERTE ACCOUNT-VERWALTUNG & SICHERHEIT -->
+        <!-- 5. ACCOUNT & SICHERHEIT (Geschützt) -->
         <section id="view-account" class="view-section hidden space-y-6 max-w-xl mx-auto">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-6">
                 <div class="border-b border-cyan-500/20 pb-4 text-center">
@@ -309,7 +302,7 @@
                     <button type="button" id="btn-change-pin" class="cyber-button w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-xs font-mono uppercase cursor-pointer">PIN Aktualisieren</button>
                 </div>
 
-                <!-- B) SPIELSTAND RESETTEN -->
+                <!-- B) SPIELSTAND RESET -->
                 <div class="bg-[#030712] p-5 rounded-2xl border border-amber-500/20 space-y-3">
                     <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🔄 Spielstand Zurücksetzen</h3>
                     <p class="text-[11px] text-slate-400">Setzt nur den Fortschritt im CyberBeat Tycoon Game auf 0 zurück. Ihr Account bleibt bestehen.</p>
@@ -319,7 +312,7 @@
                 <!-- C) ACCOUNT LÖSCHEN -->
                 <div class="bg-[#030712] p-5 rounded-2xl border border-red-500/30 space-y-3">
                     <h3 class="text-xs font-mono text-red-400 font-bold uppercase">⚠️ Account Unwiderruflich Löschen</h3>
-                    <p class="text-[11px] text-slate-400">Löscht Ihren Account, alle Zugangsdaten und Ihren Spielstand restlos aus dem System.</p>
+                    <p class="text-[11px] text-slate-400">Löscht Ihren Account und alle zugehörigen Daten restlos.</p>
                     <button type="button" id="btn-delete-account" class="cyber-button w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 rounded-xl text-xs font-mono uppercase cursor-pointer">Account Komplett Löschen</button>
                 </div>
 
@@ -343,7 +336,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- SECURE AUTHENTICATION SYSTEM ---
             const SecureAuth = {
                 getSession() {
                     return localStorage.getItem('secure_nexus_logged_user') || null;
@@ -356,20 +348,19 @@
                 },
                 getUsersDB() {
                     try {
-                        return JSON.parse(localStorage.getItem('secure_nexus_master_users_db_v3')) || {};
+                        return JSON.parse(localStorage.getItem('secure_nexus_master_users_db_v4')) || {};
                     } catch(e) { return {}; }
                 },
                 saveUsersDB(db) {
-                    localStorage.setItem('secure_nexus_master_users_db_v3', JSON.stringify(db));
+                    localStorage.setItem('secure_nexus_master_users_db_v4', JSON.stringify(db));
                 },
                 
-                // Pending auth state for verification flow
                 pendingEmail: null,
                 pendingPin: null,
-                pendingAction: null, // 'login', 'register', 'reset_pin'
+                pendingAction: null,
                 activeCode: null,
 
-                async initAuthAction(email, pin, actionType) {
+                initAuthAction(email, pin, actionType) {
                     if (!email || !email.includes('@')) return { success: false, msg: '❌ Ungültige E-Mail-Adresse!' };
                     if (!pin || pin.length < 4) return { success: false, msg: '❌ PIN muss mindestens 4 Ziffern haben!' };
 
@@ -378,33 +369,24 @@
                     let db = this.getUsersDB();
 
                     if (actionType === 'register') {
-                        if (db[email]) return { success: false, msg: '❌ Diese E-Mail ist bereits registriert! Nutzen Sie eine andere.' };
+                        if (db[email]) return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
                     } else if (actionType === 'login' || actionType === 'reset_pin') {
                         if (!db[email]) return { success: false, msg: '❌ E-Mail-Adresse nicht gefunden!' };
                         if (actionType === 'login' && db[email].pin !== pin) return { success: false, msg: '❌ Falsche PIN!' };
                     }
 
-                    // Generate Verification Code
+                    // Generate Code & display instantly on screen
                     const code = Math.floor(1000 + Math.random() * 9000).toString();
                     this.activeCode = code;
                     this.pendingEmail = email;
                     this.pendingPin = pin;
                     this.pendingAction = actionType;
 
-                    const serviceId = "DEIN_SERVICE_ID";
-                    const templateId = "DEIN_TEMPLATE_ID";
+                    // Display code directly in verification box
+                    const codeView = document.getElementById('debug-code-view');
+                    if (codeView) codeView.textContent = code;
 
-                    if (serviceId === "DEIN_SERVICE_ID" || templateId === "DEIN_TEMPLATE_ID") {
-                        // Test-Modus Hinweis, falls EmailJS nicht konfiguriert ist
-                        return { success: true, msg: `⚠️ Test-Modus: Ihr Verifizierungscode lautet: ${code}` };
-                    }
-
-                    try {
-                        await emailjs.send(serviceId, templateId, { to_email: email, verification_code: code });
-                        return { success: true, msg: `✉️ Verifizierungscode wurde an ${email} gesendet!` };
-                    } catch (error) {
-                        return { success: false, msg: '❌ E-Mail-Versand fehlgeschlagen.' };
-                    }
+                    return { success: true, msg: `✅ Code generiert!` };
                 },
 
                 verifyAndExecute(enteredCode) {
@@ -459,14 +441,11 @@
                 }
             };
 
-            // --- VIEW & NAVIGATION MANAGEMENT ---
-            const publicViews = ['home'];
             const protectedViews = ['game', 'cloud', 'account'];
 
             function switchView(targetId) {
                 const currentUser = SecureAuth.getSession();
 
-                // Security Check: If protected view and not logged in, force auth view
                 if (protectedViews.includes(targetId) && !currentUser) {
                     targetId = 'auth';
                     showAuthSubform('sub-login');
@@ -493,7 +472,6 @@
 
                 navContainer.innerHTML = '';
 
-                // Webradio ist immer sichtbar
                 const btnHome = document.createElement('button');
                 btnHome.type = 'button';
                 btnHome.className = 'cyber-button bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer';
@@ -502,7 +480,6 @@
                 navContainer.appendChild(btnHome);
 
                 if (currentUser) {
-                    // Geschützte Menüpunkte für eingeloggte User
                     const btnGame = document.createElement('button');
                     btnGame.type = 'button';
                     btnGame.className = 'cyber-button bg-slate-900 text-slate-300 hover:text-white border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer';
@@ -524,7 +501,6 @@
                     btnAccount.onclick = () => switchView('account');
                     navContainer.appendChild(btnAccount);
                 } else {
-                    // Login / Registrieren Button für Gäste
                     const btnAuth = document.createElement('button');
                     btnAuth.type = 'button';
                     btnAuth.className = 'cyber-button bg-cyan-600 hover:bg-cyan-500 text-white border border-cyan-400 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer';
@@ -537,7 +513,6 @@
                 }
             }
 
-            // Auth Subform Switcher
             function showAuthSubform(subId) {
                 ['sub-login', 'sub-register', 'sub-verify', 'sub-reset'].forEach(id => {
                     document.getElementById(id).classList.add('hidden');
@@ -546,7 +521,6 @@
                 document.getElementById('auth-msg').textContent = '';
             }
 
-            // Auth Navigation Links
             document.getElementById('link-to-register').onclick = () => showAuthSubform('sub-register');
             document.getElementById('link-to-reset').onclick = () => showAuthSubform('sub-reset');
             document.getElementById('link-back-to-login').onclick = () => showAuthSubform('sub-login');
@@ -556,30 +530,26 @@
                 showAuthSubform('sub-login');
             };
 
-            // --- AUTH ACTIONS ---
-            document.getElementById('btn-init-login').onclick = async () => {
+            document.getElementById('btn-init-login').onclick = () => {
                 const email = document.getElementById('login-email').value;
                 const pin = document.getElementById('login-pin').value;
-                document.getElementById('auth-msg').textContent = '⏳ Verifiziere Anmeldedaten...';
-                let res = await SecureAuth.initAuthAction(email, pin, 'login');
+                let res = SecureAuth.initAuthAction(email, pin, 'login');
                 document.getElementById('auth-msg').textContent = res.msg;
                 if (res.success) showAuthSubform('sub-verify');
             };
 
-            document.getElementById('btn-init-register').onclick = async () => {
+            document.getElementById('btn-init-register').onclick = () => {
                 const email = document.getElementById('reg-email').value;
                 const pin = document.getElementById('reg-pin').value;
-                document.getElementById('auth-msg').textContent = '⏳ Prüfe Registrierungsdaten...';
-                let res = await SecureAuth.initAuthAction(email, pin, 'register');
+                let res = SecureAuth.initAuthAction(email, pin, 'register');
                 document.getElementById('auth-msg').textContent = res.msg;
                 if (res.success) showAuthSubform('sub-verify');
             };
 
-            document.getElementById('btn-init-reset').onclick = async () => {
+            document.getElementById('btn-init-reset').onclick = () => {
                 const email = document.getElementById('reset-email').value;
                 const pin = document.getElementById('reset-newpin').value;
-                document.getElementById('auth-msg').textContent = '⏳ Sende Wiederherstellungscode...';
-                let res = await SecureAuth.initAuthAction(email, pin, 'reset_pin');
+                let res = SecureAuth.initAuthAction(email, pin, 'reset_pin');
                 document.getElementById('auth-msg').textContent = res.msg;
                 if (res.success) showAuthSubform('sub-verify');
             };
@@ -589,11 +559,10 @@
                 let res = SecureAuth.verifyAndExecute(code);
                 document.getElementById('auth-msg').textContent = res.msg;
                 if (res.success) {
-                    setTimeout(() => switchView('game'), 1000);
+                    setTimeout(() => switchView('game'), 800);
                 }
             };
 
-            // --- ACCOUNT MANAGEMENT ACTIONS ---
             document.getElementById('btn-change-pin').onclick = () => {
                 const oldPin = document.getElementById('acc-old-pin').value.trim();
                 const newPin = document.getElementById('acc-new-pin').value.trim();
@@ -621,7 +590,7 @@
             };
 
             document.getElementById('btn-reset-game').onclick = () => {
-                if (confirm('Möchten Sie wirklich nur Ihren Spielstand zurücksetzen? Ihr Account bleibt erhalten.')) {
+                if (confirm('Möchten Sie wirklich nur Ihren Spielstand zurücksetzen? Ihr Account bleibt bestehen.')) {
                     let gData = { beats: 0, fans: 0, releases: 0, upgrades: { mic: 0, studio: 0, producer: 0, rig: 0, ai: 0 } };
                     SecureAuth.saveUserGameData(gData);
                     const msgEl = document.getElementById('account-msg');
@@ -642,18 +611,16 @@
                 }
             };
 
-            const logoutHandler = () => {
+            document.getElementById('btn-account-logout').onclick = () => {
                 SecureAuth.clearSession();
                 switchView('home');
             };
-            document.getElementById('btn-account-logout').onclick = logoutHandler;
 
-            // Initial view load
             const initialView = localStorage.getItem('jack_current_view') || 'home';
             switchView(initialView);
 
 
-            // --- WEBRADIO PLAYER LOGIC (Public) ---
+            // --- WEBRADIO PLAYER ---
             const audio = document.getElementById('audio-stream');
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
@@ -717,7 +684,7 @@
             setInterval(fetchStationData, 15000);
 
 
-            // --- CYBER BEAT EMPIRE GAME LOGIC (Account Bound) ---
+            // --- CYBER BEAT EMPIRE GAME ---
             const upgradeDefs = [
                 { id: 'mic', name: 'Pro Mikrofon', baseCost: 15, costMult: 1.5, beatGen: 1, desc: '+1 Beat/s' },
                 { id: 'studio', name: 'Sound Isolation Studio', baseCost: 100, costMult: 1.6, beatGen: 5, desc: '+5 Beats/s' },
@@ -797,7 +764,6 @@
                 }
             };
 
-            // Game Loop (Every second)
             setInterval(() => {
                 if (!SecureAuth.getSession()) return;
                 let gData = SecureAuth.getUserGameData();
@@ -825,7 +791,7 @@
             }, 1000);
 
 
-            // --- CLOUD BACKUP EXPORT & IMPORT ---
+            // --- CLOUD BACKUP ---
             document.getElementById('btn-export-save').onclick = () => {
                 const user = SecureAuth.getSession();
                 const gData = SecureAuth.getUserGameData();
