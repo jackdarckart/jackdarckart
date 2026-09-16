@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | CloudBeats Quantum Flora Nexus</title>
+    <title>jackdarckart | CloudBeats Hyper-Realistic Eco-Nexus</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS SDK -->
@@ -18,12 +18,12 @@
             --beat-val: 0;
         }
         .glass-panel {
-            background: linear-gradient(135deg, rgba(8, 14, 28, 0.96) 0%, rgba(3, 6, 12, 0.99) 100%);
-            backdrop-filter: blur(32px);
-            -webkit-backdrop-filter: blur(32px);
-            border: 1px solid rgba(52, 211, 153, calc(0.3 + (var(--beat-val) * 0.6)));
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 calc(12px + (var(--beat-val) * 45px)) rgba(52, 211, 153, calc(0.12 + (var(--beat-val) * 0.35))), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transition: border-color 0.1s ease, box-shadow 0.1s ease;
+            background: linear-gradient(135deg, rgba(6, 12, 24, 0.97) 0%, rgba(2, 4, 10, 0.99) 100%);
+            backdrop-filter: blur(36px);
+            -webkit-backdrop-filter: blur(36px);
+            border: 1px solid rgba(52, 211, 153, calc(0.35 + (var(--beat-val) * 0.55)));
+            box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.95), 0 0 calc(15px + (var(--beat-val) * 40px)) rgba(52, 211, 153, calc(0.15 + (var(--beat-val) * 0.3))), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            transition: border-color 0.08s ease, box-shadow 0.08s ease;
         }
         .cyber-button {
             position: relative;
@@ -31,27 +31,27 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .cyber-button:hover {
-            box-shadow: 0 0 25px rgba(52, 211, 153, 0.45);
-            border-color: rgba(52, 211, 153, 0.8);
+            box-shadow: 0 0 28px rgba(52, 211, 153, 0.5);
+            border-color: rgba(52, 211, 153, 0.9);
         }
         .cyber-button:active { transform: scale(0.98); }
         .cyber-button:disabled { opacity: 0.3; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; border-color: rgba(255,255,255,0.05) !important; animation: none !important; }
         
         @keyframes pulse-glow {
-            0%, 100% { opacity: 1; filter: drop-shadow(0 0 14px rgba(52, 211, 153, 0.8)); }
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 16px rgba(52, 211, 153, 0.85)); }
             50% { opacity: 0.6; filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.3)); }
         }
         .neon-pulse { animation: pulse-glow 3s infinite ease-in-out; }
 
         @keyframes affordable-pulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(52, 211, 153, 0.5), inset 0 0 8px rgba(52, 211, 153, 0.3); border-color: rgba(52, 211, 153, 0.8); }
-            50% { box-shadow: 0 0 30px rgba(52, 211, 153, 0.95), inset 0 0 15px rgba(52, 211, 153, 0.5); border-color: rgba(52, 211, 153, 1); }
+            0%, 100% { box-shadow: 0 0 16px rgba(52, 211, 153, 0.55), inset 0 0 8px rgba(52, 211, 153, 0.35); border-color: rgba(52, 211, 153, 0.85); }
+            50% { box-shadow: 0 0 35px rgba(52, 211, 153, 0.98), inset 0 0 16px rgba(52, 211, 153, 0.6); border-color: rgba(52, 211, 153, 1); }
         }
         .affordable-glow { animation: affordable-pulse 2s infinite ease-in-out; }
 
         @keyframes wave {
             0%, 100% { height: 4px; }
-            50% { height: 26px; }
+            50% { height: 28px; }
         }
         .wave-bar { animation: wave 1.2s ease-in-out infinite; }
         .wave-bar:nth-child(2) { animation-delay: 0.2s; }
@@ -59,42 +59,42 @@
         .wave-bar:nth-child(4) { animation-delay: 0.6s; }
         .wave-bar:nth-child(5) { animation-delay: 0.8s; }
 
-        /* Vollflächiger, musik-synchroner Ambient-Hintergrund */
+        /* Vollflächiger Ambient-Hintergrund, perfekt synchronisiert */
         #page-ambient-bg {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none;
             z-index: 0;
-            background: radial-gradient(circle at 50% 35%, rgba(10, 60, 35, calc(0.15 + (var(--beat-val) * 0.3))) 0%, rgba(2, 5, 12, 0.96) 80%);
-            transform: scale(calc(1 + (var(--beat-val) * 0.045)));
-            transition: transform 0.1s ease, background 0.1s ease;
+            background: radial-gradient(circle at 50% 35%, rgba(12, 65, 38, calc(0.18 + (var(--beat-val) * 0.32))) 0%, rgba(2, 4, 10, 0.97) 82%);
+            transform: scale(calc(1 + (var(--beat-val) * 0.05)));
+            transition: transform 0.08s ease, background 0.08s ease;
         }
 
         ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(3, 6, 12, 0.5); }
+        ::-webkit-scrollbar-track { background: rgba(2, 4, 10, 0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.4); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(52, 211, 153, 0.7); }
     </style>
 </head>
-<body class="bg-[#020408] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white relative overflow-x-hidden">
+<body class="bg-[#020307] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white relative overflow-x-hidden">
 
     <!-- Musik-synchroner Ambient-Hintergrund -->
     <div id="page-ambient-bg"></div>
 
     <!-- Header -->
-    <header class="w-full border-b border-emerald-500/20 backdrop-blur-2xl sticky top-0 z-50 bg-[#020408]/90 px-4 py-3 shadow-2xl">
+    <header class="w-full border-b border-emerald-500/20 backdrop-blur-2xl sticky top-0 z-50 bg-[#020307]/90 px-4 py-3 shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/25 neon-pulse">
-                    <div class="w-full h-full bg-[#03060c] rounded-[10px] flex items-center justify-center text-base">🌿</div>
+                    <div class="w-full h-full bg-[#020307] rounded-[10px] flex items-center justify-center text-base">🌿</div>
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Quantum Flora Nexus v50.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Hyper-Realistic Eco-Engine v60.0</span>
                 </div>
             </div>
 
-            <div class="hidden md:flex items-center gap-1.5 bg-[#03060c] px-3.5 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
+            <div class="hidden md:flex items-center gap-1.5 bg-[#020307] px-3.5 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
                 <span class="text-[9px] font-mono text-emerald-400 mr-1 tracking-widest">LIVE STREAM</span>
                 <div class="w-1 bg-emerald-500 rounded-full wave-bar"></div>
                 <div class="w-1 bg-teal-500 rounded-full wave-bar"></div>
@@ -121,9 +121,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Quantum Flora Nexus &amp; Vollständiger Beat-Sync</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Hyper-Realistic Eco-Sync &amp; Kristallklare Grafik</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Erlebe die neuentwickelte, botanische Meister-Garten-Engine mit Hunderten von Pflanzen, lebendigen Lichtspielen und butterweicher Musik-Harmonisierung.
+                        Erlebe die fotorealistisch erweiterte Garten-Engine mit gestochen scharfen Details, üppiger Flora und absoluter Harmonie im Takt der Musik.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -143,7 +143,7 @@
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
                     <div id="subform-logged" class="space-y-3 hidden">
-                        <div class="bg-[#03060c] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
+                        <div class="bg-[#020307] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
                             <p class="text-[10px] font-mono text-slate-400 uppercase">Verifizierter Account</p>
                             <p id="auth-logged-email" class="text-xs font-bold text-emerald-300 font-mono"></p>
                         </div>
@@ -154,11 +154,11 @@
                     <div id="subform-login" class="space-y-3">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="login-email" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="login-email" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
-                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
+                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
                         </div>
                         <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
                         
@@ -174,7 +174,7 @@
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE:</label>
-                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#03060c] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
+                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#020307] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
                         </div>
                         <button type="button" id="btn-execute-verify" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✅ Code bestätigen &amp; Einloggen</button>
                         
@@ -186,11 +186,11 @@
                     <div id="subform-register" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="reg-email" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reg-email" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN:</label>
-                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
+                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
                         </div>
                         <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren</button>
                         
@@ -202,11 +202,11 @@
                     <div id="subform-reset" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
-                            <input type="email" id="reset-email" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reset-email" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
-                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#03060c] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
+                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#020307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
                         </div>
                         <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Neu Setzen</button>
                         
@@ -221,7 +221,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full border-t border-emerald-500/20 py-3 px-4 bg-[#020408] text-center relative z-10">
+    <footer class="w-full border-t border-emerald-500/20 py-3 px-4 bg-[#020307] text-center relative z-10">
         <div class="max-w-6xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
             <span id="session-status-badge" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt</span>
             <span class="text-emerald-400/90 font-bold tracking-wider">jackdarckart • Prime Elite Nexus</span>
@@ -251,7 +251,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_QUANTUM_FLORA_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_HYPER_REALISTIC_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -455,7 +455,7 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <div class="glass-panel p-4 sm:p-8 rounded-[2.5rem] relative overflow-hidden bg-gradient-to-b from-[#06180f]/95 via-[#020a06]/98 to-[#010402] shadow-2xl">
+                                <div class="glass-panel p-4 sm:p-8 rounded-[2.5rem] relative overflow-hidden bg-gradient-to-b from-[#051a0f]/95 via-[#020b06]/98 to-[#010503] shadow-2xl">
                                     
                                     <!-- Top Navigation innerhalb des Gartens -->
                                     <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4 border-b border-emerald-500/20 pb-3">
@@ -463,7 +463,7 @@
                                             ← Zum Beat-Lab
                                         </button>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Quantum Flora Nexus &amp; Live Beat-Sync aktiv</span>
+                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Hyper-Realistic Eco-Sync aktiv</span>
                                         </div>
                                     </div>
 
@@ -483,8 +483,8 @@
                                         </div>
                                     </div>
 
-                                    <!-- NEU ENTWICKELTER, GIGANTISCHER & HOCHDETAILLIERTER CANVAS CONTAINER -->
-                                    <div id="canvas-container" class="relative w-full h-[540px] sm:h-[720px] rounded-3xl border-2 border-emerald-700/60 overflow-hidden shadow-2xl bg-[#020c06]">
+                                    <!-- HOCHAUFLÖSENDES, FOTOREALISTISCHES CANVAS -->
+                                    <div id="canvas-container" class="relative w-full h-[560px] sm:h-[750px] rounded-3xl border-2 border-emerald-700/60 overflow-hidden shadow-2xl bg-[#020a05]">
                                         <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
                                     </div>
 
@@ -802,7 +802,7 @@
                 }
             });
 
-            // QUANTUM FLORA NEXUS CANVAS RENDERING ENGINE
+            // HYPER-REALISTIC ECO-SYNC CANVAS ENGINE
             let animationFrameId = null;
             function initGardenScreenCanvas() {
                 const canvas = document.getElementById('garden-canvas');
@@ -839,17 +839,17 @@
                 let smoothBeat = 0;
                 let liliAngle = 0;
 
-                // Reichhaltiges Partikelsystem für Glühwürmchen & Blütenstaub
+                // Feine Naturpartikel (Glühwürmchen & Pollen)
                 let particles = [];
-                for(let i=0; i<50; i++) {
+                for(let i=0; i<60; i++) {
                     particles.push({
-                        x: Math.random() * 1400,
-                        y: Math.random() * 900,
-                        speedX: (Math.random() - 0.5) * 0.4,
-                        speedY: (Math.random() - 0.5) * 0.4,
-                        radius: Math.random() * 2.8 + 0.8,
+                        x: Math.random() * 1500,
+                        y: Math.random() * 1000,
+                        speedX: (Math.random() - 0.5) * 0.35,
+                        speedY: (Math.random() - 0.5) * 0.35,
+                        radius: Math.random() * 2.5 + 0.6,
                         alpha: Math.random() * 0.7 + 0.2,
-                        color: Math.random() > 0.5 ? '#34d399' : '#38bdf8'
+                        color: Math.random() > 0.4 ? '#34d399' : '#67e8f9'
                     });
                 }
 
@@ -883,44 +883,44 @@
                         beatVal = (Math.sin(time * Math.PI * 2) + 1) * 0.4;
                     } else {
                         let time = Date.now() / 1000;
-                        beatVal = (Math.sin(time * 1.5) + 1) * 0.08;
+                        beatVal = (Math.sin(time * 1.5) + 1) * 0.07;
                     }
 
-                    // Seidenweiche Interpolation für absolut ruckelfreie, harmonische Beat-Synchronisation
-                    smoothBeat += (beatVal - smoothBeat) * 0.14;
+                    // Seidenweiche Interpolation für absolut ruckelfreie Harmonie
+                    smoothBeat += (beatVal - smoothBeat) * 0.15;
 
-                    // Synchronisation der gesamten Website-Oberfläche außerhalb der Grafik
+                    // Synchronisation der gesamten Website-Oberfläche
                     document.documentElement.style.setProperty('--beat-val', smoothBeat.toFixed(3));
 
                     const w = displayWidth;
                     const h = displayHeight;
                     const s = w / 1000;
 
-                    // 1. Edler, tiefer Symphonie-Garten Hintergrund mit Verlauf
+                    // 1. Fotorealistischer Tiefengrund
                     const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-                    bgGrad.addColorStop(0, '#041d11');
-                    bgGrad.addColorStop(0.5, '#020d07');
-                    bgGrad.addColorStop(1, '#010503');
+                    bgGrad.addColorStop(0, '#03170e');
+                    bgGrad.addColorStop(0.5, '#020b06');
+                    bgGrad.addColorStop(1, '#010402');
                     ctx.fillStyle = bgGrad;
                     ctx.fillRect(0, 0, w, h);
 
-                    // Park-Insel mit sanften Rändern
-                    ctx.fillStyle = '#082b15';
+                    // Park-Insel mit sanfter Kantenabtönung
+                    ctx.fillStyle = '#062412';
                     ctx.beginPath();
-                    ctx.roundRect(45 * s, 45 * s, w - (90 * s), h - (90 * s), 36 * s);
+                    ctx.roundRect(50 * s, 50 * s, w - (100 * s), h - (100 * s), 40 * s);
                     ctx.fill();
 
-                    // Geschwungene, detailreiche Parkwege mit Leuchteffekt
-                    ctx.strokeStyle = '#0e4222';
-                    ctx.lineWidth = 60 * s;
+                    // Natürliche Parkwege
+                    ctx.strokeStyle = '#0b3819';
+                    ctx.lineWidth = 65 * s;
                     ctx.lineCap = 'round';
                     ctx.beginPath();
-                    ctx.moveTo(w * 0.2, h - 45);
-                    ctx.quadraticCurveTo(w * 0.38, h * 0.55, w * 0.5, h * 0.48);
-                    ctx.quadraticCurveTo(w * 0.7, h * 0.38, w * 0.85, 45);
+                    ctx.moveTo(w * 0.18, h - 50);
+                    ctx.quadraticCurveTo(w * 0.36, h * 0.58, w * 0.5, h * 0.5);
+                    ctx.quadraticCurveTo(w * 0.72, h * 0.36, w * 0.88, 50);
                     ctx.stroke();
 
-                    // 2. Glühwürmchen & Blütenstaub (Atmen im Takt)
+                    // 2. Glühwürmchen & Pollen
                     particles.forEach(p => {
                         p.x += p.speedX;
                         p.y += p.speedY;
@@ -928,161 +928,171 @@
                         if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
 
                         ctx.fillStyle = p.color;
-                        ctx.globalAlpha = Math.min(1, p.alpha + smoothBeat * 0.4);
+                        ctx.globalAlpha = Math.min(1, p.alpha + smoothBeat * 0.35);
                         ctx.beginPath();
-                        ctx.arc(p.x, p.y, (p.radius + smoothBeat * 1.5) * s, 0, Math.PI * 2);
+                        ctx.arc(p.x, p.y, (p.radius + smoothBeat * 1.2) * s, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.globalAlpha = 1.0;
                     });
 
-                    // 3. Üppige, detaillierte Baumgruppen (Obergruppe)
-                    let treeCount = Math.min(14, userAcc.baumeLevel + 6);
+                    // 3. Fotorealistische Baumgruppen mit Schattierung
+                    let treeCount = Math.min(15, userAcc.baumeLevel + 6);
                     for (let i = 0; i < treeCount; i++) {
-                        let tx = (110 + (i % 4) * 70) * s;
-                        let ty = (115 + Math.floor(i / 4) * 65) * s;
-                        let treeRadius = (34 + (smoothBeat * 8)) * s;
+                        let tx = (120 + (i % 4) * 72) * s;
+                        let ty = (120 + Math.floor(i / 4) * 68) * s;
+                        let treeRadius = (36 + (smoothBeat * 7)) * s;
+
+                        // Ambient Baumschatten
+                        ctx.fillStyle = `rgba(3, 15, 8, ${0.4 + smoothBeat * 0.2})`;
+                        ctx.beginPath();
+                        ctx.arc(tx + (5 * s), ty + (15 * s), treeRadius * 1.3, 0, Math.PI * 2);
+                        ctx.fill();
 
                         // Baum-Aura im Takt
-                        ctx.fillStyle = `rgba(52, 211, 153, ${0.12 + smoothBeat * 0.3})`;
+                        ctx.fillStyle = `rgba(52, 211, 153, ${0.1 + smoothBeat * 0.25})`;
                         ctx.beginPath();
-                        ctx.arc(tx, ty, treeRadius * 1.6, 0, Math.PI * 2);
+                        ctx.arc(tx, ty, treeRadius * 1.65, 0, Math.PI * 2);
                         ctx.fill();
 
-                        // Baumstamm
-                        ctx.fillStyle = '#3d1802';
-                        ctx.fillRect(tx - (4.5 * s), ty, 9 * s, 36 * s);
+                        // Stamm
+                        ctx.fillStyle = '#2c1202';
+                        ctx.fillRect(tx - (5 * s), ty, 10 * s, 40 * s);
 
-                        // Baumkrone Schichten
-                        ctx.fillStyle = '#022c14';
+                        // Blattwerk-Schichten
+                        ctx.fillStyle = '#022610';
                         ctx.beginPath();
-                        ctx.arc(tx, ty, Math.max(14, treeRadius), 0, Math.PI * 2);
+                        ctx.arc(tx, ty, Math.max(15, treeRadius), 0, Math.PI * 2);
                         ctx.fill();
 
-                        ctx.fillStyle = '#059669';
+                        ctx.fillStyle = '#047857';
                         ctx.beginPath();
-                        ctx.arc(tx, ty - (4 * s), Math.max(11, treeRadius * 0.8), 0, Math.PI * 2);
+                        ctx.arc(tx, ty - (5 * s), Math.max(12, treeRadius * 0.8), 0, Math.PI * 2);
                         ctx.fill();
 
                         ctx.fillStyle = '#34d399';
                         ctx.beginPath();
-                        ctx.arc(tx - (5 * s), ty - (8 * s), Math.max(4, treeRadius * 0.4), 0, Math.PI * 2);
+                        ctx.arc(tx - (4 * s), ty - (8 * s), Math.max(4, treeRadius * 0.4), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
                     // 4. Studio & Essentials Matrix (Unten links)
-                    ctx.fillStyle = '#040d1f';
-                    ctx.strokeStyle = '#3b82f6';
+                    ctx.fillStyle = '#030a17';
+                    ctx.strokeStyle = '#2563eb';
                     ctx.lineWidth = 3 * s;
                     ctx.beginPath();
-                    ctx.roundRect(75 * s, h - (235 * s), 160 * s, 135 * s, 18 * s);
+                    ctx.roundRect(80 * s, h - (250 * s), 170 * s, 140 * s, 20 * s);
                     ctx.fill();
                     ctx.stroke();
 
                     for (let gx = 0; gx < 4; gx++) {
                         for (let gy = 0; gy < 3; gy++) {
                             ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1d4ed8';
-                            ctx.fillRect((90 + gx * 33) * s, (h - 212 + gy * 33) * s, 22 * s, 20 * s);
+                            ctx.fillRect((95 + gx * 35) * s, (h - 225 + gy * 35) * s, 23 * s, 21 * s);
                         }
                     }
 
-                    // 5. RIESIGES, HOCHDETAILLIERTES STAUDEN- & BLUMENPARADIES (Zentriert)
-                    let dotCount = 120 * userAcc.staudenLevel;
+                    // 5. HOCHDETAILLIERTES STAUDEN- & BLUMENPARADIES (Zentriert)
+                    let dotCount = 140 * userAcc.staudenLevel;
                     let centerX = w * 0.52;
                     let centerY = h * 0.52;
-                    const vibrantColors = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc', '#facc15'];
+                    const colorPalette = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#fb7185', '#38bdf8', '#c084fc', '#34d399', '#facc15'];
 
                     for (let d = 0; d < dotCount; d++) {
                         let angle = d * 137.5;
-                        let r = Math.sqrt(d) * 16 * s;
-                        let dx = centerX + Math.cos(angle + (smoothBeat * 0.1)) * r;
+                        let r = Math.sqrt(d) * 17 * s;
+                        let dx = centerX + Math.cos(angle + (smoothBeat * 0.09)) * r;
                         let dy = centerY + Math.sin(angle) * r * 0.78;
 
-                        ctx.fillStyle = vibrantColors[d % vibrantColors.length];
-                        let flowerSize = (5.5 + (smoothBeat * 3)) * s;
+                        ctx.fillStyle = colorPalette[d % colorPalette.length];
+                        let flowerSize = (5.8 + (smoothBeat * 2.8)) * s;
                         ctx.beginPath();
                         ctx.arc(dx, dy, Math.max(2, flowerSize), 0, Math.PI * 2);
                         ctx.fill();
 
-                        // Innerer leuchtender Blütenkern
+                        // Leuchtender Blütenkern
                         ctx.fillStyle = '#ffffff';
                         ctx.beginPath();
-                        ctx.arc(dx, dy, Math.max(1, flowerSize * 0.35), 0, Math.PI * 2);
+                        ctx.arc(dx, dy, Math.max(1, flowerSize * 0.32), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
-                    // 6. GLänzender KLANG-TEICH (Rechts oben) mit tiefen Wasserwellen
-                    let pondX = w - (240 * s);
+                    // 6. KRISTALLKLARER KLANG-TEICH (Mit Seerosen & Wellen)
+                    let pondX = w - (260 * s);
                     let pondY = h * 0.38;
-                    let pondRx = (120 + (smoothBeat * 12)) * s;
-                    let pondRy = (70 + (smoothBeat * 7)) * s;
+                    let pondRx = (130 + (smoothBeat * 14)) * s;
+                    let pondRy = (75 + (smoothBeat * 8)) * s;
 
                     for (let r = 5; r >= 1; r--) {
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * r + smoothBeat * 0.18})`;
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * r + smoothBeat * 0.16})`;
                         ctx.lineWidth = 3 * s;
                         ctx.beginPath();
-                        ctx.ellipse(pondX, pondY, pondRx + (r * 20 * smoothBeat * s), pondRy + (r * 13 * smoothBeat * s), 0, 0, Math.PI * 2);
+                        ctx.ellipse(pondX, pondY, pondRx + (r * 22 * smoothBeat * s), pondRy + (r * 14 * smoothBeat * s), 0, 0, Math.PI * 2);
                         ctx.stroke();
                     }
 
-                    ctx.fillStyle = '#0369a1';
-                    ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(28, pondRx), Math.max(16, pondRy), 0, 0, Math.PI * 2);
-                    ctx.fill();
-
                     ctx.fillStyle = '#0284c7';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(20, pondRx * 0.8), Math.max(11, pondRy * 0.8), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(30, pondRx), Math.max(17, pondRy), 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#38bdf8';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, Math.max(10, pondRx * 0.45), Math.max(5, pondRy * 0.45), 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(14, pondRx * 0.65), Math.max(8, pondRy * 0.65), 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // 7. LILI (JACK RUSSELL) HÜPFT FRÖHLICH UND GESCHMEIDIG IM TAKT
+                    // Seerosenblätter auf dem Teich
+                    ctx.fillStyle = '#065f46';
+                    ctx.beginPath();
+                    ctx.arc(pondX - (30 * s), pondY - (10 * s), 10 * s, 0, Math.PI * 1.5);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(pondX + (25 * s), pondY + (12 * s), 8 * s, 0.5, Math.PI * 2);
+                    ctx.fill();
+
+                    // 7. LILI (JACK RUSSELL) HÜPFT GESCHMEIDIG & LEBENDIG IM TAKT
                     liliAngle += 0.009 * s;
-                    let liliX = centerX + Math.cos(liliAngle) * (290 * s);
-                    let liliY = centerY + Math.sin(liliAngle * 2) * (100 * s) + (40 * s);
+                    let liliX = centerX + Math.cos(liliAngle) * (310 * s);
+                    let liliY = centerY + Math.sin(liliAngle * 2) * (110 * s) + (45 * s);
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
-                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (12 * smoothBeat * s);
+                    let jumpOffset = -Math.abs(Math.sin(liliAngle * 3)) * (14 * smoothBeat * s);
                     ctx.translate(0, jumpOffset);
 
-                    ctx.font = `${Math.max(38, 48 * s)}px sans-serif`;
+                    ctx.font = `${Math.max(40, 52 * s)}px sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // 8. UNTEN: Edle Holz-Terrasse & Lounge
-                    let terraceW = 500 * s;
-                    let terraceH = 110 * s;
+                    // 8. UNTEN: Edle Designer-Terrasse
+                    let terraceW = 540 * s;
+                    let terraceH = 120 * s;
                     let terraceX = (w / 2) - (terraceW / 2);
-                    let terraceY = h - terraceH - (50 * s);
+                    let terraceY = h - terraceH - (55 * s);
 
-                    ctx.fillStyle = '#5c2c16';
+                    ctx.fillStyle = '#4a2210';
                     ctx.strokeStyle = '#f59e0b';
-                    ctx.lineWidth = 3.5 * s;
+                    ctx.lineWidth = 4 * s;
                     ctx.beginPath();
-                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 18 * s);
+                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 20 * s);
                     ctx.fill();
                     ctx.stroke();
 
-                    ctx.strokeStyle = '#38170b';
+                    ctx.strokeStyle = '#281106';
                     ctx.lineWidth = 2 * s;
-                    for (let lx = terraceX + (45 * s); lx < terraceX + terraceW; lx += 45 * s) {
+                    for (let lx = terraceX + (48 * s); lx < terraceX + terraceW; lx += 48 * s) {
                         ctx.beginPath();
                         ctx.moveTo(lx, terraceY);
                         ctx.lineTo(lx, terraceY + terraceH);
                         ctx.stroke();
                     }
 
-                    // Designer Lounge-Tisch
-                    ctx.fillStyle = '#030712';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (60 * s), terraceY + (terraceH / 2) - (18 * s), 120 * s, 36 * s);
-                    ctx.fillStyle = '#1e293b';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (50 * s), terraceY + (terraceH / 2) - (12 * s), 100 * s, 24 * s);
+                    // Moderner Lounge-Tisch
+                    ctx.fillStyle = '#020617';
+                    ctx.fillRect(terraceX + (terraceW / 2) - (65 * s), terraceY + (terraceH / 2) - (20 * s), 130 * s, 40 * s);
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(terraceX + (terraceW / 2) - (55 * s), terraceY + (terraceH / 2) - (14 * s), 110 * s, 28 * s);
                 }
 
                 renderLoop();
