@@ -23,10 +23,8 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- Globaler Audioplayer mit sauberem Quell-Tag -->
-    <audio id="audio-stream" preload="none">
-        <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
-    </audio>
+    <!-- Globaler Audioplayer -->
+    <audio id="audio-stream" preload="none"></audio>
 
     <header class="max-w-4xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center border-b border-cyan-500/20 pb-4 gap-3">
         <div class="flex items-center space-x-3">
@@ -222,7 +220,7 @@
                 switchView('home');
             };
 
-            // Event-gesteuerter Audioplayer für stabile Wiedergabe auf Smartphones
+            // Anti-Cache Mobile Audio Engine (verhindert das Hängenbleiben bei "Verbinde...")
             const audio = document.getElementById('audio-stream');
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
@@ -232,9 +230,14 @@
             playBtn.addEventListener('click', () => {
                 if (audio.paused) {
                     playText.textContent = 'Verbinde...';
+                    // Verhindert das Caching des alten Stream-Zustands durch einen variablen Zeitstempel
+                    audio.src = 'https://stream.laut.fm/jackdarckart?cache=' + Date.now();
                     audio.load();
-                    audio.play().catch(err => {
-                        console.error("Playback error:", err);
+                    audio.play().then(() => {
+                        playIcon.textContent = '⏸';
+                        playText.textContent = 'Stream Pausieren';
+                    }).catch(err => {
+                        console.error(err);
                         playIcon.textContent = '▶';
                         playText.textContent = 'Webradio Abspielen';
                     });
@@ -250,9 +253,8 @@
                 playText.textContent = 'Stream Pausieren';
             });
 
-            audio.addEventListener('pause', () => {
-                playIcon.textContent = '▶';
-                playText.textContent = 'Webradio Abspielen';
+            audio.addEventListener('stalled', () => {
+                playText.textContent = 'Puffer lädt...';
             });
 
             volumeSlider.addEventListener('input', (e) => { audio.volume = e.target.value; });
