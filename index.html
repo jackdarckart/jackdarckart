@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Photorealistic Park Elite v20.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Harmonic Natural Elite v21.0</span>
                 </div>
             </div>
 
@@ -103,9 +103,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Fotorealistischer Botanischer Garten &amp; Tropenhaus Diarama</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Harmonische Natur-Resonanz &amp; Botanischer Garten</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem fotorealistisch nachgebildeten Park-Layout mit echtem Live-Visualisierer.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem harmonisch atmenden, fotorealistischen Park-Diarama.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -235,7 +235,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_PHOTO_GARDEN_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_HARMONIC_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -401,7 +401,7 @@
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
-                { id: 'garden', name: 'Garden', icon: '🏛️', desc: 'Fotorealistisches Park-Diarama', protected: true },
+                { id: 'garden', name: 'Garden', icon: '🏛️', desc: 'Harmonisches Park-Diarama', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
@@ -668,7 +668,7 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <!-- FOTOREALISTISCHES PARK-DIARAMA MIT ECHTZEIT-CANVAS LANDSCHAFTSZEICHNUNG -->
+                                <!-- HARMONISCHES PARK-DIARAMA MIT RUHIGER NATUR-SYNCHRONISATION -->
                                 <div class="p-6 sm:p-10 rounded-[3rem] border-2 border-emerald-500/80 relative overflow-hidden bg-gradient-to-b from-[#031c0e] via-[#010c06] to-[#000502] shadow-2xl">
                                     
                                     <!-- Kopfbereich -->
@@ -679,10 +679,10 @@
                                             </div>
                                             <div>
                                                 <h3 class="text-lg sm:text-xl font-black text-white font-mono tracking-wide flex items-center gap-2">
-                                                    Botanischer Garten • Tropenhaus Park-Diarama
-                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/90 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/50">🌿 Exakte Foto-Simulation</span>
+                                                    Botanischer Garten • Natürliche Harmonie
+                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/90 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/50">🌿 Ruhig &amp; Takt-Atmend</span>
                                                 </h3>
-                                                <p class="text-xs text-emerald-200/80 font-mono mt-0.5">Visuelle Echtzeit-Darstellung des Großen Tropenhauses, der Alleen, des Nierenteichs und Lili im Takt.</p>
+                                                <p class="text-xs text-emerald-200/80 font-mono mt-0.5">Sanfte, organische Visualisierung des Großen Tropenhauses, der Alleen und Lili im natürlichen Rhythmus.</p>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-3 bg-[#010c06]/90 px-4 py-2 rounded-xl border border-emerald-500/40 shadow-inner">
@@ -691,11 +691,11 @@
                                         </div>
                                     </div>
 
-                                    <!-- INTERAKTIVES PARK-LUFTBILD CANVAS (FOTOREALISTISCHE ZEICHNUNG) -->
+                                    <!-- HARMONISCHES PARK-CANVAS -->
                                     <div class="relative w-full h-[420px] rounded-3xl border-2 border-emerald-500/60 overflow-hidden shadow-2xl bg-[#02140a]">
                                         <canvas id="garden-map-canvas" class="absolute inset-0 w-full h-full"></canvas>
                                         <div class="absolute top-4 left-4 bg-[#010c06]/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/40 text-[10px] font-mono text-emerald-300 shadow">
-                                            🌿 Live Park-Diarama &amp; Beat-Resonanz
+                                            🌿 Live Park-Diarama • Audio-Resonanz
                                         </div>
                                     </div>
 
@@ -718,7 +718,8 @@
                                             </div>
                                         </div>
                                         
-                                        <audio id="garden-audio" crossorigin="anonymous" preload="none">
+                                        <!-- Audioplayer mit sicherem Fallback -->
+                                        <audio id="garden-audio" crossorigin="anonymous" preload="auto">
                                             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
                                             <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
                                         </audio>
@@ -1018,7 +1019,7 @@
                 }
             });
 
-            // FOTOREALISTISCHE PARK-CANVAS MAP & TAKT-SYNCHRONISATION
+            // HARMONISCHE, RUHIG ATMENDE PARK-CANVAS MAP & AUDIO ENGINE
             function initGardenCanvasMap() {
                 const canvas = document.getElementById('garden-map-canvas');
                 const audio = document.getElementById('garden-audio');
@@ -1028,6 +1029,7 @@
                 canvas.height = canvas.parentElement.clientHeight || 420;
                 const ctx = canvas.getContext('2d');
 
+                // Audio Context mit robustem Fallback (verhindert Stummheit durch CORS)
                 try {
                     if (!audioCtx && audio) {
                         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1039,14 +1041,15 @@
                         analyser.connect(audioCtx.destination);
                     }
                 } catch (e) {
-                    console.log("AudioContext Auto-Init im Hybrid-Modus");
+                    console.log("Audio Stream läuft im sicheren Direct-Playback Modus.");
                 }
 
                 const bufferLength = analyser ? analyser.frequencyBinCount : 32;
                 const dataArray = new Uint8Array(bufferLength);
-                let liliX = canvas.width * 0.65;
-                let liliY = canvas.height * 0.7;
+                
+                // Lili Start-Positionen (ruhige, natürliche Bewegung)
                 let liliAngle = 0;
+                let smoothBass = 0;
 
                 function renderLoop() {
                     visualizerAnimationId = requestAnimationFrame(renderLoop);
@@ -1059,136 +1062,143 @@
                         }
                     }
 
-                    // Hybrid Beat Synthesizer wenn kein Stream aktiv
-                    if (!isAudioValid) {
-                        const now = Date.now() / 1000;
-                        const beat = Math.abs(Math.sin(now * Math.PI * 2.2));
-                        for (let i = 0; i < bufferLength; i++) {
-                            dataArray[i] = Math.floor(beat * 200 + Math.random() * 55);
-                        }
+                    // Sanfter, organischer Takt-Generator (Atmen der Natur, falls Stream aktiv ist aber Frequenzen stumm bleiben)
+                    const timeSec = Date.now() / 1000;
+                    let targetBass = 0;
+                    if (isAudioValid) {
+                        targetBass = (dataArray[0] + dataArray[1] + dataArray[2]) / 3 / 255;
+                    } else if (audio && !audio.paused) {
+                        targetBass = Math.abs(Math.sin(timeSec * Math.PI * 1.8)) * 0.6; // Ruhiger 108 BPM Takt
+                    } else {
+                        targetBass = (Math.sin(timeSec * 1.2) + 1) * 0.15; // Sanftes Atmen im Ruhezustand
                     }
 
-                    let bassVal = (dataArray[0] + dataArray[1] + dataArray[2] + dataArray[3]) / 4;
-                    let bassNorm = bassVal / 255;
+                    // Weiche Glättung (Interpolation), verhindert jegliches Zucken
+                    smoothBass += (targetBass - smoothBass) * 0.15;
 
-                    // 1. RASEN & WEGE HINTERGRUND ZEICHNEN
-                    ctx.fillStyle = '#051f10';
+                    // 1. RASEN & WEGE HINTERGRUND
+                    ctx.fillStyle = '#04160c';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    // Rasen-Parterres (Exakt wie im Foto)
-                    ctx.fillStyle = '#0a381d';
+                    // Rasen-Parterres
+                    ctx.fillStyle = '#082b17';
                     ctx.beginPath();
                     ctx.roundRect(canvas.width * 0.1, canvas.height * 0.3, canvas.width * 0.8, canvas.height * 0.6, 20);
                     ctx.fill();
 
-                    // Symmetrische Schotterwege / Alleen
-                    ctx.fillStyle = '#1c2d22';
-                    ctx.fillRect(canvas.width * 0.45, canvas.height * 0.5, canvas.width * 0.1, canvas.height * 0.45);
+                    // Symmetrische Wege
+                    ctx.fillStyle = '#17251d';
+                    ctx.fillRect(canvas.width * 0.46, canvas.height * 0.5, canvas.width * 0.08, canvas.height * 0.45);
                     ctx.beginPath();
-                    ctx.arc(canvas.width * 0.5, canvas.height * 0.5, 75 + bassNorm * 15, 0, Math.PI * 2);
+                    ctx.arc(canvas.width * 0.5, canvas.height * 0.5, 65 + (smoothBass * 8), 0, Math.PI * 2);
                     ctx.fill();
 
-                    // 2. DER NIEREN- / KLEEBLATT-FONTÄNENTEICH (EXAKT WIE IM FOTO)
+                    // 2. DER NIEREN- / FONTÄNENTEICH (SANFTES PULSIEREN)
                     ctx.save();
                     ctx.translate(canvas.width * 0.5, canvas.height * 0.5);
-                    ctx.fillStyle = '#0e7490';
+                    ctx.fillStyle = '#085f78';
                     ctx.beginPath();
-                    ctx.ellipse(0, 0, 55 + bassNorm * 6, 28 + bassNorm * 4, 0, 0, Math.PI * 2);
+                    ctx.ellipse(0, 0, 50 + (smoothBass * 4), 25 + (smoothBass * 2), 0, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = '#22d3ee';
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
-
-                    // Sprudelnde Fontäne im Takt
-                    ctx.fillStyle = '#ffffff';
-                    for(let f = 0; f < 6; f++) {
-                        let fOffset = Math.sin(Date.now() / 100 + f) * (10 + bassNorm * 25);
-                        ctx.fillRect(-2 + f * 3, -15 - fOffset, 3, 8);
-                    }
-                    ctx.restore();
-
-                    // 3. DAS GROSSE TROPENHAUS (OBEN IM BILD)
-                    let tropenWidth = canvas.width * 0.45;
-                    let tropenHeight = 90 + bassNorm * 12;
-                    let tropenX = (canvas.width - tropenWidth) / 2;
-                    let tropenY = 20;
-
-                    // Glasdach-Glow im Takt
-                    ctx.save();
-                    let grad = ctx.createLinearGradient(tropenX, tropenY, tropenX, tropenY + tropenHeight);
-                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.4)');
-                    grad.addColorStop(0.5, `rgba(16, 185, 129, ${0.6 + bassNorm * 0.4})`);
-                    grad.addColorStop(1, 'rgba(6, 182, 212, 0.8)');
-                    
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.roundRect(tropenX, tropenY, tropenWidth, tropenHeight, [40, 40, 10, 10]);
-                    ctx.fill();
-                    ctx.strokeStyle = '#34d399';
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // Glasrippen & Seitenflügel
+                    // Ruhige Fontäne
+                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                    for(let f = 0; f < 4; f++) {
+                        let fRise = Math.sin(timeSec * 5 + f) * (6 + smoothBass * 10);
+                        ctx.fillRect(-1.5 + f * 2.5, -12 - fRise, 2.5, 6);
+                    }
+                    ctx.restore();
+
+                    // 3. DAS GROSSE TROPENHAUS (ATMENDES GLASDACH)
+                    let tropenWidth = canvas.width * 0.42;
+                    let tropenHeight = 85 + (smoothBass * 6);
+                    let tropenX = (canvas.width - tropenWidth) / 2;
+                    let tropenY = 22;
+
+                    ctx.save();
+                    let grad = ctx.createLinearGradient(tropenX, tropenY, tropenX, tropenY + tropenHeight);
+                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.35)');
+                    grad.addColorStop(0.6, `rgba(16, 185, 129, ${0.5 + smoothBass * 0.3})`);
+                    grad.addColorStop(1, 'rgba(6, 182, 212, 0.7)');
+                    
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(tropenX, tropenY, tropenWidth, tropenHeight, [35, 35, 8, 8]);
+                    ctx.fill();
+                    ctx.strokeStyle = '#34d399';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Glasrippen
                     ctx.strokeStyle = '#a7f3d0';
-                    ctx.lineWidth = 1.5;
-                    for (let xPos = tropenX + 20; xPos < tropenX + tropenWidth - 10; xPos += 25) {
+                    ctx.lineWidth = 1;
+                    for (let xPos = tropenX + 20; xPos < tropenX + tropenWidth - 10; xPos += 28) {
                         ctx.beginPath();
-                        ctx.moveTo(xPos, tropenY + 10);
+                        ctx.moveTo(xPos, tropenY + 8);
                         ctx.lineTo(xPos, tropenY + tropenHeight);
                         ctx.stroke();
                     }
                     ctx.restore();
 
-                    // 4. AUDIO FREQUENZ-SPEKTRUM IM TROPENHAUS
-                    let barW = (tropenWidth - 40) / bufferLength;
-                    for (let i = 0; i < bufferLength; i++) {
-                        let barH = (dataArray[i] / 255) * 45;
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-                        ctx.fillRect(tropenX + 20 + i * barW, tropenY + tropenHeight - barH - 8, barW - 2, barH);
+                    // 4. DEZENTES FREQUENZ-SPEKTRUM IN DER KUPPEL
+                    if (isAudioValid) {
+                        let barW = (tropenWidth - 40) / 16;
+                        for (let i = 0; i < 16; i++) {
+                            let barH = (dataArray[i] / 255) * 30;
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+                            ctx.fillRect(tropenX + 25 + i * barW, tropenY + tropenHeight - barH - 6, barW - 3, barH);
+                        }
                     }
 
-                    // 5. LILI (JACK RUSSELL) - LÄUFT & HÜPFT IM TAKT ÜBER DIE ALLEE
-                    liliAngle += 0.04 + (bassNorm * 0.05);
-                    liliX = canvas.width * 0.5 + Math.cos(liliAngle) * 110;
-                    liliY = canvas.height * 0.7 + Math.sin(liliAngle * 2) * 25;
+                    // 5. LILI (JACK RUSSELL) - NATÜRLICHER, RUHIGER SPAZIERGANG
+                    liliAngle += 0.012; // Deutlich langsamer und natürlicher
+                    let liliX = canvas.width * 0.5 + Math.cos(liliAngle) * 95;
+                    let liliY = canvas.height * 0.68 + Math.sin(liliAngle * 2) * 15;
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
+                    
                     // Schatten
-                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    ctx.fillStyle = 'rgba(0,0,0,0.4)';
                     ctx.beginPath();
-                    ctx.ellipse(0, 12, 12, 6, 0, 0, Math.PI * 2);
+                    ctx.ellipse(0, 10, 10, 5, 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Lili Emoji / Sprite
-                    ctx.font = `${Math.floor(24 + bassNorm * 6)}px sans-serif`;
+                    // Lili Sprite
+                    ctx.font = '22px sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // Text-Label
+                    // Beschriftung
                     ctx.fillStyle = '#34d399';
-                    ctx.font = '11px monospace';
-                    ctx.fillText('🐾 Lili auf den Rasen-Alleen', liliX, liliY - 20);
+                    ctx.font = '10px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🐾 Lili', liliX, liliY - 18);
                 }
                 renderLoop();
             }
 
-            // Play Button Event
+            // Play Button Event & Audio Fix
             document.addEventListener('click', function(e) {
                 const playBtn = e.target.closest('#garden-play-btn');
                 if (playBtn) {
                     const audio = document.getElementById('garden-audio');
                     if (audio) {
                         if (audio.paused) {
-                            audio.load();
                             audio.play().then(() => {
                                 playBtn.textContent = '⏸';
                                 playBtn.classList.add('affordable-glow');
+                                if (audioCtx && audioCtx.state === 'suspended') {
+                                    audioCtx.resume();
+                                }
                             }).catch(err => {
-                                console.error("Stream Playback Error:", err);
-                                alert("⚠️ Stream konnte nicht gestartet werden. Bitte Verbindung prüfen.");
+                                console.error("Audio Playback Error:", err);
+                                alert("⚠️ Audio-Stream konnte nicht gestartet werden. Bitte Browser-Berechtigungen prüfen.");
                             });
                         } else {
                             audio.pause();
