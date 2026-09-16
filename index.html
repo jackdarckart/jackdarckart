@@ -36,7 +36,7 @@
                     </div>
                     <span id="user-display" class="font-black text-sm tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">jackdarckart</span>
                 </div>
-                <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 sm:hidden">Nexus v4.0</span>
+                <span class="text-[10px] text-purple-400 font-mono tracking-widest uppercase bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30 sm:hidden">Nexus v4.1</span>
             </div>
             
             <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end">
@@ -61,7 +61,7 @@
                 <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats &amp; Rock-Lab Hub</h1>
                 <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">High-End Audio-Mediathek &amp; Web-Nexus • Meckenheim</p>
                 <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light">
-                    Das vollständige Ökosystem von jackdarckart. Inklusive Studio-Mining, interaktivem Lyrics-Editor und Krypto-Staking-Matrix.
+                    Das vollständige Ökosystem von jackdarckart. Inklusive sicherem Login, Studio-Mining, Lyrics-Editor und Krypto-Matrix.
                 </p>
                 <div class="mt-8 flex flex-wrap justify-center gap-4">
                     <button type="button" id="home-to-game-btn" class="cyber-button bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 px-7 rounded-2xl shadow-xl text-xs sm:text-sm flex items-center gap-2.5 cursor-pointer">
@@ -74,9 +74,10 @@
             </div>
         </div>
 
-        <!-- 2. STUDIO-LAB (GAME & AUTH) -->
+        <!-- 2. STUDIO-LAB (GAME & VOLLSTÄNDIGES AUTH-SYSTEM) -->
         <div id="view-game" class="view-page hidden w-full max-w-md mx-auto text-center space-y-4">
             
+            <!-- Auth Gateway (Login / Register) -->
             <div id="game-auth-container" class="glass-panel p-6 sm:p-8 rounded-[2rem] text-left space-y-4">
                 <div class="text-center">
                     <span class="text-3xl mb-2 block">🔐</span>
@@ -85,6 +86,7 @@
                 </div>
                 <div id="auth-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
                 
+                <!-- Login Form -->
                 <div id="form-login" class="space-y-3">
                     <div>
                         <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
@@ -95,9 +97,31 @@
                         <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" value="1234">
                     </div>
                     <button type="button" id="submit-login-btn" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg mt-2">🔓 Studio entsperren</button>
+                    
+                    <div class="flex justify-between items-center text-[11px] font-mono pt-2">
+                        <button type="button" id="to-register-btn" class="text-purple-400 hover:underline cursor-pointer">Konto registrieren</button>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div id="form-register" class="space-y-3 hidden">
+                    <div>
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE E-MAIL:</label>
+                        <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="name@domain.com">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-mono text-slate-400 block mb-1">WÄHLE PIN (4-6 Ziffern):</label>
+                        <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="1234">
+                    </div>
+                    <button type="button" id="submit-register-btn" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg mt-2">✨ Registrieren &amp; Starten</button>
+                    
+                    <div class="text-center pt-2">
+                        <button type="button" id="to-login-btn" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zum Login</button>
+                    </div>
                 </div>
             </div>
 
+            <!-- Main Studio Panel (Nach Login sichtbar) -->
             <div id="game-main-container" class="space-y-4 hidden">
                 <div class="glass-panel p-3.5 rounded-2xl flex justify-between items-center text-xs">
                     <span id="logged-user-email" class="text-purple-300 font-mono truncate max-w-[170px]">Session Aktiv</span>
@@ -174,7 +198,7 @@
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-mono text-purple-400 block mb-1.5">LYRICS &amp; STRUKTUR (Strophe, Chorus, Bridge):</label>
+                    <label class="text-[11px] font-mono text-purple-400 block mb-1.5">LYRICS &amp; STRUKTUR:</label>
                     <textarea id="lyric-content-input" rows="8" class="w-full bg-[#030508] border border-slate-800 rounded-2xl p-4 text-white text-xs font-mono outline-none leading-relaxed resize-none">[Verse 1]
 Neonlichter spiegeln sich im Asphalt,
 Der Bass drückt schwer, die Nacht ist kalt.
@@ -202,17 +226,14 @@ CloudBeats am Start, für immer treu!</textarea>
                     <div class="bg-[#030508] p-4 rounded-2xl border border-cyan-500/20">
                         <p class="text-[10px] font-mono text-cyan-300 uppercase">Cosmos ATOM Staking</p>
                         <p class="text-lg font-black text-white font-mono mt-1">~14.5% APY</p>
-                        <p class="text-[10px] text-slate-400 mt-1">Reguläre Prämien-Auszahlung</p>
                     </div>
                     <div class="bg-[#030508] p-4 rounded-2xl border border-purple-500/20">
                         <p class="text-[10px] font-mono text-purple-300 uppercase">GoMining Hashrate</p>
                         <p class="text-lg font-black text-white font-mono mt-1">Liquid Bitcoin</p>
-                        <p class="text-[10px] text-slate-400 mt-1">Tägliche Rewards aktiv</p>
                     </div>
                     <div class="bg-[#030508] p-4 rounded-2xl border border-emerald-500/20">
                         <p class="text-[10px] font-mono text-emerald-300 uppercase">Aave / Staking Pool</p>
                         <p class="text-lg font-black text-white font-mono mt-1">Optimiert</p>
-                        <p class="text-[10px] text-slate-400 mt-1">Sicherheits-Layer aktiv</p>
                     </div>
                 </div>
 
@@ -278,7 +299,7 @@ CloudBeats am Start, für immer treu!</textarea>
         <div id="view-admin" class="view-page hidden w-full max-w-md mx-auto py-4 text-left">
             <div class="glass-panel p-6 rounded-[2rem] space-y-3.5 border-amber-500/20">
                 <h2 class="text-lg font-bold text-amber-400 font-mono mb-2">🛠️ Nexus System Hub</h2>
-                <p class="text-xs text-slate-400">Systemdiagnose aktiv. Domain-Migration zu GitHub Pages läuft.</p>
+                <p class="text-xs text-slate-400">Systemdiagnose aktiv. GitHub Pages &amp; Cloudflare Live.</p>
                 <button type="button" id="admin-to-home-btn" class="cyber-button w-full bg-slate-900 text-slate-300 py-3 rounded-2xl text-xs font-mono border border-slate-800 cursor-pointer">← Dashboard</button>
             </div>
         </div>
@@ -288,7 +309,7 @@ CloudBeats am Start, für immer treu!</textarea>
     <!-- Cyber-Footer -->
     <footer class="w-full border-t border-purple-500/15 py-3 px-4 bg-[#05070c]">
         <div class="max-w-4xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
-            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> GitHub Pages &amp; Cloudflare Ready</span>
+            <span id="save-status" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Auth &amp; Auto-Sync Aktiv</span>
             <span class="text-purple-400/60">jackdarckart • CloudBeats</span>
         </div>
     </footer>
@@ -297,34 +318,56 @@ CloudBeats am Start, für immer treu!</textarea>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            /* --- ECONOMY & GAME ENGINE --- */
+            /* --- GAME & AUTH ENGINE --- */
             const GameEngine = {
                 beats: 3449,
                 fans: 586,
                 upg1: 0,
                 upg2: 0,
-                loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || 'artur.hamm90@gmail.com',
+                loggedInUser: localStorage.getItem('beat_lab_logged_in_user') || null,
                 
                 init() {
-                    this.load();
+                    let usersDB = {};
+                    try { 
+                        usersDB = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; 
+                    } catch(e) {}
+                    
+                    if (!usersDB['artur.hamm90@gmail.com']) {
+                        usersDB['artur.hamm90@gmail.com'] = { pin: '1234', beats: 3449, fans: 586, u1: 0, u2: 0 };
+                        localStorage.setItem('beat_lab_users_db', JSON.stringify(usersDB));
+                    }
+
+                    if (this.loggedInUser && usersDB[this.loggedInUser]) {
+                        this.load();
+                    }
                     this.startAutoBoost();
                 },
                 load() {
+                    if (!this.loggedInUser) return;
                     try {
-                        let data = JSON.parse(localStorage.getItem('cloudbeats_save_data'));
-                        if(data) {
-                            this.beats = Number(data.beats) || 3449;
-                            this.fans = Number(data.fans) || 586;
-                            this.upg1 = Number(data.upg1) || 0;
-                            this.upg2 = Number(data.upg2) || 0;
+                        let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                        if (db[this.loggedInUser]) {
+                            let u = db[this.loggedInUser];
+                            this.beats = Number(u.beats) || 3449;
+                            this.fans = Number(u.fans) || 586;
+                            this.upg1 = Number(u.u1) || 0;
+                            this.upg2 = Number(u.u2) || 0;
                         }
                     } catch(e) {}
                 },
                 save() {
+                    if (!this.loggedInUser) return;
                     try {
-                        localStorage.setItem('cloudbeats_save_data', JSON.stringify({
-                            beats: this.beats, fans: this.fans, upg1: this.upg1, upg2: this.upg2
-                        }));
+                        let db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {};
+                        if (!db[this.loggedInUser]) db[this.loggedInUser] = { pin: '1234' };
+                        db[this.loggedInUser] = { 
+                            ...db[this.loggedInUser],
+                            beats: this.beats, 
+                            fans: this.fans,
+                            u1: this.upg1,
+                            u2: this.upg2
+                        };
+                        localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
                     } catch(e) {}
                 },
                 getBPS() { return (this.upg1 * 2) + (this.upg2 * 10); },
@@ -333,7 +376,7 @@ CloudBeats am Start, für immer treu!</textarea>
                 startAutoBoost() {
                     setInterval(() => {
                         let bps = this.getBPS();
-                        if(bps > 0) {
+                        if(bps > 0 && this.loggedInUser) {
                             this.beats += bps;
                             this.updateUI();
                             this.save();
@@ -360,10 +403,110 @@ CloudBeats am Start, für immer treu!</textarea>
             };
             GameEngine.init();
 
+            // --- AUTH LOGIC ---
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+            const authMsg = document.getElementById('auth-msg');
+            const authContainer = document.getElementById('game-auth-container');
+            const mainContainer = document.getElementById('game-main-container');
+
+            function updateAuthUI() {
+                if (GameEngine.loggedInUser) {
+                    if(authContainer) authContainer.classList.add('hidden');
+                    if(mainContainer) mainContainer.classList.remove('hidden');
+                    const emailSpan = document.getElementById('logged-user-email');
+                    if(emailSpan) emailSpan.innerText = "Session: " + GameEngine.loggedInUser;
+                    GameEngine.load();
+                    GameEngine.updateUI();
+                } else {
+                    if(authContainer) authContainer.classList.remove('hidden');
+                    if(mainContainer) mainContainer.classList.add('hidden');
+                }
+            }
+            updateAuthUI();
+
+            // Toggle to register
+            const toRegBtn = document.getElementById('to-register-btn');
+            if(toRegBtn) {
+                toRegBtn.addEventListener('click', () => {
+                    if(formLogin) formLogin.classList.add('hidden');
+                    if(formRegister) formRegister.classList.remove('hidden');
+                    if(authMsg) authMsg.innerText = "";
+                    document.getElementById('auth-title').innerText = "Konto Registrierung";
+                });
+            }
+
+            // Toggle back to login
+            const toLoginBtn = document.getElementById('to-login-btn');
+            if(toLoginBtn) {
+                toLoginBtn.addEventListener('click', () => {
+                    if(formRegister) formRegister.classList.add('hidden');
+                    if(formLogin) formLogin.classList.remove('hidden');
+                    if(authMsg) authMsg.innerText = "";
+                    document.getElementById('auth-title').innerText = "Studio Secure Gateway";
+                });
+            }
+
+            // Login Action
+            const loginBtn = document.getElementById('submit-login-btn');
+            if(loginBtn) {
+                loginBtn.addEventListener('click', () => {
+                    const email = document.getElementById('login-email').value.trim().toLowerCase();
+                    const pin = document.getElementById('login-pin').value.trim();
+                    let db = {};
+                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+
+                    if(db[email] && db[email].pin === pin) {
+                        GameEngine.loggedInUser = email;
+                        localStorage.setItem('beat_lab_logged_in_user', email);
+                        updateAuthUI();
+                    } else {
+                        if(authMsg) authMsg.innerText = "❌ Falsche E-Mail oder PIN!";
+                    }
+                });
+            }
+
+            // Register Action
+            const regBtn = document.getElementById('submit-register-btn');
+            if(regBtn) {
+                regBtn.addEventListener('click', () => {
+                    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+                    const pin = document.getElementById('reg-pin').value.trim();
+
+                    if(!email || !email.includes('@') || pin.length < 4) {
+                        if(authMsg) authMsg.innerText = "❌ Gültige E-Mail & PIN (min. 4 Ziffern) erforderlich!";
+                        return;
+                    }
+                    let db = {};
+                    try { db = JSON.parse(localStorage.getItem('beat_lab_users_db')) || {}; } catch(e) {}
+                    if(db[email]) {
+                        if(authMsg) authMsg.innerText = "❌ E-Mail ist bereits registriert!";
+                        return;
+                    }
+                    db[email] = { pin: pin, beats: 3449, fans: 586, u1: 0, u2: 0 };
+                    localStorage.setItem('beat_lab_users_db', JSON.stringify(db));
+                    GameEngine.loggedInUser = email;
+                    localStorage.setItem('beat_lab_logged_in_user', email);
+                    updateAuthUI();
+                });
+            }
+
+            // Logout Action
+            const logoutBtn = document.getElementById('logout-btn');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    GameEngine.save();
+                    GameEngine.loggedInUser = null;
+                    localStorage.removeItem('beat_lab_logged_in_user');
+                    updateAuthUI();
+                });
+            }
+
             // Click Producer
             const produceBtn = document.getElementById('produce-beat-btn');
             if(produceBtn) {
                 produceBtn.addEventListener('click', () => {
+                    if (!GameEngine.loggedInUser) return;
                     GameEngine.beats += 1;
                     GameEngine.fans += 1;
                     GameEngine.updateUI();
@@ -397,7 +540,7 @@ CloudBeats am Start, für immer treu!</textarea>
                 });
             }
 
-            /* --- LYRICS EDITOR MODULE --- -->
+            /* --- LYRICS EDITOR MODULE --- */
             const saveLyricsBtn = document.getElementById('save-lyrics-btn');
             if(saveLyricsBtn) {
                 saveLyricsBtn.addEventListener('click', () => {
@@ -469,21 +612,18 @@ CloudBeats am Start, für immer treu!</textarea>
 
                     let pulse = (this.isStreaming && !this.audioEl.paused) ? (Math.sin(Date.now() / 200) * 0.5 + 0.5) * 0.05 : 0.01;
 
-                    // Lawn Background
                     let grad = ctx.createLinearGradient(0, 0, 0, 750);
                     grad.addColorStop(0, '#52b788');
                     grad.addColorStop(1, '#1b4332');
                     ctx.fillStyle = grad;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    // Pool
                     ctx.fillStyle = '#014f86';
                     ctx.fillRect(720, 380, 400, 240);
                     ctx.strokeStyle = `rgba(72, 202, 228, ${0.6 + pulse * 4})`;
                     ctx.lineWidth = 4;
                     ctx.strokeRect(730, 390, 380, 220);
 
-                    // Topiary Trees
                     const tree = (bx, by) => {
                         ctx.fillStyle = '#3a2e2b';
                         ctx.fillRect(bx - 6, by - 15, 12, 40);
