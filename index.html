@@ -250,9 +250,6 @@
             const views = ['home', 'auth', 'game', 'account'];
             function switchView(target) {
                 const user = SecureAuth.getSession();
-                if ((target === 'game' || target === 'account') && !user) {
-                    target = 'auth';
-                }
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if (el) el.classList.add('hidden');
@@ -275,18 +272,9 @@
                 const user = SecureAuth.getSession();
                 nav.innerHTML = `
                     <button onclick="switchView('home')" class="cyber-button bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎧 Webradio</button>
+                    <button onclick="switchView('game')" class="cyber-button bg-slate-900 text-slate-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎮 Empire Game</button>
+                    <button onclick="switchView('account')" class="cyber-button bg-slate-900 text-amber-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🛠️ Account</button>
                 `;
-                if (user) {
-                    nav.innerHTML += `
-                        <button onclick="switchView('game')" class="cyber-button bg-slate-900 text-slate-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎮 Empire Game</button>
-                        <button onclick="switchView('account')" class="cyber-button bg-slate-900 text-amber-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🛠️ Account &amp; Cloud</button>
-                        <button onclick="logoutUser()" class="cyber-button bg-red-600/20 text-red-300 border border-red-500/30 px-3.5 py-2 rounded-xl text-xs font-mono cursor-pointer">🚪 Abmelden</button>
-                    `;
-                } else {
-                    nav.innerHTML += `
-                        <button onclick="switchView('auth')" class="cyber-button bg-cyan-600 text-white border border-cyan-400 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🔑 Login / Registrieren</button>
-                    `;
-                }
             }
 
             window.switchView = switchView;
@@ -447,7 +435,7 @@
                 };
             }
 
-            // Game Upgrades & Logic
+            // Upgrades & Game Logic
             const upgrades = [
                 { id: 'mic', name: 'Pro Mikrofon', cost: 40, mult: 1.65, beat: 1, desc: '+1 Beat/s' },
                 { id: 'midi', name: 'MIDI Keyboard', cost: 180, mult: 1.70, beat: 3, desc: '+3 Beats/s' },
@@ -464,40 +452,42 @@
             function getCost(u, lvl) { return Math.floor(u.cost * Math.pow(u.mult, lvl)); }
 
             function updateGameUI() {
-                let gData = SecureAuth.getUserGameData();
-                if (!gData) return;
+                try {
+                    let gData = SecureAuth.getUserGameData();
+                    if (!gData) return;
 
-                const uBadge = document.getElementById('user-badge');
-                if (uBadge) uBadge.textContent = SecureAuth.getSession();
+                    const uBadge = document.getElementById('user-badge');
+                    if (uBadge) uBadge.textContent = SecureAuth.getSession();
 
-                let bEl = document.getElementById('g-beats');
-                let fEl = document.getElementById('g-fans');
-                let rEl = document.getElementById('g-releases');
-                let hEl = document.getElementById('g-hash');
+                    let bEl = document.getElementById('g-beats');
+                    let fEl = document.getElementById('g-fans');
+                    let rEl = document.getElementById('g-releases');
+                    let hEl = document.getElementById('g-hash');
 
-                if(bEl) bEl.textContent = Math.floor(gData.beats).toLocaleString();
-                if(fEl) fEl.textContent = Math.floor(gData.fans).toLocaleString();
-                if(rEl) rEl.textContent = gData.releases.toLocaleString();
-                
-                let hash = 0;
-                upgrades.forEach(u => { if(u.fan) hash += (gData.upgrades[u.id] || 0) * u.fan; });
-                if(hEl) hEl.textContent = `${hash} H/s`;
+                    if(bEl) bEl.textContent = Math.floor(gData.beats).toLocaleString();
+                    if(fEl) fEl.textContent = Math.floor(gData.fans).toLocaleString();
+                    if(rEl) rEl.textContent = gData.releases.toLocaleString();
+                    
+                    let hash = 0;
+                    upgrades.forEach(u => { if(u.fan) hash += (gData.upgrades[u.id] || 0) * u.fan; });
+                    if(hEl) hEl.textContent = `${hash} H/s`;
 
-                let shop = document.getElementById('shop');
-                if(shop) {
-                    shop.innerHTML = '';
-                    upgrades.forEach(u => {
-                        let lvl = gData.upgrades[u.id] || 0;
-                        let cost = getCost(u, lvl);
-                        let can = gData.beats >= cost;
-                        shop.innerHTML += `
-                            <div class="bg-[#030712] p-3 rounded-xl border ${can ? 'border-cyan-500/40':'border-slate-800'} flex justify-between items-center text-xs font-mono">
-                                <div><b>${u.name}</b> (Lvl ${lvl})<br><span class="text-slate-400">${u.desc}</span></div>
-                                <button onclick="buyUpgrade('${u.id}')" class="cyber-button bg-cyan-600 text-white px-3 py-1.5 rounded-lg uppercase cursor-pointer ${!can?'opacity-45':''}">⚡ ${cost.toLocaleString()}</button>
-                            </div>`;
-                    });
-                }
-                SecureAuth.saveUserGameData(gData);
+                    let shop = document.getElementById('shop');
+                    if(shop) {
+                        shop.innerHTML = '';
+                        upgrades.forEach(u => {
+                            let lvl = gData.upgrades[u.id] || 0;
+                            let cost = getCost(u, lvl);
+                            let can = gData.beats >= cost;
+                            shop.innerHTML += `
+                                <div class="bg-[#030712] p-3 rounded-xl border ${can ? 'border-cyan-500/40':'border-slate-800'} flex justify-between items-center text-xs font-mono">
+                                    <div><b>${u.name}</b> (Lvl ${lvl})<br><span class="text-slate-400">${u.desc}</span></div>
+                                    <button onclick="buyUpgrade('${u.id}')" class="cyber-button bg-cyan-600 text-white px-3 py-1.5 rounded-lg uppercase cursor-pointer ${!can?'opacity-45':''}">⚡ ${cost.toLocaleString()}</button>
+                                </div>`;
+                        });
+                    }
+                    SecureAuth.saveUserGameData(gData);
+                } catch(e) {}
             }
 
             window.buyUpgrade = function(id) {
@@ -516,38 +506,40 @@
             if(btnClick) {
                 btnClick.onclick = () => {
                     let gData = SecureAuth.getUserGameData();
-                    if (!gData) return;
+                    if (!gData) gData = { beats: 0, fans: 0, releases: 0, upgrades: {} };
                     gData.beats += 1;
+                    SecureAuth.saveUserGameData(gData);
                     updateGameUI();
                 };
             }
 
             // Game Loop (Every second)
             setInterval(() => {
-                if (!SecureAuth.getSession()) return;
-                let gData = SecureAuth.getUserGameData();
-                if (!gData) return;
+                try {
+                    let gData = SecureAuth.getUserGameData();
+                    if (!gData) return;
 
-                let bInc = 0, fInc = 0;
-                upgrades.forEach(u => {
-                    let lvl = gData.upgrades[u.id] || 0;
-                    if(u.beat) bInc += lvl * u.beat;
-                    if(u.fan) fInc += lvl * u.fan;
-                });
+                    let bInc = 0, fInc = 0;
+                    upgrades.forEach(u => {
+                        let lvl = gData.upgrades[u.id] || 0;
+                        if(u.beat) bInc += lvl * u.beat;
+                        if(u.fan) fInc += lvl * u.fan;
+                    });
 
-                if(bInc > 0 || fInc > 0) {
                     gData.beats += bInc; 
                     gData.fans += fInc;
                     if(gData.beats >= (gData.releases + 1) * 5000) gData.releases++;
-                    SecureAuth.saveUserGameData(gData);
                     
-                    if (!document.getElementById('view-game').classList.contains('hidden')) {
+                    SecureAuth.saveUserGameData(gData);
+
+                    const gameView = document.getElementById('view-game');
+                    if (gameView && !gameView.classList.contains('hidden')) {
                         updateGameUI();
                     }
-                }
+                } catch(e){}
             }, 1000);
 
-            // Account & PIN Management
+            // Account Actions & Backup
             const btnChangePin = document.getElementById('btn-changepin');
             if(btnChangePin) {
                 btnChangePin.onclick = async () => {
@@ -558,7 +550,7 @@
                     if(db[user]) {
                         db[user].pinHash = await SecureAuth.hashPin(pin);
                         SecureAuth.saveUsersDB(db);
-                        alert('✅ PIN erfolgreich verschlüsselt aktualisiert!');
+                        alert('✅ PIN erfolgreich aktualisiert!');
                         document.getElementById('new-pin').value = '';
                     }
                 };
@@ -586,7 +578,6 @@
                 };
             }
 
-            // Backup Export & Import
             const btnExport = document.getElementById('btn-export');
             if(btnExport) {
                 btnExport.onclick = () => {
