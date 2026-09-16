@@ -179,7 +179,7 @@
                 <div class="flex justify-between items-center border-b border-cyan-500/20 pb-4">
                     <div>
                         <h2 class="text-lg font-black text-cyan-300 font-mono uppercase">🎮 CyberBeat Tycoon</h2>
-                        <p class="text-[11px] text-slate-400 font-mono">Commander: <span id="user-badge" class="text-emerald-400 font-bold">--</span></p>
+                        <p class="text-[11px] text-slate-400 font-mono">Gesicherter Account: <span id="user-badge" class="text-emerald-400 font-bold">--</span></p>
                     </div>
                 </div>
 
@@ -250,6 +250,9 @@
             const views = ['home', 'auth', 'game', 'account'];
             function switchView(target) {
                 const user = SecureAuth.getSession();
+                if ((target === 'game' || target === 'account') && !user) {
+                    target = 'auth';
+                }
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if (el) el.classList.add('hidden');
@@ -259,7 +262,7 @@
 
                 renderNavbar();
                 if (target === 'game') updateGameUI();
-                if (target === 'account') {
+                if (target === 'account' && user) {
                     const uBadge = document.getElementById('user-badge');
                     if (uBadge) uBadge.textContent = user;
                 }
@@ -272,9 +275,18 @@
                 const user = SecureAuth.getSession();
                 nav.innerHTML = `
                     <button onclick="switchView('home')" class="cyber-button bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎧 Webradio</button>
-                    <button onclick="switchView('game')" class="cyber-button bg-slate-900 text-slate-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎮 Empire Game</button>
-                    <button onclick="switchView('account')" class="cyber-button bg-slate-900 text-amber-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🛠️ Account &amp; Cloud</button>
                 `;
+                if (user) {
+                    nav.innerHTML += `
+                        <button onclick="switchView('game')" class="cyber-button bg-slate-900 text-slate-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎮 Empire Game</button>
+                        <button onclick="switchView('account')" class="cyber-button bg-slate-900 text-amber-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🛠️ Account &amp; Cloud</button>
+                        <button onclick="logoutUser()" class="cyber-button bg-red-600/20 text-red-300 border border-red-500/30 px-3.5 py-2 rounded-xl text-xs font-mono cursor-pointer">🚪 Abmelden</button>
+                    `;
+                } else {
+                    nav.innerHTML += `
+                        <button onclick="switchView('auth')" class="cyber-button bg-cyan-600 text-white border border-cyan-400 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🔑 Login / Registrieren</button>
+                    `;
+                }
             }
 
             window.switchView = switchView;
@@ -378,6 +390,63 @@
             }
             fetchRadio(); setInterval(fetchRadio, 15000);
 
+            // Auth Subviews Handler
+            function showAuthSub(id) {
+                ['form-login', 'form-register', 'form-reset', 'form-verify'].forEach(f => {
+                    const el = document.getElementById(f);
+                    if(el) el.classList.add('hidden');
+                });
+                const targetEl = document.getElementById(id);
+                if(targetEl) targetEl.classList.remove('hidden');
+                const msgEl = document.getElementById('auth-msg');
+                if(msgEl) msgEl.textContent = '';
+            }
+            
+            const toReg = document.getElementById('to-reg');
+            if(toReg) toReg.onclick = () => showAuthSub('form-register');
+            const toReset = document.getElementById('to-reset');
+            if(toReset) toReset.onclick = () => showAuthSub('form-reset');
+            const backLogin1 = document.getElementById('back-login-1');
+            if(backLogin1) backLogin1.onclick = () => showAuthSub('form-login');
+            const backLogin2 = document.getElementById('back-login-2');
+            if(backLogin2) backLogin2.onclick = () => showAuthSub('form-login');
+            const cancelVerify = document.getElementById('cancel-verify');
+            if(cancelVerify) cancelVerify.onclick = () => showAuthSub('form-login');
+
+            async function handleAuthAction(email, pin, action) {
+                let res = await SecureAuth.initAuthAction(email, pin, action);
+                const msgEl = document.getElementById('auth-msg');
+                if (!res.success) {
+                    if(msgEl) msgEl.textContent = res.msg;
+                    return;
+                }
+                const displayCode = document.getElementById('display-code');
+                if(displayCode) displayCode.textContent = res.code;
+                showAuthSub('form-verify');
+            }
+
+            const btnLogin = document.getElementById('btn-login');
+            if(btnLogin) btnLogin.onclick = () => handleAuthAction(document.getElementById('login-email').value, document.getElementById('login-pin').value, 'login');
+            
+            const btnRegister = document.getElementById('btn-register');
+            if(btnRegister) btnRegister.onclick = () => handleAuthAction(document.getElementById('reg-email').value, document.getElementById('reg-pin').value, 'register');
+            
+            const btnReset = document.getElementById('btn-reset');
+            if(btnReset) btnReset.onclick = () => handleAuthAction(document.getElementById('reset-email').value, document.getElementById('reset-pin').value, 'reset_pin');
+
+            const btnVerify = document.getElementById('btn-verify');
+            if(btnVerify) {
+                btnVerify.onclick = async () => {
+                    let input = document.getElementById('verify-input').value.trim();
+                    let res = await SecureAuth.verifyAndExecute(input);
+                    const msgEl = document.getElementById('auth-msg');
+                    if(msgEl) msgEl.textContent = res.msg;
+                    if (res.success) {
+                        setTimeout(() => switchView('game'), 800);
+                    }
+                };
+            }
+
             // Game Upgrades & Logic
             const upgrades = [
                 { id: 'mic', name: 'Pro Mikrofon', cost: 40, mult: 1.65, beat: 1, desc: '+1 Beat/s' },
@@ -455,6 +524,7 @@
 
             // Game Loop (Every second)
             setInterval(() => {
+                if (!SecureAuth.getSession()) return;
                 let gData = SecureAuth.getUserGameData();
                 if (!gData) return;
 
@@ -465,19 +535,58 @@
                     if(u.fan) fInc += lvl * u.fan;
                 });
 
-                // Auch ohne Upgrades läuft der Ticker flüssig weiter zur Aktualisierung
-                gData.beats += bInc; 
-                gData.fans += fInc;
-                if(gData.beats >= (gData.releases + 1) * 5000) gData.releases++;
-                
-                SecureAuth.saveUserGameData(gData);
-
-                if (!document.getElementById('view-game').classList.contains('hidden')) {
-                    updateGameUI();
+                if(bInc > 0 || fInc > 0) {
+                    gData.beats += bInc; 
+                    gData.fans += fInc;
+                    if(gData.beats >= (gData.releases + 1) * 5000) gData.releases++;
+                    SecureAuth.saveUserGameData(gData);
+                    
+                    if (!document.getElementById('view-game').classList.contains('hidden')) {
+                        updateGameUI();
+                    }
                 }
             }, 1000);
 
-            // Account actions & Backup
+            // Account & PIN Management
+            const btnChangePin = document.getElementById('btn-changepin');
+            if(btnChangePin) {
+                btnChangePin.onclick = async () => {
+                    let pin = document.getElementById('new-pin').value.trim();
+                    if(pin.length < 4) return alert('PIN muss min. 4 Ziffern haben!');
+                    let user = SecureAuth.getSession();
+                    let db = SecureAuth.getUsersDB();
+                    if(db[user]) {
+                        db[user].pinHash = await SecureAuth.hashPin(pin);
+                        SecureAuth.saveUsersDB(db);
+                        alert('✅ PIN erfolgreich verschlüsselt aktualisiert!');
+                        document.getElementById('new-pin').value = '';
+                    }
+                };
+            }
+
+            const btnResetGame = document.getElementById('btn-resetgame');
+            if(btnResetGame) {
+                btnResetGame.onclick = () => {
+                    if(confirm('Spielstand wirklich auf 0 zurücksetzen?')) {
+                        SecureAuth.saveUserGameData({ beats: 0, fans: 0, releases: 0, upgrades: {} });
+                        updateGameUI(); alert('✅ Spielstand zurückgesetzt!');
+                    }
+                };
+            }
+
+            const btnDeleteAcc = document.getElementById('btn-deleteacc');
+            if(btnDeleteAcc) {
+                btnDeleteAcc.onclick = () => {
+                    if(confirm('Account unwiderruflich löschen?')) {
+                        let user = SecureAuth.getSession();
+                        let db = SecureAuth.getUsersDB();
+                        delete db[user]; SecureAuth.saveUsersDB(db);
+                        SecureAuth.clearSession(); switchView('home');
+                    }
+                };
+            }
+
+            // Backup Export & Import
             const btnExport = document.getElementById('btn-export');
             if(btnExport) {
                 btnExport.onclick = () => {
