@@ -255,7 +255,10 @@
                 if (active) active.classList.remove('hidden');
 
                 renderNavbar();
-                if (target === 'game') updateGameUI();
+                if (target === 'game') {
+                    initShopOnce();
+                    updateGameUI();
+                }
                 if (target === 'account' && user) {
                     const uBadge = document.getElementById('user-badge');
                     if (uBadge) uBadge.textContent = user;
@@ -457,6 +460,19 @@
 
             function getCost(u, lvl) { return Math.floor(u.cost * Math.pow(u.mult, lvl)); }
 
+            function initShopOnce() {
+                let shop = document.getElementById('shop');
+                if (!shop || shop.children.length > 0) return;
+                shop.innerHTML = '';
+                upgrades.forEach(u => {
+                    shop.innerHTML += `
+                        <div id="shop-card-${u.id}" class="bg-[#030712] p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono">
+                            <div><b id="shop-title-${u.id}">${u.name} (Lvl 0)</b><br><span class="text-slate-400">${u.desc}</span></div>
+                            <button id="shop-btn-${u.id}" onclick="buyUpgrade('${u.id}')" class="cyber-button bg-cyan-600 text-white px-3 py-1.5 rounded-lg uppercase cursor-pointer">⚡ 0</button>
+                        </div>`;
+                });
+            }
+
             function updateGameUI() {
                 try {
                     let gData = SecureAuth.getUserGameData();
@@ -478,20 +494,34 @@
                     upgrades.forEach(u => { if(u.fan) hash += (gData.upgrades[u.id] || 0) * u.fan; });
                     if(hEl) hEl.textContent = `${hash} H/s`;
 
-                    let shop = document.getElementById('shop');
-                    if(shop) {
-                        shop.innerHTML = '';
-                        upgrades.forEach(u => {
-                            let lvl = gData.upgrades[u.id] || 0;
-                            let cost = getCost(u, lvl);
-                            let can = gData.beats >= cost;
-                            shop.innerHTML += `
-                                <div class="bg-[#030712] p-3 rounded-xl border ${can ? 'border-cyan-500/40':'border-slate-800'} flex justify-between items-center text-xs font-mono">
-                                    <div><b>${u.name}</b> (Lvl ${lvl})<br><span class="text-slate-400">${u.desc}</span></div>
-                                    <button onclick="buyUpgrade('${u.id}')" class="cyber-button bg-cyan-600 text-white px-3 py-1.5 rounded-lg uppercase cursor-pointer ${!can?'opacity-45':''}">⚡ ${cost.toLocaleString()}</button>
-                                </div>`;
-                        });
-                    }
+                    // Live update of existing shop elements without wiping DOM
+                    upgrades.forEach(u => {
+                        let lvl = gData.upgrades[u.id] || 0;
+                        let cost = getCost(u, lvl);
+                        let can = gData.beats >= cost;
+
+                        let titleEl = document.getElementById(`shop-title-${u.id}`);
+                        let btnEl = document.getElementById(`shop-btn-${u.id}`);
+                        let cardEl = document.getElementById(`shop-card-${u.id}`);
+
+                        if(titleEl) titleEl.textContent = `${u.name} (Lvl ${lvl})`;
+                        if(btnEl) {
+                            btnEl.textContent = `⚡ ${cost.toLocaleString()}`;
+                            if(can) {
+                                btnEl.classList.remove('opacity-45');
+                            } else {
+                                btnEl.classList.add('opacity-45');
+                            }
+                        }
+                        if(cardEl) {
+                            if(can) {
+                                cardEl.className = "bg-[#030712] p-3 rounded-xl border border-cyan-500/40 flex justify-between items-center text-xs font-mono";
+                            } else {
+                                cardEl.className = "bg-[#030712] p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono";
+                            }
+                        }
+                    });
+
                     SecureAuth.saveUserGameData(gData);
                 } catch(e) {}
             }
