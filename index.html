@@ -50,9 +50,9 @@
                 <div class="glass-panel p-8 sm:p-10 rounded-[2.5rem] text-center relative overflow-hidden">
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/20 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Secure Nexus</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Verifizierungs-Engine • Anti-Cheat Aktiv</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">2-Schritte E-Mail-Verifizierung Aktiv</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Willkommen im öffentlichen Portal. Logge dich über den Account-Bereich ein, um geschützte Sektionen freizuschalten.
+                        Willkommen im öffentlichen Portal. Für geschützte Bereiche ist eine obligatorische E-Mail-Code-Verifizierung vorgeschrieben.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -60,7 +60,7 @@
                 </div>
             </section>
 
-            <!-- 2. AUTH & ACCOUNT MANAGEMENT (Inkl. integriertem Abmelden-Button) -->
+            <!-- 2. AUTH & VERIFICATION PORTAL -->
             <section id="view-auth" class="view-section hidden space-y-4 text-left max-w-md mx-auto">
                 <div class="glass-panel p-6 sm:p-8 rounded-[2rem] space-y-4">
                     <div class="text-center">
@@ -71,17 +71,17 @@
 
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
-                    <!-- Bereits Eingeloggt Ansicht (Mit Abmelden-Button) -->
+                    <!-- Bereits Eingeloggt Ansicht -->
                     <div id="subform-logged" class="space-y-3 hidden">
                         <div class="bg-[#030508] p-4 rounded-2xl border border-purple-500/30 text-center space-y-1">
-                            <p class="text-[10px] font-mono text-slate-400 uppercase">Aktiver Account</p>
+                            <p class="text-[10px] font-mono text-slate-400 uppercase">Verifizierter Account</p>
                             <p id="auth-logged-email" class="text-xs font-bold text-purple-300 font-mono"></p>
                         </div>
                         <button type="button" id="btn-auth-logout" class="cyber-button w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🚪 Sicher Abmelden</button>
                         <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Studio wechseln</button>
                     </div>
 
-                    <!-- Login Form -->
+                    <!-- Schritt 1: Login Form -->
                     <div id="subform-login" class="space-y-3">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
@@ -91,11 +91,27 @@
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
                             <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="••••">
                         </div>
-                        <button type="button" id="btn-execute-login" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔓 Verifizieren &amp; Einloggen</button>
+                        <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
                         
                         <div class="flex justify-between items-center text-[11px] font-mono pt-2">
                             <button type="button" id="link-to-register" class="text-purple-400 hover:underline cursor-pointer">Konto registrieren</button>
                             <button type="button" id="link-to-reset" class="text-cyan-400 hover:underline cursor-pointer">PIN vergessen?</button>
+                        </div>
+                    </div>
+
+                    <!-- Schritt 2: Code Eingabe (Pflichtfeld für Verifizierung) -->
+                    <div id="subform-verify" class="space-y-3 hidden">
+                        <div class="bg-purple-950/40 p-3 rounded-xl border border-purple-500/30 text-[11px] font-mono text-purple-200">
+                            📨 Ein Bestätigungscode wurde an Ihre E-Mail gesendet. Bitte geben Sie den 4-stelligen Code ein, um fortzufahren.
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE (PFLICHT):</label>
+                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#030508] border border-purple-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="1234">
+                        </div>
+                        <button type="button" id="btn-execute-verify" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✅ Code bestätigen &amp; Einloggen</button>
+                        
+                        <div class="text-center pt-2">
+                            <button type="button" id="link-cancel-verify" class="text-[11px] font-mono text-slate-400 hover:underline cursor-pointer">← Abbrechen</button>
                         </div>
                     </div>
 
@@ -109,7 +125,7 @@
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN (min. 4 Ziffern):</label>
                             <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none" placeholder="Sichere PIN">
                         </div>
-                        <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren</button>
+                        <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren &amp; Code senden</button>
                         
                         <div class="text-center pt-2">
                             <button type="button" id="link-back-to-login" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zum Login</button>
@@ -152,6 +168,9 @@
 
             const SecureAuth = {
                 currentUser: localStorage.getItem('secure_nexus_session') || null,
+                pendingEmail: null,
+                pendingPin: null,
+                activeVerificationCode: null,
                 
                 getDB() {
                     try {
@@ -170,54 +189,78 @@
                     }
                     return hash;
                 },
-                register(email, pin) {
-                    if (!email) return { success: false, msg: '❌ Bitte E-Mail eingeben!' };
+                initVerification(email, pin, isRegistration = false) {
+                    if (!email || email.trim() === '') return { success: false, msg: '❌ E-Mail Eingabe fehlt!' };
+                    if (!pin || pin.trim() === '') return { success: false, msg: '❌ PIN Eingabe fehlt!' };
+                    
                     email = email.trim().toLowerCase();
-                    pin = pin ? pin.trim() : '';
+                    pin = pin.trim();
 
                     if (!email.includes('@') || pin.length < 4) {
-                        return { success: false, msg: '❌ Gültige E-Mail & PIN (min. 4 Ziffern) erforderlich!' };
+                        return { success: false, msg: '❌ Ungültige E-Mail oder PIN (min. 4 Ziffern)!' };
                     }
-                    let db = this.getDB();
-                    if (db[email]) {
-                        return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
-                    }
-                    let initialData = { pin: pin, beats: 10, fans: 10, hype: 0, releasesCount: 0, marketingLevel: 0, studioLevel: 0 };
-                    initialData.checksum = this.generateChecksum(initialData);
-                    db[email] = initialData;
-                    this.saveDB(db);
-                    this.currentUser = email;
-                    localStorage.setItem('secure_nexus_session', email);
-                    return { success: true, msg: '✅ Erfolgreich verifiziert & eingeloggt!' };
-                },
-                login(email, pin) {
-                    if (!email) return { success: false, msg: '❌ Bitte E-Mail eingeben!' };
-                    email = email.trim().toLowerCase();
-                    pin = pin ? pin.trim() : '';
 
                     let db = this.getDB();
+                    if (isRegistration && db[email]) {
+                        return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
+                    }
+                    if (!isRegistration && (!db[email] || db[email].pin !== pin)) {
+                        return { success: false, msg: '❌ E-Mail oder PIN falsch!' };
+                    }
+
+                    // Generiere einen 4-stelligen Verifizierungscode
+                    const code = Math.floor(1000 + Math.random() * 9000).toString();
+                    this.activeVerificationCode = code;
+                    this.pendingEmail = email;
+                    this.pendingPin = pin;
+
+                    // Zeige den Code simuliert an (da statische Hosting-Umgebung)
+                    return { success: true, needsCode: true, msg: `✉️ Code gesendet! (Demo-Code für Test: ${code})` };
+                },
+                finalizeVerification(enteredCode) {
+                    if (!enteredCode || enteredCode.trim() === '') {
+                        return { success: false, msg: '❌ Verifizierungscode Eingabe fehlt!' };
+                    }
+                    if (enteredCode.trim() !== this.activeVerificationCode) {
+                        return { success: false, msg: '❌ Falscher Verifizierungscode!' };
+                    }
+
+                    let db = this.getDB();
+                    let email = this.pendingEmail;
+                    let pin = this.pendingPin;
+
                     if (!db[email]) {
-                        return { success: false, msg: '❌ E-Mail auf diesem Gerät nicht gefunden! (Backup importieren?)' };
+                        // Registrierung abschließen
+                        let initialData = { pin: pin, beats: 10, fans: 10, hype: 0, releasesCount: 0, marketingLevel: 0, studioLevel: 0 };
+                        initialData.checksum = this.generateChecksum(initialData);
+                        db[email] = initialData;
+                        this.saveDB(db);
+                    } else {
+                        // Login Checksummen-Validierung
+                        let u = db[email];
+                        if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
+                            return { success: false, msg: '⚠️ Integritätsfehler: Daten manipuliert!' };
+                        }
                     }
-                    if (db[email].pin !== pin) {
-                        return { success: false, msg: '❌ Falsche PIN eingegeben!' };
-                    }
-                    let u = db[email];
-                    if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
-                        return { success: false, msg: '⚠️ Integritätsfehler: Daten manipuliert!' };
-                    }
+
                     this.currentUser = email;
                     localStorage.setItem('secure_nexus_session', email);
-                    return { success: true, msg: '✅ Verifizierung erfolgreich!' };
+                    this.activeVerificationCode = null;
+                    this.pendingEmail = null;
+                    this.pendingPin = null;
+
+                    return { success: true, msg: '✅ Verifizierung erfolgreich abgeschlossen!' };
                 },
                 resetPin(email, newPin) {
-                    if (!email) return { success: false, msg: '❌ Bitte E-Mail eingeben!' };
+                    if (!email || email.trim() === '') return { success: false, msg: '❌ E-Mail Eingabe fehlt!' };
+                    if (!newPin || newPin.trim() === '') return { success: false, msg: '❌ Neue PIN Eingabe fehlt!' };
+
                     email = email.trim().toLowerCase();
-                    newPin = newPin ? newPin.trim() : '';
+                    newPin = newPin.trim();
 
                     let db = this.getDB();
                     if (!db[email]) return { success: false, msg: '❌ E-Mail im System nicht gefunden!' };
-                    if (!newPin || newPin.length < 4) return { success: false, msg: '❌ Neue PIN muss min. 4 Ziffern haben!' };
+                    if (newPin.length < 4) return { success: false, msg: '❌ Neue PIN muss min. 4 Ziffern haben!' };
                     
                     db[email].pin = newPin;
                     db[email].checksum = this.generateChecksum(db[email]);
@@ -395,6 +438,7 @@
                 const subLogin = document.getElementById('subform-login');
                 const subReg = document.getElementById('subform-register');
                 const subReset = document.getElementById('subform-reset');
+                const subVerify = document.getElementById('subform-verify');
                 const subLogged = document.getElementById('subform-logged');
                 const mainTitle = document.getElementById('auth-main-title');
                 const subTitle = document.getElementById('auth-subtitle');
@@ -403,13 +447,25 @@
                     subLogin.classList.add('hidden');
                     subReg.classList.add('hidden');
                     subReset.classList.add('hidden');
+                    subVerify.classList.add('hidden');
                     subLogged.classList.remove('hidden');
                     if (mainTitle) mainTitle.innerText = "Account-Verwaltung";
                     if (subTitle) subTitle.innerText = "Aktive, gesicherte Sitzung";
                     const emailDisplay = document.getElementById('auth-logged-email');
                     if (emailDisplay) emailDisplay.innerText = SecureAuth.currentUser;
+                } else if (SecureAuth.activeVerificationCode) {
+                    subLogin.classList.add('hidden');
+                    subReg.classList.add('hidden');
+                    subReset.classList.add('hidden');
+                    subLogged.classList.add('hidden');
+                    subVerify.classList.remove('hidden');
+                    if (mainTitle) mainTitle.innerText = "E-Mail Verifizierung";
+                    if (subTitle) subTitle.innerText = "Code-Eingabe erforderlich";
                 } else {
                     subLogged.classList.add('hidden');
+                    subVerify.classList.add('hidden');
+                    subReg.classList.add('hidden');
+                    subReset.classList.add('hidden');
                     subLogin.classList.remove('hidden');
                     if (mainTitle) mainTitle.innerText = "Sicheres Login-Portal";
                     if (subTitle) subTitle.innerText = "Verifizierung per E-Mail & PIN";
@@ -456,45 +512,75 @@
             const subLogin = document.getElementById('subform-login');
             const subReg = document.getElementById('subform-register');
             const subReset = document.getElementById('subform-reset');
+            const subVerify = document.getElementById('subform-verify');
             const mainTitle = document.getElementById('auth-main-title');
             const feedbackMsg = document.getElementById('auth-feedback-msg');
 
             document.getElementById('link-to-register').addEventListener('click', () => {
-                subLogin.classList.add('hidden'); subReset.classList.add('hidden'); subReg.classList.remove('hidden');
+                subLogin.classList.add('hidden'); subReset.classList.add('hidden'); subVerify.classList.add('hidden'); subReg.classList.remove('hidden');
                 mainTitle.innerText = "Konto Registrierung"; feedbackMsg.innerText = "";
             });
             document.getElementById('link-to-reset').addEventListener('click', () => {
-                subLogin.classList.add('hidden'); subReg.classList.add('hidden'); subReset.classList.remove('hidden');
+                subLogin.classList.add('hidden'); subReg.classList.add('hidden'); subVerify.classList.add('hidden'); subReset.classList.remove('hidden');
                 mainTitle.innerText = "PIN Zurücksetzen"; feedbackMsg.innerText = "";
             });
             document.getElementById('link-back-to-login').addEventListener('click', () => {
-                subReg.classList.add('hidden'); subReset.classList.add('hidden'); subLogin.classList.remove('hidden');
+                subReg.classList.add('hidden'); subReset.classList.add('hidden'); subVerify.classList.add('hidden'); subLogin.classList.remove('hidden');
                 mainTitle.innerText = "Sicheres Login-Portal"; feedbackMsg.innerText = "";
             });
             document.getElementById('link-cancel-reset').addEventListener('click', () => {
                 subReset.classList.add('hidden'); subLogin.classList.remove('hidden');
                 mainTitle.innerText = "Sicheres Login-Portal"; feedbackMsg.innerText = "";
             });
-
-            document.getElementById('btn-execute-login').addEventListener('click', () => {
-                const res = SecureAuth.login(document.getElementById('login-email').value, document.getElementById('login-pin').value);
-                feedbackMsg.innerText = res.msg;
-                if (res.success) { renderNavbar(); updateFooterStatus(); setTimeout(() => switchView('studio'), 800); }
+            document.getElementById('link-cancel-verify').addEventListener('click', () => {
+                SecureAuth.activeVerificationCode = null;
+                updateAuthPortalUI();
+                feedbackMsg.innerText = "❌ Verifizierung abgebrochen.";
             });
 
-            document.getElementById('btn-execute-register').addEventListener('click', () => {
-                const res = SecureAuth.register(document.getElementById('reg-email').value, document.getElementById('reg-pin').value);
+            // Schritt 1: Login / Anforderung Code
+            document.getElementById('btn-init-login').addEventListener('click', () => {
+                const email = document.getElementById('login-email').value;
+                const pin = document.getElementById('login-pin').value;
+                const res = SecureAuth.initVerification(email, pin, false);
                 feedbackMsg.innerText = res.msg;
-                if (res.success) { renderNavbar(); updateFooterStatus(); setTimeout(() => switchView('studio'), 800); }
+                if (res.success && res.needsCode) {
+                    updateAuthPortalUI();
+                }
+            });
+
+            // Schritt 1.2: Registrierung / Anforderung Code
+            document.getElementById('btn-execute-register').addEventListener('click', () => {
+                const email = document.getElementById('reg-email').value;
+                const pin = document.getElementById('reg-pin').value;
+                const res = SecureAuth.initVerification(email, pin, true);
+                feedbackMsg.innerText = res.msg;
+                if (res.success && res.needsCode) {
+                    updateAuthPortalUI();
+                }
+            });
+
+            // Schritt 2: Code bestätigen & Verifizierung abschließen
+            document.getElementById('btn-execute-verify').addEventListener('click', () => {
+                const code = document.getElementById('verify-code-input').value;
+                const res = SecureAuth.finalizeVerification(code);
+                feedbackMsg.innerText = res.msg;
+                if (res.success) {
+                    renderNavbar();
+                    updateFooterStatus();
+                    updateAuthPortalUI();
+                    setTimeout(() => switchView('studio'), 800);
+                }
             });
 
             document.getElementById('btn-execute-reset').addEventListener('click', () => {
-                const res = SecureAuth.resetPin(document.getElementById('reset-email').value, document.getElementById('reset-newpin').value);
+                const email = document.getElementById('reset-email').value;
+                const newPin = document.getElementById('reset-newpin').value;
+                const res = SecureAuth.resetPin(email, newPin);
                 feedbackMsg.innerText = res.msg;
                 if (res.success) { subReset.classList.add('hidden'); subLogin.classList.remove('hidden'); mainTitle.innerText = "Sicheres Login-Portal"; }
             });
 
-            // Abmelden-Button Event-Listener (sowohl im Login-Portal als auch im Admin-Bereich)
             document.addEventListener('click', function(e) {
                 if (e.target && (e.target.id === 'btn-trigger-logout' || e.target.id === 'btn-auth-logout')) {
                     SecureAuth.logout();
