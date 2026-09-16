@@ -18,7 +18,7 @@
             background: linear-gradient(135deg, rgba(13, 19, 35, 0.95) 0%, rgba(5, 8, 15, 0.99) 100%);
             backdrop-filter: blur(28px);
             -webkit-backdrop-filter: blur(28px);
-            border: 1px solid rgba(168, 85, 247, 0.28);
+            border: 1px solid rgba(52, 211, 153, 0.25);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.07);
         }
         .cyber-button {
@@ -27,15 +27,15 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .cyber-button:hover {
-            box-shadow: 0 0 22px rgba(168, 85, 247, 0.45);
-            border-color: rgba(168, 85, 247, 0.6);
+            box-shadow: 0 0 22px rgba(52, 211, 153, 0.35);
+            border-color: rgba(52, 211, 153, 0.6);
         }
         .cyber-button:active { transform: scale(0.98); }
         .cyber-button:disabled { opacity: 0.3; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; border-color: rgba(255,255,255,0.05) !important; animation: none !important; }
         
         @keyframes pulse-glow {
-            0%, 100% { opacity: 1; filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.85)); }
-            50% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.3)); }
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.7)); }
+            50% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.2)); }
         }
         .neon-pulse { animation: pulse-glow 3.5s infinite ease-in-out; }
 
@@ -57,32 +57,32 @@
 
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: rgba(5, 8, 15, 0.5); }
-        ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.4); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.7); }
+        ::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.4); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(52, 211, 153, 0.7); }
     </style>
 </head>
-<body class="bg-[#030508] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+<body class="bg-[#030508] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
 
     <!-- Header -->
-    <header class="w-full border-b border-purple-500/15 backdrop-blur-2xl sticky top-0 z-50 bg-[#030508]/90 px-4 py-3 shadow-2xl">
+    <header class="w-full border-b border-emerald-500/15 backdrop-blur-2xl sticky top-0 z-50 bg-[#030508]/90 px-4 py-3 shadow-2xl">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-pink-600 to-cyan-400 p-0.5 shadow-lg shadow-purple-500/25 neon-pulse">
-                    <div class="w-full h-full bg-[#05080f] rounded-[10px] flex items-center justify-center text-base">🛡️</div>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/25 neon-pulse">
+                    <div class="w-full h-full bg-[#05080f] rounded-[10px] flex items-center justify-center text-base">🌿</div>
                 </div>
                 <div>
-                    <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Harmonic Masterpiece v23.0</span>
+                    <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Realistic Botanical Engine v27.0</span>
                 </div>
             </div>
 
-            <div class="hidden md:flex items-center gap-1.5 bg-[#05080f] px-3.5 py-1.5 rounded-xl border border-purple-500/20 shadow-inner">
-                <span class="text-[9px] font-mono text-purple-400 mr-1 tracking-widest">LIVE STREAM</span>
-                <div class="w-1 bg-purple-500 rounded-full wave-bar"></div>
-                <div class="w-1 bg-pink-500 rounded-full wave-bar"></div>
+            <div class="hidden md:flex items-center gap-1.5 bg-[#05080f] px-3.5 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
+                <span class="text-[9px] font-mono text-emerald-400 mr-1 tracking-widest">LIVE STREAM</span>
+                <div class="w-1 bg-emerald-500 rounded-full wave-bar"></div>
+                <div class="w-1 bg-teal-500 rounded-full wave-bar"></div>
                 <div class="w-1 bg-cyan-400 rounded-full wave-bar"></div>
-                <div class="w-1 bg-purple-500 rounded-full wave-bar"></div>
-                <div class="w-1 bg-indigo-500 rounded-full wave-bar"></div>
+                <div class="w-1 bg-emerald-500 rounded-full wave-bar"></div>
+                <div class="w-1 bg-green-500 rounded-full wave-bar"></div>
             </div>
             
             <nav id="navbar-container" class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end">
@@ -98,14 +98,14 @@
             <!-- 1. STARTSEITE -->
             <section id="view-home" class="view-section space-y-6 text-left">
                 <div class="glass-panel p-8 sm:p-12 rounded-[2.5rem] text-center relative overflow-hidden">
-                    <div class="absolute -top-12 -right-12 w-72 h-72 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -top-12 -right-12 w-72 h-72 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="absolute -bottom-12 -left-12 w-72 h-72 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none"></div>
                     
-                    <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
-                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Majestätischer Botanischer Garten &amp; Ruhige Audio-Harmonie</p>
+                    <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌳</span>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Realistischer Botanischer Garten &amp; Musik-Matrix</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem extrem detailreichen, seidenweichen Park-Diarama.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem naturgetreuen, autark musikgesteuerten Park.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -118,45 +118,45 @@
                 <div class="glass-panel p-6 sm:p-8 rounded-[2rem] space-y-4">
                     <div class="text-center">
                         <span class="text-3xl mb-1 block">🔐</span>
-                        <h2 id="auth-main-title" class="text-lg font-bold text-purple-300 font-mono">Sicheres Login-Portal</h2>
+                        <h2 id="auth-main-title" class="text-lg font-bold text-emerald-300 font-mono">Sicheres Login-Portal</h2>
                         <p id="auth-subtitle" class="text-[11px] text-slate-400">Verifizierung per E-Mail &amp; PIN</p>
                     </div>
 
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
                     <div id="subform-logged" class="space-y-3 hidden">
-                        <div class="bg-[#030508] p-4 rounded-2xl border border-purple-500/30 text-center space-y-1">
+                        <div class="bg-[#030508] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
                             <p class="text-[10px] font-mono text-slate-400 uppercase">Verifizierter Account</p>
-                            <p id="auth-logged-email" class="text-xs font-bold text-purple-300 font-mono"></p>
+                            <p id="auth-logged-email" class="text-xs font-bold text-emerald-300 font-mono"></p>
                         </div>
                         <button type="button" id="btn-auth-logout" class="cyber-button w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🚪 Sicher Abmelden</button>
-                        <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Elite Studio</button>
+                        <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Elite Studio</button>
                     </div>
 
                     <div id="subform-login" class="space-y-3">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="login-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
-                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="••••">
+                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
                         </div>
-                        <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
+                        <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
                         
                         <div class="flex justify-between items-center text-[11px] font-mono pt-2">
-                            <button type="button" id="link-to-register" class="text-purple-400 hover:underline cursor-pointer">Konto registrieren</button>
+                            <button type="button" id="link-to-register" class="text-emerald-400 hover:underline cursor-pointer">Konto registrieren</button>
                             <button type="button" id="link-to-reset" class="text-cyan-400 hover:underline cursor-pointer">PIN vergessen?</button>
                         </div>
                     </div>
 
                     <div id="subform-verify" class="space-y-3 hidden">
-                        <div class="bg-purple-950/40 p-3 rounded-xl border border-purple-500/30 text-[11px] font-mono text-purple-200">
+                        <div class="bg-emerald-950/40 p-3 rounded-xl border border-emerald-500/30 text-[11px] font-mono text-emerald-200">
                             📨 Ein Bestätigungscode wurde gesendet. Bitte geben Sie ihn hier ein.
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE:</label>
-                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#030508] border border-purple-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
+                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#030508] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
                         </div>
                         <button type="button" id="btn-execute-verify" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✅ Code bestätigen &amp; Einloggen</button>
                         
@@ -168,32 +168,32 @@
                     <div id="subform-register" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN:</label>
-                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="Sichere PIN">
+                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
                         </div>
                         <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren</button>
                         
                         <div class="text-center pt-2">
-                            <button type="button" id="link-back-to-login" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zum Login</button>
+                            <button type="button" id="link-back-to-login" class="text-[11px] font-mono text-emerald-400 hover:underline cursor-pointer">← Zum Login</button>
                         </div>
                     </div>
 
                     <div id="subform-reset" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
-                            <input type="email" id="reset-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reset-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
-                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="Neue PIN">
+                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
                         </div>
                         <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Neu Setzen</button>
                         
                         <div class="text-center pt-2">
-                            <button type="button" id="link-cancel-reset" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Abbrechen</button>
+                            <button type="button" id="link-cancel-reset" class="text-[11px] font-mono text-emerald-400 hover:underline cursor-pointer">← Abbrechen</button>
                         </div>
                     </div>
                 </div>
@@ -203,10 +203,10 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full border-t border-purple-500/15 py-3 px-4 bg-[#030508] text-center">
+    <footer class="w-full border-t border-emerald-500/15 py-3 px-4 bg-[#030508] text-center">
         <div class="max-w-5xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
             <span id="session-status-badge" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt</span>
-            <span class="text-purple-400/90 font-bold tracking-wider">jackdarckart • Prime Elite Nexus</span>
+            <span class="text-emerald-400/90 font-bold tracking-wider">jackdarckart • Prime Elite Nexus</span>
         </div>
     </footer>
 
@@ -235,7 +235,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_MAJESTIC_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_REALISTIC_GARDEN_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -401,7 +401,7 @@
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
-                { id: 'garden', name: 'Garden', icon: '🏛️', desc: 'Majestätisches Park-Diarama', protected: true },
+                { id: 'garden', name: 'Garden', icon: '🌳', desc: 'Realistischer Botanischer Garten', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
@@ -422,8 +422,8 @@
                         innerHTMLContent = `
                             <div class="space-y-4">
                                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                                    <div class="glass-panel p-3.5 rounded-2xl border border-purple-500/20">
-                                        <p class="text-[10px] font-mono text-purple-300 uppercase tracking-wider">Fans</p>
+                                    <div class="glass-panel p-3.5 rounded-2xl border border-emerald-500/20">
+                                        <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-wider">Fans</p>
                                         <p id="studio-fans" class="text-xl font-black text-white font-mono mt-1">5</p>
                                     </div>
                                     <div class="glass-panel p-3.5 rounded-2xl border border-cyan-500/20">
@@ -438,13 +438,13 @@
                                         <p class="text-[10px] font-mono text-amber-300 uppercase tracking-wider">Gold Platten</p>
                                         <p id="studio-gold" class="text-xl font-black text-amber-400 font-mono mt-1">0</p>
                                     </div>
-                                    <div class="glass-panel p-3.5 rounded-2xl border border-emerald-500/20 col-span-2 sm:col-span-1">
-                                        <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-wider">Wachstum /s</p>
-                                        <p id="studio-fps" class="text-xl font-black text-emerald-400 font-mono mt-1">+0</p>
+                                    <div class="glass-panel p-3.5 rounded-2xl border border-teal-500/20 col-span-2 sm:col-span-1">
+                                        <p class="text-[10px] font-mono text-teal-300 uppercase tracking-wider">Wachstum /s</p>
+                                        <p id="studio-fps" class="text-xl font-black text-teal-400 font-mono mt-1">+0</p>
                                     </div>
                                 </div>
 
-                                <div id="panel-prestige" class="glass-panel p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-center gap-3 bg-gradient-to-r from-amber-950/30 via-purple-950/20 to-slate-900/40">
+                                <div id="panel-prestige" class="glass-panel p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-center gap-3 bg-gradient-to-r from-amber-950/30 via-emerald-950/20 to-slate-900/40">
                                     <div>
                                         <p class="text-xs font-mono text-amber-400 font-bold uppercase flex items-center gap-1.5"><span>🌟</span> Globale Welt-Tournee (Prestige)</p>
                                         <p class="text-[10px] text-slate-300 mt-0.5">Setzt Fans &amp; Upgrades zurück, gibt aber permanent <span class="text-amber-300 font-bold">+25% Ertrag pro Gold-Platte</span>.</p>
@@ -452,15 +452,15 @@
                                     <button type="button" id="btn-prestige" class="cyber-button bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white text-[11px] font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer shrink-0 shadow">🌟 Tournee Starten (Ab 50k Fans)</button>
                                 </div>
 
-                                <div class="glass-panel p-4 rounded-2xl border border-purple-500/30 flex items-center justify-between gap-3 bg-gradient-to-r from-purple-950/40 via-slate-900/60 to-cyan-950/40">
+                                <div class="glass-panel p-4 rounded-2xl border border-emerald-500/30 flex items-center justify-between gap-3 bg-gradient-to-r from-emerald-950/40 via-slate-900/60 to-cyan-950/40">
                                     <div class="flex items-center gap-3">
                                         <span class="text-2xl animate-bounce">📡</span>
                                         <div>
-                                            <p class="text-[10px] font-mono text-purple-300 uppercase tracking-wider">Live Industrie-Ticker</p>
+                                            <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-wider">Live Industrie-Ticker</p>
                                             <p id="industry-ticker-text" class="text-xs font-mono text-slate-200">Analysiere Musikmarkt... Bereit für Events.</p>
                                         </div>
                                     </div>
-                                    <span id="ticker-timer-badge" class="text-[10px] font-mono bg-purple-900/60 text-purple-300 px-2.5 py-1 rounded-lg border border-purple-500/40 shrink-0">Nächstes Event in 30s</span>
+                                    <span id="ticker-timer-badge" class="text-[10px] font-mono bg-emerald-900/60 text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-500/40 shrink-0">Nächstes Event in 30s</span>
                                 </div>
 
                                 <div class="glass-panel p-4 rounded-2xl border-slate-800 space-y-2.5">
@@ -469,38 +469,38 @@
                                         <span class="text-[10px] font-mono text-slate-400">Beeinflusst Boni &amp; Erträge</span>
                                     </div>
                                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        <button type="button" data-genre="synthwave" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-purple-500 p-2.5 rounded-xl text-left cursor-pointer transition">
+                                        <button type="button" data-genre="synthwave" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-emerald-500 p-2.5 rounded-xl text-left cursor-pointer transition">
                                             <p class="text-xs font-bold text-white">🌆 Synthwave</p>
-                                            <p class="text-[9px] font-mono text-purple-300 mt-0.5">+15% Passiv-Boost</p>
+                                            <p class="text-[9px] font-mono text-emerald-300 mt-0.5">+15% Passiv-Boost</p>
                                         </button>
-                                        <button type="button" data-genre="hiphop" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-purple-500 p-2.5 rounded-xl text-left cursor-pointer transition">
+                                        <button type="button" data-genre="hiphop" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-emerald-500 p-2.5 rounded-xl text-left cursor-pointer transition">
                                             <p class="text-xs font-bold text-white">🎤 Hip-Hop</p>
-                                            <p class="text-[9px] font-mono text-indigo-300 mt-0.5">+30% Hype-Zuwachs</p>
+                                            <p class="text-[9px] font-mono text-teal-300 mt-0.5">+30% Hype-Zuwachs</p>
                                         </button>
-                                        <button type="button" data-genre="rock" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-purple-500 p-2.5 rounded-xl text-left cursor-pointer transition">
+                                        <button type="button" data-genre="rock" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-emerald-500 p-2.5 rounded-xl text-left cursor-pointer transition">
                                             <p class="text-xs font-bold text-white">🎸 Rock / Metal</p>
                                             <p class="text-[9px] font-mono text-pink-300 mt-0.5">-25% Release-Kosten</p>
                                         </button>
-                                        <button type="button" data-genre="electro" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-purple-500 p-2.5 rounded-xl text-left cursor-pointer transition">
+                                        <button type="button" data-genre="electro" class="genre-btn cyber-button bg-[#030508] border border-slate-800 hover:border-emerald-500 p-2.5 rounded-xl text-left cursor-pointer transition">
                                             <p class="text-xs font-bold text-white">⚡ Electro Club</p>
                                             <p class="text-[9px] font-mono text-cyan-300 mt-0.5">-30% Cooldown-Timer</p>
                                         </button>
                                     </div>
                                 </div>
 
-                                <div class="glass-panel p-5 rounded-2xl border border-purple-500/30 space-y-3">
+                                <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">💿 Musik-Produktion &amp; Releases</h3>
+                                        <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">💿 Musik-Produktion &amp; Releases</h3>
                                         <span class="text-[10px] font-mono text-amber-400">Leuchtet grün, wenn bereit</span>
                                     </div>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                        <button type="button" id="release-rock-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
+                                        <button type="button" id="release-rock-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
                                             <span>🎸 Underground Single</span>
-                                            <span id="release-rock-txt" class="text-[10px] font-light text-purple-200">Kosten: 6 Fans | +14 Netto (3s)</span>
+                                            <span id="release-rock-txt" class="text-[10px] font-light text-emerald-200">Kosten: 6 Fans | +14 Netto (3s)</span>
                                         </button>
-                                        <button type="button" id="release-hiphop-btn" class="cyber-button bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
+                                        <button type="button" id="release-hiphop-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
                                             <span>🎤 Street Beat</span>
-                                            <span id="release-hiphop-txt" class="text-[10px] font-light text-indigo-200">Kosten: 25 Fans | +45 Netto (8s)</span>
+                                            <span id="release-hiphop-txt" class="text-[10px] font-light text-teal-200">Kosten: 25 Fans | +45 Netto (8s)</span>
                                         </button>
                                         <button type="button" id="release-album-btn" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-4 rounded-xl cursor-pointer shadow flex flex-col items-center gap-0.5">
                                             <span>💿 Studio Album</span>
@@ -511,20 +511,20 @@
 
                                 <div class="glass-panel p-5 rounded-2xl border-slate-800 space-y-4">
                                     <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                                        <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">📈 Studio-Upgrades &amp; 15 Empire Stufen</h3>
-                                        <span class="text-[9px] font-mono text-emerald-400">💡 Leuchtende Elemente sind kaufbereit!</span>
+                                        <h3 class="text-xs font-mono text-teal-300 font-bold uppercase">📈 Studio-Upgrades &amp; 15 Empire Stufen</h3>
+                                        <span class="text-[9px] font-mono text-teal-400">💡 Leuchtende Elemente sind kaufbereit!</span>
                                     </div>
                                     
                                     <div class="space-y-4 max-h-[420px] overflow-y-auto pr-1.5">
                                         <div class="space-y-2">
-                                            <p class="text-[10px] font-mono text-purple-300 uppercase tracking-wider font-bold">1. Basis &amp; Studio</p>
+                                            <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-wider font-bold">1. Basis &amp; Studio</p>
                                             
                                             <div id="row-market" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
                                                 <div>
                                                     <p class="text-xs font-bold text-white">📢 Social-Media Kampagne (Lvl <span id="market-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+1 Fan/s | Kosten: <span id="market-cost">35</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-market-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-market-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
 
                                             <div id="row-studio" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
@@ -532,7 +532,7 @@
                                                     <p class="text-xs font-bold text-white">🎛️ High-End Mastering Suite (Lvl <span id="studio-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+4 Fans/s | Kosten: <span id="studio-cost">150</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-studio-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-studio-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
 
                                             <div id="row-producer" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
@@ -540,7 +540,7 @@
                                                     <p class="text-xs font-bold text-white">🎹 Ghostproducer-Team (Lvl <span id="producer-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+12 Fans/s | Kosten: <span id="producer-cost">600</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-producer-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-producer-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
                                         </div>
 
@@ -552,7 +552,7 @@
                                                     <p class="text-xs font-bold text-white">📰 PR-Agentur &amp; Management (Lvl <span id="pr-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+15% Gesamtwachstum | Kosten: <span id="pr-cost">1200</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-pr-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-pr-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
 
                                             <div id="row-label" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
@@ -560,7 +560,7 @@
                                                     <p class="text-xs font-bold text-white">🏢 Eigenes Plattenlabel (Lvl <span id="label-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+45 Fans/s | Kosten: <span id="label-cost">4500</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-label-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-label-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
 
                                             <div id="row-merch" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
@@ -568,7 +568,7 @@
                                                     <p class="text-xs font-bold text-white">👕 Merchandising-Linie (Lvl <span id="merch-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+120 Fans/s | Kosten: <span id="merch-cost">18000</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-merch-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-merch-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
 
                                             <div id="row-algo" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800/80 transition">
@@ -576,35 +576,35 @@
                                                     <p class="text-xs font-bold text-white">🌐 Streaming-Algorithmus (Lvl <span id="algo-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+350 Fans/s | Kosten: <span id="algo-cost">75000</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-algo-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-algo-btn" class="cyber-button bg-teal-600 hover:bg-teal-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
                                         </div>
 
                                         <div class="space-y-2 pt-2">
                                             <p class="text-[10px] font-mono text-pink-300 uppercase tracking-wider font-bold">3. High-Tech &amp; Enterprise</p>
 
-                                            <div id="row-tourbus" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25 transition">
+                                            <div id="row-tourbus" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-emerald-500/25 transition">
                                                 <div>
                                                     <p class="text-xs font-bold text-white">🚌 World Tour Arena Bus (Lvl <span id="tourbus-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+950 Fans/s | Kosten: <span id="tourbus-cost">280000</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-tourbus-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-tourbus-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
 
-                                            <div id="row-aineural" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25 transition">
+                                            <div id="row-aineural" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-emerald-500/25 transition">
                                                 <div>
                                                     <p class="text-xs font-bold text-white">🤖 AI-Mastering Neural Net (Lvl <span id="aineural-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+2800 Fans/s | Kosten: <span id="aineural-cost">1200000</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-aineural-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-aineural-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
 
-                                            <div id="row-satellite" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-purple-500/25 transition">
+                                            <div id="row-satellite" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-emerald-500/25 transition">
                                                 <div>
                                                     <p class="text-xs font-bold text-white">🛰️ Global Satellite Uplink (Lvl <span id="satellite-lvl">0</span>)</p>
                                                     <p class="text-[10px] text-slate-400 font-mono">+9500 Fans/s | Kosten: <span id="satellite-cost">5500000</span> Fans</p>
                                                 </div>
-                                                <button type="button" id="buy-satellite-btn" class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
+                                                <button type="button" id="buy-satellite-btn" class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3.5 py-2 rounded-xl font-mono font-bold cursor-pointer">Upgrade</button>
                                             </div>
 
                                             <div id="row-hologram" class="upgrade-row flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-cyan-500/30 transition">
@@ -668,42 +668,42 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <!-- MAJESTÄTISCHES PARK-DIARAMA MIT GESCHWINDIGKEITS-REGLER -->
-                                <div class="p-6 sm:p-10 rounded-[3rem] border-2 border-emerald-500/80 relative overflow-hidden bg-gradient-to-b from-[#031c0e] via-[#010c06] to-[#000502] shadow-2xl">
+                                <!-- REALISTISCHER BOTANISCHER GARTEN -->
+                                <div class="p-6 sm:p-10 rounded-[3rem] border-2 border-emerald-600/50 relative overflow-hidden bg-gradient-to-b from-[#09180e] via-[#040f07] to-[#010703] shadow-2xl">
                                     
-                                    <!-- Kopfbereich & Live Controller -->
-                                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 border-b border-emerald-500/40 pb-5">
+                                    <!-- Kopfbereich -->
+                                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 border-b border-emerald-500/25 pb-5">
                                         <div class="flex items-center gap-4">
-                                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-400 p-0.5 shadow-xl shadow-emerald-500/40">
-                                                <div class="w-full h-full bg-[#010c06] rounded-[14px] flex items-center justify-center text-2xl">🏛️</div>
+                                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 p-0.5 shadow-xl shadow-emerald-500/30">
+                                                <div class="w-full h-full bg-[#040f07] rounded-[14px] flex items-center justify-center text-2xl">🌿</div>
                                             </div>
                                             <div>
                                                 <h3 class="text-lg sm:text-xl font-black text-white font-mono tracking-wide flex items-center gap-2">
-                                                    Botanischer Garten • Majestätische Harmonie
-                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/90 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/50">🌿 Ultra-Smooth &amp; Detailliert</span>
+                                                    Botanischer Garten • Natur &amp; Autonomer Takt
+                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/80 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/40">🌿 100% Autonomer Musik-Sync</span>
                                                 </h3>
-                                                <p class="text-xs text-emerald-200/80 font-mono mt-0.5">Ruhige, seidenweiche Takt-Resonanz mit glühenden Parterres und sanftem Lili-Spaziergang.</p>
+                                                <p class="text-xs text-emerald-200/70 font-mono mt-0.5">Realistische Gartenlandschaft mit organischem Glashaus, Naturteich und Jack Russell Lili.</p>
                                             </div>
                                         </div>
 
-                                        <!-- Animations-Geschwindigkeitsregler -->
-                                        <div class="flex items-center gap-3 bg-[#010c06]/90 px-4 py-2.5 rounded-2xl border border-emerald-500/40 shadow-inner">
-                                            <span class="text-xs font-mono text-emerald-300">⚡ Tempo:</span>
-                                            <input type="range" id="garden-speed-range" min="0.2" max="2.0" step="0.1" value="0.8" class="w-24 accent-emerald-500 cursor-pointer">
-                                            <span id="garden-speed-label" class="text-xs font-mono text-cyan-300 font-bold w-10 text-right">0.8x</span>
+                                        <!-- Dezenter Tempo-Regler -->
+                                        <div class="flex items-center gap-3 bg-[#040f07]/90 px-4 py-2.5 rounded-2xl border border-emerald-500/30 shadow-inner">
+                                            <span class="text-xs font-mono text-emerald-300">⚡ Animation:</span>
+                                            <input type="range" id="garden-speed-range" min="0.5" max="2.0" step="0.1" value="1.0" class="w-20 accent-emerald-500 cursor-pointer">
+                                            <span id="garden-speed-label" class="text-xs font-mono text-emerald-400 font-bold w-8 text-right">1.0x</span>
                                         </div>
                                     </div>
 
-                                    <!-- HOCHDETAILLIERTES PARK-CANVAS -->
-                                    <div class="relative w-full h-[460px] rounded-3xl border-2 border-emerald-500/60 overflow-hidden shadow-2xl bg-[#02140a]">
+                                    <!-- REALISTISCHES PARK-CANVAS -->
+                                    <div class="relative w-full h-[480px] rounded-3xl border-2 border-emerald-700/40 overflow-hidden shadow-2xl bg-[#07130a]">
                                         <canvas id="garden-map-canvas" class="absolute inset-0 w-full h-full"></canvas>
-                                        <div class="absolute top-4 left-4 bg-[#010c06]/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/40 text-[10px] font-mono text-emerald-300 shadow">
-                                            🌿 Live Diarama • Glühende Blumenbeete &amp; Partikel aktiv
+                                        <div class="absolute top-4 left-4 bg-[#040f07]/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/30 text-[10px] font-mono text-emerald-300 shadow">
+                                            🌱 Organische Audio-Reaktivität aktiv
                                         </div>
                                     </div>
 
                                     <!-- WEBRADIO PLAYER -->
-                                    <div class="mt-6 bg-[#010c06]/95 backdrop-blur-2xl p-6 rounded-3xl border border-emerald-500/50 shadow-2xl space-y-4">
+                                    <div class="mt-6 bg-[#040f07]/95 backdrop-blur-2xl p-6 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-4">
                                         <div class="flex flex-col sm:flex-row justify-between items-center gap-5">
                                             <div class="flex items-center gap-5 w-full sm:w-auto">
                                                 <button type="button" id="garden-play-btn" class="cyber-button w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center text-2xl shadow-xl shadow-emerald-500/40 cursor-pointer shrink-0">▶</button>
@@ -714,7 +714,7 @@
                                             </div>
                                             
                                             <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
-                                                <div class="flex items-center gap-3 bg-[#000502] px-4 py-2.5 rounded-2xl border border-emerald-500/30 shadow-inner">
+                                                <div class="flex items-center gap-3 bg-[#020804] px-4 py-2.5 rounded-2xl border border-emerald-500/25 shadow-inner">
                                                     <span class="text-base">🔊</span>
                                                     <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-32 accent-emerald-500 cursor-pointer">
                                                 </div>
@@ -737,7 +737,7 @@
                                     <p class="text-xs text-slate-300">Sichere deinen harten Fortschritt als Datei ab.</p>
                                     <div class="flex flex-wrap gap-3 pt-2">
                                         <button type="button" id="btn-export-backup" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow">📥 Backup exportieren (.json)</button>
-                                        <label class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow inline-block text-center">
+                                        <label class="cyber-button bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow inline-block text-center">
                                             📤 Backup importieren
                                             <input type="file" id="input-import-backup" accept=".json" class="hidden">
                                         </label>
@@ -751,7 +751,7 @@
                             <div class="space-y-4">
                                 <div class="glass-panel p-5 rounded-2xl border border-amber-500/30 space-y-3">
                                     <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🔒 Account-Verwaltung</h3>
-                                    <p class="text-xs text-slate-300 font-mono">Eingeloggt als: <span id="admin-current-email" class="text-purple-400 font-bold"></span></p>
+                                    <p class="text-xs text-slate-300 font-mono">Eingeloggt als: <span id="admin-current-email" class="text-emerald-400 font-bold"></span></p>
                                     <button type="button" id="btn-trigger-logout" class="cyber-button bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold py-2.5 px-5 rounded-xl cursor-pointer">🚪 Abmelden</button>
                                 </div>
                             </div>
@@ -759,11 +759,11 @@
                     }
 
                     section.innerHTML = `
-                        <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-4 border-purple-500/30">
+                        <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-4 border-emerald-500/30">
                             <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
                                 <span class="text-3xl">${page.icon}</span>
                                 <div>
-                                    <h2 class="text-xl font-bold text-purple-300 font-mono">${page.name} Sektion</h2>
+                                    <h2 class="text-xl font-bold text-emerald-300 font-mono">${page.name} Sektion</h2>
                                     <p class="text-xs text-slate-400">${page.desc}</p>
                                 </div>
                             </div>
@@ -788,7 +788,7 @@
 
                 const authBtn = document.createElement('button');
                 authBtn.type = 'button';
-                authBtn.className = 'cyber-button nav-link bg-purple-600/80 hover:bg-purple-600 text-white px-3 py-2 rounded-xl text-xs font-bold border border-purple-500 cursor-pointer shrink-0 ml-2';
+                authBtn.className = 'cyber-button nav-link bg-emerald-600/80 hover:bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold border border-emerald-500 cursor-pointer shrink-0 ml-2';
                 authBtn.dataset.target = 'auth';
                 authBtn.innerHTML = SecureAuth.currentUser ? '🔐 Account' : '🔑 Login';
                 navContainer.appendChild(authBtn);
@@ -799,7 +799,7 @@
                 if (page.id !== 'home') {
                     const card = document.createElement('button');
                     card.type = 'button';
-                    card.className = 'cyber-button nav-link glass-panel p-5 rounded-2xl border border-purple-500/20 text-left hover:border-purple-500/50 cursor-pointer transition flex flex-col justify-between';
+                    card.className = 'cyber-button nav-link glass-panel p-5 rounded-2xl border border-emerald-500/20 text-left hover:border-emerald-500/50 cursor-pointer transition flex flex-col justify-between';
                     card.dataset.target = page.id;
                     card.innerHTML = `
                         <div class="text-3xl mb-3">${page.icon}</div>
@@ -1021,7 +1021,7 @@
                 }
             });
 
-            // MAJESTÄTISCHES, RUHIGES & ERWEITERTES PARK-DIARAMA
+            // REALISTISCHE, 100% AUTONOME BOTANISCHER GARTEN MATRIX ENGINE
             function initGardenCanvasMap() {
                 const canvas = document.getElementById('garden-map-canvas');
                 const audio = document.getElementById('garden-audio');
@@ -1030,7 +1030,7 @@
                 if (!canvas) return;
 
                 canvas.width = canvas.parentElement.clientWidth || 800;
-                canvas.height = canvas.parentElement.clientHeight || 460;
+                canvas.height = canvas.parentElement.clientHeight || 480;
                 const ctx = canvas.getContext('2d');
 
                 try {
@@ -1038,7 +1038,7 @@
                         const AudioContext = window.AudioContext || window.webkitAudioContext;
                         audioCtx = new AudioContext();
                         analyser = audioCtx.createAnalyser();
-                        analyser.fftSize = 128;
+                        analyser.fftSize = 256;
                         sourceNode = audioCtx.createMediaElementSource(audio);
                         sourceNode.connect(analyser);
                         analyser.connect(audioCtx.destination);
@@ -1047,24 +1047,24 @@
                     console.log("Audio Direkt-Modus aktiv.");
                 }
 
-                const bufferLength = analyser ? analyser.frequencyBinCount : 64;
+                const bufferLength = analyser ? analyser.frequencyBinCount : 128;
                 const dataArray = new Uint8Array(bufferLength);
                 
-                let smoothBass = 0;
-                let smoothTreble = 0;
-                let particles = [];
-                let shockwaves = [];
+                let bassSmooth = 0;
+                let energySmooth = 0;
+                let ripples = [];
+                let fireflies = [];
                 let liliAngle = 0;
-                let lastBeat = 0;
+                let lastRippleTime = 0;
 
-                // Glühwürmchen / Partikel generieren
-                for (let p = 0; p < 25; p++) {
-                    particles.push({
+                // Natürliche Glühwürmchen / Sporen im Garten
+                for (let f = 0; f < 30; f++) {
+                    fireflies.push({
                         x: Math.random() * canvas.width,
                         y: Math.random() * canvas.height,
                         radius: Math.random() * 2 + 1,
-                        speedX: (Math.random() - 0.5) * 0.3,
-                        speedY: (Math.random() - 0.5) * 0.3,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
                         alpha: Math.random() * 0.7 + 0.2
                     });
                 }
@@ -1072,182 +1072,215 @@
                 function renderLoop() {
                     visualizerAnimationId = requestAnimationFrame(renderLoop);
 
-                    let animSpeed = speedRange ? parseFloat(speedRange.value) : 0.8;
+                    let animSpeed = speedRange ? parseFloat(speedRange.value) : 1.0;
                     if (speedLabel) speedLabel.innerText = animSpeed.toFixed(1) + 'x';
 
                     let isAudioValid = false;
+                    let totalEnergy = 0;
                     if (analyser) {
                         analyser.getByteFrequencyData(dataArray);
                         for (let i = 0; i < bufferLength; i++) {
-                            if (dataArray[i] > 0) { isAudioValid = true; break; }
+                            totalEnergy += dataArray[i];
+                            if (dataArray[i] > 0) { isAudioValid = true; }
                         }
                     }
 
                     const timeSec = Date.now() / 1000 * animSpeed;
-                    let bassVal = 0;
-                    let trebleVal = 0;
+                    let rawBass = 0;
+                    let rawTreble = 0;
 
                     if (isAudioValid) {
-                        bassVal = (dataArray[0] + dataArray[1] + dataArray[2]) / 3 / 255;
-                        trebleVal = (dataArray[bufferLength - 2] + dataArray[bufferLength - 3]) / 2 / 255;
+                        let bSum = 0;
+                        for (let i = 0; i < 5; i++) bSum += dataArray[i];
+                        rawBass = (bSum / 5) / 255;
+
+                        let tSum = 0;
+                        for (let i = bufferLength - 8; i < bufferLength; i++) tSum += dataArray[i];
+                        rawTreble = (tSum / 8) / 255;
+
+                        let avgFrameEnergy = (totalEnergy / bufferLength) / 255;
+                        energySmooth += (avgFrameEnergy - energySmooth) * 0.04;
                     } else if (audio && !audio.paused) {
-                        bassVal = Math.max(0, Math.sin(timeSec * Math.PI * 1.8));
-                        trebleVal = Math.abs(Math.cos(timeSec * Math.PI * 3.6));
+                        rawBass = Math.max(0, Math.sin(timeSec * Math.PI * 2.2)) > 0.7 ? 1.0 : 0.05;
+                        rawTreble = Math.abs(Math.cos(timeSec * Math.PI * 4.4));
+                        energySmooth = 0.5;
                     } else {
-                        bassVal = (Math.sin(timeSec * 1.2) + 1) * 0.08;
-                        trebleVal = 0.04;
+                        rawBass = (Math.sin(timeSec * 2.0) + 1) * 0.1;
+                        rawTreble = 0.04;
+                        energySmooth = 0.15;
                     }
 
-                    // Sehr sanfte Interpolation für majestätische Laufruhe
-                    smoothBass += (bassVal - smoothBass) * 0.08;
-                    smoothTreble += (trebleVal - smoothTreble) * 0.1;
-
-                    if (smoothBass > 0.6 && (Date.now() - lastBeat > 500)) {
-                        shockwaves.push({ x: canvas.width * 0.5, y: canvas.height * 0.5, radius: 10, alpha: 0.75 });
-                        lastBeat = Date.now();
+                    if (rawBass > bassSmooth) {
+                        bassSmooth = rawBass;
+                    } else {
+                        bassSmooth += (rawBass - bassSmooth) * 0.25;
                     }
 
-                    // 1. TIEFER GRUND HINTERGRUND
-                    ctx.fillStyle = '#021007';
+                    // Wasserwellen im Teich bei starkem Kick
+                    if (rawBass > 0.7 && (Date.now() - lastRippleTime > 300)) {
+                        ripples.push({ x: canvas.width * 0.5, y: canvas.height * 0.52, radius: 8, alpha: 0.85 });
+                        lastRippleTime = Date.now();
+                    }
+
+                    // 1. REALISTISCHER GARTEN HINTERGRUND (Erde, Rasen, Naturtöne)
+                    ctx.fillStyle = '#06130a';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    // Rasen-Parterres mit edler Textur
-                    ctx.fillStyle = '#051f0f';
+                    // Üppige Rasenflächen
+                    ctx.fillStyle = '#0d2814';
                     ctx.beginPath();
-                    ctx.roundRect(canvas.width * 0.06, canvas.height * 0.26, canvas.width * 0.88, canvas.height * 0.68, 28);
+                    ctx.roundRect(canvas.width * 0.03, canvas.height * 0.22, canvas.width * 0.94, canvas.height * 0.74, 28);
                     ctx.fill();
 
-                    // 2. GLÜHENDE BLUMENBEETE & BEET-AKZENTE
-                    ctx.save();
-                    ctx.strokeStyle = `rgba(52, 211, 153, ${0.3 + smoothTreble * 0.4})`;
-                    ctx.lineWidth = 2;
+                    // Realistische Natur-Steinwege (geschwungene Alleen)
+                    ctx.strokeStyle = '#233827';
+                    ctx.lineWidth = 28;
+                    ctx.lineCap = 'round';
                     ctx.beginPath();
-                    ctx.roundRect(canvas.width * 0.42, canvas.height * 0.55, canvas.width * 0.16, canvas.height * 0.32, 12);
+                    ctx.moveTo(canvas.width * 0.2, canvas.height * 0.95);
+                    ctx.quadraticCurveTo(canvas.width * 0.5, canvas.height * 0.7, canvas.width * 0.5, canvas.height * 0.52);
+                    ctx.quadraticCurveTo(canvas.width * 0.5, canvas.height * 0.3, canvas.width * 0.8, canvas.height * 0.25);
+                    ctx.stroke();
+
+                    // 2. NATÜRLICHE BLUMENBEETE (Atmend im Takt)
+                    ctx.save();
+                    ctx.strokeStyle = `rgba(74, 222, 128, ${0.4 + bassSmooth * 0.5})`;
+                    ctx.lineWidth = 3 + bassSmooth * 2;
+                    ctx.beginPath();
+                    ctx.roundRect(canvas.width * 0.35, canvas.height * 0.50, canvas.width * 0.30, canvas.height * 0.40, 18);
                     ctx.stroke();
                     ctx.restore();
 
-                    // 3. SCHWEBENDE LICHTPARTIKEL / GLÜHWÜRMCHEN
-                    particles.forEach(pt => {
-                        pt.x += pt.speedX * animSpeed;
-                        pt.y += pt.speedY * animSpeed;
-                        if (pt.x < 0) pt.x = canvas.width;
-                        if (pt.x > canvas.width) pt.x = 0;
-                        if (pt.y < 0) pt.y = canvas.height;
-                        if (pt.y > canvas.height) pt.y = 0;
+                    // 3. GLÜHWÜRMCHEN & PFLANZEN-SPOREN
+                    fireflies.forEach(ff => {
+                        ff.x += ff.vx * animSpeed * (1 + bassSmooth);
+                        ff.y += ff.vy * animSpeed * (1 + bassSmooth);
+                        if (ff.x < 0) ff.x = canvas.width;
+                        if (ff.x > canvas.width) ff.x = 0;
+                        if (ff.y < 0) ff.y = canvas.height;
+                        if (ff.y > canvas.height) ff.y = 0;
 
-                        ctx.fillStyle = `rgba(167, 243, 208, ${pt.alpha})`;
+                        ctx.fillStyle = `rgba(187, 247, 208, ${ff.alpha})`;
                         ctx.beginPath();
-                        ctx.arc(pt.x, pt.y, pt.radius + (smoothBass * 1.5), 0, Math.PI * 2);
+                        ctx.arc(ff.x, ff.y, ff.radius + (bassSmooth * 1.5), 0, Math.PI * 2);
                         ctx.fill();
                     });
 
-                    // 4. BASS-SCHOCKWELLEN
-                    for (let i = shockwaves.length - 1; i >= 0; i--) {
-                        let sw = shockwaves[i];
-                        sw.radius += 1.8 * animSpeed;
-                        sw.alpha -= 0.015;
-                        if (sw.alpha <= 0) {
-                            shockwaves.splice(i, 1);
+                    // 4. WASSERRIPPEL IM TEICH
+                    for (let i = ripples.length - 1; i >= 0; i--) {
+                        let rp = ripples[i];
+                        rp.radius += 3.0 * animSpeed;
+                        rp.alpha -= 0.025;
+                        if (rp.alpha <= 0) {
+                            ripples.splice(i, 1);
                             continue;
                         }
                         ctx.save();
-                        ctx.strokeStyle = `rgba(34, 211, 238, ${sw.alpha})`;
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${rp.alpha})`;
                         ctx.lineWidth = 1.5;
                         ctx.beginPath();
-                        ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+                        ctx.arc(rp.x, rp.y, rp.radius, 0, Math.PI * 2);
                         ctx.stroke();
                         ctx.restore();
                     }
 
-                    // 5. NIEREN- / FONTÄNENTEICH
+                    // 5. IDYLLISCHER SEEROSENTEICH & FONTÄNE
                     ctx.save();
-                    ctx.translate(canvas.width * 0.5, canvas.height * 0.5);
-                    ctx.fillStyle = '#05546b';
+                    ctx.translate(canvas.width * 0.5, canvas.height * 0.52);
+                    let pScale = 1 + (bassSmooth * 0.15);
+                    ctx.scale(pScale, pScale);
+
+                    ctx.fillStyle = '#093145';
                     ctx.beginPath();
-                    ctx.ellipse(0, 0, 48 + (smoothBass * 5), 24 + (smoothBass * 2.5), 0, 0, Math.PI * 2);
+                    ctx.ellipse(0, 0, 58, 28, 0, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.strokeStyle = '#22d3ee';
+                    ctx.strokeStyle = '#38bdf8';
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // Fontäne mit sanftem Bogen
-                    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+                    // Dezente Wasserfontäne
+                    ctx.fillStyle = '#e0f2fe';
                     for(let f = 0; f < 5; f++) {
-                        let fH = Math.sin(timeSec * 4 + f) * (6 + smoothBass * 12);
-                        ctx.fillRect(-1.5 + f * 2.5, -12 - fH, 2, 5);
+                        let fH = (f % 2 === 0 ? bassSmooth : rawTreble) * 26 + 4;
+                        ctx.fillRect(-1.5 + f * 2.2, -12 - fH, 2, 7);
                     }
                     ctx.restore();
 
-                    // 6. DAS GROSSE TROPENHAUS (MAJESTÄTISCH ATMEND)
-                    let tropenWidth = canvas.width * 0.42;
-                    let tropenHeight = 85 + (smoothBass * 8);
-                    let tropenX = (canvas.width - tropenWidth) / 2;
-                    let tropenY = 18;
+                    // 6. KLASSISCHES ARCHITEKTURISCHES GLASHAUS (TROPENHAUS)
+                    let glassWidth = canvas.width * 0.48;
+                    let glassHeight = 85 + (bassSmooth * 20);
+                    let glassX = (canvas.width - glassWidth) / 2;
+                    let glassY = 18;
 
                     ctx.save();
-                    let grad = ctx.createLinearGradient(tropenX, tropenY, tropenX, tropenY + tropenHeight);
-                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.35)');
-                    grad.addColorStop(0.5, `rgba(16, 185, 129, ${0.45 + smoothBass * 0.35})`);
-                    grad.addColorStop(1, 'rgba(6, 182, 212, 0.75)');
+                    let gGrad = ctx.createLinearGradient(glassX, glassY, glassX, glassY + glassHeight);
+                    gGrad.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
+                    gGrad.addColorStop(0.5, `rgba(5, 150, 105, ${0.45 + bassSmooth * 0.4})`);
+                    gGrad.addColorStop(1, 'rgba(13, 148, 136, 0.85)');
                     
-                    ctx.fillStyle = grad;
+                    ctx.fillStyle = gGrad;
                     ctx.beginPath();
-                    ctx.roundRect(tropenX, tropenY, tropenWidth, tropenHeight, [35, 35, 8, 8]);
+                    ctx.roundRect(glassX, glassY, glassWidth, glassHeight, [30, 30, 10, 10]);
                     ctx.fill();
                     ctx.strokeStyle = '#34d399';
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // Glasrippen
+                    // Dezente Glas-Sprossen
                     ctx.strokeStyle = '#a7f3d0';
-                    ctx.lineWidth = 1;
-                    for (let xPos = tropenX + 18; xPos < tropenX + tropenWidth - 10; xPos += 24) {
+                    ctx.lineWidth = 1.0;
+                    for (let xPos = glassX + 20; xPos < glassX + glassWidth - 10; xPos += 24) {
                         ctx.beginPath();
-                        ctx.moveTo(xPos, tropenY + 8);
-                        ctx.lineTo(xPos, tropenY + tropenHeight);
+                        ctx.moveTo(xPos, glassY + 8);
+                        ctx.lineTo(xPos, glassY + glassHeight);
                         ctx.stroke();
                     }
                     ctx.restore();
 
-                    // 7. SPEKTRUM IN DER KUPPEL
-                    let barW = (tropenWidth - 36) / bufferLength;
+                    // Frequenz-Spektrum dezent im Glashaus integriert
+                    let barW = (glassWidth - 40) / bufferLength;
                     for (let i = 0; i < bufferLength; i++) {
-                        let barH = (dataArray[i] / 255) * 35;
+                        let barH = (dataArray[i] / 255) * 40;
                         ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + (dataArray[i]/510)})`;
-                        ctx.fillRect(tropenX + 18 + i * barW, tropenY + tropenHeight - barH - 6, barW - 2, barH);
+                        ctx.fillRect(glassX + 20 + i * barW, glassY + glassHeight - barH - 6, barW - 1.2, barH);
                     }
 
-                    // 8. LILI (JACK RUSSELL) - RUHIGER, ENTSPANNTER SPAZIERGANG
-                    liliAngle += 0.008 * animSpeed;
-                    let liliX = canvas.width * 0.5 + Math.cos(liliAngle) * 95;
-                    let liliY = canvas.height * 0.7 + Math.sin(liliAngle * 2) * 14;
+                    // 7. LILI (JACK RUSSELL) - LÄUFT NATÜRLICH ÜBER DIE WEGE
+                    liliAngle += 0.012 * animSpeed;
+                    let liliX = canvas.width * 0.5 + Math.cos(liliAngle) * 115;
+                    let liliY = canvas.height * 0.74 + Math.sin(liliAngle * 2) * 16 - (bassSmooth * 12);
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
                     
-                    // Schatten
-                    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
                     ctx.beginPath();
-                    ctx.ellipse(0, 10, 10, 4, 0, 0, Math.PI * 2);
+                    ctx.ellipse(0, 12 + (bassSmooth * 6), 11, 4.5, 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Lili Sprite
-                    ctx.font = '22px sans-serif';
+                    let lScale = 1 + (bassSmooth * 0.2);
+                    ctx.scale(lScale, lScale);
+                    ctx.font = '26px sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // Label
+                    if (bassSmooth > 0.55) {
+                        ctx.fillStyle = '#34d399';
+                        ctx.font = '14px monospace';
+                        ctx.fillText('♪', liliX + 16, liliY - 26 - (bassSmooth * 20));
+                    }
+
                     ctx.fillStyle = '#34d399';
                     ctx.font = '10px monospace';
                     ctx.textAlign = 'center';
-                    ctx.fillText('🐾 Lili', liliX, liliY - 18);
+                    ctx.fillText('🐾 Lili', liliX, liliY - 20);
                 }
                 renderLoop();
             }
 
-            // Play Button Event & Audio Fix
+            // Play Button & Audio Handlers
             document.addEventListener('click', function(e) {
                 const playBtn = e.target.closest('#garden-play-btn');
                 if (playBtn) {
@@ -1365,9 +1398,9 @@
 
                 document.querySelectorAll('.genre-btn').forEach(btn => {
                     if (btn.dataset.genre === data.genre) {
-                        btn.classList.add('border-purple-500', 'bg-purple-950/40', 'shadow-[0_0_18px_rgba(168,85,247,0.35)]');
+                        btn.classList.add('border-emerald-500', 'bg-emerald-950/40', 'shadow-[0_0_18px_rgba(52,211,153,0.35)]');
                     } else {
-                        btn.classList.remove('border-purple-500', 'bg-purple-950/40', 'shadow-[0_0_18px_rgba(168,85,247,0.35)]');
+                        btn.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'shadow-[0_0_18px_rgba(52,211,153,0.35)]');
                     }
                 });
 
