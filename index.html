@@ -188,7 +188,6 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    // Strenges Anti-Cheat: Bezieht alle Spielwerte und Upgrades in die Signatur ein
                     const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_JACK_SALT_HARDCORE_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
@@ -260,7 +259,6 @@
                     let pin = this.pendingPin;
 
                     if (!db[email]) {
-                        // Hardcore-Modus Startwerte: Deutlich weniger Start-Fans (5 statt 10)
                         let initialData = { 
                             pin: pin, 
                             fans: 5, 
@@ -312,7 +310,6 @@
                     let db = this.getDB();
                     let u = db[this.currentUser];
                     if (!u) return null;
-                    // Anti-Cheat Integritätsprüfung
                     if (u.checksum !== undefined && u.checksum !== this.generateChecksum(u)) {
                         alert('⚠️ Anti-Cheat Alarm: Manipulierter Spielstand erkannt! Werte wurden zurückgesetzt.');
                         u.fans = 5; u.marketingLevel = 0; u.studioLevel = 0; u.producerLevel = 0; u.prLevel = 0; u.labelLevel = 0; u.merchLevel = 0; u.algoLevel = 0;
@@ -376,7 +373,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Releases (Aktive Produktion mit harten Kosten/Ertrags-Verhältnissen) -->
+                                <!-- Releases (Manuell) -->
                                 <div class="bg-[#030508]/80 p-5 rounded-2xl border border-purple-500/30 space-y-3">
                                     <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">🎧 Musik-Releases (Manuell)</h3>
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -386,10 +383,10 @@
                                     </div>
                                 </div>
 
-                                <!-- Upgrades Matrix (Schwer & Viele Möglichkeiten mit exponentieller Kostensteigerung) -->
+                                <!-- Upgrades Matrix -->
                                 <div class="bg-[#030508]/80 p-5 rounded-2xl border border-slate-800 space-y-3">
                                     <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">📈 Studio-Upgrades &amp; Expansion</h3>
-                                    <div class="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
+                                    <div class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
                                         
                                         <!-- Upgrade 1 -->
                                         <div class="flex justify-between items-center bg-[#030508] p-3 rounded-xl border border-slate-800">
@@ -456,6 +453,16 @@
 
                                     </div>
                                 </div>
+
+                                <!-- NEU: Spielstand Reset (Account bleibt erhalten) -->
+                                <div class="bg-[#030508]/80 p-4 rounded-2xl border border-red-500/30 flex flex-col sm:flex-row justify-between items-center gap-3">
+                                    <div>
+                                        <p class="text-xs font-mono text-red-400 font-bold uppercase">⚠️ Spielstand Zurücksetzen</p>
+                                        <p class="text-[10px] text-slate-400">Setzt Fans, Releases &amp; Upgrades auf Anfang zurück (E-Mail &amp; PIN bleiben aktiv).</p>
+                                    </div>
+                                    <button type="button" id="btn-reset-gamestate" class="cyber-button bg-red-600/80 hover:bg-red-600 text-white text-[11px] font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer shrink-0 shadow">🔄 Spielstand Reset</button>
+                                </div>
+
                             </div>
                         `;
                     } else if (page.id === 'cloud') {
@@ -763,7 +770,6 @@
 
             // --- HARDCORE STUDIO GAME LOGIC ---
             
-            // Berechnet das automatische Wachstum pro Sekunde inklusive PR-Multiplikator
             function getFansPerSec(data) {
                 let base = (data.marketingLevel * 1) + 
                            (data.studioLevel * 3) + 
@@ -772,12 +778,10 @@
                            (data.merchLevel * 120) + 
                            (data.algoLevel * 350);
                 
-                // PR-Agentur gibt +15% Boost pro Level
                 let multiplier = 1 + (data.prLevel * 0.15);
                 return Math.floor(base * multiplier);
             }
 
-            // Kostenberechnungen mit steileren Exponenten (Schwerer!)
             function getCost(baseCost, factor, level) {
                 return Math.floor(baseCost * Math.pow(factor, level));
             }
@@ -794,7 +798,6 @@
                 if (rEl) rEl.innerText = data.releasesCount;
                 if (fpsEl) fpsEl.innerText = "+" + getFansPerSec(data);
 
-                // Update Levels & Costs
                 const upgrades = [
                     { id: 'market', base: 35, factor: 1.45, lvl: data.marketingLevel },
                     { id: 'studio', base: 150, factor: 1.50, lvl: data.studioLevel },
@@ -827,13 +830,30 @@
                 }
             }, 1000);
 
-            // Event-Listener für Releases und Upgrades
+            // Event-Listener für Releases, Upgrades und Game-Reset
             document.addEventListener('click', function(e) {
                 if (!SecureAuth.currentUser) return;
                 let data = SecureAuth.getAccountData();
                 if (!data) return;
 
                 let updated = false;
+
+                // Spielstand Reset Button
+                if (e.target && e.target.id === 'btn-reset-gamestate') {
+                    if (confirm("⚠️ Bist du sicher, dass du deinen Spielstand zurücksetzen möchtest? Dein Account und deine PIN bleiben erhalten, aber alle Fans und Upgrades werden gelöscht!")) {
+                        data.fans = 5;
+                        data.hype = 0;
+                        data.releasesCount = 0;
+                        data.marketingLevel = 0;
+                        data.studioLevel = 0;
+                        data.producerLevel = 0;
+                        data.prLevel = 0;
+                        data.labelLevel = 0;
+                        data.merchLevel = 0;
+                        data.algoLevel = 0;
+                        updated = true;
+                    }
+                }
 
                 // Releases (Manuelle Erträge)
                 if (e.target && e.target.id === 'release-rock-btn') {
