@@ -15,7 +15,7 @@
     </script>
     <style>
         .glass-panel {
-            background: linear-gradient(135deg, rgba(13, 19, 35, 0.94) 0%, rgba(5, 8, 15, 0.99) 100%);
+            background: linear-gradient(135deg, rgba(13, 19, 35, 0.95) 0%, rgba(5, 8, 15, 0.99) 100%);
             backdrop-filter: blur(28px);
             -webkit-backdrop-filter: blur(28px);
             border: 1px solid rgba(168, 85, 247, 0.28);
@@ -47,18 +47,36 @@
             animation: affordable-pulse 2s infinite ease-in-out;
         }
 
-        /* 100% flackerfreier, stabiler Rhythmus-Glow (Kein Layout-Springen mehr!) */
-        @keyframes garden-glow {
-            0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.25); border-color: rgba(16, 185, 129, 0.35); }
-            50% { box-shadow: 0 0 35px rgba(52, 211, 153, 0.8); border-color: rgba(52, 211, 153, 0.95); }
+        /* Präzise & Flackerfreie Garten-Synchronisation */
+        @keyframes botanical-sanctuary-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.25), inset 0 0 10px rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 45px rgba(52, 211, 153, 0.75), inset 0 0 25px rgba(52, 211, 153, 0.3); border-color: rgba(52, 211, 153, 0.9); }
         }
         .garden-groove {
-            animation: garden-glow 1.2s infinite ease-in-out;
+            animation: botanical-sanctuary-glow 1.4s infinite ease-in-out;
         }
+
+        @keyframes lili-dance {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-4px) scale(1.02); }
+        }
+        .lili-grooving { animation: lili-dance 0.7s infinite ease-in-out; }
+
+        @keyframes lotus-bloom {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4)); }
+            50% { filter: drop-shadow(0 0 22px rgba(236, 72, 153, 0.95)); }
+        }
+        .lotus-pulsing { animation: lotus-bloom 1.4s infinite ease-in-out; }
+
+        @keyframes fountain-flow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.4)); }
+            50% { filter: drop-shadow(0 0 25px rgba(34, 211, 238, 0.95)); }
+        }
+        .fountain-flowing { animation: fountain-flow 1.0s infinite ease-in-out; }
 
         @keyframes wave {
             0%, 100% { height: 4px; }
-            50% { height: 22px; }
+            50% { height: 24px; }
         }
         .wave-bar { animation: wave 1.2s ease-in-out infinite; }
         .wave-bar:nth-child(2) { animation-delay: 0.2s; }
@@ -83,7 +101,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Sanctuary Elite v12.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Sanctuary Elite v13.0</span>
                 </div>
             </div>
 
@@ -114,9 +132,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Optimized Edition &amp; Stable Beat-Synced Garden</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Massively Optimized Garden &amp; Empire Edition</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und dem flackerfreien, beat-synchronisierten Garten mit Lili.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und dem hochgradig synchronisierten Cyber-Botanical Sanctuary Garden.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -242,7 +260,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_STABLE_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_MASSIVE_GARDEN_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -675,66 +693,74 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <div id="garden-sanctuary-box" class="glass-panel p-6 sm:p-8 rounded-3xl border border-emerald-500/30 relative overflow-hidden bg-gradient-to-b from-[#050e14] via-[#03070f] to-[#020408] transition-all duration-300">
-                                    <div class="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                                    <div class="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                                <div id="garden-sanctuary-box" class="glass-panel p-6 sm:p-10 rounded-[2.5rem] border border-emerald-500/30 relative overflow-hidden bg-gradient-to-br from-[#050e14] via-[#03070f] to-[#020408] transition-all duration-300">
+                                    
+                                    <!-- Ambient Leucht-Effekte -->
+                                    <div class="absolute -top-16 -right-16 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                                    <div class="absolute -bottom-16 -left-16 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                                    <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                                        <div class="flex items-center gap-3">
-                                            <span class="text-3xl">🌱</span>
+                                    <!-- Top Bar des Gartens -->
+                                    <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                                        <div class="flex items-center gap-3.5">
+                                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 flex items-center justify-center text-2xl shadow-inner">🌱</div>
                                             <div>
-                                                <h3 class="text-lg font-bold text-emerald-300 font-mono">Cyber-Botanical Sanctuary <span class="text-[10px] text-emerald-400 font-normal bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40 ml-2">🎧 Beat-Synced</span></h3>
-                                                <p class="text-[11px] text-slate-400">Garten erwacht im Takt der Musik zum Leben</p>
+                                                <h3 class="text-lg font-bold text-emerald-300 font-mono tracking-wide">Cyber-Botanical Sanctuary</h3>
+                                                <p class="text-[11px] text-slate-400 font-mono">Bio-Harmonischer Livestream &amp; Rhythmus-Biosphäre</p>
                                             </div>
                                         </div>
-                                        <div class="flex items-center gap-2 bg-[#030508] px-3.5 py-1.5 rounded-xl border border-emerald-500/30">
-                                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                                            <a href="https://laut.fm/jackdarckart" target="_blank" class="text-[10px] font-mono text-emerald-400 hover:underline font-bold">laut.fm/jackdarckart ↗</a>
+                                        <div class="flex items-center gap-2.5 bg-[#030508] px-4 py-2 rounded-2xl border border-emerald-500/30 shadow-lg">
+                                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                            <a href="https://laut.fm/jackdarckart" target="_blank" class="text-[11px] font-mono text-emerald-400 hover:underline font-bold">laut.fm/jackdarckart ↗</a>
                                         </div>
                                     </div>
 
-                                    <div class="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-                                        <div class="garden-element bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-emerald-500/30 flex items-center gap-3 shadow-lg transition">
-                                            <span class="text-3xl">🐕</span>
+                                    <!-- Interaktive Garten-Elemente mit gezielten Rhythmus-Klassen -->
+                                    <div class="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                                        <!-- Hündin Lili -->
+                                        <div id="garden-card-lili" class="bg-slate-900/80 backdrop-blur-xl p-5 rounded-3xl border border-emerald-500/30 flex items-center gap-4 shadow-xl transition">
+                                            <span id="lili-icon" class="text-4xl p-2.5 bg-emerald-950/40 rounded-2xl border border-emerald-500/20">🐕</span>
                                             <div>
                                                 <p class="text-xs font-bold text-white font-mono">Lili (Jack Russell)</p>
-                                                <p class="text-[10px] text-emerald-400 font-mono">Tanzt &amp; groovt zur Musik 🐾</p>
+                                                <p class="text-[10px] text-emerald-400 font-mono mt-0.5">Wuff! Bewacht die Biosphäre 🐾</p>
                                             </div>
                                         </div>
-                                        <div class="garden-element bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-purple-500/30 flex items-center gap-3 shadow-lg transition">
-                                            <span class="text-3xl">🌸</span>
+                                        <!-- Neon Lotus -->
+                                        <div id="garden-card-lotus" class="bg-slate-900/80 backdrop-blur-xl p-5 rounded-3xl border border-purple-500/30 flex items-center gap-4 shadow-xl transition">
+                                            <span id="lotus-icon" class="text-4xl p-2.5 bg-purple-950/40 rounded-2xl border border-purple-500/20">🌸</span>
                                             <div>
                                                 <p class="text-xs font-bold text-white font-mono">Neon Lotus</p>
-                                                <p class="text-[10px] text-purple-300 font-mono">Pulsierende Blütenpracht</p>
+                                                <p class="text-[10px] text-purple-300 font-mono mt-0.5">Pulsierende Blütenpracht</p>
                                             </div>
                                         </div>
-                                        <div class="garden-element bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-cyan-500/30 flex items-center gap-3 shadow-lg transition">
-                                            <span class="text-3xl">🔮</span>
+                                        <!-- Crystal Fountain -->
+                                        <div id="garden-card-fountain" class="bg-slate-900/80 backdrop-blur-xl p-5 rounded-3xl border border-cyan-500/30 flex items-center gap-4 shadow-xl transition">
+                                            <span id="fountain-icon" class="text-4xl p-2.5 bg-cyan-950/40 rounded-2xl border border-cyan-500/20">🔮</span>
                                             <div>
                                                 <p class="text-xs font-bold text-white font-mono">Crystal Fountain</p>
-                                                <p class="text-[10px] text-cyan-300 font-mono">Wogen im Sound-Rhythmus</p>
+                                                <p class="text-[10px] text-cyan-300 font-mono mt-0.5">Harmonische Klangwellen</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="relative z-10 bg-slate-900/90 backdrop-blur-xl p-5 sm:p-6 rounded-2xl border border-emerald-500/40 shadow-2xl space-y-4">
-                                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <!-- Stream Player & EQ Hub -->
+                                    <div class="relative z-10 bg-slate-900/90 backdrop-blur-2xl p-6 sm:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-5">
+                                        <div class="flex flex-col sm:flex-row justify-between items-center gap-5">
                                             <div class="flex items-center gap-4 w-full sm:w-auto">
-                                                <button type="button" id="garden-play-btn" class="cyber-button w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-cyan-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/30 cursor-pointer shrink-0">▶</button>
+                                                <button type="button" id="garden-play-btn" class="cyber-button w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center text-3xl shadow-xl shadow-emerald-500/30 cursor-pointer shrink-0">▶</button>
                                                 <div class="overflow-hidden">
                                                     <p class="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">Live Stream (laut.fm/jackdarckart)</p>
-                                                    <p id="radio-track-title" class="text-xs sm:text-sm font-bold text-white font-mono truncate max-w-xs sm:max-w-md">Verbinde mit Webradio...</p>
+                                                    <p id="radio-track-title" class="text-xs sm:text-sm font-bold text-white font-mono truncate max-w-xs sm:max-w-md mt-0.5">Bereit zum Starten...</p>
                                                 </div>
                                             </div>
                                             
-                                            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                                                <div class="flex items-center gap-2 bg-[#030508] px-4 py-2 rounded-xl border border-slate-800">
-                                                    <span class="text-sm">🔊</span>
-                                                    <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-24 accent-emerald-500 cursor-pointer">
+                                            <div class="flex items-center gap-3.5 w-full sm:w-auto justify-end">
+                                                <div class="flex items-center gap-2.5 bg-[#030508] px-4 py-2.5 rounded-2xl border border-slate-800 shadow-inner">
+                                                    <span class="text-base">🔊</span>
+                                                    <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-28 accent-emerald-500 cursor-pointer">
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- Robuste Audio-Streaming-Elemente mit Direktquellen -->
+                                        
                                         <audio id="garden-audio" preload="none">
                                             <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
                                             <source src="https://jackdarckart.stream.laut.fm/jackdarckart" type="audio/mpeg">
@@ -1032,13 +1058,15 @@
                 }
             });
 
-            // Flackerfreier Garten Audio Player mit direktem Stream-Start
+            // Fein abgestimmte, harmonische Garten-Synchronisation ohne Layout-Sprünge
             document.addEventListener('click', function(e) {
                 const playBtn = e.target.closest('#garden-play-btn');
                 if (playBtn) {
                     const audio = document.getElementById('garden-audio');
                     const sanctuaryBox = document.getElementById('garden-sanctuary-box');
-                    const elements = document.querySelectorAll('.garden-element');
+                    const liliCard = document.getElementById('garden-card-lili');
+                    const lotusCard = document.getElementById('garden-card-lotus');
+                    const fountainCard = document.getElementById('garden-card-fountain');
 
                     if (audio) {
                         if (audio.paused) {
@@ -1047,7 +1075,9 @@
                                 playBtn.textContent = '⏸';
                                 playBtn.classList.add('affordable-glow');
                                 if (sanctuaryBox) sanctuaryBox.classList.add('garden-groove');
-                                elements.forEach(el => el.classList.add('garden-groove'));
+                                if (liliCard) liliCard.classList.add('lili-grooving', 'border-emerald-500');
+                                if (lotusCard) lotusCard.classList.add('lotus-pulsing', 'border-purple-500');
+                                if (fountainCard) fountainCard.classList.add('fountain-flowing', 'border-cyan-500');
                             }).catch(err => {
                                 console.error("Stream Playback Error:", err);
                                 alert("⚠️ Stream konnte nicht gestartet werden. Bitte Laut.fm Verbindung prüfen.");
@@ -1057,7 +1087,9 @@
                             playBtn.textContent = '▶';
                             playBtn.classList.remove('affordable-glow');
                             if (sanctuaryBox) sanctuaryBox.classList.remove('garden-groove');
-                            elements.forEach(el => el.classList.remove('garden-groove'));
+                            if (liliCard) liliCard.classList.remove('lili-grooving', 'border-emerald-500');
+                            if (lotusCard) lotusCard.classList.remove('lotus-pulsing', 'border-purple-500');
+                            if (fountainCard) fountainCard.classList.remove('fountain-flowing', 'border-cyan-500');
                         }
                     }
                 }
