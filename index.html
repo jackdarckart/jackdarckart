@@ -74,7 +74,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">True 3D Botanical Engine v29.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Aerial 3D Botanical Engine v31.0</span>
                 </div>
             </div>
 
@@ -103,11 +103,11 @@
                     <div class="absolute -top-12 -right-12 w-72 h-72 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="absolute -bottom-12 -left-12 w-72 h-72 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none"></div>
                     
-                    <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌐</span>
+                    <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🦅</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Realistischer 3D-Botanischer Garten &amp; Musik-Matrix</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Botanischer Garten in der Vogelperspektive &amp; Musik-Matrix</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem echten 3D-WebGL Park, der vollständig autonom auf die Musik reagiert.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem echten 3D-Park aus der Vogelperspektive, der autonom auf den Stream reagiert.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -237,7 +237,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_TRUE_3D_GARDEN_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_AERIAL_GARDEN_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -403,7 +403,7 @@
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
-                { id: 'garden', name: 'Garden', icon: '🌐', desc: 'Realistischer 3D-Botanischer Garten', protected: true },
+                { id: 'garden', name: 'Garden', icon: '🦅', desc: 'Botanischer Garten (Vogelperspektive)', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
@@ -670,21 +670,21 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <!-- ECHTER 3D BOTANISCHER GARTEN (THREE.JS) -->
+                                <!-- BOTANISCHER GARTEN IN DER VOGELPERSPEKTIVE (THREE.JS) -->
                                 <div class="p-6 sm:p-10 rounded-[3rem] border-2 border-emerald-600/40 relative overflow-hidden bg-gradient-to-b from-[#05140b] via-[#020a05] to-[#010402] shadow-2xl">
                                     
                                     <!-- Kopfbereich -->
                                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 border-b border-emerald-500/20 pb-5">
                                         <div class="flex items-center gap-4">
                                             <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 p-0.5 shadow-xl shadow-emerald-500/25">
-                                                <div class="w-full h-full bg-[#020a05] rounded-[14px] flex items-center justify-center text-2xl">🌐</div>
+                                                <div class="w-full h-full bg-[#020a05] rounded-[14px] flex items-center justify-center text-2xl">🦅</div>
                                             </div>
                                             <div>
                                                 <h3 class="text-lg sm:text-xl font-black text-white font-mono tracking-wide flex items-center gap-2">
-                                                    Botanischer Garten • True 3D WebGL Szene
-                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/80 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30">🌿 100% Autonomer 3D-Beat-Sync</span>
+                                                    Botanischer Garten • Vogelperspektive (Drohnen-Ansicht)
+                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/80 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30">🌿 Autonomer Beat-Sync</span>
                                                 </h3>
-                                                <p class="text-xs text-emerald-200/70 font-mono mt-0.5">Echte 3D-Umgebung mit Glashaus, Teich und Lili — vollautomatisch gesteuert vom Stream.</p>
+                                                <p class="text-xs text-emerald-200/70 font-mono mt-0.5">Kompletter Parküberblick von oben mit Glashaus, Alleen, Teich und Lili.</p>
                                             </div>
                                         </div>
 
@@ -699,7 +699,7 @@
                                     <!-- THREE.JS 3D CONTAINER -->
                                     <div id="garden-3d-container" class="relative w-full h-[500px] rounded-3xl border-2 border-emerald-800/50 overflow-hidden shadow-2xl bg-[#030a06]">
                                         <div class="absolute top-4 left-4 z-10 bg-[#020a05]/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/30 text-[10px] font-mono text-emerald-300 shadow">
-                                            🌐 WebGL 3D Real-Time Audio Reactivity
+                                            🦅 Aerial Drone View Mode Active
                                         </div>
                                     </div>
 
@@ -1022,7 +1022,7 @@
                 }
             });
 
-            // TRUE 3D WEBGL BOTANISCHER GARTEN (THREE.JS)
+            // 3D WEBGL GARTEN IN DER VOGELPERSPEKTIVE (DROHNEN-ANSICHT)
             let threeSceneInstance = null;
             function initGarden3DScene() {
                 const container = document.getElementById('garden-3d-container');
@@ -1040,101 +1040,109 @@
                 const height = container.clientHeight || 500;
 
                 const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x030a06);
-                scene.fog = new THREE.FogExp2(0x030a06, 0.015);
+                scene.background = new THREE.Color(0x040e07);
+                scene.fog = new THREE.FogExp2(0x040e07, 0.01);
 
-                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-                camera.position.set(0, 18, 32);
-                camera.lookAt(0, 0, 0);
+                const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+                // VOGELPERSPEKTIVE (Schrägluftbild von oben, analog zum Referenzfoto)
+                camera.position.set(0, 42, 14);
+                camera.lookAt(0, 0, -2);
 
                 const renderer = new THREE.WebGLRenderer({ antialias: true });
                 renderer.setSize(width, height);
                 renderer.shadowMap.enabled = true;
                 container.appendChild(renderer.domElement);
 
-                // Lichtquellen für echten 3D-Realismus & Schatten
-                const ambientLight = new THREE.AmbientLight(0x103a22, 1.2);
+                // Natürliche Beleuchtung für die Vogelperspektive
+                const ambientLight = new THREE.AmbientLight(0x1e3f2b, 1.5);
                 scene.add(ambientLight);
 
-                const dirLight = new THREE.DirectionalLight(0xa7f3d0, 1.8);
-                dirLight.position.set(15, 30, 20);
+                const dirLight = new THREE.DirectionalLight(0xd1fae5, 1.6);
+                dirLight.position.set(10, 40, 20);
                 dirLight.castShadow = true;
                 scene.add(dirLight);
 
-                const pointLight = new THREE.PointLight(0x34d399, 2, 40);
+                const pointLight = new THREE.PointLight(0x34d399, 1.2, 35);
                 pointLight.position.set(0, 10, 0);
                 scene.add(pointLight);
 
-                // 3D Boden / Rasen
+                // 3D Boden / Rasen (Große Parkfläche)
                 const groundGeo = new THREE.PlaneGeometry(60, 60);
-                const groundMat = new THREE.MeshStandardMaterial({ color: 0x071c0d, roughness: 0.8 });
+                const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a1f11, roughness: 0.8 });
                 const ground = new THREE.Mesh(groundGeo, groundMat);
                 ground.rotation.x = -Math.PI / 2;
                 ground.receiveShadow = true;
                 scene.add(ground);
 
-                // 3D Steinwege (Alleen)
-                const pathGeo = new THREE.PlaneGeometry(8, 50);
-                const pathMat = new THREE.MeshStandardMaterial({ color: 0x14281a, roughness: 0.9 });
+                // 3D Symmetrische Hauptalleen & Wege (wie im echten Garten)
+                const pathGeo = new THREE.PlaneGeometry(6, 45);
+                const pathMat = new THREE.MeshStandardMaterial({ color: 0x183020, roughness: 0.9 });
                 const path = new THREE.Mesh(pathGeo, pathMat);
                 path.rotation.x = -Math.PI / 2;
-                path.position.y = 0.02;
+                path.position.set(0, 0.02, 0);
                 path.receiveShadow = true;
                 scene.add(path);
 
-                // 3D Glashaus (Gewächshaus)
-                const glassGroup = new THREE.Group();
-                const frameMat = new THREE.MeshStandardMaterial({ color: 0x064e3b, metalness: 0.5, roughness: 0.3 });
-                const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x10b981, transparent: true, opacity: 0.35, roughness: 0.1, transmission: 0.6 });
+                // Querweg
+                const pathGeoCross = new THREE.PlaneGeometry(35, 5);
+                const pathCross = new THREE.Mesh(pathGeoCross, pathMat);
+                pathCross.rotation.x = -Math.PI / 2;
+                pathCross.position.set(0, 0.02, -4);
+                pathCross.receiveShadow = true;
+                scene.add(pathCross);
 
-                const structure = new THREE.Mesh(new THREE.BoxGeometry(16, 10, 22), glassMat);
-                structure.position.y = 5;
+                // 3D Glashaus (Zentrale Gewächshaus-Architektur)
+                const glassGroup = new THREE.Group();
+                const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x059669, transparent: true, opacity: 0.45, roughness: 0.1, transmission: 0.5 });
+
+                const structure = new THREE.Mesh(new THREE.BoxGeometry(14, 8, 18), glassMat);
+                structure.position.set(0, 4, -8);
                 structure.castShadow = true;
                 glassGroup.add(structure);
 
-                const roofGeo = new THREE.ConeGeometry(11.5, 5, 4);
+                const roofGeo = new THREE.ConeGeometry(10, 4, 4);
                 const roof = new THREE.Mesh(roofGeo, glassMat);
-                roof.position.y = 12.5;
+                roof.position.set(0, 10, -8);
                 roof.rotation.y = Math.PI / 4;
                 glassGroup.add(roof);
                 scene.add(glassGroup);
 
-                // 3D Teich & Wasser
-                const pondGeo = new THREE.CylinderGeometry(8, 8, 0.8, 32);
-                const pondMat = new THREE.MeshStandardMaterial({ color: 0x06283d, roughness: 0.2 });
+                // 3D Naturteich (Organische Form im Blickfeld)
+                const pondGeo = new THREE.CylinderGeometry(7, 7, 0.4, 32);
+                const pondMat = new THREE.MeshStandardMaterial({ color: 0x081a12, roughness: 0.6 });
                 const pond = new THREE.Mesh(pondGeo, pondMat);
-                pond.position.set(0, 0.4, 8);
+                pond.position.set(0, 0.2, 5);
                 scene.add(pond);
 
-                const waterGeo = new THREE.PlaneGeometry(14, 14, 16, 16);
-                const waterMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.3, transparent: true, opacity: 0.85 });
+                const waterGeo = new THREE.PlaneGeometry(10, 10, 16, 16);
+                const waterMat = new THREE.MeshStandardMaterial({ color: 0x0c3344, roughness: 0.2, metalness: 0.3, transparent: true, opacity: 0.85 });
                 const water = new THREE.Mesh(waterGeo, waterMat);
                 water.rotation.x = -Math.PI / 2;
-                water.position.set(0, 0.82, 8);
+                water.position.set(0, 0.45, 5);
                 scene.add(water);
 
-                // 3D Lili (Jack Russell Hund) aus feinen geometrischen Formen aufgebaut
+                // 3D Lili (Jack Russell) in der Parkanlage
                 const liliGroup = new THREE.Group();
                 const dogMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6 });
                 const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 });
 
-                const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 2.6), dogMat);
-                body.position.y = 0.8;
+                const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.9, 2.0), dogMat);
+                body.position.y = 0.6;
                 liliGroup.add(body);
 
-                const head = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), whiteMat);
-                head.position.set(0, 1.8, 1.2);
+                const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), whiteMat);
+                head.position.set(0, 1.3, 0.9);
                 liliGroup.add(head);
 
-                const ear1 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.6, 0.3), dogMat);
-                ear1.position.set(-0.6, 2.3, 1.3);
+                const ear1 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.2), dogMat);
+                ear1.position.set(-0.4, 1.7, 1.0);
                 liliGroup.add(ear1);
 
-                const ear2 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.6, 0.3), dogMat);
-                ear2.position.set(0.6, 2.3, 1.3);
+                const ear2 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.4, 0.2), dogMat);
+                ear2.position.set(0.4, 1.7, 1.0);
                 liliGroup.add(ear2);
 
-                liliGroup.position.set(0, 0, -4);
+                liliGroup.position.set(0, 0, 0);
                 scene.add(liliGroup);
 
                 // Audio Setup
@@ -1180,9 +1188,9 @@
                         for (let i = 0; i < 5; i++) bSum += dataArray[i];
                         rawBass = (bSum / 5) / 255;
                     } else if (audio && !audio.paused) {
-                        rawBass = Math.max(0, Math.sin(timeSec * Math.PI * 2.2)) > 0.7 ? 1.0 : 0.05;
+                        rawBass = Math.max(0, Math.sin(timeSec * Math.PI * 2.2)) > 0.7 ? 0.8 : 0.05;
                     } else {
-                        rawBass = (Math.sin(timeSec * 2.0) + 1) * 0.08;
+                        rawBass = (Math.sin(timeSec * 2.0) + 1) * 0.05;
                     }
 
                     if (rawBass > bassSmooth) {
@@ -1191,19 +1199,16 @@
                         bassSmooth += (rawBass - bassSmooth) * 0.2;
                     }
 
-                    // 3D Animationen im Takt
-                    pointLight.intensity = 2 + bassSmooth * 8;
-                    glassGroup.scale.set(1 + bassSmooth * 0.08, 1 + bassSmooth * 0.12, 1 + bassSmooth * 0.08);
+                    // Dezent organische Beat-Reaktivität aus der Vogelperspektive
+                    pointLight.intensity = 1.2 + bassSmooth * 2.0;
+                    glassGroup.scale.set(1 + bassSmooth * 0.03, 1 + bassSmooth * 0.05, 1 + bassSmooth * 0.03);
+                    water.position.y = 0.45 + Math.sin(timeSec * 4) * 0.015 * (bassSmooth + 0.2);
 
-                    // Wasserwellen im Takt
-                    water.position.y = 0.82 + Math.sin(timeSec * 8) * 0.15 * (bassSmooth + 0.2);
-
-                    // Lili läuft im Kreis durch den 3D-Garten
-                    liliAngle += 0.008 * animSpeed;
-                    liliGroup.position.x = Math.cos(liliAngle) * 10;
-                    liliGroup.position.z = Math.sin(liliAngle) * 10 + 4;
+                    // Lili läuft auf den Wegen durch den Park
+                    liliAngle += 0.006 * animSpeed;
+                    liliGroup.position.x = Math.cos(liliAngle) * 8;
+                    liliGroup.position.z = Math.sin(liliAngle) * 6 + 2;
                     liliGroup.rotation.y = -liliAngle + Math.PI / 2;
-                    liliGroup.position.y = Math.abs(Math.sin(liliAngle * 4)) * 0.6 * (bassSmooth + 0.5);
 
                     renderer.render(scene, camera);
                 }
