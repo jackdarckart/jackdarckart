@@ -49,15 +49,13 @@
 
     <main class="max-w-4xl mx-auto w-full space-y-6 my-auto py-4">
         
-        <!-- 1. NEUE CYBER COMMAND STARTSEITE -->
+        <!-- 1. STARTSEITE -->
         <section id="view-home" class="view-section space-y-6">
             <div class="glass-panel p-6 sm:p-10 rounded-[2.5rem] space-y-8 cyber-glow relative overflow-hidden">
-                
-                <!-- Dekorative Hintergrundlichter -->
                 <div class="absolute -top-32 -right-32 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute -bottom-32 -left-32 w-56 h-56 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                <!-- Top Telemetry Matrix -->
+                <!-- Telemetry Matrix -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-mono">
                     <div class="bg-[#030712]/90 p-2.5 rounded-xl border border-cyan-500/20">
                         <span class="text-[9px] text-slate-400 uppercase tracking-wider block">Status</span>
@@ -79,16 +77,13 @@
                     </div>
                 </div>
 
-                <!-- Center Deck: Spinning Vinyl & Now Playing -->
+                <!-- Vinyl & Track Info -->
                 <div class="flex flex-col sm:flex-row items-center gap-6 bg-[#030712]/60 p-6 rounded-3xl border border-slate-800/80">
-                    <!-- Spinning Vinyl Icon -->
                     <div id="vinyl-container" class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-cyan-600 via-slate-900 to-pink-600 p-1 shadow-2xl shrink-0 flex items-center justify-center">
                         <div class="w-full h-full rounded-full bg-[#020617] flex items-center justify-center border border-cyan-500/30 spinning-disc" id="spinning-vinyl">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-400 to-pink-500 border-2 border-[#010309] flex items-center justify-center text-[10px] font-bold font-mono text-white">JC</div>
                         </div>
                     </div>
-
-                    <!-- Track Infos & Equalizer -->
                     <div class="space-y-3 text-center sm:text-left w-full overflow-hidden">
                         <div class="flex justify-center sm:justify-start items-center gap-1.5 h-6">
                             <span class="w-1 bg-cyan-400 rounded-full wave-bar-1"></span>
@@ -103,19 +98,17 @@
                     </div>
                 </div>
 
-                <!-- Play & Volume Control Hub -->
+                <!-- Play Button & Volume -->
                 <div class="space-y-4 max-w-lg mx-auto">
                     <button type="button" id="play-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-600 text-white font-black py-4.5 rounded-2xl text-xs uppercase tracking-widest cursor-pointer shadow-xl transition-all transform active:scale-95 flex items-center justify-center gap-3">
                         <span id="play-icon" class="text-base">▶</span> <span id="play-text">Webradio Abspielen</span>
                     </button>
-
                     <div class="flex items-center justify-between bg-[#030712]/90 px-5 py-3 rounded-2xl border border-slate-800 text-xs font-mono">
                         <span class="text-slate-400 flex items-center gap-2">🔊 Master Lautstärke</span>
                         <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.8" class="w-36 accent-cyan-500 cursor-pointer">
                     </div>
                 </div>
 
-                <!-- Direct Stream Footer Link -->
                 <div class="text-center pt-1">
                     <a href="https://laut.fm/jackdarckart" target="_blank" class="text-[11px] font-mono text-slate-400 hover:text-cyan-400 transition-colors inline-flex items-center gap-1.5">
                         🌐 Offizielle laut.fm Station öffnen ↗
@@ -123,7 +116,7 @@
                 </div>
             </div>
 
-            <!-- History Feed Deck -->
+            <!-- History Feed -->
             <div class="glass-panel p-6 rounded-[2rem] space-y-4 shadow-xl">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h2 class="text-xs font-mono text-cyan-300 uppercase font-bold tracking-wider">📜 Zuletzt gespielte Tracks</h2>
@@ -180,17 +173,17 @@
             </div>
         </section>
 
-        <!-- 3. GAME VIEW (MIT INTEGRIERTEM WEBRADIO-PLAYER) -->
+        <!-- 3. GAME VIEW (CYBER BEAT TYCOON) -->
         <section id="view-game" class="view-section hidden space-y-6">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-6">
                 <div class="flex justify-between items-center border-b border-cyan-500/20 pb-4">
                     <div>
                         <h2 class="text-lg font-black text-cyan-300 font-mono uppercase">🎮 CyberBeat Tycoon</h2>
-                        <p class="text-[11px] text-slate-400 font-mono">Gesicherter Account: <span id="user-badge" class="text-emerald-400 font-bold">--</span></p>
+                        <p class="text-[11px] text-slate-400 font-mono">Commander: <span id="user-badge" class="text-emerald-400 font-bold">--</span></p>
                     </div>
                 </div>
 
-                <!-- IN-GAME RADIO PLAYER -->
+                <!-- In-Game Radio Player -->
                 <div class="bg-[#030712] p-4 sm:p-5 rounded-2xl border border-cyan-500/40 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-inner">
                     <div class="flex items-center space-x-3 w-full sm:w-auto text-center sm:text-left">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-pink-500 flex items-center justify-center font-bold text-lg shrink-0 mx-auto sm:mx-0">🎧</div>
@@ -206,6 +199,7 @@
                     </div>
                 </div>
 
+                <!-- Stats Grid -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono">
                     <div class="bg-[#030712] p-4 rounded-2xl border border-cyan-500/20"><span class="text-[10px] text-slate-400 uppercase">Beats</span><p id="g-beats" class="text-xl font-black text-white mt-1">0</p></div>
                     <div class="bg-[#030712] p-4 rounded-2xl border border-teal-500/20"><span class="text-[10px] text-slate-400 uppercase">Fans</span><p id="g-fans" class="text-xl font-black text-teal-300 mt-1">0</p></div>
@@ -256,9 +250,6 @@
             const views = ['home', 'auth', 'game', 'account'];
             function switchView(target) {
                 const user = SecureAuth.getSession();
-                if ((target === 'game' || target === 'account') && !user) {
-                    target = 'auth';
-                }
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if (el) el.classList.add('hidden');
@@ -281,18 +272,9 @@
                 const user = SecureAuth.getSession();
                 nav.innerHTML = `
                     <button onclick="switchView('home')" class="cyber-button bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎧 Webradio</button>
+                    <button onclick="switchView('game')" class="cyber-button bg-slate-900 text-slate-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎮 Empire Game</button>
+                    <button onclick="switchView('account')" class="cyber-button bg-slate-900 text-amber-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🛠️ Account &amp; Cloud</button>
                 `;
-                if (user) {
-                    nav.innerHTML += `
-                        <button onclick="switchView('game')" class="cyber-button bg-slate-900 text-slate-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎮 Empire Game</button>
-                        <button onclick="switchView('account')" class="cyber-button bg-slate-900 text-amber-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🛠️ Account &amp; Cloud</button>
-                        <button onclick="logoutUser()" class="cyber-button bg-red-600/20 text-red-300 border border-red-500/30 px-3.5 py-2 rounded-xl text-xs font-mono cursor-pointer">🚪 Abmelden</button>
-                    `;
-                } else {
-                    nav.innerHTML += `
-                        <button onclick="switchView('auth')" class="cyber-button bg-cyan-600 text-white border border-cyan-400 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🔑 Login / Registrieren</button>
-                    `;
-                }
             }
 
             window.switchView = switchView;
@@ -301,19 +283,16 @@
                 switchView('home');
             };
 
-            // Audio-Engine Sync mit Vinyl-Animation
+            // Audio & Vinyl Sync
             const audio = document.getElementById('audio-stream');
             const spinningVinyl = document.getElementById('spinning-vinyl');
-            
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
             const playText = document.getElementById('play-text');
-            
             const gamePlayBtn = document.getElementById('game-play-btn');
             const gamePlayIcon = document.getElementById('game-play-icon');
             const gamePlayText = document.getElementById('game-play-text');
             const gameTrackTitle = document.getElementById('game-track-title');
-
             const volumeSlider = document.getElementById('volume-slider');
             let playTimeout = null;
 
@@ -326,9 +305,7 @@
 
                     if (playTimeout) clearTimeout(playTimeout);
                     playTimeout = setTimeout(() => {
-                        if (audio.paused) {
-                            resetUI();
-                        }
+                        if (audio.paused) resetUI();
                     }, 5000);
 
                     try {
@@ -350,11 +327,11 @@
                 playText.textContent = 'Webradio Abspielen';
                 gamePlayIcon.textContent = '▶';
                 gamePlayText.textContent = 'Radio Starten';
-                spinningVinyl.classList.remove('active');
+                if (spinningVinyl) spinningVinyl.classList.remove('active');
             }
 
-            playBtn.addEventListener('click', togglePlay);
-            gamePlayBtn.addEventListener('click', togglePlay);
+            if(playBtn) playBtn.addEventListener('click', togglePlay);
+            if(gamePlayBtn) gamePlayBtn.addEventListener('click', togglePlay);
 
             audio.addEventListener('playing', () => {
                 if (playTimeout) clearTimeout(playTimeout);
@@ -362,20 +339,16 @@
                 playText.textContent = 'Stream Pausieren';
                 gamePlayIcon.textContent = '⏸';
                 gamePlayText.textContent = 'Stream Pausieren';
-                spinningVinyl.classList.add('active');
+                if (spinningVinyl) spinningVinyl.classList.add('active');
             });
 
-            audio.addEventListener('pause', () => {
-                resetUI();
-            });
-
+            audio.addEventListener('pause', resetUI);
             audio.addEventListener('error', (e) => {
                 if (playTimeout) clearTimeout(playTimeout);
-                console.error("Audio error event:", e);
                 resetUI();
             });
 
-            volumeSlider.addEventListener('input', (e) => { audio.volume = e.target.value; });
+            if(volumeSlider) volumeSlider.addEventListener('input', (e) => { audio.volume = e.target.value; });
 
             async function fetchRadio() {
                 try {
@@ -383,56 +356,29 @@
                     if(r1.ok) { 
                         let d = await r1.json(); 
                         let songText = `${d.artist?.name || 'jackdarckart'} – ${d.title || ''}`;
-                        document.getElementById('track-title').textContent = songText;
-                        gameTrackTitle.textContent = songText;
+                        let trackEl = document.getElementById('track-title');
+                        let gameTrackEl = document.getElementById('game-track-title');
+                        if(trackEl) trackEl.textContent = songText;
+                        if(gameTrackEl) gameTrackEl.textContent = songText;
                     }
                     let r2 = await fetch('https://api.laut.fm/station/jackdarckart/listeners');
-                    if(r2.ok) document.getElementById('listener-count').textContent = await r2.json();
+                    if(r2.ok) {
+                        let lEl = document.getElementById('listener-count');
+                        if(lEl) lEl.textContent = await r2.json();
+                    }
                     let r3 = await fetch('https://api.laut.fm/station/jackdarckart/last_songs');
                     if(r3.ok) {
                         let songs = await r3.json();
-                        document.getElementById('last-songs-container').innerHTML = songs.slice(0, 3).map(s => `<div class="bg-[#030712] p-3 rounded-xl border border-slate-800/80 flex items-center justify-between"><span>🎵 ${s.artist?.name} – ${s.title}</span></div>`).join('');
+                        let histEl = document.getElementById('last-songs-container');
+                        if(histEl) {
+                            histEl.innerHTML = songs.slice(0, 3).map(s => `<div class="bg-[#030712] p-3 rounded-xl border border-slate-800/80 flex items-center justify-between"><span>🎵 ${s.artist?.name} – ${s.title}</span></div>`).join('');
+                        }
                     }
                 } catch(e){}
             }
             fetchRadio(); setInterval(fetchRadio, 15000);
 
-            // Auth Subviews
-            function showAuthSub(id) {
-                ['form-login', 'form-register', 'form-reset', 'form-verify'].forEach(f => document.getElementById(f).classList.add('hidden'));
-                document.getElementById(id).classList.remove('hidden');
-                document.getElementById('auth-msg').textContent = '';
-            }
-            document.getElementById('to-reg').onclick = () => showAuthSub('form-register');
-            document.getElementById('to-reset').onclick = () => showAuthSub('form-reset');
-            document.getElementById('back-login-1').onclick = () => showAuthSub('form-login');
-            document.getElementById('back-login-2').onclick = () => showAuthSub('form-login');
-            document.getElementById('cancel-verify').onclick = () => showAuthSub('form-login');
-
-            async function handleAuthAction(email, pin, action) {
-                let res = await SecureAuth.initAuthAction(email, pin, action);
-                if (!res.success) {
-                    document.getElementById('auth-msg').textContent = res.msg;
-                    return;
-                }
-                document.getElementById('display-code').textContent = res.code;
-                showAuthSub('form-verify');
-            }
-
-            document.getElementById('btn-login').onclick = () => handleAuthAction(document.getElementById('login-email').value, document.getElementById('login-pin').value, 'login');
-            document.getElementById('btn-register').onclick = () => handleAuthAction(document.getElementById('reg-email').value, document.getElementById('reg-pin').value, 'register');
-            document.getElementById('btn-reset').onclick = () => handleAuthAction(document.getElementById('reset-email').value, document.getElementById('reset-pin').value, 'reset_pin');
-
-            document.getElementById('btn-verify').onclick = async () => {
-                let input = document.getElementById('verify-input').value.trim();
-                let res = await SecureAuth.verifyAndExecute(input);
-                document.getElementById('auth-msg').textContent = res.msg;
-                if (res.success) {
-                    setTimeout(() => switchView('game'), 800);
-                }
-            };
-
-            // Upgrades & Game
+            // Game Upgrades & Logic
             const upgrades = [
                 { id: 'mic', name: 'Pro Mikrofon', cost: 40, mult: 1.65, beat: 1, desc: '+1 Beat/s' },
                 { id: 'midi', name: 'MIDI Keyboard', cost: 180, mult: 1.70, beat: 3, desc: '+3 Beats/s' },
@@ -455,26 +401,33 @@
                 const uBadge = document.getElementById('user-badge');
                 if (uBadge) uBadge.textContent = SecureAuth.getSession();
 
-                document.getElementById('g-beats').textContent = Math.floor(gData.beats).toLocaleString();
-                document.getElementById('g-fans').textContent = Math.floor(gData.fans).toLocaleString();
-                document.getElementById('g-releases').textContent = gData.releases.toLocaleString();
+                let bEl = document.getElementById('g-beats');
+                let fEl = document.getElementById('g-fans');
+                let rEl = document.getElementById('g-releases');
+                let hEl = document.getElementById('g-hash');
+
+                if(bEl) bEl.textContent = Math.floor(gData.beats).toLocaleString();
+                if(fEl) fEl.textContent = Math.floor(gData.fans).toLocaleString();
+                if(rEl) rEl.textContent = gData.releases.toLocaleString();
                 
                 let hash = 0;
                 upgrades.forEach(u => { if(u.fan) hash += (gData.upgrades[u.id] || 0) * u.fan; });
-                document.getElementById('g-hash').textContent = `${hash} H/s`;
+                if(hEl) hEl.textContent = `${hash} H/s`;
 
                 let shop = document.getElementById('shop');
-                shop.innerHTML = '';
-                upgrades.forEach(u => {
-                    let lvl = gData.upgrades[u.id] || 0;
-                    let cost = getCost(u, lvl);
-                    let can = gData.beats >= cost;
-                    shop.innerHTML += `
-                        <div class="bg-[#030712] p-3 rounded-xl border ${can ? 'border-cyan-500/40':'border-slate-800'} flex justify-between items-center text-xs font-mono">
-                            <div><b>${u.name}</b> (Lvl ${lvl})<br><span class="text-slate-400">${u.desc}</span></div>
-                            <button onclick="buyUpgrade('${u.id}')" class="cyber-button bg-cyan-600 text-white px-3 py-1.5 rounded-lg uppercase cursor-pointer ${!can?'opacity-45':''}">⚡ ${cost.toLocaleString()}</button>
-                        </div>`;
-                });
+                if(shop) {
+                    shop.innerHTML = '';
+                    upgrades.forEach(u => {
+                        let lvl = gData.upgrades[u.id] || 0;
+                        let cost = getCost(u, lvl);
+                        let can = gData.beats >= cost;
+                        shop.innerHTML += `
+                            <div class="bg-[#030712] p-3 rounded-xl border ${can ? 'border-cyan-500/40':'border-slate-800'} flex justify-between items-center text-xs font-mono">
+                                <div><b>${u.name}</b> (Lvl ${lvl})<br><span class="text-slate-400">${u.desc}</span></div>
+                                <button onclick="buyUpgrade('${u.id}')" class="cyber-button bg-cyan-600 text-white px-3 py-1.5 rounded-lg uppercase cursor-pointer ${!can?'opacity-45':''}">⚡ ${cost.toLocaleString()}</button>
+                            </div>`;
+                    });
+                }
                 SecureAuth.saveUserGameData(gData);
             }
 
@@ -490,15 +443,18 @@
                 }
             };
 
-            document.getElementById('btn-click').onclick = () => {
-                let gData = SecureAuth.getUserGameData();
-                if (!gData) return;
-                gData.beats += 1;
-                updateGameUI();
-            };
+            const btnClick = document.getElementById('btn-click');
+            if(btnClick) {
+                btnClick.onclick = () => {
+                    let gData = SecureAuth.getUserGameData();
+                    if (!gData) return;
+                    gData.beats += 1;
+                    updateGameUI();
+                };
+            }
 
+            // Game Loop (Every second)
             setInterval(() => {
-                if (!SecureAuth.getSession()) return;
                 let gData = SecureAuth.getUserGameData();
                 if (!gData) return;
 
@@ -508,60 +464,44 @@
                     if(u.beat) bInc += lvl * u.beat;
                     if(u.fan) fInc += lvl * u.fan;
                 });
-                if(bInc > 0 || fInc > 0) {
-                    gData.beats += bInc; gData.fans += fInc;
-                    if(gData.beats >= (gData.releases + 1) * 5000) gData.releases++;
-                    SecureAuth.saveUserGameData(gData);
-                    if (!document.getElementById('view-game').classList.contains('hidden')) {
-                        updateGameUI();
-                    }
+
+                // Auch ohne Upgrades läuft der Ticker flüssig weiter zur Aktualisierung
+                gData.beats += bInc; 
+                gData.fans += fInc;
+                if(gData.beats >= (gData.releases + 1) * 5000) gData.releases++;
+                
+                SecureAuth.saveUserGameData(gData);
+
+                if (!document.getElementById('view-game').classList.contains('hidden')) {
+                    updateGameUI();
                 }
             }, 1000);
 
-            // Account & PIN Management
-            document.getElementById('btn-changepin').onclick = async () => {
-                let pin = document.getElementById('new-pin').value.trim();
-                if(pin.length < 4) return alert('PIN muss min. 4 Ziffern haben!');
-                let user = SecureAuth.getSession();
-                let db = SecureAuth.getUsersDB();
-                db[user].pinHash = await SecureAuth.hashPin(pin);
-                SecureAuth.saveUsersDB(db);
-                alert('✅ PIN erfolgreich verschlüsselt aktualisiert!');
-                document.getElementById('new-pin').value = '';
-            };
-            document.getElementById('btn-resetgame').onclick = () => {
-                if(confirm('Spielstand wirklich auf 0 zurücksetzen?')) {
-                    SecureAuth.saveUserGameData({ beats: 0, fans: 0, releases: 0, upgrades: {} });
-                    updateGameUI(); alert('✅ Spielstand zurückgesetzt!');
-                }
-            };
-            document.getElementById('btn-deleteacc').onclick = () => {
-                if(confirm('Account unwiderruflich löschen?')) {
+            // Account actions & Backup
+            const btnExport = document.getElementById('btn-export');
+            if(btnExport) {
+                btnExport.onclick = () => {
                     let user = SecureAuth.getSession();
-                    let db = SecureAuth.getUsersDB();
-                    delete db[user]; SecureAuth.saveUsersDB(db);
-                    SecureAuth.clearSession(); switchView('home');
-                }
-            };
-
-            // Backup
-            document.getElementById('btn-export').onclick = () => {
-                let user = SecureAuth.getSession();
-                let gData = SecureAuth.getUserGameData();
-                let blob = new Blob([JSON.stringify({ user, gameData: gData }, null, 2)], { type: 'application/json' });
-                let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `secure_backup_${user}.json`; a.click();
-            };
-            document.getElementById('input-import').onchange = (e) => {
-                let file = e.target.files[0]; if(!file) return;
-                let r = new FileReader();
-                r.onload = (ev) => {
-                    try {
-                        let d = JSON.parse(ev.target.result);
-                        if(d.gameData) { SecureAuth.saveUserGameData(d.gameData); updateGameUI(); alert('✅ Backup erfolgreich geladen!'); }
-                    } catch(err) { alert('❌ Fehlerhafte Datei.'); }
+                    let gData = SecureAuth.getUserGameData();
+                    let blob = new Blob([JSON.stringify({ user, gameData: gData }, null, 2)], { type: 'application/json' });
+                    let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `secure_backup_${user}.json`; a.click();
                 };
-                r.readAsText(file);
-            };
+            }
+
+            const inputImport = document.getElementById('input-import');
+            if(inputImport) {
+                inputImport.onchange = (e) => {
+                    let file = e.target.files[0]; if(!file) return;
+                    let r = new FileReader();
+                    r.onload = (ev) => {
+                        try {
+                            let d = JSON.parse(ev.target.result);
+                            if(d.gameData) { SecureAuth.saveUserGameData(d.gameData); updateGameUI(); alert('✅ Backup erfolgreich geladen!'); }
+                        } catch(err) { alert('❌ Fehlerhafte Datei.'); }
+                    };
+                    r.readAsText(file);
+                };
+            }
 
             const initView = localStorage.getItem('nexus_current_view') || 'home';
             switchView(initView);
