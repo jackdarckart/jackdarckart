@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>jackdarckart | Webradio &amp; Hub</title>
+    <title>jackdarckart | Webradio Hub</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -47,7 +47,7 @@
 
     <!-- Header -->
     <header class="w-full border-b border-cyan-500/20 bg-[#010309]/90 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-8 py-4">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/20">
                     <div class="w-full h-full bg-[#010309] rounded-[10px] flex items-center justify-center text-sm">🎧</div>
@@ -68,7 +68,7 @@
     </header>
 
     <!-- Hauptinhalt -->
-    <main class="w-full max-w-4xl mx-auto p-4 sm:p-8 flex-grow space-y-6 my-auto">
+    <main class="w-full max-w-2xl mx-auto p-4 sm:p-8 flex-grow space-y-6 my-auto">
         
         <!-- Webplayer Hauptbox -->
         <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden space-y-6">
@@ -101,39 +101,22 @@
             </audio>
         </div>
 
-        <!-- Grid: Song-Historie & Ideen-Notizblock -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            <!-- Letzte Songs -->
-            <div class="glass-panel p-6 rounded-[2rem] space-y-4">
-                <div class="flex items-center justify-between border-b border-cyan-500/20 pb-3">
-                    <h2 class="text-xs font-mono text-cyan-300 uppercase font-bold tracking-wider">📜 Zuletzt gespielt</h2>
-                    <span class="text-[10px] font-mono text-slate-400">Live Historie</span>
-                </div>
-                <div id="last-songs-container" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
-                    <p class="text-xs text-slate-400 font-mono italic">Lade Historie...</p>
-                </div>
+        <!-- Song-Historie -->
+        <div class="glass-panel p-6 rounded-[2rem] space-y-4">
+            <div class="flex items-center justify-between border-b border-cyan-500/20 pb-3">
+                <h2 class="text-xs font-mono text-cyan-300 uppercase font-bold tracking-wider">📜 Zuletzt gespielt</h2>
+                <span class="text-[10px] font-mono text-slate-400">Live Historie</span>
             </div>
-
-            <!-- Songwriter & Vibe Notizblock -->
-            <div class="glass-panel p-6 rounded-[2rem] space-y-4 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between border-b border-cyan-500/20 pb-3 mb-3">
-                        <h2 class="text-xs font-mono text-pink-300 uppercase font-bold tracking-wider">📝 Vibe &amp; Song Ideen</h2>
-                        <span id="save-status" class="text-[10px] font-mono text-teal-400">Automatisch gespeichert</span>
-                    </div>
-                    <textarea id="idea-notepad" rows="5" class="w-full bg-[#030712] border border-cyan-500/20 rounded-xl p-3 text-xs text-slate-200 outline-none focus:border-cyan-500 transition resize-none font-mono" placeholder="Schreibe hier deine Song-Ideen, Lyrics oder Notizen..."></textarea>
-                </div>
-                <button type="button" id="btn-clear-notes" class="cyber-button w-full bg-slate-900 text-slate-400 hover:text-white border border-slate-800 py-2 rounded-xl text-[11px] font-mono cursor-pointer">Notizblock leeren</button>
+            <div id="last-songs-container" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
+                <p class="text-xs text-slate-400 font-mono italic">Lade Historie...</p>
             </div>
-
         </div>
 
     </main>
 
     <!-- Footer -->
     <footer class="w-full border-t border-cyan-500/20 py-4 px-4 bg-[#010309] text-center">
-        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center text-[11px] font-mono text-slate-400 gap-2">
+        <div class="max-w-2xl mx-auto flex flex-col sm:flex-row justify-between items-center text-[11px] font-mono text-slate-400 gap-2">
             <span>© 2026 jackdarckart • Alle Rechte vorbehalten</span>
             <a href="https://laut.fm/jackdarckart" target="_blank" class="text-cyan-400 hover:underline">Offizieller Sender auf laut.fm</a>
         </div>
@@ -150,9 +133,6 @@
             const trackTitle = document.getElementById('track-title');
             const listenerCount = document.getElementById('listener-count');
             const lastSongsContainer = document.getElementById('last-songs-container');
-            const notepad = document.getElementById('idea-notepad');
-            const saveStatus = document.getElementById('save-status');
-            const clearNotesBtn = document.getElementById('btn-clear-notes');
 
             // Play / Pause Steuerung
             playBtn.addEventListener('click', () => {
@@ -178,7 +158,6 @@
             // API Daten abrufen (Aktueller Song, Hörer, Historie)
             async function fetchStationData() {
                 try {
-                    // Aktueller Song
                     const resSong = await fetch('https://api.laut.fm/station/jackdarckart/current_song');
                     if (resSong.ok) {
                         const data = await resSong.json();
@@ -191,7 +170,6 @@
                 }
 
                 try {
-                    // Höreranzahl
                     const resListeners = await fetch('https://api.laut.fm/station/jackdarckart/listeners');
                     if (resListeners.ok) {
                         const listeners = await resListeners.json();
@@ -202,7 +180,6 @@
                 }
 
                 try {
-                    // Letzte Songs
                     const resLast = await fetch('https://api.laut.fm/station/jackdarckart/last_songs');
                     if (resLast.ok) {
                         const songs = await resLast.json();
@@ -225,24 +202,6 @@
 
             fetchStationData();
             setInterval(fetchStationData, 15000);
-
-            // Notizblock LocalStorage
-            const savedNote = localStorage.getItem('jack_notepad_ideas');
-            if (savedNote) notepad.value = savedNote;
-
-            notepad.addEventListener('input', () => {
-                localStorage.setItem('jack_notepad_ideas', notepad.value);
-                saveStatus.textContent = 'Gespeichert ✓';
-                setTimeout(() => { saveStatus.textContent = 'Automatisch gespeichert'; }, 2000);
-            });
-
-            clearNotesBtn.addEventListener('click', () => {
-                if (confirm('Möchtest du den Notizblock wirklich leeren?')) {
-                    notepad.value = '';
-                    localStorage.removeItem('jack_notepad_ideas');
-                    saveStatus.textContent = 'Geleert';
-                }
-            });
         });
     </script>
 </body>
