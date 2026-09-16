@@ -462,14 +462,22 @@
 
             function initShopOnce() {
                 let shop = document.getElementById('shop');
-                if (!shop || shop.children.length > 0) return;
+                if (!shop) return;
                 shop.innerHTML = '';
                 upgrades.forEach(u => {
                     shop.innerHTML += `
                         <div id="shop-card-${u.id}" class="bg-[#030712] p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono">
                             <div><b id="shop-title-${u.id}">${u.name} (Lvl 0)</b><br><span class="text-slate-400">${u.desc}</span></div>
-                            <button id="shop-btn-${u.id}" onclick="buyUpgrade('${u.id}')" class="cyber-button bg-cyan-600 text-white px-3 py-1.5 rounded-lg uppercase cursor-pointer">⚡ 0</button>
+                            <button id="shop-btn-${u.id}" data-id="${u.id}" class="shop-buy-btn cyber-button bg-cyan-600 text-white px-3 py-1.5 rounded-lg uppercase cursor-pointer">⚡ 0</button>
                         </div>`;
+                });
+
+                // Attach robust event listeners to shop container (CSP-compliant)
+                shop.querySelectorAll('.shop-buy-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        buyUpgrade(id);
+                    });
                 });
             }
 
@@ -494,7 +502,6 @@
                     upgrades.forEach(u => { if(u.fan) hash += (gData.upgrades[u.id] || 0) * u.fan; });
                     if(hEl) hEl.textContent = `${hash} H/s`;
 
-                    // Live update of existing shop elements without wiping DOM
                     upgrades.forEach(u => {
                         let lvl = gData.upgrades[u.id] || 0;
                         let cost = getCost(u, lvl);
@@ -508,7 +515,7 @@
                         if(btnEl) {
                             btnEl.textContent = `⚡ ${cost.toLocaleString()}`;
                             if(can) {
-                                btnEl.classList.remove('opacity-45');
+                                btnEl.classList.remove('opacity-45', 'pointer-events-none');
                             } else {
                                 btnEl.classList.add('opacity-45');
                             }
