@@ -55,7 +55,6 @@
                 <div class="absolute -top-32 -right-32 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute -bottom-32 -left-32 w-56 h-56 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                <!-- Telemetry Matrix -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-mono">
                     <div class="bg-[#030712]/90 p-2.5 rounded-xl border border-cyan-500/20">
                         <span class="text-[9px] text-slate-400 uppercase tracking-wider block">Status</span>
@@ -77,7 +76,6 @@
                     </div>
                 </div>
 
-                <!-- Vinyl & Track Info -->
                 <div class="flex flex-col sm:flex-row items-center gap-6 bg-[#030712]/60 p-6 rounded-3xl border border-slate-800/80">
                     <div id="vinyl-container" class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-cyan-600 via-slate-900 to-pink-600 p-1 shadow-2xl shrink-0 flex items-center justify-center">
                         <div class="w-full h-full rounded-full bg-[#020617] flex items-center justify-center border border-cyan-500/30 spinning-disc" id="spinning-vinyl">
@@ -98,7 +96,6 @@
                     </div>
                 </div>
 
-                <!-- Play Button & Volume -->
                 <div class="space-y-4 max-w-lg mx-auto">
                     <button type="button" id="play-btn" class="cyber-button w-full bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-600 text-white font-black py-4.5 rounded-2xl text-xs uppercase tracking-widest cursor-pointer shadow-xl transition-all transform active:scale-95 flex items-center justify-center gap-3">
                         <span id="play-icon" class="text-base">▶</span> <span id="play-text">Webradio Abspielen</span>
@@ -116,7 +113,6 @@
                 </div>
             </div>
 
-            <!-- History Feed -->
             <div class="glass-panel p-6 rounded-[2rem] space-y-4 shadow-xl">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h2 class="text-xs font-mono text-cyan-300 uppercase font-bold tracking-wider">📜 Zuletzt gespielte Tracks</h2>
@@ -183,7 +179,6 @@
                     </div>
                 </div>
 
-                <!-- In-Game Radio Player -->
                 <div class="bg-[#030712] p-4 sm:p-5 rounded-2xl border border-cyan-500/40 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-inner">
                     <div class="flex items-center space-x-3 w-full sm:w-auto text-center sm:text-left">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-pink-500 flex items-center justify-center font-bold text-lg shrink-0 mx-auto sm:mx-0">🎧</div>
@@ -199,7 +194,6 @@
                     </div>
                 </div>
 
-                <!-- Stats Grid -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono">
                     <div class="bg-[#030712] p-4 rounded-2xl border border-cyan-500/20"><span class="text-[10px] text-slate-400 uppercase">Beats</span><p id="g-beats" class="text-xl font-black text-white mt-1">0</p></div>
                     <div class="bg-[#030712] p-4 rounded-2xl border border-teal-500/20"><span class="text-[10px] text-slate-400 uppercase">Fans</span><p id="g-fans" class="text-xl font-black text-teal-300 mt-1">0</p></div>
@@ -250,6 +244,9 @@
             const views = ['home', 'auth', 'game', 'account'];
             function switchView(target) {
                 const user = SecureAuth.getSession();
+                if ((target === 'game' || target === 'account') && !user) {
+                    target = 'auth';
+                }
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
                     if (el) el.classList.add('hidden');
@@ -272,9 +269,18 @@
                 const user = SecureAuth.getSession();
                 nav.innerHTML = `
                     <button onclick="switchView('home')" class="cyber-button bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎧 Webradio</button>
-                    <button onclick="switchView('game')" class="cyber-button bg-slate-900 text-slate-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎮 Empire Game</button>
-                    <button onclick="switchView('account')" class="cyber-button bg-slate-900 text-amber-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🛠️ Account</button>
                 `;
+                if (user) {
+                    nav.innerHTML += `
+                        <button onclick="switchView('game')" class="cyber-button bg-slate-900 text-slate-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎮 Empire Game</button>
+                        <button onclick="switchView('account')" class="cyber-button bg-slate-900 text-amber-300 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🛠️ Account</button>
+                        <button onclick="logoutUser()" class="cyber-button bg-red-600/20 text-red-300 border border-red-500/30 px-3.5 py-2 rounded-xl text-xs font-mono cursor-pointer">🚪 Abmelden</button>
+                    `;
+                } else {
+                    nav.innerHTML += `
+                        <button onclick="switchView('auth')" class="cyber-button bg-cyan-600 text-white border border-cyan-400 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🔑 Login / Registrieren</button>
+                    `;
+                }
             }
 
             window.switchView = switchView;
@@ -516,6 +522,7 @@
             // Game Loop (Every second)
             setInterval(() => {
                 try {
+                    if (!SecureAuth.getSession()) return;
                     let gData = SecureAuth.getUserGameData();
                     if (!gData) return;
 
