@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Multi-Layer Beat-Sync Elite v22.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Harmonic Masterpiece v23.0</span>
                 </div>
             </div>
 
@@ -103,9 +103,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Präzisions-Takt Visualisierung &amp; Botanischer Garten</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Majestätischer Botanischer Garten &amp; Ruhige Audio-Harmonie</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem fotorealistischen Park-Diarama mit exakter, visueller Beat-Resonanz.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem extrem detailreichen, seidenweichen Park-Diarama.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -235,7 +235,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_MULTILAYER_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_MAJESTIC_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -401,7 +401,7 @@
                 { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
                 { id: 'lyrics', name: 'Lyrics', icon: '📝', desc: 'Songwriting & Texteditor', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
-                { id: 'garden', name: 'Garden', icon: '🏛️', desc: 'Multi-Layer Beat-Sync Diarama', protected: true },
+                { id: 'garden', name: 'Garden', icon: '🏛️', desc: 'Majestätisches Park-Diarama', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
                 { id: 'admin', name: 'Admin', icon: '🛠️', desc: 'Sicherheits-Telemetrie & Account', protected: true }
             ];
@@ -668,34 +668,37 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <!-- MULTI-LAYER BEAT-SYNC PARK-DIARAMA -->
+                                <!-- MAJESTÄTISCHES PARK-DIARAMA MIT GESCHWINDIGKEITS-REGLER -->
                                 <div class="p-6 sm:p-10 rounded-[3rem] border-2 border-emerald-500/80 relative overflow-hidden bg-gradient-to-b from-[#031c0e] via-[#010c06] to-[#000502] shadow-2xl">
                                     
-                                    <!-- Kopfbereich -->
-                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-emerald-500/40 pb-5">
+                                    <!-- Kopfbereich & Live Controller -->
+                                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 border-b border-emerald-500/40 pb-5">
                                         <div class="flex items-center gap-4">
                                             <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-400 p-0.5 shadow-xl shadow-emerald-500/40">
                                                 <div class="w-full h-full bg-[#010c06] rounded-[14px] flex items-center justify-center text-2xl">🏛️</div>
                                             </div>
                                             <div>
                                                 <h3 class="text-lg sm:text-xl font-black text-white font-mono tracking-wide flex items-center gap-2">
-                                                    Botanischer Garten • Multi-Layer Takt-Analyse
-                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/90 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/50">🎵 100% Takt- &amp; Wellen-Sync</span>
+                                                    Botanischer Garten • Majestätische Harmonie
+                                                    <span class="text-[10px] font-normal font-mono bg-emerald-950/90 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/50">🌿 Ultra-Smooth &amp; Detailliert</span>
                                                 </h3>
-                                                <p class="text-xs text-emerald-200/80 font-mono mt-0.5">Oszilloskop-Wellen, Bass-Schockwellen und detailliertes Frequenzspektrum im Tropenhaus.</p>
+                                                <p class="text-xs text-emerald-200/80 font-mono mt-0.5">Ruhige, seidenweiche Takt-Resonanz mit glühenden Parterres und sanftem Lili-Spaziergang.</p>
                                             </div>
                                         </div>
-                                        <div class="flex items-center gap-3 bg-[#010c06]/90 px-4 py-2 rounded-xl border border-emerald-500/40 shadow-inner">
-                                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                                            <a href="https://laut.fm/jackdarckart" target="_blank" class="text-xs font-mono text-emerald-400 hover:underline font-bold">laut.fm/jackdarckart ↗</a>
+
+                                        <!-- Animations-Geschwindigkeitsregler -->
+                                        <div class="flex items-center gap-3 bg-[#010c06]/90 px-4 py-2.5 rounded-2xl border border-emerald-500/40 shadow-inner">
+                                            <span class="text-xs font-mono text-emerald-300">⚡ Tempo:</span>
+                                            <input type="range" id="garden-speed-range" min="0.2" max="2.0" step="0.1" value="0.8" class="w-24 accent-emerald-500 cursor-pointer">
+                                            <span id="garden-speed-label" class="text-xs font-mono text-cyan-300 font-bold w-10 text-right">0.8x</span>
                                         </div>
                                     </div>
 
                                     <!-- HOCHDETAILLIERTES PARK-CANVAS -->
-                                    <div class="relative w-full h-[450px] rounded-3xl border-2 border-emerald-500/60 overflow-hidden shadow-2xl bg-[#02140a]">
+                                    <div class="relative w-full h-[460px] rounded-3xl border-2 border-emerald-500/60 overflow-hidden shadow-2xl bg-[#02140a]">
                                         <canvas id="garden-map-canvas" class="absolute inset-0 w-full h-full"></canvas>
                                         <div class="absolute top-4 left-4 bg-[#010c06]/90 px-3.5 py-1.5 rounded-xl border border-emerald-500/40 text-[10px] font-mono text-emerald-300 shadow">
-                                            🌿 Live Takt-Analyse &amp; Oszilloskop aktiv
+                                            🌿 Live Diarama • Glühende Blumenbeete &amp; Partikel aktiv
                                         </div>
                                     </div>
 
@@ -1018,14 +1021,16 @@
                 }
             });
 
-            // MULTI-LAYER BEAT-SYNC ENGINE & HIGH-DETAIL PARK-DIARAMA
+            // MAJESTÄTISCHES, RUHIGES & ERWEITERTES PARK-DIARAMA
             function initGardenCanvasMap() {
                 const canvas = document.getElementById('garden-map-canvas');
                 const audio = document.getElementById('garden-audio');
+                const speedRange = document.getElementById('garden-speed-range');
+                const speedLabel = document.getElementById('garden-speed-label');
                 if (!canvas) return;
 
                 canvas.width = canvas.parentElement.clientWidth || 800;
-                canvas.height = canvas.parentElement.clientHeight || 450;
+                canvas.height = canvas.parentElement.clientHeight || 460;
                 const ctx = canvas.getContext('2d');
 
                 try {
@@ -1033,13 +1038,13 @@
                         const AudioContext = window.AudioContext || window.webkitAudioContext;
                         audioCtx = new AudioContext();
                         analyser = audioCtx.createAnalyser();
-                        analyser.fftSize = 128; // Höhere Auflösung für detailliertes Spektrum
+                        analyser.fftSize = 128;
                         sourceNode = audioCtx.createMediaElementSource(audio);
                         sourceNode.connect(analyser);
                         analyser.connect(audioCtx.destination);
                     }
                 } catch (e) {
-                    console.log("Audio Stream im Direktmodus aktiv.");
+                    console.log("Audio Direkt-Modus aktiv.");
                 }
 
                 const bufferLength = analyser ? analyser.frequencyBinCount : 64;
@@ -1047,12 +1052,28 @@
                 
                 let smoothBass = 0;
                 let smoothTreble = 0;
+                let particles = [];
                 let shockwaves = [];
                 let liliAngle = 0;
-                let lastBeatTime = 0;
+                let lastBeat = 0;
+
+                // Glühwürmchen / Partikel generieren
+                for (let p = 0; p < 25; p++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 2 + 1,
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        speedY: (Math.random() - 0.5) * 0.3,
+                        alpha: Math.random() * 0.7 + 0.2
+                    });
+                }
 
                 function renderLoop() {
                     visualizerAnimationId = requestAnimationFrame(renderLoop);
+
+                    let animSpeed = speedRange ? parseFloat(speedRange.value) : 0.8;
+                    if (speedLabel) speedLabel.innerText = animSpeed.toFixed(1) + 'x';
 
                     let isAudioValid = false;
                     if (analyser) {
@@ -1062,117 +1083,125 @@
                         }
                     }
 
-                    const timeSec = Date.now() / 1000;
+                    const timeSec = Date.now() / 1000 * animSpeed;
                     let bassVal = 0;
                     let trebleVal = 0;
 
                     if (isAudioValid) {
-                        bassVal = (dataArray[0] + dataArray[1] + dataArray[2] + dataArray[3]) / 4 / 255;
-                        trebleVal = (dataArray[bufferLength - 4] + dataArray[bufferLength - 3]) / 2 / 255;
+                        bassVal = (dataArray[0] + dataArray[1] + dataArray[2]) / 3 / 255;
+                        trebleVal = (dataArray[bufferLength - 2] + dataArray[bufferLength - 3]) / 2 / 255;
                     } else if (audio && !audio.paused) {
-                        // Präziser Synth-Beat (ca. 120 BPM) für absolute Resonanz bei stummen Streams
-                        bassVal = Math.max(0, Math.sin(timeSec * Math.PI * 2.0));
-                        trebleVal = Math.abs(Math.cos(timeSec * Math.PI * 4.0));
+                        bassVal = Math.max(0, Math.sin(timeSec * Math.PI * 1.8));
+                        trebleVal = Math.abs(Math.cos(timeSec * Math.PI * 3.6));
                     } else {
-                        bassVal = (Math.sin(timeSec * 1.5) + 1) * 0.1;
-                        trebleVal = 0.05;
+                        bassVal = (Math.sin(timeSec * 1.2) + 1) * 0.08;
+                        trebleVal = 0.04;
                     }
 
-                    // Glättung für geschmeidige, natürliche Reaktionen
-                    smoothBass += (bassVal - smoothBass) * 0.25;
-                    smoothTreble += (trebleVal - smoothTreble) * 0.2;
+                    // Sehr sanfte Interpolation für majestätische Laufruhe
+                    smoothBass += (bassVal - smoothBass) * 0.08;
+                    smoothTreble += (trebleVal - smoothTreble) * 0.1;
 
-                    // Bass-Schockwellen Trigger bei starkem Beat
-                    if (smoothBass > 0.65 && (Date.now() - lastBeatTime > 350)) {
-                        shockwaves.push({ x: canvas.width * 0.5, y: canvas.height * 0.5, radius: 15, alpha: 0.85 });
-                        lastBeatTime = Date.now();
+                    if (smoothBass > 0.6 && (Date.now() - lastBeat > 500)) {
+                        shockwaves.push({ x: canvas.width * 0.5, y: canvas.height * 0.5, radius: 10, alpha: 0.75 });
+                        lastBeat = Date.now();
                     }
 
-                    // 1. RASEN & WEGE HINTERGRUND
-                    ctx.fillStyle = '#031208';
+                    // 1. TIEFER GRUND HINTERGRUND
+                    ctx.fillStyle = '#021007';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    // Rasen-Parterres
-                    ctx.fillStyle = '#072412';
+                    // Rasen-Parterres mit edler Textur
+                    ctx.fillStyle = '#051f0f';
                     ctx.beginPath();
-                    ctx.roundRect(canvas.width * 0.08, canvas.height * 0.28, canvas.width * 0.84, canvas.height * 0.65, 24);
+                    ctx.roundRect(canvas.width * 0.06, canvas.height * 0.26, canvas.width * 0.88, canvas.height * 0.68, 28);
                     ctx.fill();
 
-                    // 2. OSZILLOSKOP-WENDEBAHN AUF DEN WEGEN (VISUELLE TAKT-LINIE)
+                    // 2. GLÜHENDE BLUMENBEETE & BEET-AKZENTE
                     ctx.save();
-                    ctx.strokeStyle = `rgba(34, 211, 238, ${0.4 + smoothTreble * 0.5})`;
-                    ctx.lineWidth = 2.5;
+                    ctx.strokeStyle = `rgba(52, 211, 153, ${0.3 + smoothTreble * 0.4})`;
+                    ctx.lineWidth = 2;
                     ctx.beginPath();
-                    let pathY = canvas.height * 0.72;
-                    for (let x = canvas.width * 0.15; x < canvas.width * 0.85; x += 4) {
-                        let waveOffset = Math.sin(x * 0.03 + timeSec * 6) * (smoothBass * 18);
-                        if (x === canvas.width * 0.15) ctx.moveTo(x, pathY + waveOffset);
-                        else ctx.lineTo(x, pathY + waveOffset);
-                    }
+                    ctx.roundRect(canvas.width * 0.42, canvas.height * 0.55, canvas.width * 0.16, canvas.height * 0.32, 12);
                     ctx.stroke();
                     ctx.restore();
 
-                    // 3. EXPANDIERENDE BASS-SCHOCKWELLEN (VOM NIERENTEICH)
+                    // 3. SCHWEBENDE LICHTPARTIKEL / GLÜHWÜRMCHEN
+                    particles.forEach(pt => {
+                        pt.x += pt.speedX * animSpeed;
+                        pt.y += pt.speedY * animSpeed;
+                        if (pt.x < 0) pt.x = canvas.width;
+                        if (pt.x > canvas.width) pt.x = 0;
+                        if (pt.y < 0) pt.y = canvas.height;
+                        if (pt.y > canvas.height) pt.y = 0;
+
+                        ctx.fillStyle = `rgba(167, 243, 208, ${pt.alpha})`;
+                        ctx.beginPath();
+                        ctx.arc(pt.x, pt.y, pt.radius + (smoothBass * 1.5), 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    // 4. BASS-SCHOCKWELLEN
                     for (let i = shockwaves.length - 1; i >= 0; i--) {
                         let sw = shockwaves[i];
-                        sw.radius += 2.2;
-                        sw.alpha -= 0.02;
+                        sw.radius += 1.8 * animSpeed;
+                        sw.alpha -= 0.015;
                         if (sw.alpha <= 0) {
                             shockwaves.splice(i, 1);
                             continue;
                         }
                         ctx.save();
-                        ctx.strokeStyle = `rgba(52, 211, 153, ${sw.alpha})`;
-                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = `rgba(34, 211, 238, ${sw.alpha})`;
+                        ctx.lineWidth = 1.5;
                         ctx.beginPath();
                         ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
                         ctx.stroke();
                         ctx.restore();
                     }
 
-                    // 4. DER NIEREN- / FONTÄNENTEICH
+                    // 5. NIEREN- / FONTÄNENTEICH
                     ctx.save();
                     ctx.translate(canvas.width * 0.5, canvas.height * 0.5);
-                    ctx.fillStyle = '#064e63';
+                    ctx.fillStyle = '#05546b';
                     ctx.beginPath();
-                    ctx.ellipse(0, 0, 52 + (smoothBass * 7), 26 + (smoothBass * 4), 0, 0, Math.PI * 2);
+                    ctx.ellipse(0, 0, 48 + (smoothBass * 5), 24 + (smoothBass * 2.5), 0, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = '#22d3ee';
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
-
-                    // Sprudelnde Fontäne exakt im Takt
-                    ctx.fillStyle = '#ffffff';
-                    for(let f = 0; f < 5; f++) {
-                        let fHeight = Math.sin(timeSec * 8 + f) * (8 + smoothBass * 18);
-                        ctx.fillRect(-2 + f * 3, -14 - fHeight, 3, 7);
-                    }
-                    ctx.restore();
-
-                    // 5. DAS GROSSE TROPENHAUS (MIT INTEGRIERTEM SPEKTRUM)
-                    let tropenWidth = canvas.width * 0.44;
-                    let tropenHeight = 90 + (smoothBass * 10);
-                    let tropenX = (canvas.width - tropenWidth) / 2;
-                    let tropenY = 20;
-
-                    ctx.save();
-                    let grad = ctx.createLinearGradient(tropenX, tropenY, tropenX, tropenY + tropenHeight);
-                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.4)');
-                    grad.addColorStop(0.5, `rgba(16, 185, 129, ${0.5 + smoothBass * 0.45})`);
-                    grad.addColorStop(1, 'rgba(6, 182, 212, 0.85)');
-                    
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.roundRect(tropenX, tropenY, tropenWidth, tropenHeight, [40, 40, 10, 10]);
-                    ctx.fill();
-                    ctx.strokeStyle = '#34d399';
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // Detailreiche Glasrippen
+                    // Fontäne mit sanftem Bogen
+                    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+                    for(let f = 0; f < 5; f++) {
+                        let fH = Math.sin(timeSec * 4 + f) * (6 + smoothBass * 12);
+                        ctx.fillRect(-1.5 + f * 2.5, -12 - fH, 2, 5);
+                    }
+                    ctx.restore();
+
+                    // 6. DAS GROSSE TROPENHAUS (MAJESTÄTISCH ATMEND)
+                    let tropenWidth = canvas.width * 0.42;
+                    let tropenHeight = 85 + (smoothBass * 8);
+                    let tropenX = (canvas.width - tropenWidth) / 2;
+                    let tropenY = 18;
+
+                    ctx.save();
+                    let grad = ctx.createLinearGradient(tropenX, tropenY, tropenX, tropenY + tropenHeight);
+                    grad.addColorStop(0, 'rgba(52, 211, 153, 0.35)');
+                    grad.addColorStop(0.5, `rgba(16, 185, 129, ${0.45 + smoothBass * 0.35})`);
+                    grad.addColorStop(1, 'rgba(6, 182, 212, 0.75)');
+                    
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(tropenX, tropenY, tropenWidth, tropenHeight, [35, 35, 8, 8]);
+                    ctx.fill();
+                    ctx.strokeStyle = '#34d399';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Glasrippen
                     ctx.strokeStyle = '#a7f3d0';
-                    ctx.lineWidth = 1.2;
-                    for (let xPos = tropenX + 18; xPos < tropenX + tropenWidth - 10; xPos += 22) {
+                    ctx.lineWidth = 1;
+                    for (let xPos = tropenX + 18; xPos < tropenX + tropenWidth - 10; xPos += 24) {
                         ctx.beginPath();
                         ctx.moveTo(xPos, tropenY + 8);
                         ctx.lineTo(xPos, tropenY + tropenHeight);
@@ -1180,49 +1209,40 @@
                     }
                     ctx.restore();
 
-                    // 6. FREQUENZ-SPEKTRUM IN DER GLASKUPPEL
+                    // 7. SPEKTRUM IN DER KUPPEL
                     let barW = (tropenWidth - 36) / bufferLength;
                     for (let i = 0; i < bufferLength; i++) {
-                        let barH = (dataArray[i] / 255) * 42;
-                        ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + (dataArray[i]/510)})`;
+                        let barH = (dataArray[i] / 255) * 35;
+                        ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + (dataArray[i]/510)})`;
                         ctx.fillRect(tropenX + 18 + i * barW, tropenY + tropenHeight - barH - 6, barW - 2, barH);
                     }
 
-                    // 7. LILI (JACK RUSSELL) - HARMONISCHER RHYTHMUS & MUSIKNOTEN
-                    liliAngle += 0.018;
-                    let liliX = canvas.width * 0.5 + Math.cos(liliAngle) * 105;
-                    let liliY = canvas.height * 0.68 + Math.sin(liliAngle * 2) * 18;
+                    // 8. LILI (JACK RUSSELL) - RUHIGER, ENTSPANNTER SPAZIERGANG
+                    liliAngle += 0.008 * animSpeed;
+                    let liliX = canvas.width * 0.5 + Math.cos(liliAngle) * 95;
+                    let liliY = canvas.height * 0.7 + Math.sin(liliAngle * 2) * 14;
 
                     ctx.save();
                     ctx.translate(liliX, liliY);
                     
                     // Schatten
-                    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                    ctx.fillStyle = 'rgba(0,0,0,0.4)';
                     ctx.beginPath();
-                    ctx.ellipse(0, 12, 11, 5, 0, 0, Math.PI * 2);
+                    ctx.ellipse(0, 10, 10, 4, 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Lili Sprite mit Beat-Skalierung
-                    let liliScale = 1 + (smoothBass * 0.15);
-                    ctx.scale(liliScale, liliScale);
-                    ctx.font = '24px sans-serif';
+                    // Lili Sprite
+                    ctx.font = '22px sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // Musiknoten bei starkem Bass
-                    if (smoothBass > 0.5) {
-                        ctx.fillStyle = '#34d399';
-                        ctx.font = '14px monospace';
-                        ctx.fillText('♪', liliX + 15, liliY - 25 - (smoothBass * 20));
-                    }
-
                     // Label
                     ctx.fillStyle = '#34d399';
                     ctx.font = '10px monospace';
                     ctx.textAlign = 'center';
-                    ctx.fillText('🐾 Lili (Beat-Sync)', liliX, liliY - 20);
+                    ctx.fillText('🐾 Lili', liliX, liliY - 18);
                 }
                 renderLoop();
             }
@@ -1242,7 +1262,7 @@
                                 }
                             }).catch(err => {
                                 console.error("Audio Playback Error:", err);
-                                alert("⚠️ Stream konnte nicht gestartet werden. Bitte Verbindung prüfen.");
+                                alert("⚠️ Stream konnte nicht gestartet werden.");
                             });
                         } else {
                             audio.pause();
