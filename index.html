@@ -2,8 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | CloudBeats Quantum Eco-Nexus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>jackdarckart | CloudBeats Quantum Eco-Nexus v91.0</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS SDK -->
@@ -17,8 +17,16 @@
         :root {
             --beat-val: 0;
         }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
         .glass-panel {
-            background: linear-gradient(135deg, rgba(4, 12, 22, 0.98) 0%, rgba(1, 4, 10, 0.99) 100%);
+            background: linear-gradient(135deg, rgba(3, 10, 20, 0.98) 0%, rgba(1, 3, 8, 0.99) 100%);
             backdrop-filter: blur(40px);
             -webkit-backdrop-filter: blur(40px);
             border: 1px solid rgba(52, 211, 153, calc(0.35 + (var(--beat-val) * 0.6)));
@@ -59,42 +67,44 @@
         .wave-bar:nth-child(4) { animation-delay: 0.6s; }
         .wave-bar:nth-child(5) { animation-delay: 0.8s; }
 
-        /* Vollflächiger Ambient-Hintergrund, perfekt synchronisiert */
         #page-ambient-bg {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none;
             z-index: 0;
-            background: radial-gradient(circle at 50% 35%, rgba(8, 55, 30, calc(0.2 + (var(--beat-val) * 0.38))) 0%, rgba(1, 3, 8, 0.98) 85%);
+            background: radial-gradient(circle at 50% 35%, rgba(6, 45, 25, calc(0.2 + (var(--beat-val) * 0.38))) 0%, rgba(1, 2, 6, 0.98) 85%);
             transform: scale(calc(1 + (var(--beat-val) * 0.055)));
             transition: transform 0.08s ease, background 0.08s ease;
         }
 
         ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(1, 3, 8, 0.5); }
+        ::-webkit-scrollbar-track { background: rgba(1, 2, 6, 0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.4); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(52, 211, 153, 0.7); }
     </style>
 </head>
-<body class="bg-[#010307] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white relative overflow-x-hidden">
+<body class="bg-[#010206] text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-emerald-500 selection:text-white relative">
 
     <!-- Musik-synchroner Ambient-Hintergrund -->
     <div id="page-ambient-bg"></div>
 
-    <!-- Header -->
-    <header class="w-full border-b border-emerald-500/20 backdrop-blur-2xl sticky top-0 z-50 bg-[#010307]/90 px-4 py-3 shadow-2xl">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/25 neon-pulse">
-                    <div class="w-full h-full bg-[#010307] rounded-[10px] flex items-center justify-center text-base">🌿</div>
+    <!-- Header (Voll anpassbar & ein/ausblendbar) -->
+    <header id="main-header" class="w-full border-b border-emerald-500/20 backdrop-blur-2xl sticky top-0 z-50 bg-[#010206]/95 px-3 sm:px-6 py-3 shadow-2xl transition-all duration-300">
+        <div class="w-full flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center justify-between w-full sm:w-auto">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/25 neon-pulse">
+                        <div class="w-full h-full bg-[#010206] rounded-[10px] flex items-center justify-center text-base">🌿</div>
+                    </div>
+                    <div>
+                        <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
+                        <span class="text-[9px] font-mono text-slate-400 tracking-wider">Quantum Eco-Nexus v91.0</span>
+                    </div>
                 </div>
-                <div>
-                    <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Quantum Eco-Nexus v80.0</span>
-                </div>
+                <button type="button" id="btn-toggle-nav-bar" class="cyber-button sm:hidden bg-slate-900 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-[10px] font-mono cursor-pointer">👁️ Menü</button>
             </div>
 
-            <div class="hidden md:flex items-center gap-1.5 bg-[#010307] px-3.5 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
+            <div class="hidden md:flex items-center gap-1.5 bg-[#010206] px-4 py-1.5 rounded-xl border border-emerald-500/20 shadow-inner">
                 <span class="text-[9px] font-mono text-emerald-400 mr-1 tracking-widest">LIVE STREAM</span>
                 <div class="w-1 bg-emerald-500 rounded-full wave-bar"></div>
                 <div class="w-1 bg-teal-500 rounded-full wave-bar"></div>
@@ -103,37 +113,40 @@
                 <div class="w-1 bg-green-500 rounded-full wave-bar"></div>
             </div>
             
-            <nav id="navbar-container" class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-start sm:justify-end z-10">
-                <!-- Dynamisch -->
-            </nav>
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                <nav id="navbar-container" class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 z-10 w-full sm:w-auto">
+                    <!-- Dynamisch -->
+                </nav>
+                <button type="button" id="btn-toggle-nav-desktop" class="cyber-button hidden sm:flex bg-slate-900 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-xl text-xs font-mono cursor-pointer items-center gap-1 shrink-0" title="Leiste ein-/ausblenden">👁️</button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-6xl mx-auto p-4 sm:p-6 w-full my-auto text-center relative z-10">
-        <div id="views-container">
+    <!-- Main Content (Füllt den Bildschirm voll aus) -->
+    <main class="w-full flex-grow p-2 sm:p-6 my-auto text-center relative z-10">
+        <div id="views-container" class="w-full h-full">
             
             <!-- 1. STARTSEITE -->
-            <section id="view-home" class="view-section space-y-6 text-left">
-                <div class="glass-panel p-8 sm:p-12 rounded-[2.5rem] text-center relative overflow-hidden">
-                    <div class="absolute -top-12 -right-12 w-72 h-72 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="absolute -bottom-12 -left-12 w-72 h-72 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            <section id="view-home" class="view-section space-y-6 text-left w-full max-w-7xl mx-auto">
+                <div class="glass-panel p-6 sm:p-12 rounded-[2.5rem] text-center relative overflow-hidden w-full">
+                    <div class="absolute -top-16 -right-16 w-80 h-80 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-16 -left-16 w-80 h-80 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none"></div>
                     
-                    <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
-                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Quantum Eco-Meadow &amp; Vollständiger Beat-Sync</p>
-                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Erlebe die vollständig erweiterte, ressourcenschonende Web-Architektur mit lebendiger Flora, schwingendem Gras und absolutem Musik-Einklang.
+                    <span class="inline-block text-5xl p-5 bg-gradient-to-tr from-emerald-600/20 to-teal-600/20 rounded-3xl mb-5 border border-emerald-500/40 shadow-inner neon-pulse">🌿</span>
+                    <h1 class="text-3xl sm:text-6xl font-black tracking-tight mb-4 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">Quantum Eco-Nexus Prime</h1>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Ultimatives Ressourcenschonendes Ökosystem &amp; Empire Studio</p>
+                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-3xl mx-auto font-light mb-8">
+                        Vollständig flüssiges, bildschirmfüllendes Layout. Erlebe die perfekte, synchrone Verschmelzung aus interaktivem Garten, Lili (Jack Russell) und einer extrem ausgebauten Studio-Wirtschaftsmatrix.
                     </p>
-                    <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
+                    <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
                         <!-- Dynamisch -->
                     </div>
                 </div>
             </section>
 
             <!-- 2. AUTH & LOGIN PORTAL -->
-            <section id="view-auth" class="view-section hidden space-y-4 text-left max-w-md mx-auto">
-                <div class="glass-panel p-6 sm:p-8 rounded-[2rem] space-y-4">
+            <section id="view-auth" class="view-section hidden space-y-4 text-left w-full max-w-md mx-auto">
+                <div class="glass-panel p-6 sm:p-8 rounded-[2rem] space-y-4 w-full">
                     <div class="text-center">
                         <span class="text-3xl mb-1 block">🔐</span>
                         <h2 id="auth-main-title" class="text-lg font-bold text-emerald-300 font-mono">Sicheres Login-Portal</h2>
@@ -143,7 +156,7 @@
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
                     <div id="subform-logged" class="space-y-3 hidden">
-                        <div class="bg-[#010307] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
+                        <div class="bg-[#010206] p-4 rounded-2xl border border-emerald-500/30 text-center space-y-1">
                             <p class="text-[10px] font-mono text-slate-400 uppercase">Verifizierter Account</p>
                             <p id="auth-logged-email" class="text-xs font-bold text-emerald-300 font-mono"></p>
                         </div>
@@ -154,11 +167,11 @@
                     <div id="subform-login" class="space-y-3">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="login-email" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="login-email" class="w-full bg-[#010206] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN:</label>
-                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
+                            <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#010206] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="••••">
                         </div>
                         <button type="button" id="btn-init-login" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✉️ E-Mail Code anfordern</button>
                         
@@ -174,7 +187,7 @@
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE:</label>
-                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#010307] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
+                            <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#010206] border border-emerald-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
                         </div>
                         <button type="button" id="btn-execute-verify" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✅ Code bestätigen &amp; Einloggen</button>
                         
@@ -186,11 +199,11 @@
                     <div id="subform-register" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
-                            <input type="email" id="reg-email" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reg-email" class="w-full bg-[#010206] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN:</label>
-                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
+                            <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#010206] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Sichere PIN">
                         </div>
                         <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren</button>
                         
@@ -202,11 +215,11 @@
                     <div id="subform-reset" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
-                            <input type="email" id="reset-email" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
+                            <input type="email" id="reset-email" class="w-full bg-[#010206] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
-                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#010307] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
+                            <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#010206] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-emerald-500 transition" placeholder="Neue PIN">
                         </div>
                         <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Neu Setzen</button>
                         
@@ -221,8 +234,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full border-t border-emerald-500/20 py-3 px-4 bg-[#010307] text-center relative z-10">
-        <div class="max-w-6xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
+    <footer class="w-full border-t border-emerald-500/20 py-3 px-4 bg-[#010206] text-center relative z-10">
+        <div class="w-full max-w-7xl mx-auto flex justify-between items-center text-[11px] font-mono text-slate-400">
             <span id="session-status-badge" class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Nicht eingeloggt</span>
             <span class="text-emerald-400/90 font-bold tracking-wider">jackdarckart • Prime Elite Nexus</span>
         </div>
@@ -236,6 +249,30 @@
             let analyser = null;
             let sourceNode = null;
 
+            const headerEl = document.getElementById('main-header');
+            const toggleNavBtnMobile = document.getElementById('btn-toggle-nav-bar');
+            const toggleNavBtnDesktop = document.getElementById('btn-toggle-nav-desktop');
+            let isNavHidden = false;
+
+            function toggleNavbar() {
+                isNavHidden = !isNavHidden;
+                const navContainerEl = document.getElementById('navbar-container');
+                if (isNavHidden) {
+                    if(navContainerEl) navContainerEl.style.display = 'none';
+                    if(toggleNavBtnMobile) toggleNavBtnMobile.innerText = '👁️ Einblenden';
+                    if(toggleNavBtnDesktop) toggleNavBtnDesktop.innerText = '👁️ Einblenden';
+                    headerEl.style.opacity = '0.3';
+                } else {
+                    if(navContainerEl) navContainerEl.style.display = 'flex';
+                    if(toggleNavBtnMobile) toggleNavBtnMobile.innerText = '👁️ Menü';
+                    if(toggleNavBtnDesktop) toggleNavBtnDesktop.innerText = '👁️';
+                    headerEl.style.opacity = '1';
+                }
+            }
+
+            if(toggleNavBtnMobile) toggleNavBtnMobile.addEventListener('click', toggleNavbar);
+            if(toggleNavBtnDesktop) toggleNavBtnDesktop.addEventListener('click', toggleNavbar);
+
             const SecureAuth = {
                 currentUser: localStorage.getItem('secure_nexus_session') || null,
                 pendingEmail: null,
@@ -244,14 +281,14 @@
                 
                 getDB() {
                     try {
-                        return JSON.parse(localStorage.getItem('secure_nexus_users_db')) || {};
+                        return JSON.parse(localStorage.getItem('secure_nexus_users_db_v91')) || {};
                     } catch(e) { return {}; }
                 },
                 saveDB(db) {
-                    localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
+                    localStorage.setItem('secure_nexus_users_db_v91', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_QUANTUM_ECO_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_FLUID_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -275,12 +312,8 @@
                         return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
                     }
                     if (!isRegistration) {
-                        if (!db[email]) {
-                            return { success: false, msg: '❌ E-Mail unbekannt! Bitte zuerst registrieren.' };
-                        }
-                        if (db[email].pin !== pin) {
-                            return { success: false, msg: '❌ Falsche PIN eingegeben!' };
-                        }
+                        if (!db[email]) return { success: false, msg: '❌ E-Mail unbekannt!' };
+                        if (db[email].pin !== pin) return { success: false, msg: '❌ Falsche PIN!' };
                     }
 
                     const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -291,31 +324,22 @@
                         this.activeVerificationCode = code;
                         this.pendingEmail = email;
                         this.pendingPin = pin;
-                        return { success: true, needsCode: true, msg: `⚠️ (Test-Modus) Ihr Code lautet: ${code}` };
+                        return { success: true, needsCode: true, msg: `⚠️ (Test-Modus) Code: ${code}` };
                     }
 
                     try {
-                        await emailjs.send(serviceId, templateId, {
-                            to_email: email,
-                            verification_code: code
-                        });
-
+                        await emailjs.send(serviceId, templateId, { to_email: email, verification_code: code });
                         this.activeVerificationCode = code;
                         this.pendingEmail = email;
                         this.pendingPin = pin;
-                        return { success: true, needsCode: true, msg: `✉️ Bestätigungscode an ${email} gesendet!` };
+                        return { success: true, needsCode: true, msg: `✉️ Code an ${email} gesendet!` };
                     } catch (error) {
-                        console.error("EmailJS Fehler:", error);
-                        return { success: false, msg: '❌ E-Mail Versand fehlgeschlagen.' };
+                        return { success: false, msg: '❌ Versand fehlgeschlagen.' };
                     }
                 },
                 finalizeVerification(enteredCode) {
-                    if (!enteredCode || enteredCode.trim() === '') {
-                        return { success: false, msg: '❌ Verifizierungscode Eingabe fehlt!' };
-                    }
-                    if (enteredCode.trim() !== this.activeVerificationCode) {
-                        return { success: false, msg: '❌ Falscher Verifizierungscode!' };
-                    }
+                    if (!enteredCode || enteredCode.trim() === '') return { success: false, msg: '❌ Code fehlt!' };
+                    if (enteredCode.trim() !== this.activeVerificationCode) return { success: false, msg: '❌ Falscher Code!' };
 
                     let db = this.getDB();
                     let email = this.pendingEmail;
@@ -323,30 +347,9 @@
 
                     if (!db[email]) {
                         let initialData = { 
-                            pin: pin, 
-                            fans: 5, 
-                            hype: 0, 
-                            releasesCount: 0, 
-                            genre: 'synthwave', 
-                            goldRecords: 0,
-                            staudenLevel: 1,
-                            baumeLevel: 3,
-                            teichLevel: 1,
-                            marketingLevel: 0, 
-                            studioLevel: 0, 
-                            producerLevel: 0, 
-                            prLevel: 0, 
-                            labelLevel: 0, 
-                            merchLevel: 0, 
-                            algoLevel: 0,
-                            tourBusLevel: 0,
-                            aiNeuralLevel: 0,
-                            satelliteLevel: 0,
-                            hologramTourLevel: 0,
-                            quantumSynthLevel: 0,
-                            musicAcademyLevel: 0,
-                            deepSpaceLevel: 0,
-                            singularityLevel: 0
+                            pin: pin, fans: 10, hype: 0, releasesCount: 0, goldRecords: 0,
+                            staudenLevel: 1, baumeLevel: 3, teichLevel: 1,
+                            upgrades: { marketing: 0, studio: 0, producer: 0, pr: 0, label: 0, merch: 0, aiNeural: 0, satellite: 0, hologram: 0, quantum: 0 }
                         };
                         initialData.checksum = this.generateChecksum(initialData);
                         db[email] = initialData;
@@ -359,23 +362,18 @@
                     this.pendingEmail = null;
                     this.pendingPin = null;
 
-                    return { success: true, msg: '✅ Verifizierung erfolgreich abgeschlossen!' };
+                    return { success: true, msg: '✅ Verifizierung erfolgreich!' };
                 },
                 resetPin(email, newPin) {
-                    if (!email || email.trim() === '') return { success: false, msg: '❌ E-Mail Eingabe fehlt!' };
-                    if (!newPin || newPin.trim() === '') return { success: false, msg: '❌ Neue PIN Eingabe fehlt!' };
-
+                    if (!email || !newPin) return { success: false, msg: '❌ Fehler!' };
                     email = email.trim().toLowerCase();
                     newPin = newPin.trim();
-
                     let db = this.getDB();
-                    if (!db[email]) return { success: false, msg: '❌ E-Mail im System nicht gefunden!' };
-                    if (newPin.length < 4) return { success: false, msg: '❌ Neue PIN muss min. 4 Ziffern haben!' };
-                    
+                    if (!db[email]) return { success: false, msg: '❌ E-Mail nicht gefunden!' };
                     db[email].pin = newPin;
                     db[email].checksum = this.generateChecksum(db[email]);
                     this.saveDB(db);
-                    return { success: true, msg: '✅ PIN erfolgreich geändert! Bitte jetzt einloggen.' };
+                    return { success: true, msg: '✅ PIN geändert!' };
                 },
                 logout() {
                     this.currentUser = null;
@@ -386,9 +384,7 @@
                     let db = this.getDB();
                     let u = db[this.currentUser];
                     if (!u) return null;
-                    if (u.staudenLevel === undefined) u.staudenLevel = 1;
-                    if (u.baumeLevel === undefined) u.baumeLevel = 3;
-                    if (u.teichLevel === undefined) u.teichLevel = 1;
+                    if (!u.upgrades) u.upgrades = { marketing: 0, studio: 0, producer: 0, pr: 0, label: 0, merch: 0, aiNeural: 0, satellite: 0, hologram: 0, quantum: 0 };
                     return u;
                 },
                 saveAccountData(dataObj) {
@@ -400,10 +396,9 @@
                 }
             };
 
-            // LYRICS ENTFERNT – GARTEN NEU AN DIESER STELLE INTEGRATED
             const sitePages = [
                 { id: 'home', name: 'Home', icon: '🏠', desc: 'Öffentliche Startseite', protected: false },
-                { id: 'studio', name: 'Studio', icon: '🎸', desc: 'Elite Empire Studio', protected: true },
+                { id: 'studio', name: 'Empire Studio', icon: '🎸', desc: 'Schwereres Idle-Game & Upgrades', protected: true },
                 { id: 'garden', name: 'Garten', icon: '🌿', desc: 'Living Eco-Meadow & Beat-Lab', protected: true },
                 { id: 'crypto', name: 'Crypto', icon: '🪙', desc: 'Staking & Tokenomics Matrix', protected: true },
                 { id: 'cloud', name: 'Cloud', icon: '☁️', desc: 'Externes Backup & Wiederherstellung', protected: true },
@@ -418,57 +413,63 @@
                 if (page.id !== 'home') {
                     const section = document.createElement('section');
                     section.id = `view-${page.id}`;
-                    section.className = 'view-section hidden space-y-4 text-left';
+                    section.className = 'view-section hidden space-y-4 text-left w-full h-full';
                     
                     let innerHTMLContent = `<p class="text-xs text-slate-300 font-mono">Geschützter Bereich für ${page.name}.</p>`;
                     
                     if (page.id === 'studio') {
                         innerHTMLContent = `
-                            <div class="space-y-4">
-                                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                                    <div class="glass-panel p-3.5 rounded-2xl border border-emerald-500/20">
-                                        <p class="text-[10px] font-mono text-emerald-300 uppercase tracking-wider">Fans</p>
-                                        <p id="studio-fans" class="text-xl font-black text-white font-mono mt-1">5</p>
+                            <div class="space-y-6 w-full">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+                                    <div class="glass-panel p-4 rounded-2xl border border-emerald-500/30 text-center">
+                                        <p class="text-[10px] font-mono text-emerald-300 uppercase">Fans</p>
+                                        <p id="studio-fans" class="text-2xl font-black text-white font-mono mt-1">10</p>
                                     </div>
-                                    <div class="glass-panel p-3.5 rounded-2xl border border-cyan-500/20">
-                                        <p class="text-[10px] font-mono text-cyan-300 uppercase tracking-wider">Hype</p>
-                                        <p id="studio-hype" class="text-xl font-black text-white font-mono mt-1">0</p>
+                                    <div class="glass-panel p-4 rounded-2xl border border-cyan-500/30 text-center">
+                                        <p class="text-[10px] font-mono text-cyan-300 uppercase">Hype</p>
+                                        <p id="studio-hype" class="text-2xl font-black text-white font-mono mt-1">0</p>
                                     </div>
-                                    <div class="glass-panel p-3.5 rounded-2xl border border-pink-500/20">
-                                        <p class="text-[10px] font-mono text-pink-300 uppercase tracking-wider">Releases</p>
-                                        <p id="studio-releases" class="text-xl font-black text-white font-mono mt-1">0</p>
+                                    <div class="glass-panel p-4 rounded-2xl border border-pink-500/30 text-center">
+                                        <p class="text-[10px] font-mono text-pink-300 uppercase">Releases</p>
+                                        <p id="studio-releases" class="text-2xl font-black text-white font-mono mt-1">0</p>
                                     </div>
-                                    <div class="glass-panel p-3.5 rounded-2xl border border-amber-500/20">
-                                        <p class="text-[10px] font-mono text-amber-300 uppercase tracking-wider">Gold Platten</p>
-                                        <p id="studio-gold" class="text-xl font-black text-amber-400 font-mono mt-1">0</p>
-                                    </div>
-                                    <div class="glass-panel p-3.5 rounded-2xl border border-teal-500/20 col-span-2 sm:col-span-1">
-                                        <p class="text-[10px] font-mono text-teal-300 uppercase tracking-wider">Wachstum /s</p>
-                                        <p id="studio-fps" class="text-xl font-black text-teal-400 font-mono mt-1">+0</p>
+                                    <div class="glass-panel p-4 rounded-2xl border border-amber-500/30 text-center">
+                                        <p class="text-[10px] font-mono text-amber-300 uppercase">Gold Platten</p>
+                                        <p id="studio-gold" class="text-2xl font-black text-amber-400 font-mono mt-1">0</p>
                                     </div>
                                 </div>
-                                <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 text-center">
-                                    <p class="text-xs font-mono text-emerald-300">🎸 Studio-Wirtschaftsmatrix aktiv. Besuche den Garten für den Live-Stream &amp; Beat-Sync!</p>
+
+                                <div class="glass-panel p-6 rounded-3xl text-center space-y-4 border border-emerald-500/40 w-full">
+                                    <p class="text-xs font-mono text-emerald-300">🎸 Aktives Empire-Management: Klicke, um Hype zu generieren &amp; Fans zu gewinnen!</p>
+                                    <button type="button" id="btn-studio-click" class="cyber-button w-full sm:w-auto bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-500 text-white font-black py-4 px-8 rounded-2xl text-sm uppercase tracking-widest cursor-pointer shadow-xl shadow-emerald-500/30">
+                                        ⚡ Hype &amp; Track Produzieren (+1 Hype)
+                                    </button>
+                                    <p class="text-[11px] font-mono text-slate-400">Automatisches Wachstum: <span id="studio-fps" class="text-teal-400 font-bold">+0 Fans/s</span></p>
+                                </div>
+
+                                <div class="glass-panel p-6 rounded-3xl space-y-4 border border-cyan-500/30 w-full">
+                                    <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase tracking-wider">⚡ Erweiterte Empire Upgrades</h3>
+                                    <div id="upgrades-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">
+                                        <!-- Dynamisch -->
+                                    </div>
                                 </div>
                             </div>
                         `;
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
-                            <div class="space-y-6">
-                                <div class="glass-panel p-4 sm:p-8 rounded-[2.5rem] relative overflow-hidden bg-gradient-to-b from-[#051a0f]/95 via-[#020b06]/98 to-[#010503] shadow-2xl">
+                            <div class="space-y-6 w-full h-full flex flex-col">
+                                <div class="glass-panel p-4 sm:p-6 rounded-[2.5rem] relative overflow-hidden bg-gradient-to-b from-[#051a0f]/95 via-[#020b06]/98 to-[#010503] shadow-2xl w-full flex-grow flex flex-col">
                                     
-                                    <!-- Top Navigation innerhalb des Gartens -->
-                                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4 border-b border-emerald-500/20 pb-3">
+                                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4 border-b border-emerald-500/20 pb-3 w-full">
                                         <button type="button" class="nav-link cyber-button bg-slate-900 text-emerald-300 border border-emerald-500/30 px-4 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer" data-target="studio">
-                                            ← Zum Beat-Lab
+                                            ← Zum Empire Studio
                                         </button>
                                         <div class="flex items-center gap-2">
                                             <span class="text-[11px] font-mono text-emerald-400">🌿 Quantum Eco-Meadow &amp; Live Beat-Sync aktiv</span>
                                         </div>
                                     </div>
 
-                                    <!-- STATS LEVEL LEISTE -->
-                                    <div class="grid grid-cols-3 gap-3 mb-4">
+                                    <div class="grid grid-cols-3 gap-3 mb-4 w-full">
                                         <div class="glass-panel p-3 rounded-2xl border border-emerald-500/30 text-center">
                                             <p class="text-[10px] font-mono text-emerald-300 uppercase">Stauden Level</p>
                                             <p id="stat-stauden-lvl" class="text-lg font-black text-white font-mono mt-1">1</p>
@@ -483,13 +484,12 @@
                                         </div>
                                     </div>
 
-                                    <!-- GIGANTISCHER, RESPONSIVER CANVAS CONTAINER -->
-                                    <div id="canvas-container" class="relative w-full h-[580px] sm:h-[780px] rounded-3xl border-2 border-emerald-700/60 overflow-hidden shadow-2xl bg-[#020a05]">
+                                    <!-- Canvas füllt den Bildschirm optimal aus -->
+                                    <div id="canvas-container" class="relative w-full h-[620px] sm:h-[75vh] rounded-3xl border-2 border-emerald-700/60 overflow-hidden shadow-2xl bg-[#020a05] flex-grow">
                                         <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
                                     </div>
 
-                                    <!-- WEBRADIO PLAYER -->
-                                    <div class="mt-4 glass-panel p-4 sm:p-5 rounded-3xl space-y-3">
+                                    <div class="mt-4 glass-panel p-4 sm:p-5 rounded-3xl space-y-3 w-full">
                                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                                             <div class="flex items-center gap-4 w-full sm:w-auto">
                                                 <button type="button" id="garden-play-btn" class="cyber-button w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center text-xl shadow-xl shadow-emerald-500/40 cursor-pointer shrink-0">▶</button>
@@ -499,7 +499,7 @@
                                                 </div>
                                             </div>
                                             
-                                            <div class="flex items-center gap-3 bg-[#010408] px-4 py-2 rounded-2xl border border-emerald-500/20 shadow-inner w-full sm:w-auto justify-end">
+                                            <div class="flex items-center gap-3 bg-[#010206] px-4 py-2 rounded-2xl border border-emerald-500/20 shadow-inner w-full sm:w-auto justify-end">
                                                 <span class="text-base">🔊</span>
                                                 <input type="range" id="garden-volume" min="0" max="1" step="0.05" value="0.8" class="w-28 accent-emerald-500 cursor-pointer">
                                             </div>
@@ -515,8 +515,8 @@
                         `;
                     } else if (page.id === 'crypto') {
                         innerHTMLContent = `
-                            <div class="space-y-4">
-                                <div class="glass-panel p-5 rounded-2xl border border-amber-500/30 space-y-4">
+                            <div class="space-y-4 w-full">
+                                <div class="glass-panel p-5 rounded-2xl border border-amber-500/30 space-y-4 w-full">
                                     <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🪙 Crypto Staking &amp; Tokenomics Matrix</h3>
                                     <p class="text-xs text-slate-300">Verwalte deine Hashrates, Cosmos (ATOM) Prämien und Staking-Renditen im Takt.</p>
                                 </div>
@@ -524,8 +524,8 @@
                         `;
                     } else if (page.id === 'cloud') {
                         innerHTMLContent = `
-                            <div class="space-y-4">
-                                <div class="glass-panel p-5 rounded-2xl border border-cyan-500/30 space-y-4">
+                            <div class="space-y-4 w-full">
+                                <div class="glass-panel p-5 rounded-2xl border border-cyan-500/30 space-y-4 w-full">
                                     <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase">☁️ Externes Backup &amp; Portabilität</h3>
                                     <p class="text-xs text-slate-300">Sichere deinen harten Fortschritt als Datei ab.</p>
                                     <div class="flex flex-wrap gap-3 pt-2">
@@ -541,9 +541,9 @@
                         `;
                     } else if (page.id === 'admin') {
                         innerHTMLContent = `
-                            <div class="space-y-4">
-                                <div class="glass-panel p-5 rounded-2xl border border-amber-500/30 space-y-3">
-                                    <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🔒 Account-Verwaltung</h3>
+                            <div class="space-y-4 w-full">
+                                <div class="glass-panel p-5 rounded-2xl border border-amber-500/30 space-y-3 w-full">
+                                    <h3 class="text-xs font-mono text-amber-400 font-bold uppercase">🔒 Account-Verwaltung &amp; Stabilität</h3>
                                     <p class="text-xs text-slate-300 font-mono">Eingeloggt als: <span id="admin-current-email" class="text-emerald-400 font-bold"></span></p>
                                     <button type="button" id="btn-trigger-logout" class="cyber-button bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold py-2.5 px-5 rounded-xl cursor-pointer">🚪 Abmelden</button>
                                 </div>
@@ -552,7 +552,7 @@
                     }
 
                     section.innerHTML = `
-                        <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-4 border-emerald-500/30">
+                        <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-4 border-emerald-500/30 w-full">
                             <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
                                 <span class="text-3xl">${page.icon}</span>
                                 <div>
@@ -573,7 +573,7 @@
                 sitePages.forEach(page => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'cyber-button nav-link bg-slate-900/80 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0';
+                    btn.className = 'cyber-button nav-link bg-slate-900/80 text-slate-300 hover:text-white px-3.5 py-2 rounded-xl text-xs font-medium border border-slate-800 cursor-pointer shrink-0';
                     btn.dataset.target = page.id;
                     btn.innerHTML = `${page.icon} ${page.name}`;
                     navContainer.appendChild(btn);
@@ -581,7 +581,7 @@
 
                 const authBtn = document.createElement('button');
                 authBtn.type = 'button';
-                authBtn.className = 'cyber-button nav-link bg-emerald-600/80 hover:bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold border border-emerald-500 cursor-pointer shrink-0 ml-2';
+                authBtn.className = 'cyber-button nav-link bg-emerald-600/80 hover:bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold border border-emerald-500 cursor-pointer shrink-0 ml-2';
                 authBtn.dataset.target = 'auth';
                 authBtn.innerHTML = SecureAuth.currentUser ? '🔐 Account' : '🔑 Login';
                 navContainer.appendChild(authBtn);
@@ -592,12 +592,17 @@
                 if (page.id !== 'home') {
                     const card = document.createElement('button');
                     card.type = 'button';
-                    card.className = 'cyber-button nav-link glass-panel p-5 rounded-2xl border border-emerald-500/20 text-left hover:border-emerald-500/50 cursor-pointer transition flex flex-col justify-between';
+                    card.className = 'cyber-button nav-link glass-panel p-6 rounded-3xl border border-emerald-500/20 text-left hover:border-emerald-500/60 cursor-pointer transition flex flex-col justify-between group w-full';
                     card.dataset.target = page.id;
                     card.innerHTML = `
-                        <div class="text-3xl mb-3">${page.icon}</div>
-                        <div class="text-xs font-bold text-white font-mono">${page.name} ${page.protected ? '🔒' : ''}</div>
-                        <div class="text-[10px] text-slate-400 mt-1">${page.desc}</div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-4xl p-3 bg-emerald-600/10 rounded-2xl border border-emerald-500/20 group-hover:scale-110 transition">${page.icon}</span>
+                            <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">${page.protected ? '🔒 Aktiv' : '🌐 Öffentlich'}</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white font-mono">${page.name}</div>
+                            <div class="text-[11px] text-slate-400 mt-1">${page.desc}</div>
+                        </div>
                     `;
                     homeGrid.appendChild(card);
                 }
@@ -625,29 +630,17 @@
                 const subTitle = document.getElementById('auth-subtitle');
 
                 if (SecureAuth.currentUser) {
-                    subLogin.classList.add('hidden');
-                    subReg.classList.add('hidden');
-                    subReset.classList.add('hidden');
-                    subVerify.classList.add('hidden');
-                    subLogged.classList.remove('hidden');
+                    subLogin.classList.add('hidden'); subReg.classList.add('hidden'); subReset.classList.add('hidden'); subVerify.classList.add('hidden'); subLogged.classList.remove('hidden');
                     if (mainTitle) mainTitle.innerText = "Account-Verwaltung";
                     if (subTitle) subTitle.innerText = "Aktive, gesicherte Sitzung";
                     const emailDisplay = document.getElementById('auth-logged-email');
                     if (emailDisplay) emailDisplay.innerText = SecureAuth.currentUser;
                 } else if (SecureAuth.activeVerificationCode) {
-                    subLogin.classList.add('hidden');
-                    subReg.classList.add('hidden');
-                    subReset.classList.add('hidden');
-                    subLogged.classList.add('hidden');
-                    subVerify.classList.remove('hidden');
+                    subLogin.classList.add('hidden'); subReg.classList.add('hidden'); subReset.classList.add('hidden'); subLogged.classList.add('hidden'); subVerify.classList.remove('hidden');
                     if (mainTitle) mainTitle.innerText = "E-Mail Verifizierung";
                     if (subTitle) subTitle.innerText = "Code-Eingabe erforderlich";
                 } else {
-                    subLogged.classList.add('hidden');
-                    subVerify.classList.add('hidden');
-                    subReg.classList.add('hidden');
-                    subReset.classList.add('hidden');
-                    subLogin.classList.remove('hidden');
+                    subLogged.classList.add('hidden'); subVerify.classList.add('hidden'); subReg.classList.add('hidden'); subReset.classList.add('hidden'); subLogin.classList.remove('hidden');
                     if (mainTitle) mainTitle.innerText = "Sicheres Login-Portal";
                     if (subTitle) subTitle.innerText = "Verifizierung per E-Mail & PIN";
                 }
@@ -661,9 +654,7 @@
                     if (msg) msg.innerText = "🔒 Bitte zuerst registrieren / einloggen!";
                 }
 
-                if (targetId === 'auth') {
-                    updateAuthPortalUI();
-                }
+                if (targetId === 'auth') updateAuthPortalUI();
 
                 document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
                 const targetSec = document.getElementById(`view-${targetId}`);
@@ -676,19 +667,125 @@
                         const emailSpan = document.getElementById('admin-current-email');
                         if (emailSpan) emailSpan.innerText = SecureAuth.currentUser || 'Unbekannt';
                     }
-                    if (targetId === 'garden') {
-                        initGardenScreenCanvas();
-                    }
+                    if (targetId === 'studio') updateStudioUI();
+                    if (targetId === 'garden') initGardenScreenCanvas();
                 }
             }
 
             document.addEventListener('click', function(e) {
                 const navBtn = e.target.closest('.nav-link');
-                if (navBtn) {
-                    switchView(navBtn.dataset.target);
+                if (navBtn) switchView(navBtn.dataset.target);
+                if (e.target && e.target.classList.contains('back-to-home')) switchView('home');
+            });
+
+            const upgradeDefs = [
+                { id: 'marketing', name: 'Kampagnen-Marketing', baseCost: 25, costMult: 1.6, fanGen: 1, desc: '+1 Fan/s' },
+                { id: 'studio', name: 'Pro-Studio Equipment', baseCost: 120, costMult: 1.7, fanGen: 5, desc: '+5 Fans/s' },
+                { id: 'producer', name: 'Star-Producer Heuern', baseCost: 600, costMult: 1.8, fanGen: 22, desc: '+22 Fans/s' },
+                { id: 'pr', name: 'Globale PR-Agentur', baseCost: 3000, costMult: 1.9, fanGen: 100, desc: '+100 Fans/s' },
+                { id: 'label', name: 'Major Record Label', baseCost: 15000, costMult: 2.0, fanGen: 450, desc: '+450 Fans/s' },
+                { id: 'merch', name: 'Exklusive Merch-Linie', baseCost: 75000, costMult: 2.1, fanGen: 2000, desc: '+2k Fans/s' },
+                { id: 'aiNeural', name: 'KI Neural Master-Engine', baseCost: 350000, costMult: 2.25, fanGen: 9500, desc: '+9.5k Fans/s' },
+                { id: 'satellite', name: 'Orbital Satellit', baseCost: 1800000, costMult: 2.4, fanGen: 45000, desc: '+45k Fans/s' },
+                { id: 'hologram', name: 'Hologramm Welttournee', baseCost: 9000000, costMult: 2.55, fanGen: 220000, desc: '+220k Fans/s' },
+                { id: 'quantum', name: 'Quanten-Synthesizer Nexus', baseCost: 50000000, costMult: 2.7, fanGen: 1100000, desc: '+1.1M Fans/s' }
+            ];
+
+            function getUpgradeCost(def, level) {
+                return Math.floor(def.baseCost * Math.pow(def.costMult, level));
+            }
+
+            function updateStudioUI() {
+                let u = SecureAuth.getAccountData();
+                if (!u) return;
+
+                document.getElementById('studio-fans').innerText = u.fans.toLocaleString();
+                document.getElementById('studio-hype').innerText = u.hype.toLocaleString();
+                document.getElementById('studio-releases').innerText = u.releasesCount.toLocaleString();
+                document.getElementById('studio-gold').innerText = u.goldRecords.toLocaleString();
+
+                let totalFps = 0;
+                upgradeDefs.forEach(def => {
+                    let lvl = u.upgrades[def.id] || 0;
+                    totalFps += lvl * def.fanGen;
+                });
+                document.getElementById('studio-fps').innerText = `+${totalFps.toLocaleString()} Fans/s`;
+
+                const listContainer = document.getElementById('upgrades-list-container');
+                if (listContainer) {
+                    listContainer.innerHTML = '';
+                    upgradeDefs.forEach(def => {
+                        let lvl = u.upgrades[def.id] || 0;
+                        let cost = getUpgradeCost(def, lvl);
+                        let canAfford = u.hype >= cost;
+
+                        let card = document.createElement('div');
+                        card.className = `glass-panel p-4 rounded-2xl border ${canAfford ? 'border-emerald-500/50 affordable-glow' : 'border-slate-800'} flex flex-col justify-between space-y-3 w-full`;
+                        card.innerHTML = `
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs font-bold text-white font-mono">${def.name}</span>
+                                    <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded-md border border-emerald-500/30">Lvl ${lvl}</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1">${def.desc}</p>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                                <span class="text-xs font-mono text-amber-400 font-bold">💎 ${cost.toLocaleString()} Hype</span>
+                                <button type="button" data-upgrade="${def.id}" class="cyber-button btn-buy-upgrade bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2 px-4 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow ${!canAfford ? 'opacity-40 cursor-not-allowed' : ''}">Kaufen</button>
+                            </div>
+                        `;
+                        listContainer.appendChild(card);
+                    });
                 }
-                if (e.target && e.target.classList.contains('back-to-home')) {
-                    switchView('home');
+            }
+
+            setInterval(() => {
+                if (!SecureAuth.currentUser) return;
+                let u = SecureAuth.getAccountData();
+                if (!u) return;
+
+                let totalFps = 0;
+                upgradeDefs.forEach(def => {
+                    let lvl = u.upgrades[def.id] || 0;
+                    totalFps += lvl * def.fanGen;
+                });
+
+                if (totalFps > 0) {
+                    u.fans += totalFps;
+                    if (u.fans >= (u.releasesCount + 1) * 100000) {
+                        u.releasesCount++;
+                        u.goldRecords += Math.floor(u.releasesCount / 5) + 1;
+                    }
+                    SecureAuth.saveAccountData(u);
+                    if (!document.getElementById('view-studio').classList.contains('hidden')) {
+                        updateStudioUI();
+                    }
+                }
+            }, 1000);
+
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'btn-studio-click') {
+                    let u = SecureAuth.getAccountData();
+                    if (!u) return;
+                    u.hype += 1;
+                    u.fans += 2;
+                    SecureAuth.saveAccountData(u);
+                    updateStudioUI();
+                }
+                const buyBtn = e.target.closest('.btn-buy-upgrade');
+                if (buyBtn) {
+                    let upgradeId = buyBtn.dataset.upgrade;
+                    let u = SecureAuth.getAccountData();
+                    let def = upgradeDefs.find(d => d.id === upgradeId);
+                    if (!u || !def) return;
+                    let lvl = u.upgrades[upgradeId] || 0;
+                    let cost = getUpgradeCost(def, lvl);
+                    if (u.hype >= cost) {
+                        u.hype -= cost;
+                        u.upgrades[upgradeId] = lvl + 1;
+                        SecureAuth.saveAccountData(u);
+                        updateStudioUI();
+                    }
                 }
             });
 
@@ -769,11 +866,7 @@
                 if (e.target && e.target.id === 'btn-export-backup') {
                     if (!SecureAuth.currentUser) return;
                     let db = SecureAuth.getDB();
-                    let backupData = {
-                        userEmail: SecureAuth.currentUser,
-                        accountData: db[SecureAuth.currentUser],
-                        exportDate: new Date().toISOString()
-                    };
+                    let backupData = { userEmail: SecureAuth.currentUser, accountData: db[SecureAuth.currentUser], exportDate: new Date().toISOString() };
                     let blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
                     let url = URL.createObjectURL(blob);
                     let a = document.createElement('a');
@@ -801,17 +894,14 @@
                             localStorage.setItem('secure_nexus_session', parsed.userEmail);
                             renderNavbar();
                             updateFooterStatus();
-                            document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
+                            document.getElementById('backup-status-msg').innerText = `✅ Backup importiert!`;
                             setTimeout(() => switchView('garden'), 1000);
-                        } catch (err) {
-                            alert("❌ Import-Fehler: Datei beschädigt oder ungültig.");
-                        }
+                        } catch (err) { alert("❌ Import-Fehler."); }
                     };
                     reader.readAsText(file);
                 }
             });
 
-            // QUANTUM ECO-MEADOW CANVAS RENDERING ENGINE
             let animationFrameId = null;
             function initGardenScreenCanvas() {
                 const canvas = document.getElementById('garden-canvas');
@@ -820,8 +910,8 @@
                 if (!canvas || !container) return;
 
                 const ctx = canvas.getContext('2d');
-
                 let userAcc = SecureAuth.getAccountData() || { staudenLevel: 1, baumeLevel: 3, teichLevel: 1 };
+                
                 const staudenEl = document.getElementById('stat-stauden-lvl');
                 const baumeEl = document.getElementById('stat-baume-lvl');
                 const teichEl = document.getElementById('stat-teich-lvl');
@@ -839,37 +929,21 @@
                         sourceNode.connect(analyser);
                         analyser.connect(audioCtx.destination);
                     }
-                } catch (e) {
-                    console.log("Audio-Analyse im sicheren Modus aktiv.");
-                }
+                } catch (e) {}
 
                 const bufferLength = analyser ? analyser.frequencyBinCount : 128;
                 const dataArray = new Uint8Array(bufferLength);
                 let smoothBeat = 0;
                 let liliAngle = 0;
 
-                // Lebendige Grashalme
                 let grassBlades = [];
-                for(let i=0; i<130; i++) {
-                    grassBlades.push({
-                        xOffsetRatio: Math.random(),
-                        yOffsetRatio: 0.45 + Math.random() * 0.5,
-                        height: 16 + Math.random() * 26,
-                        swaySpeed: 2 + Math.random() * 3
-                    });
+                for(let i=0; i<150; i++) {
+                    grassBlades.push({ xOffsetRatio: Math.random(), yOffsetRatio: 0.45 + Math.random() * 0.5, height: 18 + Math.random() * 28, swaySpeed: 2 + Math.random() * 3 });
                 }
 
-                // Glühwürmchen & Pollen
                 let particles = [];
-                for(let i=0; i<50; i++) {
-                    particles.push({
-                        x: Math.random() * 1000,
-                        y: Math.random() * 1000,
-                        speedX: (Math.random() - 0.5) * 0.3,
-                        speedY: (Math.random() - 0.5) * 0.3,
-                        radius: Math.random() * 2.3 + 0.6,
-                        alpha: Math.random() * 0.6 + 0.2
-                    });
+                for(let i=0; i<55; i++) {
+                    particles.push({ x: Math.random() * 1200, y: Math.random() * 1000, speedX: (Math.random() - 0.5) * 0.3, speedY: (Math.random() - 0.5) * 0.3, radius: Math.random() * 2.3 + 0.6, alpha: Math.random() * 0.6 + 0.2 });
                 }
 
                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -913,7 +987,6 @@
                     const s = w / 1000;
                     const timeSec = Date.now() / 1000;
 
-                    // 1. Tiefgrüner, lebendiger Wiesen-Hintergrund
                     const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
                     bgGrad.addColorStop(0, '#042213');
                     bgGrad.addColorStop(0.6, '#020f07');
@@ -921,27 +994,23 @@
                     ctx.fillStyle = bgGrad;
                     ctx.fillRect(0, 0, w, h);
 
-                    // Park-Rasenfläche mit sanften Kurven
                     ctx.fillStyle = '#08331a';
                     ctx.beginPath();
-                    ctx.roundRect(30 * s, 30 * s, w - (60 * s), h - (60 * s), 32 * s);
+                    ctx.roundRect(20 * s, 20 * s, w - (40 * s), h - (40 * s), 32 * s);
                     ctx.fill();
 
-                    // Organisch geschwungene Parkwege
                     ctx.strokeStyle = '#0d4523';
                     ctx.lineWidth = 45 * s;
                     ctx.lineCap = 'round';
                     ctx.beginPath();
-                    ctx.moveTo(w * 0.25, h - 30);
-                    ctx.bezierCurveTo(w * 0.25, h * 0.5, w * 0.75, h * 0.5, w * 0.75, 30);
+                    ctx.moveTo(w * 0.25, h - 20);
+                    ctx.bezierCurveTo(w * 0.25, h * 0.5, w * 0.75, h * 0.5, w * 0.75, 20);
                     ctx.stroke();
 
-                    // 2. LEBENDIGES GRAS (Schwingt im Wind & Takt)
                     grassBlades.forEach(g => {
                         let gx = g.xOffsetRatio * w;
                         let gy = g.yOffsetRatio * h;
                         let windSway = Math.sin(timeSec * g.swaySpeed + gx) * (4.5 + smoothBeat * 9);
-                        
                         ctx.strokeStyle = '#10b981';
                         ctx.lineWidth = 1.9 * s;
                         ctx.beginPath();
@@ -950,20 +1019,17 @@
                         ctx.stroke();
                     });
 
-                    // 3. Glühwürmchen & Partikel
                     particles.forEach(p => {
                         p.x += p.speedX;
                         p.y += p.speedY;
                         if(p.x < 0) p.x = w; if(p.x > w) p.x = 0;
                         if(p.y < 0) p.y = h; if(p.y > h) p.y = 0;
-
                         ctx.fillStyle = `rgba(52, 211, 153, ${Math.min(1, p.alpha + smoothBeat * 0.4)})`;
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, (p.radius + smoothBeat * 1.2) * s, 0, Math.PI * 2);
                         ctx.fill();
                     });
 
-                    // 4. Bäume & üppige Baumkronen
                     let treeCount = Math.min(15, userAcc.baumeLevel + 6);
                     for (let i = 0; i < treeCount; i++) {
                         let tx = (95 + (i % 3) * 125) * s;
@@ -989,23 +1055,21 @@
                         ctx.fill();
                     }
 
-                    // 5. Studio Matrix (Unten links)
                     ctx.fillStyle = '#030a17';
                     ctx.strokeStyle = '#2563eb';
                     ctx.lineWidth = 2.5 * s;
                     ctx.beginPath();
-                    ctx.roundRect(50 * s, h - (175 * s), 130 * s, 110 * s, 14 * s);
+                    ctx.roundRect(40 * s, h - (165 * s), 130 * s, 110 * s, 14 * s);
                     ctx.fill();
                     ctx.stroke();
 
                     for (let gx = 0; gx < 4; gx++) {
                         for (let gy = 0; gy < 3; gy++) {
                             ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1d4ed8';
-                            ctx.fillRect((60 + gx * 27) * s, (h - 158 + gy * 27) * s, 18 * s, 16 * s);
+                            ctx.fillRect((50 + gx * 27) * s, (h - 148 + gy * 27) * s, 18 * s, 16 * s);
                         }
                     }
 
-                    // 6. BLUMENPARADIES / STAUDEN (Zentriert im perfekten Einklang mit der Musik)
                     let dotCount = 110 * userAcc.staudenLevel;
                     let centerX = w * 0.5;
                     let centerY = h * 0.52;
@@ -1029,7 +1093,6 @@
                         ctx.fill();
                     }
 
-                    // 7. KLANG-TEICH (Rechts oben) mit Seerosen
                     let pondX = w - (175 * s);
                     let pondY = h * 0.35;
                     let pondRx = (90 + (smoothBeat * 11)) * s;
@@ -1053,13 +1116,11 @@
                     ctx.ellipse(pondX, pondY, Math.max(10, pondRx * 0.65), Math.max(6, pondRy * 0.65), 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Seerosenblatt
                     ctx.fillStyle = '#065f46';
                     ctx.beginPath();
                     ctx.arc(pondX - (20 * s), pondY - (5 * s), 7.5 * s, 0, Math.PI * 1.5);
                     ctx.fill();
 
-                    // 8. LILI (JACK RUSSELL) SCHWENKT LEBENDIG IM TAKT
                     liliAngle += 0.009 * s;
                     let liliX = centerX + Math.cos(liliAngle) * (210 * s);
                     let liliY = centerY + Math.sin(liliAngle * 2) * (75 * s) + (30 * s);
@@ -1075,11 +1136,10 @@
                     ctx.fillText('🐕', 0, 0);
                     ctx.restore();
 
-                    // 9. TERRASSE & LOUNGE (Unten)
                     let terraceW = 400 * s;
                     let terraceH = 90 * s;
                     let terraceX = (w / 2) - (terraceW / 2);
-                    let terraceY = h - terraceH - (35 * s);
+                    let terraceY = h - terraceH - (25 * s);
 
                     ctx.fillStyle = '#4a2210';
                     ctx.strokeStyle = '#f59e0b';
@@ -1088,18 +1148,6 @@
                     ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 16 * s);
                     ctx.fill();
                     ctx.stroke();
-
-                    ctx.strokeStyle = '#281106';
-                    ctx.lineWidth = 1.5 * s;
-                    for (let lx = terraceX + (36 * s); lx < terraceX + terraceW; lx += 36 * s) {
-                        ctx.beginPath();
-                        ctx.moveTo(lx, terraceY);
-                        ctx.lineTo(lx, terraceY + terraceH);
-                        ctx.stroke();
-                    }
-
-                    ctx.fillStyle = '#020617';
-                    ctx.fillRect(terraceX + (terraceW / 2) - (48 * s), terraceY + (terraceH / 2) - (13 * s), 96 * s, 26 * s);
                 }
 
                 renderLoop();
@@ -1114,13 +1162,8 @@
                             audio.play().then(() => {
                                 playBtn.textContent = '⏸';
                                 playBtn.classList.add('affordable-glow');
-                                if (audioCtx && audioCtx.state === 'suspended') {
-                                    audioCtx.resume();
-                                }
-                            }).catch(err => {
-                                console.error("Audio Playback Error:", err);
-                                alert("⚠️ Stream konnte nicht gestartet werden.");
-                            });
+                                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                            }).catch(err => alert("⚠️ Stream konnte nicht gestartet werden."));
                         } else {
                             audio.pause();
                             playBtn.textContent = '▶';
