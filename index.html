@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Botanical Beat Engine v33.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Retina Botanical Engine v35.0</span>
                 </div>
             </div>
 
@@ -103,9 +103,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-emerald-600/10 rounded-2xl mb-4 border border-emerald-500/30 shadow-inner">🌿</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-emerald-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Botanischer Garten &amp; Musik-Matrix im Takt der Musik</p>
+                    <p class="text-emerald-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">High-End Retina Garten &amp; Beat-Sync</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und einem interaktiven Garten, der live im Rhythmus des Webradios pulsiert.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades und einem gestochen scharfen, responsiven Garten-Layout.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -233,7 +233,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_BEAT_GARDEN_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.staudenLevel}_${dataObj.baumeLevel}_${dataObj.teichLevel}_JACK_RETINA_GARDEN_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -437,21 +437,20 @@
                     } else if (page.id === 'garden') {
                         innerHTMLContent = `
                             <div class="space-y-6">
-                                <!-- GARTEN BEREICH EXAKT WIE IM SCREENSHOT -->
-                                <div class="p-6 sm:p-8 rounded-[3rem] border-2 border-emerald-600/40 relative overflow-hidden bg-gradient-to-b from-[#05140b] via-[#020a05] to-[#010402] shadow-2xl">
+                                <div class="p-4 sm:p-8 rounded-[2.5rem] border-2 border-emerald-600/40 relative overflow-hidden bg-gradient-to-b from-[#05140b] via-[#020a05] to-[#010402] shadow-2xl">
                                     
                                     <!-- Top Navigation innerhalb des Gartens -->
-                                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-5 border-b border-emerald-500/20 pb-4">
+                                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4 border-b border-emerald-500/20 pb-3">
                                         <button type="button" class="nav-link cyber-button bg-slate-900 text-emerald-300 border border-emerald-500/30 px-4 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer" data-target="studio">
                                             ← Zum Beat-Lab
                                         </button>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-xs font-mono text-emerald-400">🌿 Live Audio-Beat-Synchronisierung aktiv</span>
+                                            <span class="text-[11px] font-mono text-emerald-400">🌿 Retina High-Res Beat-Sync aktiv</span>
                                         </div>
                                     </div>
 
-                                    <!-- STATS LEVEL LEISTE (Stauden, Bäume, Teich) -->
-                                    <div class="grid grid-cols-3 gap-3 mb-5">
+                                    <!-- STATS LEVEL LEISTE -->
+                                    <div class="grid grid-cols-3 gap-3 mb-4">
                                         <div class="glass-panel p-3 rounded-2xl border border-emerald-500/30 text-center">
                                             <p class="text-[10px] font-mono text-emerald-300 uppercase">Stauden Level</p>
                                             <p id="stat-stauden-lvl" class="text-lg font-black text-white font-mono mt-1">1</p>
@@ -466,13 +465,13 @@
                                         </div>
                                     </div>
 
-                                    <!-- INTERAKTIVES GARTEN-CANVAS (Genau wie im Screenshot) -->
-                                    <div class="relative w-full h-[450px] rounded-3xl border-2 border-emerald-800/60 overflow-hidden shadow-2xl bg-[#040f07]">
-                                        <canvas id="garden-canvas" class="absolute inset-0 w-full h-full cursor-pointer"></canvas>
+                                    <!-- RETINA CANVAS CONTAINER -->
+                                    <div id="canvas-container" class="relative w-full aspect-[16/10] sm:aspect-[2/1] rounded-3xl border-2 border-emerald-800/60 overflow-hidden shadow-2xl bg-[#040f07]">
+                                        <canvas id="garden-canvas" class="w-full h-full block cursor-pointer"></canvas>
                                     </div>
 
                                     <!-- WEBRADIO PLAYER -->
-                                    <div class="mt-6 bg-[#020a05]/95 backdrop-blur-2xl p-5 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-3">
+                                    <div class="mt-4 bg-[#020a05]/95 backdrop-blur-2xl p-4 sm:p-5 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-3">
                                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                                             <div class="flex items-center gap-4 w-full sm:w-auto">
                                                 <button type="button" id="garden-play-btn" class="cyber-button w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 text-white flex items-center justify-center text-xl shadow-xl shadow-emerald-500/40 cursor-pointer shrink-0">▶</button>
@@ -775,7 +774,7 @@
                             localStorage.setItem('secure_nexus_session', parsed.userEmail);
                             renderNavbar();
                             updateFooterStatus();
-    document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
+                            document.getElementById('backup-status-msg').innerText = `✅ Backup für ${parsed.userEmail} importiert!`;
                             setTimeout(() => switchView('garden'), 1000);
                         } catch (err) {
                             alert("❌ Import-Fehler: Datei beschädigt oder ungültig.");
@@ -785,15 +784,14 @@
                 }
             });
 
-            // GARTEN RENDERER & BEAT-SYNCHRONISIERUNG (EXAKT NACH DEINEM SCREENSHOT)
+            // RETINA-OPTIMIERTES GARTEN-CANVAS (OHNE QUALITÄTSVERLUST AUF ALLEN GERÄTEN)
             let animationFrameId = null;
             function initGardenScreenCanvas() {
                 const canvas = document.getElementById('garden-canvas');
+                const container = document.getElementById('canvas-container');
                 const audio = document.getElementById('garden-audio');
-                if (!canvas) return;
+                if (!canvas || !container) return;
 
-                canvas.width = canvas.parentElement.clientWidth || 800;
-                canvas.height = canvas.parentElement.clientHeight || 450;
                 const ctx = canvas.getContext('2d');
 
                 let userAcc = SecureAuth.getAccountData() || { staudenLevel: 1, baumeLevel: 3, teichLevel: 1 };
@@ -801,7 +799,6 @@
                 document.getElementById('stat-baume-lvl').innerText = userAcc.baumeLevel;
                 document.getElementById('stat-teich-lvl').innerText = userAcc.teichLevel;
 
-                // Sichere Audio-Analyse mit Fallback-Taktgeber für Webradio
                 try {
                     if (!audioCtx && audio) {
                         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -825,6 +822,19 @@
                 function renderLoop() {
                     animationFrameId = requestAnimationFrame(renderLoop);
 
+                    // High-DPI / Retina Skalierung ohne Qualitätsverlust
+                    const dpr = window.devicePixelRatio || 1;
+                    const displayWidth = container.clientWidth;
+                    const displayHeight = container.clientHeight;
+
+                    if (canvas.width !== displayWidth * dpr || canvas.height !== displayHeight * dpr) {
+                        canvas.width = displayWidth * dpr;
+                        canvas.height = displayHeight * dpr;
+                        canvas.style.width = displayWidth + 'px';
+                        canvas.style.height = displayHeight + 'px';
+                        ctx.scale(dpr, dpr);
+                    }
+
                     let isPlaying = audio && !audio.paused;
                     let beatVal = 0;
 
@@ -834,7 +844,6 @@
                         for (let i = 0; i < 6; i++) sum += dataArray[i];
                         beatVal = (sum / 6) / 255;
                     } else if (isPlaying) {
-                        // Dynamischer Takt-Generator im Rhythmus von 120 BPM, falls Stream-CORS aktiv ist
                         let time = Date.now() / 1000;
                         beatVal = Math.max(0, Math.sin(time * Math.PI * 2.2)) > 0.6 ? 0.75 : 0.05;
                     } else {
@@ -844,141 +853,131 @@
 
                     smoothBeat += (beatVal - smoothBeat) * 0.25;
 
-                    const w = canvas.width;
-                    const h = canvas.height;
+                    const w = displayWidth;
+                    const h = displayHeight;
+                    const s = w / 800;
 
-                    // 1. Garten-Hintergrund (Sattes Dunkelgrün)
+                    // 1. Garten-Hintergrund
                     ctx.fillStyle = '#061a0d';
                     ctx.fillRect(0, 0, w, h);
 
-                    // Dezent gefüllter Rasen
                     ctx.fillStyle = '#082413';
-                    ctx.fillRect(15, 15, w - 30, h - 30);
+                    ctx.fillRect(15 * s, 15 * s, w - (30 * s), h - (30 * s));
 
-                    // 2. LINKE SEITE: BÄUME LEVEL (Grüne kugelförmige Baumkronen pulsieren im Takt)
+                    // 2. LINKE SEITE: BÄUME LEVEL
                     let treeCount = Math.min(6, userAcc.baumeLevel + 2);
                     for (let i = 0; i < treeCount; i++) {
-                        let tx = 65 + (i % 2) * 45;
-                        let ty = 60 + Math.floor(i / 2) * 45;
-                        let treeRadius = 22 + (smoothBeat * 5);
+                        let tx = (65 + (i % 2) * 45) * s;
+                        let ty = (60 + Math.floor(i / 2) * 45) * s;
+                        let treeRadius = (22 + (smoothBeat * 5)) * s;
 
                         ctx.fillStyle = '#10b981';
                         ctx.beginPath();
-                        ctx.arc(tx, ty, treeRadius, 0, Math.PI * 2);
+                        ctx.arc(tx, ty, Math.max(5, treeRadius), 0, Math.PI * 2);
                         ctx.fill();
 
-                        // Innerer Glanz
                         ctx.fillStyle = '#34d399';
                         ctx.beginPath();
-                        ctx.arc(tx - 4, ty - 4, treeRadius * 0.4, 0, Math.PI * 2);
+                        ctx.arc(tx - (4 * s), ty - (4 * s), Math.max(2, treeRadius * 0.4), 0, Math.PI * 2);
                         ctx.fill();
                     }
 
-                    // 3. STUDIO & ESSENTIALS GRID (Linke Box unter Bäumen)
+                    // 3. STUDIO & ESSENTIALS GRID
                     ctx.fillStyle = '#0d1526';
                     ctx.strokeStyle = '#3b82f6';
-                    ctx.lineWidth = 1.5;
+                    ctx.lineWidth = 1.5 * s;
                     ctx.beginPath();
-                    ctx.roundRect(50, 170, 130, 95, 8);
+                    ctx.roundRect(50 * s, 170 * s, 130 * s, 95 * s, 8 * s);
                     ctx.fill();
                     ctx.stroke();
 
-                    // Mini-Grid Rasterpunkte
                     for (let gx = 0; gx < 4; gx++) {
                         for (let gy = 0; gy < 3; gy++) {
                             ctx.fillStyle = (gx + gy) % 2 === 0 ? '#3b82f6' : '#1e3a8a';
-                            ctx.fillRect(62 + gx * 28, 185 + gy * 25, 18, 16);
+                            ctx.fillRect((62 + gx * 28) * s, (185 + gy * 25) * s, 18 * s, 16 * s);
                         }
                     }
 
-                    // 4. MITTE: STAUDEN / GARTEN (Bunte Kreise/Blüten pulsieren im Takt)
+                    // 4. MITTE: STAUDEN / GARTEN
                     let dotCount = 35 * userAcc.staudenLevel;
-                    let centerX = w / 2 - 10;
-                    let centerY = h / 2 - 20;
+                    let centerX = w / 2;
+                    let centerY = (h / 2) - (20 * s);
                     const colors = ['#f43f5e', '#ec4899', '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
 
                     for (let d = 0; d < dotCount; d++) {
-                        // Pseudozufällige Anordnung im Beet
                         let angle = d * 137.5;
-                        let r = Math.sqrt(d) * 9;
+                        let r = Math.sqrt(d) * 9 * s;
                         let dx = centerX + Math.cos(angle) * r;
                         let dy = centerY + Math.sin(angle) * r * 0.7;
 
-                        if (dx > centerX - 60 && dx < centerX + 60 && dy > centerY - 65 && dy < centerY + 65) {
-                            ctx.fillStyle = colors[d % colors.length];
-                            let dotSize = 3.5 + (smoothBeat * 2.5);
-                            ctx.beginPath();
-                            ctx.arc(dx, dy, dotSize, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
+                        ctx.fillStyle = colors[d % colors.length];
+                        let dotSize = (3.5 + (smoothBeat * 2.5)) * s;
+                        ctx.beginPath();
+                        ctx.arc(dx, dy, Math.max(1, dotSize), 0, Math.PI * 2);
+                        ctx.fill();
                     }
 
-                    // Label "Stauden/Garten"
                     ctx.fillStyle = '#a7f3d0';
-                    ctx.font = '10px monospace';
+                    ctx.font = `${Math.max(10, 11 * s)}px monospace`;
                     ctx.textAlign = 'center';
-                    ctx.fillText('🌸 Stauden/Garten', centerX, centerY - 72);
+                    ctx.fillText('🌸 Stauden/Garten', centerX, centerY - (75 * s));
 
-                    // 5. RECHTS: KLANG-TEICH (Blauer Ovaler Teich pulsiert und wirft Wellen)
-                    let pondX = w - 160;
-                    let pondY = 140;
-                    let pondRx = 65 + (smoothBeat * 8);
-                    let pondRy = 38 + (smoothBeat * 5);
+                    // 5. RECHTS: KLANG-TEICH
+                    let pondX = w - (160 * s);
+                    let pondY = 140 * s;
+                    let pondRx = (65 + (smoothBeat * 8)) * s;
+                    let pondRy = (38 + (smoothBeat * 5)) * s;
 
                     ctx.fillStyle = '#0284c7';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, pondRx, pondRy, 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(10, pondRx), Math.max(5, pondRy), 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#38bdf8';
                     ctx.beginPath();
-                    ctx.ellipse(pondX, pondY, pondRx * 0.65, pondRy * 0.65, 0, 0, Math.PI * 2);
+                    ctx.ellipse(pondX, pondY, Math.max(5, pondRx * 0.65), Math.max(3, pondRy * 0.65), 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#e0f2fe';
-                    ctx.font = '10px monospace';
-                    ctx.fillText('💧 Klang-Teich', pondX, pondY + pondRy + 16);
+                    ctx.font = `${Math.max(10, 11 * s)}px monospace`;
+                    ctx.fillText('💧 Klang-Teich', pondX, pondY + pondRy + (16 * s));
 
-                    // 6. UNTEN: LOUNGE & TERRASSE (Holzdeck mit Möbeln)
-                    let terraceW = 280;
-                    let terraceH = 75;
-                    let terraceX = w / 2 - terraceW / 2;
-                    let terraceY = h - 90;
+                    // 6. UNTEN: LOUNGE & TERRASSE
+                    let terraceW = 280 * s;
+                    let terraceH = 75 * s;
+                    let terraceX = (w / 2) - (terraceW / 2);
+                    let terraceY = h - terraceH - (15 * s);
 
-                    // Holzboden Latten
                     ctx.fillStyle = '#78350f';
                     ctx.strokeStyle = '#92400e';
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 2 * s;
                     ctx.beginPath();
-                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 8);
+                    ctx.roundRect(terraceX, terraceY, terraceW, terraceH, 8 * s);
                     ctx.fill();
                     ctx.stroke();
 
-                    // Holzstruktur-Linien
                     ctx.strokeStyle = '#451a03';
-                    ctx.lineWidth = 1;
-                    for (let lx = terraceX + 25; lx < terraceX + terraceW; lx += 25) {
+                    ctx.lineWidth = 1 * s;
+                    for (let lx = terraceX + (25 * s); lx < terraceX + terraceW; lx += 25 * s) {
                         ctx.beginPath();
                         ctx.moveTo(lx, terraceY);
                         ctx.lineTo(lx, terraceY + terraceH);
                         ctx.stroke();
                     }
 
-                    // Tisch in der Lounge
                     ctx.fillStyle = '#cbd5e1';
-                    ctx.fillRect(terraceX + terraceW / 2 - 35, terraceY + terraceH / 2 - 12, 70, 24);
+                    ctx.fillRect(terraceX + (terraceW / 2) - (35 * s), terraceY + (terraceH / 2) - (12 * s), 70 * s, 24 * s);
                     ctx.fillStyle = '#64748b';
-                    ctx.fillRect(terraceX + terraceW / 2 - 25, terraceY + terraceH / 2 - 8, 50, 16);
+                    ctx.fillRect(terraceX + (terraceW / 2) - (25 * s), terraceY + (terraceH / 2) - (8 * s), 50 * s, 16 * s);
 
                     ctx.fillStyle = '#fde047';
-                    ctx.font = '10px monospace';
-                    ctx.fillText('🪑 Lounge & Terrasse', w / 2, terraceY + terraceH + 16);
+                    ctx.font = `${Math.max(10, 11 * s)}px monospace`;
+                    ctx.fillText('🪑 Lounge & Terrasse', w / 2, terraceY + terraceH + (16 * s));
                 }
 
                 renderLoop();
             }
 
-            // Audio & Play Button Handler
             document.addEventListener('click', function(e) {
                 const playBtn = e.target.closest('#garden-play-btn');
                 if (playBtn) {
