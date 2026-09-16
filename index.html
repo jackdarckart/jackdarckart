@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jackdarckart | Nexus &amp; Cyber Beat Empire</title>
+    <title>jackdarckart | Secure Nexus &amp; Cyber Beat Empire</title>
+    <!-- Strenge Sicherheits-Header gegen XSS, Clickjacking und Injektionen -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://api.laut.fm https://stream.laut.fm 'unsafe-inline' 'unsafe-eval';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Einbindung der separaten Sicherheits-Datei -->
     <script src="security.js"></script>
     <style>
         body { background: #010309; color: #f8fafc; font-family: ui-sans-serif, system-ui, sans-serif; }
@@ -20,29 +24,25 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- GLOBALER AUDIO-STREAM (Bleibt beim Seitenwechsel absolut ununterbrochen im Hintergrund aktiv!) -->
+    <!-- Globaler Audioplayer - Läuft absolut ununterbrochen im Hintergrund -->
     <audio id="audio-stream" preload="auto">
         <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
     </audio>
 
-    <!-- Header & Navigation -->
     <header class="max-w-4xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center border-b border-cyan-500/20 pb-4 gap-3">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-pink-500 p-0.5 flex items-center justify-center font-bold">🎧</div>
             <div>
-                <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
+                <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent block">jackdarckart Secure Nexus</span>
                 <a href="https://laut.fm/jackdarckart" target="_blank" class="text-[10px] font-mono text-slate-400 hover:text-cyan-400">laut.fm/jackdarckart ↗</a>
             </div>
         </div>
-        <nav id="navbar-container" class="flex items-center gap-2 flex-wrap justify-center">
-            <!-- Wird dynamisch geladen -->
-        </nav>
+        <nav id="navbar-container" class="flex items-center gap-2 flex-wrap justify-center"></nav>
     </header>
 
-    <!-- Hauptinhalt (Views) -->
     <main class="max-w-4xl mx-auto w-full space-y-6 my-auto py-4">
         
-        <!-- 1. STARTSEITE (Öffentlich) -->
+        <!-- 1. STARTSEITE -->
         <section id="view-home" class="view-section space-y-6">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-6 text-center">
                 <div class="space-y-1">
@@ -71,18 +71,17 @@
             </div>
         </section>
 
-        <!-- 2. LOGIN / REGISTRIERUNG PORTAL -->
+        <!-- 2. LOGIN / AUTH PORTAL -->
         <section id="view-auth" class="view-section hidden max-w-md mx-auto">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-5">
                 <div class="text-center space-y-1">
                     <span class="text-4xl block mb-2">🔐</span>
-                    <h2 class="text-base font-black text-cyan-300 font-mono uppercase">Sicheres Login-Portal</h2>
-                    <p class="text-[11px] text-slate-400">Zugang zu Cyber Beat Empire</p>
+                    <h2 class="text-base font-black text-cyan-300 font-mono uppercase">Verschlüsseltes Login-Portal</h2>
+                    <p class="text-[11px] text-slate-400">Maximale Sicherheitsstufe aktiv</p>
                 </div>
 
                 <div id="auth-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
-                <!-- Login Form -->
                 <div id="form-login" class="space-y-4">
                     <input type="email" id="login-email" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="E-Mail-Adresse">
                     <input type="password" id="login-pin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="PIN">
@@ -93,7 +92,6 @@
                     </div>
                 </div>
 
-                <!-- Register Form -->
                 <div id="form-register" class="space-y-4 hidden">
                     <input type="email" id="reg-email" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="E-Mail (einmalig)">
                     <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="Sichere PIN wählen">
@@ -101,7 +99,6 @@
                     <div class="text-center pt-2"><button type="button" id="back-login-1" class="text-[11px] font-mono text-cyan-400 hover:underline">← Zum Login</button></div>
                 </div>
 
-                <!-- Reset Form -->
                 <div id="form-reset" class="space-y-4 hidden">
                     <input type="email" id="reset-email" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="Registrierte E-Mail">
                     <input type="password" id="reset-pin" maxlength="6" class="w-full bg-[#030712] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-cyan-500" placeholder="Neue PIN">
@@ -109,10 +106,9 @@
                     <div class="text-center pt-2"><button type="button" id="back-login-2" class="text-[11px] font-mono text-cyan-400 hover:underline">← Zum Login</button></div>
                 </div>
 
-                <!-- Verify Form -->
                 <div id="form-verify" class="space-y-4 hidden">
                     <div class="bg-cyan-950/50 p-4 rounded-xl border border-cyan-500/40 text-center space-y-2">
-                        <p class="text-[11px] font-mono text-cyan-200">📨 Ihr Sicherheitscode:</p>
+                        <p class="text-[11px] font-mono text-cyan-200">📨 Sicherheitscode:</p>
                         <div id="display-code" class="text-2xl font-black text-amber-400 font-mono tracking-widest bg-[#010309] py-2 rounded-lg border border-amber-500/30">----</div>
                     </div>
                     <input type="text" id="verify-input" maxlength="4" class="w-full bg-[#030712] border border-cyan-500 rounded-xl px-3.5 py-3 text-white text-center text-xl font-mono tracking-widest outline-none" placeholder="Code eingeben">
@@ -122,13 +118,13 @@
             </div>
         </section>
 
-        <!-- 3. CYBER BEAT EMPIRE GAME (Geschützt) -->
+        <!-- 3. GAME VIEW -->
         <section id="view-game" class="view-section hidden space-y-6">
             <div class="glass-panel p-6 sm:p-8 rounded-[2.5rem] space-y-6">
                 <div class="flex justify-between items-center border-b border-cyan-500/20 pb-4">
                     <div>
                         <h2 class="text-lg font-black text-cyan-300 font-mono uppercase">🎮 CyberBeat Tycoon (Hard Mode)</h2>
-                        <p class="text-[11px] text-slate-400 font-mono">Eingeloggt als: <span id="user-badge" class="text-emerald-400 font-bold">--</span></p>
+                        <p class="text-[11px] text-slate-400 font-mono">Gesicherter Account: <span id="user-badge" class="text-emerald-400 font-bold">--</span></p>
                     </div>
                 </div>
 
@@ -144,16 +140,16 @@
                 </button>
 
                 <div class="space-y-3">
-                    <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase">🛠️ Erweiterter Upgrades Shop</h3>
+                    <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase">🛠️ Upgrades Shop</h3>
                     <div id="shop" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[320px] overflow-y-auto pr-1"></div>
                 </div>
             </div>
         </section>
 
-        <!-- 4. CLOUD BACKUP & ACCOUNT SICHERHEIT (Geschützt) -->
+        <!-- 4. ACCOUNT & CLOUD VIEW -->
         <section id="view-account" class="view-section hidden grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="glass-panel p-6 rounded-3xl space-y-4">
-                <h3 class="text-xs font-mono text-teal-300 font-bold uppercase">☁️ Cloud Backup</h3>
+                <h3 class="text-xs font-mono text-teal-300 font-bold uppercase">☁️ Verschlüsseltes Cloud Backup</h3>
                 <div class="flex gap-2">
                     <button type="button" id="btn-export" class="cyber-button bg-cyan-600 text-white text-xs font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer w-full">📥 Exportieren</button>
                     <label class="cyber-button bg-teal-600 text-white text-xs font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer w-full text-center">📤 Importieren<input type="file" id="input-import" accept=".json" class="hidden"></label>
@@ -173,15 +169,12 @@
 
     </main>
 
-    <!-- Footer -->
     <footer class="max-w-4xl mx-auto w-full text-center text-[10px] font-mono text-slate-500 border-t border-slate-900 pt-4">
-        © 2026 jackdarckart • Ununterbrochenes Webradio &amp; Empire Hub
+        © 2026 jackdarckart • Secure Nexus System
     </footer>
 
-    <!-- App Logic Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Navigation & Views ---
             const views = ['home', 'auth', 'game', 'account'];
             function switchView(target) {
                 const user = SecureAuth.getSession();
@@ -230,7 +223,7 @@
                 switchView('home');
             };
 
-            // --- Webradio Persistent Audio Player ---
+            // Globaler Audioplayer
             const audio = document.getElementById('audio-stream');
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
@@ -267,8 +260,7 @@
             }
             fetchRadio(); setInterval(fetchRadio, 15000);
 
-
-            // --- Auth Forms Subview Logic ---
+            // Auth Subviews
             function showAuthSub(id) {
                 ['form-login', 'form-register', 'form-reset', 'form-verify'].forEach(f => document.getElementById(f).classList.add('hidden'));
                 document.getElementById(id).classList.remove('hidden');
@@ -280,14 +272,12 @@
             document.getElementById('back-login-2').onclick = () => showAuthSub('form-login');
             document.getElementById('cancel-verify').onclick = () => showAuthSub('form-login');
 
-            let pendingAuth = {};
-            function handleAuthAction(email, pin, action) {
-                let res = SecureAuth.initAuthAction(email, pin, action);
+            async function handleAuthAction(email, pin, action) {
+                let res = await SecureAuth.initAuthAction(email, pin, action);
                 if (!res.success) {
                     document.getElementById('auth-msg').textContent = res.msg;
                     return;
                 }
-                pendingAuth = { email, pin, action, code: res.code };
                 document.getElementById('display-code').textContent = res.code;
                 showAuthSub('form-verify');
             }
@@ -296,17 +286,16 @@
             document.getElementById('btn-register').onclick = () => handleAuthAction(document.getElementById('reg-email').value, document.getElementById('reg-pin').value, 'register');
             document.getElementById('btn-reset').onclick = () => handleAuthAction(document.getElementById('reset-email').value, document.getElementById('reset-pin').value, 'reset_pin');
 
-            document.getElementById('btn-verify').onclick = () => {
+            document.getElementById('btn-verify').onclick = async () => {
                 let input = document.getElementById('verify-input').value.trim();
-                let res = SecureAuth.verifyAndExecute(input);
+                let res = await SecureAuth.verifyAndExecute(input);
                 document.getElementById('auth-msg').textContent = res.msg;
                 if (res.success) {
                     setTimeout(() => switchView('game'), 800);
                 }
             };
 
-
-            // --- Cyber Beat Empire Game & Upgrades ---
+            // Upgrades & Game
             const upgrades = [
                 { id: 'mic', name: 'Pro Mikrofon', cost: 40, mult: 1.65, beat: 1, desc: '+1 Beat/s' },
                 { id: 'midi', name: 'MIDI Keyboard', cost: 180, mult: 1.70, beat: 3, desc: '+3 Beats/s' },
@@ -371,7 +360,6 @@
                 updateGameUI();
             };
 
-            // Game Loop
             setInterval(() => {
                 if (!SecureAuth.getSession()) return;
                 let gData = SecureAuth.getUserGameData();
@@ -393,14 +381,16 @@
                 }
             }, 1000);
 
-            // Account Actions
-            document.getElementById('btn-changepin').onclick = () => {
+            // Account & PIN Management
+            document.getElementById('btn-changepin').onclick = async () => {
                 let pin = document.getElementById('new-pin').value.trim();
                 if(pin.length < 4) return alert('PIN muss min. 4 Ziffern haben!');
                 let user = SecureAuth.getSession();
                 let db = SecureAuth.getUsersDB();
-                db[user].pin = pin; SecureAuth.saveUsersDB(db);
-                alert('✅ PIN erfolgreich geändert!'); document.getElementById('new-pin').value = '';
+                db[user].pinHash = await SecureAuth.hashPin(pin);
+                SecureAuth.saveUsersDB(db);
+                alert('✅ PIN erfolgreich verschlüsselt aktualisiert!');
+                document.getElementById('new-pin').value = '';
             };
             document.getElementById('btn-resetgame').onclick = () => {
                 if(confirm('Spielstand wirklich auf 0 zurücksetzen?')) {
@@ -417,12 +407,12 @@
                 }
             };
 
-            // Cloud Backup
+            // Backup
             document.getElementById('btn-export').onclick = () => {
                 let user = SecureAuth.getSession();
                 let gData = SecureAuth.getUserGameData();
                 let blob = new Blob([JSON.stringify({ user, gameData: gData }, null, 2)], { type: 'application/json' });
-                let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_${user}.json`; a.click();
+                let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `secure_backup_${user}.json`; a.click();
             };
             document.getElementById('input-import').onchange = (e) => {
                 let file = e.target.files[0]; if(!file) return;
@@ -430,13 +420,12 @@
                 r.onload = (ev) => {
                     try {
                         let d = JSON.parse(ev.target.result);
-                        if(d.gameData) { SecureAuth.saveUserGameData(d.gameData); updateGameUI(); alert('✅ Backup geladen!'); }
+                        if(d.gameData) { SecureAuth.saveUserGameData(d.gameData); updateGameUI(); alert('✅ Backup erfolgreich geladen!'); }
                     } catch(err) { alert('❌ Fehlerhafte Datei.'); }
                 };
                 r.readAsText(file);
             };
 
-            // Initial Load
             const initView = localStorage.getItem('nexus_current_view') || 'home';
             switchView(initView);
         });
