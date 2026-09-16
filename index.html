@@ -23,8 +23,10 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- Globaler Audioplayer ohne statisches src (wird dynamisch geladen) -->
-    <audio id="audio-stream" preload="none"></audio>
+    <!-- Globaler Audioplayer mit stabilem Source-Tag für Mobilgeräte -->
+    <audio id="audio-stream" preload="none">
+        <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
+    </audio>
 
     <header class="max-w-4xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center border-b border-cyan-500/20 pb-4 gap-3">
         <div class="flex items-center space-x-3">
@@ -220,7 +222,7 @@
                 switchView('home');
             };
 
-            // Audioplayer mit dynamischer Quellenzuweisung für mobile Browser
+            // Robuster Audioplayer mit stabilem Quell-Handling
             const audio = document.getElementById('audio-stream');
             const playBtn = document.getElementById('play-btn');
             const playIcon = document.getElementById('play-icon');
@@ -230,16 +232,20 @@
             playBtn.addEventListener('click', () => {
                 if (audio.paused) {
                     playText.textContent = 'Verbinde...';
-                    if (!audio.src || audio.src === "" || audio.src === window.location.href) {
-                        audio.src = 'https://stream.laut.fm/jackdarckart';
-                    }
                     audio.play().then(() => {
                         playIcon.textContent = '⏸';
                         playText.textContent = 'Stream Pausieren';
                     }).catch(err => {
                         console.error("Playback error:", err);
-                        playIcon.textContent = '▶';
-                        playText.textContent = 'Erneut versuchen';
+                        audio.load();
+                        audio.play().then(() => {
+                            playIcon.textContent = '⏸';
+                            playText.textContent = 'Stream Pausieren';
+                        }).catch(e => {
+                            playIcon.textContent = '▶';
+                            playText.textContent = 'Webradio Abspielen';
+                            alert('⚠️ Stream konnte nicht gestartet werden. Bitte prüfen Sie Ihre Verbindung.');
+                        });
                     });
                 } else {
                     audio.pause();
