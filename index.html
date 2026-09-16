@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jackdarckart | CloudBeats Nexus Prime Elite</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.tailwindcss.com https://stream.laut.fm https://api.laut.fm https://api.emailjs.com 'unsafe-inline' 'unsafe-eval';">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -48,7 +47,6 @@
             animation: affordable-pulse 2s infinite ease-in-out;
         }
 
-        /* Rhythmus & Beat Synchronisation für den Garten */
         @keyframes garden-beat {
             0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3)); border-color: rgba(16, 185, 129, 0.3); }
             50% { transform: scale(1.02); filter: drop-shadow(0 0 28px rgba(52, 211, 153, 0.85)); border-color: rgba(52, 211, 153, 0.9); }
@@ -67,7 +65,6 @@
         .wave-bar:nth-child(4) { animation-delay: 0.6s; }
         .wave-bar:nth-child(5) { animation-delay: 0.8s; }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: rgba(5, 8, 15, 0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.4); border-radius: 4px; }
@@ -85,11 +82,10 @@
                 </div>
                 <div>
                     <span class="font-black text-xs tracking-widest uppercase bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent block">jackdarckart Nexus</span>
-                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Sanctuary Elite v9.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-wider">Sanctuary Elite v10.0</span>
                 </div>
             </div>
 
-            <!-- Audio Visualizer in Header -->
             <div class="hidden md:flex items-center gap-1.5 bg-[#05080f] px-3.5 py-1.5 rounded-xl border border-purple-500/20 shadow-inner">
                 <span class="text-[9px] font-mono text-purple-400 mr-1 tracking-widest">LIVE STREAM</span>
                 <div class="w-1 bg-purple-500 rounded-full wave-bar"></div>
@@ -109,7 +105,7 @@
     <main class="max-w-4xl mx-auto p-4 sm:p-6 w-full my-auto text-center">
         <div id="views-container">
             
-            <!-- 1. STARTSEITE (Öffentlich) -->
+            <!-- 1. STARTSEITE -->
             <section id="view-home" class="view-section space-y-6 text-left">
                 <div class="glass-panel p-8 sm:p-12 rounded-[2.5rem] text-center relative overflow-hidden">
                     <div class="absolute -top-12 -right-12 w-72 h-72 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -117,9 +113,9 @@
                     
                     <span class="inline-block text-4xl p-4 bg-purple-600/10 rounded-2xl mb-4 border border-purple-500/30 shadow-inner">⚡</span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">CloudBeats Nexus Prime Elite</h1>
-                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Optimized Empire Simulation &amp; Beat-Synced Garden</p>
+                    <p class="text-cyan-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6">Standalone Edition &amp; Beat-Synced Garden</p>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto font-light mb-8">
-                        Erlebe das ultimative Musikimperium mit 15 Upgrades, Welt-Tournee Prestige und dem takt-synchronisierten Cyber-Botanical Sanctuary Garden.
+                        Vollständige Wirtschaftssimulation mit 15 Empire-Upgrades, Welt-Tournee Prestige und dem interaktiven, beat-synchronisierten Garten mit Lili.
                     </p>
                     <div id="home-buttons-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
                         <!-- Dynamisch -->
@@ -127,7 +123,7 @@
                 </div>
             </section>
 
-            <!-- 2. AUTH & VERIFICATION PORTAL -->
+            <!-- 2. AUTH & LOGIN PORTAL -->
             <section id="view-auth" class="view-section hidden space-y-4 text-left max-w-md mx-auto">
                 <div class="glass-panel p-6 sm:p-8 rounded-[2rem] space-y-4">
                     <div class="text-center">
@@ -138,7 +134,6 @@
 
                     <div id="auth-feedback-msg" class="text-xs text-center font-mono text-amber-400 min-h-[16px]"></div>
 
-                    <!-- Bereits Eingeloggt Ansicht -->
                     <div id="subform-logged" class="space-y-3 hidden">
                         <div class="bg-[#030508] p-4 rounded-2xl border border-purple-500/30 text-center space-y-1">
                             <p class="text-[10px] font-mono text-slate-400 uppercase">Verifizierter Account</p>
@@ -148,7 +143,6 @@
                         <button type="button" id="btn-auth-to-studio" class="cyber-button w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🎸 Zum Elite Studio</button>
                     </div>
 
-                    <!-- Login Form -->
                     <div id="subform-login" class="space-y-3">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
@@ -166,13 +160,12 @@
                         </div>
                     </div>
 
-                    <!-- Code Eingabe (Pflichtfeld) -->
                     <div id="subform-verify" class="space-y-3 hidden">
                         <div class="bg-purple-950/40 p-3 rounded-xl border border-purple-500/30 text-[11px] font-mono text-purple-200">
-                            📨 Ein Bestätigungscode wurde gesendet. Bitte geben Sie ihn hier ein, um den Zugang freizuschalten.
+                            📨 Ein Bestätigungscode wurde gesendet. Bitte geben Sie ihn hier ein.
                         </div>
                         <div>
-                            <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE (PFLICHT):</label>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">VERIFIZIERUNGSCODE:</label>
                             <input type="text" id="verify-code-input" maxlength="4" class="w-full bg-[#030508] border border-purple-500 rounded-xl px-3.5 py-2.5 text-white text-center text-lg font-mono tracking-widest outline-none" placeholder="XXXX">
                         </div>
                         <button type="button" id="btn-execute-verify" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✅ Code bestätigen &amp; Einloggen</button>
@@ -182,31 +175,29 @@
                         </div>
                     </div>
 
-                    <!-- Register Form -->
                     <div id="subform-register" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">E-MAIL:</label>
                             <input type="email" id="reg-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
-                            <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN (min. 4 Ziffern):</label>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">PIN WÄHLEN:</label>
                             <input type="password" id="reg-pin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="Sichere PIN">
                         </div>
-                        <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren &amp; Code senden</button>
+                        <button type="button" id="btn-execute-register" class="cyber-button w-full bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">✨ Registrieren</button>
                         
                         <div class="text-center pt-2">
                             <button type="button" id="link-back-to-login" class="text-[11px] font-mono text-purple-400 hover:underline cursor-pointer">← Zum Login</button>
                         </div>
                     </div>
 
-                    <!-- PIN Reset Form -->
                     <div id="subform-reset" class="space-y-3 hidden">
                         <div>
                             <label class="text-[11px] font-mono text-slate-400 block mb-1">REGISTRIERTE E-MAIL:</label>
                             <input type="email" id="reset-email" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="name@domain.com">
                         </div>
                         <div>
-                            <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN FESTLEGEN:</label>
+                            <label class="text-[11px] font-mono text-slate-400 block mb-1">NEUE PIN:</label>
                             <input type="password" id="reset-newpin" maxlength="6" class="w-full bg-[#030508] border border-slate-800 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none focus:border-purple-500 transition" placeholder="Neue PIN">
                         </div>
                         <button type="button" id="btn-execute-reset" class="cyber-button w-full bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">🔄 PIN Neu Setzen</button>
@@ -250,7 +241,7 @@
                     localStorage.setItem('secure_nexus_users_db', JSON.stringify(db));
                 },
                 generateChecksum(dataObj) {
-                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_SALT_GARDEN_BEAT_2026`;
+                    const rawString = `${dataObj.fans}_${dataObj.hype}_${dataObj.releasesCount}_${dataObj.genre}_${dataObj.goldRecords}_${dataObj.marketingLevel}_${dataObj.studioLevel}_${dataObj.producerLevel}_${dataObj.prLevel}_${dataObj.labelLevel}_${dataObj.merchLevel}_${dataObj.algoLevel}_${dataObj.tourBusLevel}_${dataObj.aiNeuralLevel}_${dataObj.satelliteLevel}_${dataObj.hologramTourLevel}_${dataObj.quantumSynthLevel}_${dataObj.musicAcademyLevel}_${dataObj.deepSpaceLevel}_${dataObj.singularityLevel}_JACK_STANDALONE_2026`;
                     let hash = 0;
                     for (let i = 0; i < rawString.length; i++) {
                         hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
@@ -436,7 +427,6 @@
                     if (page.id === 'studio') {
                         innerHTMLContent = `
                             <div class="space-y-4">
-                                <!-- Statistik-Leiste -->
                                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
                                     <div class="glass-panel p-3.5 rounded-2xl border border-purple-500/20">
                                         <p class="text-[10px] font-mono text-purple-300 uppercase tracking-wider">Fans</p>
@@ -460,7 +450,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Prestige / Welt-Tournee Panel -->
                                 <div id="panel-prestige" class="glass-panel p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-center gap-3 bg-gradient-to-r from-amber-950/30 via-purple-950/20 to-slate-900/40">
                                     <div>
                                         <p class="text-xs font-mono text-amber-400 font-bold uppercase flex items-center gap-1.5"><span>🌟</span> Globale Welt-Tournee (Prestige)</p>
@@ -469,7 +458,6 @@
                                     <button type="button" id="btn-prestige" class="cyber-button bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white text-[11px] font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer shrink-0 shadow">🌟 Tournee Starten (Ab 50k Fans)</button>
                                 </div>
 
-                                <!-- Live Industry Event Ticker -->
                                 <div class="glass-panel p-4 rounded-2xl border border-purple-500/30 flex items-center justify-between gap-3 bg-gradient-to-r from-purple-950/40 via-slate-900/60 to-cyan-950/40">
                                     <div class="flex items-center gap-3">
                                         <span class="text-2xl animate-bounce">📡</span>
@@ -481,7 +469,6 @@
                                     <span id="ticker-timer-badge" class="text-[10px] font-mono bg-purple-900/60 text-purple-300 px-2.5 py-1 rounded-lg border border-purple-500/40 shrink-0">Nächstes Event in 30s</span>
                                 </div>
 
-                                <!-- Genre-Spezialisierungs-Matrix -->
                                 <div class="glass-panel p-4 rounded-2xl border-slate-800 space-y-2.5">
                                     <div class="flex justify-between items-center">
                                         <h3 class="text-xs font-mono text-cyan-300 font-bold uppercase">🎧 Aktiver Musik-Stil (Genre-Fokus)</h3>
@@ -507,7 +494,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Hardcore Releases mit Cooldowns -->
                                 <div class="glass-panel p-5 rounded-2xl border border-purple-500/30 space-y-3">
                                     <div class="flex justify-between items-center">
                                         <h3 class="text-xs font-mono text-purple-300 font-bold uppercase">💿 Musik-Produktion &amp; Releases</h3>
@@ -529,7 +515,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Upgrades Matrix -->
                                 <div class="glass-panel p-5 rounded-2xl border-slate-800 space-y-4">
                                     <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                                         <h3 class="text-xs font-mono text-emerald-300 font-bold uppercase">📈 Studio-Upgrades &amp; 15 Empire Stufen</h3>
@@ -537,8 +522,6 @@
                                     </div>
                                     
                                     <div class="space-y-4 max-h-[420px] overflow-y-auto pr-1.5">
-                                        
-                                        <!-- Kategorie 1: Basis & Studio -->
                                         <div class="space-y-2">
                                             <p class="text-[10px] font-mono text-purple-300 uppercase tracking-wider font-bold">1. Basis &amp; Studio</p>
                                             
@@ -567,7 +550,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Kategorie 2: Business & Expansion -->
                                         <div class="space-y-2 pt-2">
                                             <p class="text-[10px] font-mono text-cyan-300 uppercase tracking-wider font-bold">2. Business &amp; Expansion</p>
 
@@ -604,7 +586,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Kategorie 3: High-Tech & Enterprise -->
                                         <div class="space-y-2 pt-2">
                                             <p class="text-[10px] font-mono text-pink-300 uppercase tracking-wider font-bold">3. High-Tech &amp; Enterprise</p>
 
@@ -641,7 +622,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Kategorie 4: Kosmische Ära (End-Game) -->
                                         <div class="space-y-2 pt-2">
                                             <p class="text-[10px] font-mono text-amber-300 uppercase tracking-wider font-bold">4. Kosmische Ära (End-Game)</p>
 
@@ -681,11 +661,10 @@
                                     </div>
                                 </div>
 
-                                <!-- Spielstand Reset -->
                                 <div class="glass-panel p-4 rounded-2xl border border-red-500/30 flex flex-col sm:flex-row justify-between items-center gap-3">
                                     <div>
                                         <p class="text-xs font-mono text-red-400 font-bold uppercase">⚠️ Spielstand Zurücksetzen</p>
-                                        <p class="text-[10px] text-slate-400">Setzt Fans, Releases &amp; Upgrades auf Anfang zurück (E-Mail &amp; PIN bleiben aktiv).</p>
+                                        <p class="text-[10px] text-slate-400">Setzt Fans, Releases &amp; Upgrades auf Anfang zurück.</p>
                                     </div>
                                     <button type="button" id="btn-reset-gamestate" class="cyber-button bg-red-600/80 hover:bg-red-600 text-white text-[11px] font-mono font-bold py-2.5 px-4 rounded-xl cursor-pointer shrink-0 shadow">🔄 Spielstand Reset</button>
                                 </div>
@@ -696,7 +675,6 @@
                         innerHTMLContent = `
                             <div class="space-y-6">
                                 <div id="garden-sanctuary-box" class="glass-panel p-6 sm:p-8 rounded-3xl border border-emerald-500/30 relative overflow-hidden bg-gradient-to-b from-[#050e14] via-[#03070f] to-[#020408] transition-all duration-300">
-                                    <!-- Hintergrund-Effekte -->
                                     <div class="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
                                     <div class="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -714,7 +692,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Hündin Lili & Garten Flora (Reagieren auf den Beat) -->
                                     <div class="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                                         <div class="garden-element bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-emerald-500/30 flex items-center gap-3 shadow-lg transition">
                                             <span class="text-3xl">🐕</span>
@@ -739,7 +716,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Der Radio Player -->
                                     <div class="relative z-10 bg-slate-900/90 backdrop-blur-xl p-5 sm:p-6 rounded-2xl border border-emerald-500/40 shadow-2xl space-y-4">
                                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                                             <div class="flex items-center gap-4 w-full sm:w-auto">
@@ -767,7 +743,7 @@
                             <div class="space-y-4">
                                 <div class="glass-panel p-5 rounded-2xl border border-cyan-500/30 space-y-4">
                                     <h3 class="text-xs font-mono text-cyan-400 font-bold uppercase">☁️ Externes Backup &amp; Portabilität</h3>
-                                    <p class="text-xs text-slate-300">Sichere deinen harten Fortschritt als Datei ab, um ihn auf anderen Geräten fortzusetzen.</p>
+                                    <p class="text-xs text-slate-300">Sichere deinen harten Fortschritt als Datei ab.</p>
                                     <div class="flex flex-wrap gap-3 pt-2">
                                         <button type="button" id="btn-export-backup" class="cyber-button bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow">📥 Backup exportieren (.json)</button>
                                         <label class="cyber-button bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold py-3 px-5 rounded-xl cursor-pointer shadow inline-block text-center">
@@ -932,7 +908,6 @@
                 }
             });
 
-            // Auth Event Handler
             const subLogin = document.getElementById('subform-login');
             const subReg = document.getElementById('subform-register');
             const subReset = document.getElementById('subform-reset');
@@ -940,71 +915,62 @@
             const mainTitle = document.getElementById('auth-main-title');
             const feedbackMsg = document.getElementById('auth-feedback-msg');
 
-            document.getElementById('link-to-register').addEventListener('click', () => {
-                subLogin.classList.add('hidden'); subReset.classList.add('hidden'); subVerify.classList.add('hidden'); subReg.classList.remove('hidden');
-                mainTitle.innerText = "Konto Registrierung"; feedbackMsg.innerText = "";
-            });
-            document.getElementById('link-to-reset').addEventListener('click', () => {
-                subLogin.classList.add('hidden'); subReg.classList.add('hidden'); subVerify.classList.add('hidden'); subReset.classList.remove('hidden');
-                mainTitle.innerText = "PIN Zurücksetzen"; feedbackMsg.innerText = "";
-            });
-            document.getElementById('link-back-to-login').addEventListener('click', () => {
-                subReg.classList.add('hidden'); subReset.classList.add('hidden'); subVerify.classList.add('hidden'); subLogin.classList.remove('hidden');
-                mainTitle.innerText = "Sicheres Login-Portal"; feedbackMsg.innerText = "";
-            });
-            document.getElementById('link-cancel-reset').addEventListener('click', () => {
-                subReset.classList.add('hidden'); subLogin.classList.remove('hidden');
-                mainTitle.innerText = "Sicheres Login-Portal"; feedbackMsg.innerText = "";
-            });
-            document.getElementById('link-cancel-verify').addEventListener('click', () => {
-                SecureAuth.activeVerificationCode = null;
-                updateAuthPortalUI();
-                feedbackMsg.innerText = "❌ Verifizierung abgebrochen.";
-            });
-
-            document.getElementById('btn-init-login').addEventListener('click', async () => {
-                const email = document.getElementById('login-email').value;
-                const pin = document.getElementById('login-pin').value;
-                feedbackMsg.innerText = "⏳ Verifiziere Daten...";
-                const res = await SecureAuth.initVerification(email, pin, false);
-                feedbackMsg.innerText = res.msg;
-                if (res.success && res.needsCode) {
-                    updateAuthPortalUI();
+            document.addEventListener('click', async function(e) {
+                if (e.target && e.target.id === 'link-to-register') {
+                    subLogin.classList.add('hidden'); subReset.classList.add('hidden'); subVerify.classList.add('hidden'); subReg.classList.remove('hidden');
+                    mainTitle.innerText = "Konto Registrierung"; feedbackMsg.innerText = "";
                 }
-            });
-
-            document.getElementById('btn-execute-register').addEventListener('click', async () => {
-                const email = document.getElementById('reg-email').value;
-                const pin = document.getElementById('reg-pin').value;
-                feedbackMsg.innerText = "⏳ Erstelle Konto...";
-                const res = await SecureAuth.initVerification(email, pin, true);
-                feedbackMsg.innerText = res.msg;
-                if (res.success && res.needsCode) {
-                    updateAuthPortalUI();
+                if (e.target && e.target.id === 'link-to-reset') {
+                    subLogin.classList.add('hidden'); subReg.classList.add('hidden'); subVerify.classList.add('hidden'); subReset.classList.remove('hidden');
+                    mainTitle.innerText = "PIN Zurücksetzen"; feedbackMsg.innerText = "";
                 }
-            });
-
-            document.getElementById('btn-execute-verify').addEventListener('click', () => {
-                const code = document.getElementById('verify-code-input').value;
-                const res = SecureAuth.finalizeVerification(code);
-                feedbackMsg.innerText = res.msg;
-                if (res.success) {
-                    renderNavbar();
-                    updateFooterStatus();
-                    updateAuthPortalUI();
-                    setTimeout(() => switchView('studio'), 800);
+                if (e.target && e.target.id === 'link-back-to-login') {
+                    subReg.classList.add('hidden'); subReset.classList.add('hidden'); subVerify.classList.add('hidden'); subLogin.classList.remove('hidden');
+                    mainTitle.innerText = "Sicheres Login-Portal"; feedbackMsg.innerText = "";
                 }
-            });
-
-            document.getElementById('btn-execute-reset').addEventListener('click', () => {
-                const email = document.getElementById('reset-email').value;
-                const newPin = document.getElementById('reset-newpin').value;
-                const res = SecureAuth.resetPin(email, newPin);
-                feedbackMsg.innerText = res.msg;
-                if (res.success) { subReset.classList.add('hidden'); subLogin.classList.remove('hidden'); mainTitle.innerText = "Sicheres Login-Portal"; }
-            });
-
-            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'link-cancel-reset') {
+                    subReset.classList.add('hidden'); subLogin.classList.remove('hidden');
+                    mainTitle.innerText = "Sicheres Login-Portal"; feedbackMsg.innerText = "";
+                }
+                if (e.target && e.target.id === 'link-cancel-verify') {
+                    SecureAuth.activeVerificationCode = null;
+                    updateAuthPortalUI();
+                    feedbackMsg.innerText = "❌ Verifizierung abgebrochen.";
+                }
+                if (e.target && e.target.id === 'btn-init-login') {
+                    const email = document.getElementById('login-email').value;
+                    const pin = document.getElementById('login-pin').value;
+                    feedbackMsg.innerText = "⏳ Verifiziere Daten...";
+                    const res = await SecureAuth.initVerification(email, pin, false);
+                    feedbackMsg.innerText = res.msg;
+                    if (res.success && res.needsCode) updateAuthPortalUI();
+                }
+                if (e.target && e.target.id === 'btn-execute-register') {
+                    const email = document.getElementById('reg-email').value;
+                    const pin = document.getElementById('reg-pin').value;
+                    feedbackMsg.innerText = "⏳ Erstelle Konto...";
+                    const res = await SecureAuth.initVerification(email, pin, true);
+                    feedbackMsg.innerText = res.msg;
+                    if (res.success && res.needsCode) updateAuthPortalUI();
+                }
+                if (e.target && e.target.id === 'btn-execute-verify') {
+                    const code = document.getElementById('verify-code-input').value;
+                    const res = SecureAuth.finalizeVerification(code);
+                    feedbackMsg.innerText = res.msg;
+                    if (res.success) {
+                        renderNavbar();
+                        updateFooterStatus();
+                        updateAuthPortalUI();
+                        setTimeout(() => switchView('studio'), 800);
+                    }
+                }
+                if (e.target && e.target.id === 'btn-execute-reset') {
+                    const email = document.getElementById('reset-email').value;
+                    const newPin = document.getElementById('reset-newpin').value;
+                    const res = SecureAuth.resetPin(email, newPin);
+                    feedbackMsg.innerText = res.msg;
+                    if (res.success) { subReset.classList.add('hidden'); subLogin.classList.remove('hidden'); mainTitle.innerText = "Sicheres Login-Portal"; }
+                }
                 if (e.target && (e.target.id === 'btn-trigger-logout' || e.target.id === 'btn-auth-logout')) {
                     SecureAuth.logout();
                     renderNavbar();
@@ -1016,10 +982,6 @@
                 if (e.target && e.target.id === 'btn-auth-to-studio') {
                     switchView('studio');
                 }
-            });
-
-            // Backup Import/Export
-            document.addEventListener('click', function(e) {
                 if (e.target && e.target.id === 'btn-export-backup') {
                     if (!SecureAuth.currentUser) return;
                     let db = SecureAuth.getDB();
@@ -1065,40 +1027,41 @@
                 }
             });
 
-            // --- BEAT-SYNCED GARDEN RADIO & STREAM SYNCHRONIZATION ---
-            const gardenAudio = document.getElementById('garden-audio');
-            const gardenPlayBtn = document.getElementById('garden-play-btn');
-            const gardenVolume = document.getElementById('garden-volume');
-
-            if (gardenPlayBtn && gardenAudio) {
-                gardenPlayBtn.addEventListener('click', () => {
+            // Garten Audio Player & Beat Sync
+            document.addEventListener('click', function(e) {
+                const playBtn = e.target.closest('#garden-play-btn');
+                if (playBtn) {
+                    const audio = document.getElementById('garden-audio');
                     const sanctuaryBox = document.getElementById('garden-sanctuary-box');
                     const elements = document.querySelectorAll('.garden-element');
 
-                    if (gardenAudio.paused) {
-                        gardenAudio.play().then(() => {
-                            gardenPlayBtn.textContent = '⏸';
-                            gardenPlayBtn.classList.add('affordable-glow');
-                            if (sanctuaryBox) sanctuaryBox.classList.add('garden-groove');
-                            elements.forEach(el => el.classList.add('garden-groove'));
-                        }).catch(err => {
-                            console.error("Playback error:", err);
-                        });
-                    } else {
-                        gardenAudio.pause();
-                        gardenPlayBtn.textContent = '▶';
-                        gardenPlayBtn.classList.remove('affordable-glow');
-                        if (sanctuaryBox) sanctuaryBox.classList.remove('garden-groove');
-                        elements.forEach(el => el.classList.remove('garden-groove'));
+                    if (audio) {
+                        if (audio.paused) {
+                            audio.play().then(() => {
+                                playBtn.textContent = '⏸';
+                                playBtn.classList.add('affordable-glow');
+                                if (sanctuaryBox) sanctuaryBox.classList.add('garden-groove');
+                                elements.forEach(el => el.classList.add('garden-groove'));
+                            }).catch(err => {
+                                console.error("Playback error:", err);
+                            });
+                        } else {
+                            audio.pause();
+                            playBtn.textContent = '▶';
+                            playBtn.classList.remove('affordable-glow');
+                            if (sanctuaryBox) sanctuaryBox.classList.remove('garden-groove');
+                            elements.forEach(el => el.classList.remove('garden-groove'));
+                        }
                     }
-                });
-            }
+                }
+            });
 
-            if (gardenVolume && gardenAudio) {
-                gardenVolume.addEventListener('input', (e) => {
-                    gardenAudio.volume = e.target.value;
-                });
-            }
+            document.addEventListener('input', function(e) {
+                if (e.target && e.target.id === 'garden-volume') {
+                    const audio = document.getElementById('garden-audio');
+                    if (audio) audio.volume = e.target.value;
+                }
+            });
 
             async function fetchCurrentSong() {
                 try {
@@ -1108,22 +1071,18 @@
                         const artist = data.artist?.name || 'jackdarckart';
                         const title = data.title || 'Live Stream';
                         const displayEl = document.getElementById('radio-track-title');
-                        if (displayEl) {
-                            displayEl.textContent = `${artist} – ${title}`;
-                        }
+                        if (displayEl) displayEl.textContent = `${artist} – ${title}`;
                     }
                 } catch(e) {
                     const displayEl = document.getElementById('radio-track-title');
-                    if (displayEl) {
-                        displayEl.textContent = 'jackdarckart • Live Stream (laut.fm/jackdarckart)';
-                    }
+                    if (displayEl) displayEl.textContent = 'jackdarckart • Live Stream (laut.fm/jackdarckart)';
                 }
             }
 
             fetchCurrentSong();
             setInterval(fetchCurrentSong, 15000);
 
-            // --- GAME LOGIC ---
+            // Game Logic
             let eventTimer = 30;
             const liveEventsList = [
                 { text: "🔥 Dein Track geht auf TikTok viral! +150 Fans erhalten.", action: (d) => { d.fans += 150; d.hype += 25; } },
@@ -1223,11 +1182,8 @@
                     if (costEl) costEl.innerText = cost.toLocaleString('de-DE');
 
                     if (rowEl) {
-                        if (data.fans >= cost) {
-                            rowEl.classList.add('affordable-glow');
-                        } else {
-                            rowEl.classList.remove('affordable-glow');
-                        }
+                        if (data.fans >= cost) rowEl.classList.add('affordable-glow');
+                        else rowEl.classList.remove('affordable-glow');
                     }
                 });
 
@@ -1289,9 +1245,7 @@
                 let data = SecureAuth.getAccountData();
                 if (data) {
                     let fps = getFansPerSec(data);
-                    if (fps > 0) {
-                        data.fans += fps;
-                    }
+                    if (fps > 0) data.fans += fps;
 
                     eventTimer--;
                     const badge = document.getElementById('ticker-timer-badge');
