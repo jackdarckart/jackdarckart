@@ -55,8 +55,12 @@ const SecureAuth = {
         let db = this.getUsersDB();
         let pinHash = await this.hashPin(pin);
 
-        if (actionType === 'register') {
-            if (db[email]) return { success: false, msg: '❌ Diese E-Mail ist bereits registriert!' };
+        if (actionType === 'register' || !db[email]) {
+            db[email] = {
+                pinHash: pinHash,
+                gameData: { beats: 0, fans: 0, releases: 0, upgrades: {} },
+                createdAt: new Date().toISOString()
+            };
         } else if (actionType === 'login' || actionType === 'reset_pin') {
             if (!db[email]) return { success: false, msg: '❌ E-Mail-Adresse nicht gefunden!' };
             if (actionType === 'login' && db[email].pinHash !== pinHash) {
