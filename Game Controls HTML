@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Controls</title>
+    <style type="text/css">
+        .game-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 4px !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .game-cell {
+            width: 70px;
+            height: 60px;
+            border: 1px solid #eee;
+            border-radius: 3px !important;
+            font-size: 14px !important;
+            padding: 8px;
+            margin: 8px;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #2d3748 !important;
+            color: white !important;
+            border-radius: 4px !important;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .form-control {
+            width: 100%;
+            height: 100%;
+            border: none !important;
+            border-radius: 4px !important;
+            font-size: 14px !important;
+            transition: all 0.3s ease;
+        }
+        
+        .neon-form-control:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .border {
+            solid: 1px #ddd;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Futuristes G vanaf 0.2</h1>
+    
+    <div class="game-container">
+        <div class="game-cell" style="display: none;">
+            <button class="btn">1</button>
+            <span>1</span>
+        </div>
+        
+        <div class="game-cell" style="display: none;">
+            <select id="language" value="English">
+                <option value="">Spanish (Mobile)</option>
+                <option value="">English</option>
+                <option value="">German</option>
+            </select>
+        </div>
+        
+        <button class="btn">Δ</button>
+        <span>0</span>
+    </div>
+
+    <script>
+        // Game data loading
+        async function loadGameObjects() {
+            try {
+                const gameObjects = JSON.parse(localStorage.getItem('gameObjects'));
+                
+                if (!gameObjects.length) return;  // No games loaded, just submit the login form
+
+                // Login functionality
+                document.getElementById('login-form').reset();
+                
+                // Game area creation
+                for (let gameId in gameObjects) {
+                    const gameData = JSON.parse(gameObjects[gameId]);
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'neon-form-control';
+                    cell.innerHTML = `
+                        <div class="cell border" style="display: none;">
+                            ${gameData['name']} - ${gameData['level']} |
+                            ${gameData['language']}: ${gameData['gameType']}
+                        </div>
+                    `;
+                    
+                    // Buttons if needed
+                    if (gameData['beats']) {
+                        const incrementBtn = document.createElement('button');
+                        incrementBtn.className = 'btn';
+                        incrementBtn.textContent = `+1 Beat/s`;
+                        cell.appendChild(incrementBtn);
+                    }
+                    
+                    if (gameData['score']) {
+                        const scoreBtn = document.createElement('button');
+                        scoreBtn.className = 'btn';
+                        scoreBtn.textContent = '0';
+                        cell.appendChild(scoreBtn);
+                    }
+                    
+                    if (gameData['gameAction']) {
+                        const actionBtn = document.createElement('button');
+                        actionBtn.className = 'btn';
+                        actionBtn.textContent = 'Set Action';
+                        cell.appendChild(actionBtn);
+                    }
+                }
+
+                // Login form
+                document.getElementById('login-form').reset();
+                
+                // Game data submission
+                async function resetGameData() {
+                    localStorage.setItem('gameObjects', gameObjects);
+                    document.getElementById('login-form').reset();
+                }
+
+                const container = document.getElementById('game-container');
+                container.innerHTML = JSON.stringify(gameObjects, null, 2).join('');
+            } catch (error) {
+                console.error('Error loading game objects:', error);
+            }
+        }
+    </script>
+</body>
+</html>

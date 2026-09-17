@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Futuristes G vanaf 0.2</title>
+    <style type="text/css">
+        .neon-color {
+            color: #2d3748;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.05em;
+        }
+        
+        .nav-links a {
+            color: #2d3748 !important;
+            text-decoration: none;
+            margin: 10px 0;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            transform: translateY(2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid transparent;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .game-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        
+        .cell {
+            width: 70px;
+            height: 60px;
+            border: 1px solid #fff;
+            font-size: 14px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #2d3748 !important;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .neon-form-control {
+            width: 100%;
+            height: 60px;
+            border: 1px solid #fff;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .neon-form-control:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .border {
+            solid: 1px #ddd;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-links">
+        <ul id="nav-mobile" aria-hidden="true"></ul>
+    </nav>
+
+    <div class="section-title">
+        <h1>Futuristes G vanaf 0.2</h1>
+        
+        <form id="login-form">
+            <div class="neon-form-control">
+                <input type="email" placeholder="info@game.js" class="form-control input"
+                    value="admin@example.com" />
+                <label>Permission:</label>
+                <select class="form-control select">
+                    <option value="">Readme included</option>
+                    <option value="">Readme not included</option>
+                </select>
+            </div>
+
+            <div class="game-container">
+                <h2>Game Areas</h2>
+                <div id="game1" class="cell border"></div>
+                <div id="game2" class="cell border"></div>
+                <div id="game3" class="cell border"></div>
+                <div id="game4" class="cell border"></div>
+            </div>
+
+            <button type="submit" class="btn">
+                Start Game
+            </button>
+        </form>
+    </div>
+
+    <div class="section-title mt1">
+        <h2>Game Controls</h2>
+        
+        <div id="game-container" class="game-container">
+            <div id="game1">
+                <div class="cell border" style="display: none;">
+                    <button class="btn">
+                        <i class="fas fa-arrows-up"></i>
+                    </button>
+                    <span>1</span>
+                </div>
+            </div>
+            <div id="game2">
+                <div class="cell border" style="display: none;">
+                    <select class="form-control">
+                        <option value="">Select language</option>
+                        <option value="">English</option>
+                        <option value="">Spanish</option>
+                    </select>
+                    <span>English</span>
+                </div>
+            </div>
+            <div id="game3">
+                <button class="btn">
+                    +1 Beat/s
+                </button>
+                <span></span>
+            </div>
+            <div id="game4">
+                <button class="btn">
+                    Δ
+                </button>
+                <span>0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript implementation based on login form and game data
+        const gameObjects = localStorage.getItem('gameObjects');
+        
+        if (!gameObjects.length) {
+            return;  // No games loaded, just submit the login form
+        }
+
+        let form, container;
+        
+        // Login functionality
+        form = document.getElementById('login-form');
+        container = document.getElementById('game-container');
+        form.reset();
+        
+        // Game area creation
+        for (let gameId in gameObjects) {
+            const gameData = JSON.parse(gameObjects[gameId]);
+            
+            const cell = document.createElement('div');
+            cell.className = 'neon-form-control';
+            cell.innerHTML = `
+                <div class="cell border" style="display: none;">
+                    ${gameData['name']} - ${gameData['level']} |
+                    ${gameData['language']}: ${gameData['gameType']}
+                </div>
+            `;
+            
+            // Create buttons if needed
+            if (gameData['beats']) {
+                const incrementBtn = document.createElement('button');
+                incrementBtn.className = 'btn';
+                incrementBtn.textContent = `+1 Beat/s`;
+                container.appendChild(incrementBtn);
+            }
+            
+            if (gameData['score']) {
+                const scoreBtn = document.createElement('button');
+                scoreBtn.className = 'btn';
+                scoreBtn.textContent = '0';
+                container.appendChild(scoreBtn);
+            }
+
+            if (gameData['gameAction']) {
+                const actionBtn = document.createElement('button');
+                actionBtn.className = 'btn';
+                actionBtn.textContent = 'Set Action';
+                container.appendChild(actionBtn);
+            }
+        }
+
+        // Login form
+        form.reset();
+        form.innerHTML = gameObjects.join('');
+        form.submit onclick={resetGameData};
+
+        function resetGameData() {
+            localStorage.setItem('gameObjects', gameObjects);  // Restore data after submit
+        }
+    </script>
+</body>
+</html>
