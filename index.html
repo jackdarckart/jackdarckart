@@ -76,7 +76,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center gap-6 bg-[#030712]/60 p-6 rounded-3xl border border-slate-800/80">
+                <div class="flex flex-col sm:flex-row items-center gap-6 bg-[#030712]/60 p-6 rounded-3xl border border-slate-800 text-xs font-mono">
                     <div id="vinyl-container" class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-cyan-600 via-slate-900 to-pink-600 p-1 shadow-2xl shrink-0 flex items-center justify-center">
                         <div class="w-full h-full rounded-full bg-[#020617] flex items-center justify-center border border-cyan-500/30 spinning-disc" id="spinning-vinyl">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-400 to-pink-500 border-2 border-[#010309] flex items-center justify-center text-[10px] font-bold font-mono text-white">JC</div>
@@ -188,7 +188,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
-                        <button type="button" id="game-play-btn" class="cyber-button bg-gradient-to-r from-cyan-600 to-pink-500 text-white font-bold py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md flex items-center justify-center gap-2 w-full sm:w-auto">
+                        <button type="button" id="game-play-btn" class="cyber-button bg-gradient-to-r from-cyan-600 to-pink-600 text-white font-bold py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-md flex items-center justify-center gap-2 w-full sm:w-auto">
                             <span id="game-play-icon">▶</span> <span id="game-play-text">Radio Starten</span>
                         </button>
                     </div>
@@ -201,7 +201,7 @@
                     <div class="bg-[#030712] p-4 rounded-2xl border border-amber-500/20"><span class="text-[10px] text-slate-400 uppercase">Hashrate</span><p id="g-hash" class="text-xl font-black text-amber-400 mt-1">0 H/s</p></div>
                 </div>
 
-                <button type="button" id="btn-click" class="cyber-button w-full bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-500 text-white font-black py-5 rounded-2xl text-sm uppercase tracking-widest cursor-pointer shadow-xl">
+                <button type="button" id="btn-click" class="cyber-button w-full bg-gradient-to-r from-cyan-600 via-teal-600 to-pink-600 text-white font-black py-5 rounded-2xl text-sm uppercase tracking-widest cursor-pointer shadow-xl">
                     ⚡ Neuen Beat Produzieren (+1 Beat)
                 </button>
 
@@ -249,7 +249,7 @@
                 }
                 views.forEach(v => {
                     const el = document.getElementById(`view-${v}`);
-                    if (el) el.classList.add('hidden');
+                    if(el) el.classList.add('hidden');
                 });
                 const active = document.getElementById(`view-${target}`);
                 if (active) active.classList.remove('hidden');
@@ -271,7 +271,7 @@
                 const nav = document.getElementById('navbar-container');
                 const user = SecureAuth.getSession();
                 nav.innerHTML = `
-                    <button onclick="switchView('home')" class="cyber-button bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎧 Webradio</button>
+                    <button onclick="switchView('home')" class="cyber-button bg-cyan-600/20 text-cyan-300 border border-cyan-400 px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer">🎧 Webradio</button>
                 `;
                 if (user) {
                     nav.innerHTML += `
