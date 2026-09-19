@@ -1285,6 +1285,9 @@
     }
 
     navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {
+      if (installPromptShell) {
+        installPromptShell.hidden = false;
+      }
       if (installStatus) {
         installStatus.textContent = 'Offline-Modus konnte in diesem Browser nicht registriert werden.';
       }
@@ -1328,6 +1331,9 @@
         updateInstallPromptVisibility();
       }
     }
+
+    installPromptEvent = null;
+    updateInstallPromptVisibility();
   }
 
   if (year) {
