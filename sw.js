@@ -57,10 +57,16 @@ self.addEventListener('fetch', (event) => {
   }
 
   const url = new URL(request.url);
-  const normalizedPageUrl = new URL(url.pathname, self.location.origin).href;
   if (url.origin !== self.location.origin) {
     return;
   }
+
+  const scopeUrl = new URL('./', self.location.href);
+  const scopePath = scopeUrl.pathname;
+  const relativePath = url.pathname.startsWith(scopePath)
+    ? url.pathname.slice(scopePath.length)
+    : url.pathname.replace(/^\/+/, '');
+  const normalizedPageUrl = new URL(relativePath || './', scopeUrl).href;
 
   if (request.destination === 'audio') {
     return;
