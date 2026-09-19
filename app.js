@@ -2289,6 +2289,10 @@
     year.textContent = String(new Date().getFullYear());
   }
 
+  if (document.documentElement && document.documentElement.dataset) {
+    document.documentElement.dataset.js = 'true';
+  }
+
   renderStaticSections();
   loadFavorites();
   updateVolume(getStoredVolume(), { persist: false });

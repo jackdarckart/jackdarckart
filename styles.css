@@ -48,6 +48,7 @@ body {
     radial-gradient(circle at top right, rgba(77, 220, 255, 0.18), transparent 23%),
     linear-gradient(180deg, #040a12 0%, #0b1320 48%, #09161f 100%);
   overflow-x: hidden;
+  position: relative;
 }
 
 html[data-theme="light"] body {
@@ -65,7 +66,7 @@ body::before {
   background:
     linear-gradient(120deg, rgba(139, 92, 246, 0.06), transparent 38%, rgba(77, 220, 255, 0.06)),
     radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.04), transparent 44%);
-  z-index: -1;
+  z-index: 0;
 }
 
 html[data-theme="light"] body::before {
@@ -1424,7 +1425,12 @@ body::after {
     repeating-linear-gradient(90deg, rgba(118, 143, 180, 0.05) 0 1px, transparent 1px 72px),
     linear-gradient(180deg, rgba(77, 220, 255, 0.08), transparent 22%, transparent 78%, rgba(139, 92, 246, 0.08));
   mask-image: radial-gradient(circle at 50% 12%, black, transparent 72%);
-  z-index: -1;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
@@ -1688,12 +1694,17 @@ body::after {
 }
 
 [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+html[data-js="true"] [data-reveal] {
   opacity: 0;
   transform: translateY(22px);
   transition: opacity 0.45s ease, transform 0.45s ease;
 }
 
-[data-reveal].is-visible {
+html[data-js="true"] [data-reveal].is-visible {
   opacity: 1;
   transform: translateY(0);
 }
