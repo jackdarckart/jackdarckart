@@ -1532,7 +1532,7 @@ function testLivePageExposesEnhancedModulesAndHooks() {
 
   assert.match(
     liveHtmlCode,
-    /class="(?=[^"]*\bwrap\b)(?=[^"]*\bcontent-columns\b)(?=[^"]*\blive-insights-grid\b)[^"]*"/,
+    /class\s*=\s*["'](?=[^"']*\bwrap\b)(?=[^"']*\bcontent-columns\b)(?=[^"']*\blive-insights-grid\b)[^"']*["']/,
     'live page should include the responsive insights grid layout'
   );
 }
