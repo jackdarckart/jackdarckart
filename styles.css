@@ -567,14 +567,14 @@ code{
   left:50%;
   right:auto;
   bottom:1rem;
-  width:min(44rem, calc(100vw - 2rem));
-  max-width:44rem;
+  width:min(34rem, calc(100vw - 2rem));
+  max-width:34rem;
   z-index:18;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:1rem;
-  padding:1rem 1.1rem;
+  justify-content:center;
+  gap:.7rem;
+  padding:.75rem .85rem;
   border:1px solid rgba(148,163,184,.24);
   border-radius:1.4rem;
   background:rgba(2,6,23,.92);
@@ -608,74 +608,15 @@ code{
   transform:translateX(-50%) translateY(0);
 }
 
-.sticky-player-copy{
-  display:grid;
-  gap:.15rem;
-  min-width:0;
-}
-
-.sticky-player-meta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:.5rem;
-  margin-top:.45rem;
-}
-
-.sticky-player-copy span{
-  color:var(--muted);
-  font-size:.95rem;
-}
-
-.sticky-chip{
-  display:inline-flex;
-  align-items:center;
-  min-height:1.9rem;
-  padding:.3rem .65rem;
-  border:1px solid rgba(148,163,184,.2);
-  border-radius:999px;
-  background:rgba(15,23,42,.68);
-  color:#eef6ff;
-  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
-  font-size:.78rem;
-  line-height:1;
-}
-
-.sticky-chip[data-state="loading"],
-.sticky-chip[data-state="active"]{
-  border-color:rgba(34,211,238,.32);
-  color:#d9f8ff;
-}
-
-.sticky-chip[data-state="playing"]{
-  border-color:rgba(52,211,153,.32);
-  color:#dcfce7;
-}
-
-.sticky-chip[data-state="online"]{
-  border-color:rgba(52,211,153,.22);
-  color:#dffcf0;
-}
-
-.sticky-chip[data-state="blocked"],
-.sticky-chip[data-state="action-needed"]{
-  border-color:rgba(236,72,153,.34);
-  color:#ffe4f2;
-}
-
-.sticky-chip[data-state="error"],
-.sticky-chip[data-state="offline"]{
-  border-color:rgba(251,113,133,.34);
-  color:#ffe0e6;
-}
-
 .sticky-player-actions{
   display:flex;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   gap:.7rem;
+  justify-content:center;
 }
 
 .sticky-play-button{
-  min-width:11rem;
+  min-width:10.5rem;
 }
 
 .site-footer{
@@ -772,27 +713,18 @@ code{
     left:50%;
     right:auto;
     bottom:.75rem;
-    width:min(100vw - 1rem, 32rem);
-    max-width:32rem;
+    width:min(30rem, calc(100vw - 1rem));
+    max-width:30rem;
     transform:translateX(-50%) translateY(1rem);
-    flex-direction:column;
-    align-items:stretch;
+    align-items:center;
   }
 
   .sticky-player.is-visible{
     transform:translateX(-50%) translateY(0);
   }
 
-   .sticky-player-meta{
-      gap:.4rem;
-    }
-
-    .sticky-chip{
-      justify-content:center;
-    }
-
   .sticky-player-actions > *{
-    flex:1 1 100%;
+    flex:0 1 auto;
   }
 }
 
