@@ -2746,10 +2746,10 @@
       || 'Europe/Berlin';
   }
 
-  function getDateKeyInTimeZone(value, timeZone) {
+  function getCalendarPartsInTimeZone(value, timeZone) {
     const timestamp = value ? new Date(value) : null;
     if (!timestamp || Number.isNaN(timestamp.getTime())) {
-      return '';
+      return null;
     }
 
     try {
@@ -2765,13 +2765,42 @@
         const month = parts.find((part) => part.type === 'month');
         const day = parts.find((part) => part.type === 'day');
         if (year && month && day) {
-          return year.value + '-' + month.value + '-' + day.value;
+          return {
+            year: Number.parseInt(year.value, 10),
+            month: Number.parseInt(month.value, 10),
+            day: Number.parseInt(day.value, 10)
+          };
         }
       }
-      return formatter.format(timestamp);
+      const formatted = formatter.format(timestamp);
+      const match = formatted.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (match) {
+        return {
+          year: Number.parseInt(match[1], 10),
+          month: Number.parseInt(match[2], 10),
+          day: Number.parseInt(match[3], 10)
+        };
+      }
+      return null;
     } catch (error) {
-      return timestamp.toISOString().slice(0, 10);
+      return {
+        year: timestamp.getUTCFullYear(),
+        month: timestamp.getUTCMonth() + 1,
+        day: timestamp.getUTCDate()
+      };
     }
+  }
+
+  function buildDateKeyFromCalendarParts(parts, dayOffset) {
+    if (!parts) {
+      return '';
+    }
+
+    return new Date(Date.UTC(parts.year, parts.month - 1, parts.day + dayOffset)).toISOString().slice(0, 10);
+  }
+
+  function getDateKeyInTimeZone(value, timeZone) {
+    return buildDateKeyFromCalendarParts(getCalendarPartsInTimeZone(value, timeZone), 0);
   }
 
   function getWeekdayIndexInTimeZone(value, timeZone) {
@@ -2802,8 +2831,9 @@
   function getFilteredScheduleUpcoming(snapshot) {
     const filterValue = getScheduleFilterValue();
     const timeZone = snapshot.timeZone;
-    const todayKey = getDateKeyInTimeZone(new Date(), timeZone);
-    const tomorrowKey = getDateKeyInTimeZone(Date.now() + 24 * 60 * 60 * 1000, timeZone);
+    const todayParts = getCalendarPartsInTimeZone(new Date(), timeZone);
+    const todayKey = buildDateKeyFromCalendarParts(todayParts, 0);
+    const tomorrowKey = buildDateKeyFromCalendarParts(todayParts, 1);
 
     if (filterValue === 'today') {
       return snapshot.allUpcoming.filter((entry) => getDateKeyInTimeZone(entry.startsAt, timeZone) === todayKey);
@@ -2815,7 +2845,7 @@
       const todayWeekday = getWeekdayIndexInTimeZone(new Date(), timeZone);
       const allowedDateKeys = new Set();
       for (let offset = 0; offset <= (6 - todayWeekday); offset += 1) {
-        allowedDateKeys.add(getDateKeyInTimeZone(Date.now() + offset * 24 * 60 * 60 * 1000, timeZone));
+        allowedDateKeys.add(buildDateKeyFromCalendarParts(todayParts, offset));
       }
       return snapshot.allUpcoming.filter((entry) => allowedDateKeys.has(getDateKeyInTimeZone(entry.startsAt, timeZone)));
     }
