@@ -20,6 +20,7 @@ Die Website bleibt bewusst eine kleine, statische Landingpage ohne Build-Pipelin
 - `styles.css` – responsives Layout, Sticky-Elemente, technische Player-UI, FAQ-Design und visuelle Gestaltung
 - `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-Verhalten, Statusdiagnose, Share-Funktion und defensive Browser-APIs
 - `CNAME` – Custom Domain `stream-musik.space`
+- `tests/app.test.js` – schlanker Node-basierter Regressionstest für zentrale Player-Flows und defensive Initialisierung
 
 Die Website benötigt **keinen Build-Schritt** und wird direkt aus dem Repository-Root veröffentlicht.
 
@@ -61,7 +62,7 @@ Die Custom Domain bleibt über `CNAME` auf `stream-musik.space` gesetzt.
 
 - GitHub Pages für statische Dateien erlaubt keine frei konfigurierbaren HTTP-Response-Header. Deshalb wird die CSP nur als **Meta-CSP** gesetzt. Das ist besser als keine CSP, aber schwächer als echte Server-Header.
 - HSTS, `X-Frame-Options`, `Permissions-Policy` und ähnliche Header lassen sich über GitHub Pages bzw. eine Custom Domain nur eingeschränkt oder gar nicht direkt aus diesem Repository steuern.
-- Der Audiostream kommt von `https://stream.laut.fm/jackdarckart`. Wenn laut.fm nicht erreichbar ist, kann die Website nur auf die offizielle laut.fm-Seite verweisen.
+- Der Audiostream kommt von `https://jackdarckart.stream.laut.fm/jackdarckart`. Wenn laut.fm nicht erreichbar ist, kann die Website nur auf die offizielle laut.fm-Seite verweisen.
 - Bei restriktiven Browser-Richtlinien (vor allem mobil/Safari) muss der Start weiter direkt über die sichtbare Nutzeraktion **Stream starten** oder **Erneut versuchen** erfolgen.
 - Es wird bewusst **kein Service Worker** eingesetzt, um veraltete Caches und unnötige Offline-Komplexität zu vermeiden.
 - Es werden bewusst keine angeblich aktuellen Titel- oder Sendeplandaten angezeigt, solange keine verlässlich eingebundene Quelle vorhanden ist.
@@ -78,6 +79,7 @@ Für diese statische Website ist keine separate `security.txt` mit verifizierter
 Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. Für Änderungen an der statischen Seite wurden daher gezielte lokale Prüfungen verwendet, zum Beispiel:
 
 - JavaScript-Syntaxprüfung mit `node --check app.js`
+- schlanker Regressionstest mit `node tests/app.test.js`
 - HTML/CSS/JS-Manuelltest über einen lokalen statischen Server
 - Wiedergabe-Flows manuell prüfen: Start, Pause, Stumm, Lautstärke, Browser-Blockierung, Retry, Pufferung und Sticky-Quick-Access
 - Mobile/Tablet/Desktop-Layout mit Fokus auf Navigation, Player-Status und FAQ-Sektionen prüfen
