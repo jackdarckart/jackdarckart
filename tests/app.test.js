@@ -128,6 +128,8 @@ class MockElement {
 
   focus() {}
 
+  scrollIntoView() {}
+
   getBoundingClientRect() {
     return { top: 1200, bottom: 1400 };
   }
@@ -423,7 +425,36 @@ function createEnvironment(options = {}) {
       };
     },
     fetch: options.fetch,
-    __JACKDARCKART_CONFIG__: options.appConfig || {}
+    __JACKDARCKART_CONFIG__: options.appConfig || {},
+    DOMParser: class MockDOMParser {
+      parseFromString(html) {
+        const source = String(html || '');
+        const titleMatch = source.match(/<title>([\s\S]*?)<\/title>/i);
+        const bodyMatch = source.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        const langMatch = source.match(/<html[^>]*\slang="([^"]+)"/i);
+        return {
+          title: titleMatch ? titleMatch[1] : '',
+          body: {
+            innerHTML: bodyMatch ? bodyMatch[1] : ''
+          },
+          documentElement: {
+            getAttribute(name) {
+              return name === 'lang' && langMatch ? langMatch[1] : '';
+            }
+          },
+          getElementById(id) {
+            const pattern = new RegExp(`id="${escapeRegExp(id)}"`, 'i');
+            return pattern.test(source) ? {} : null;
+          },
+          querySelector(selector) {
+            if (selector === 'script[src$="./app.js"]' || selector === 'script[src$="app.js"]') {
+              return /<script[^>]+src="\.\/app\.js"/i.test(source) ? {} : null;
+            }
+            return null;
+          }
+        };
+      }
+    }
   };
   windowObject.window = windowObject;
   windowObject.document = document;
@@ -827,8 +858,13 @@ function testAppProvidesPersistentInternalNavigationShell() {
   );
   assert.match(
     appCode,
-    /document\.open\(\);\s+document\.write\(html\);\s+document\.close\(\);/,
-    'internal navigation should replace the page document in-place so the player shell can survive page changes'
+    /document\.body\.innerHTML = nextBodyHtml;/,
+    'internal navigation should replace the persistent shell body in-place instead of rewriting the whole document'
+  );
+  assert.match(
+    appCode,
+    /window\.__JACKDARCKART_BOOTSTRAP__ = bootstrapApp;\s+bootstrapApp\(\);/,
+    'app.js should expose a re-runnable bootstrap so the shell can rebind itself after internal navigation'
   );
   assert.match(
     appCode,
@@ -862,17 +898,13 @@ async function testInternalNavigationPreservesAudioAcrossPages() {
     replaced: null,
     pushState(_state, _title, url) {
       this.pushed = url;
+      env.window.location.href = url;
     },
     replaceState(_state, _title, url) {
       this.replaced = url;
+      env.window.location.href = url;
     }
   };
-  env.document.openCalled = false;
-  env.document.open = () => {
-    env.document.openCalled = true;
-  };
-  env.document.write = () => {};
-  env.document.close = () => {};
 
   await env.elements.play.dispatch('click');
   await env.elements.audio.dispatch('playing');
@@ -892,10 +924,11 @@ async function testInternalNavigationPreservesAudioAcrossPages() {
   await flushMicrotasks();
   await flushMicrotasks();
 
-  assert.equal(env.document.openCalled, true, 'same-origin page clicks should rewrite the current document instead of forcing a full browser navigation');
+  assert.match(env.document.body.innerHTML, /<main id="content"><h1>Live hören<\/h1><\/main>/, 'same-origin page clicks should swap the current shell body without forcing a full browser navigation');
   assert.equal(env.window.history.pushed, 'https://stream-musik.space/live.html', 'internal navigation should push the requested HTML page into history');
-  assert.equal(env.window.__JACKDARCKART_PERSISTENT_AUDIO__, env.elements.audio, 'internal navigation should preserve the original audio element instance');
-  assert.equal(env.window.__JACKDARCKART_PERSISTENT_STATE__.currentState, 'playing', 'persistent navigation should hand off the active playback state to the rewritten page');
+  assert.ok(env.window.__JACKDARCKART_PERSISTENT_AUDIO__ == null, 'persistent audio handoff should be consumed again after the shell finishes re-initializing');
+  assert.equal(env.elements.audio.paused, false, 'the original audio element instance should still be playing after internal navigation');
+  assert.equal(env.elements.status.dataset.state, 'playing', 'the player UI should rehydrate the active playback state after internal navigation');
 }
 
 async function testNavigateHelperUsesHistoryPushStateByDefault() {
@@ -923,23 +956,19 @@ async function testNavigateHelperUsesHistoryPushStateByDefault() {
     replaced: null,
     pushState(_state, _title, url) {
       this.pushed = url;
+      env.window.location.href = url;
     },
     replaceState(_state, _title, url) {
       this.replaced = url;
+      env.window.location.href = url;
     }
   };
-  env.document.openCalled = false;
-  env.document.open = () => {
-    env.document.openCalled = true;
-  };
-  env.document.write = () => {};
-  env.document.close = () => {};
 
   await env.window.__JACKDARCKART_APP__.navigateWithinPersistentShell('https://stream-musik.space/live.html');
   await flushMicrotasks();
   await flushMicrotasks();
 
-  assert.equal(env.document.openCalled, true, 'default helper navigation should rewrite the current document inside the persistent shell');
+  assert.match(env.document.body.innerHTML, /<main id="content"><h1>Live hören<\/h1><\/main>/, 'default helper navigation should replace the shell content in place');
   assert.equal(env.window.history.pushed, 'https://stream-musik.space/live.html', 'default helper navigation should push a new history entry');
   assert.equal(env.window.history.replaced, null, 'default helper navigation should not replace history unless requested');
 }
@@ -969,24 +998,20 @@ async function testPopstateNavigationRewritesDocumentWithoutPushingHistory() {
     replaced: null,
     pushState(_state, _title, url) {
       this.pushed = url;
+      env.window.location.href = url;
     },
     replaceState(_state, _title, url) {
       this.replaced = url;
+      env.window.location.href = url;
     }
   };
   env.window.location.href = 'https://stream-musik.space/live.html';
-  env.document.openCalled = false;
-  env.document.open = () => {
-    env.document.openCalled = true;
-  };
-  env.document.write = () => {};
-  env.document.close = () => {};
 
   await env.window.dispatch('popstate');
   await flushMicrotasks();
   await flushMicrotasks();
 
-  assert.equal(env.document.openCalled, true, 'popstate navigation should also rewrite the current document inside the persistent shell');
+  assert.match(env.document.body.innerHTML, /<main id="content"><h1>Live hören<\/h1><\/main>/, 'popstate navigation should also refresh the current shell content in place');
   assert.equal(env.window.history.pushed, null, 'popstate handling should not push a new history entry');
   assert.equal(env.window.history.replaced, null, 'popstate handling should not replace the browser-managed history entry');
 }
@@ -1016,23 +1041,19 @@ async function testReplaceNavigationUsesHistoryReplaceState() {
     replaced: null,
     pushState(_state, _title, url) {
       this.pushed = url;
+      env.window.location.href = url;
     },
     replaceState(_state, _title, url) {
       this.replaced = url;
+      env.window.location.href = url;
     }
   };
-  env.document.openCalled = false;
-  env.document.open = () => {
-    env.document.openCalled = true;
-  };
-  env.document.write = () => {};
-  env.document.close = () => {};
 
   await env.window.__JACKDARCKART_APP__.navigateWithinPersistentShell('https://stream-musik.space/titel.html', { replace: true });
   await flushMicrotasks();
   await flushMicrotasks();
 
-  assert.equal(env.document.openCalled, true, 'replace-mode navigation should rewrite the current document inside the persistent shell');
+  assert.match(env.document.body.innerHTML, /<main id="content"><h1>Titel<\/h1><\/main>/, 'replace-mode navigation should refresh the shell content in place');
   assert.equal(env.window.history.pushed, null, 'replace-mode navigation should not push a new history entry');
   assert.equal(env.window.history.replaced, 'https://stream-musik.space/titel.html', 'replace-mode navigation should update the current history entry');
 }
