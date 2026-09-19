@@ -160,6 +160,7 @@ function createEnvironment(options = {}) {
   let shareCall = null;
   let openedUrl = '';
   let scrollCall = null;
+  let openedWindow = null;
   const metaThemeColor = new MockElement('meta-theme-color');
   metaThemeColor.setAttribute('content', '#070b18');
 
@@ -365,6 +366,8 @@ function createEnvironment(options = {}) {
     },
     open(url) {
       openedUrl = url;
+      openedWindow = { opener: {} };
+      return openedWindow;
     },
     MediaMetadata: function MediaMetadata(data) {
       Object.assign(this, data);
@@ -441,6 +444,9 @@ function createEnvironment(options = {}) {
     },
     getScrollCall() {
       return scrollCall;
+    },
+    getOpenedWindow() {
+      return openedWindow;
     },
     async runTimer(id) {
       const callback = timers.get(id);
@@ -792,6 +798,14 @@ async function testKeyboardShortcutsRespectInteractiveTargets() {
     preventDefault() {}
   });
   assert.equal(elements.audio.playCount, 1, 'shortcuts should stay inactive while typing in inputs');
+
+  await document.dispatch('keydown', {
+    key: 'S',
+    target: { tagName: 'DIV' },
+    defaultPrevented: true,
+    preventDefault() {}
+  });
+  assert.equal(env.getShareCall().url, 'https://stream-musik.space/', 'already prevented keyboard events should not trigger a second shortcut action');
 }
 
 async function testSleepTimerResetsOnManualStop() {
@@ -893,6 +907,27 @@ async function testFeedbackUsesHonestFallbacksAndValidation() {
   await env.elements['feedback-issue'].dispatch('click');
 
   assert.match(env.getOpenedUrl(), /title=Feedback%3A%20Kurzes%20Feedback/, 'issue fallback should prepare a GitHub issue with encoded content');
+  assert.equal(env.getOpenedWindow().opener, null, 'issue fallback should defensively clear opener on returned window handles');
+}
+
+async function testFeedbackUsesConfiguredMailtoTarget() {
+  const env = createEnvironment({
+    appConfig: {
+      content: {
+        contact: {
+          email: 'radio@example.com'
+        }
+      }
+    }
+  });
+
+  env.elements['feedback-kind'].value = 'song';
+  env.elements['feedback-subject'].value = 'Night Track';
+  env.elements['feedback-message'].value = 'Bitte spiele Night Track im nächsten Set.';
+  await env.elements['feedback-email'].dispatch('click');
+
+  assert.equal(env.elements['feedback-email'].disabled, false, 'email action should become available when a configured address exists');
+  assert.match(env.window.location.href, /^mailto:radio@example\.com\?subject=/, 'mailto flow should keep the mailbox path readable and encode only query values');
 }
 
 async function main() {
@@ -912,6 +947,7 @@ async function main() {
   await testScheduleShowsLiveAndNextWhenConfigured();
   await testScheduleHandlesOvernightWraparound();
   await testFeedbackUsesHonestFallbacksAndValidation();
+  await testFeedbackUsesConfiguredMailtoTarget();
   console.log('app.js player tests passed');
 }
 

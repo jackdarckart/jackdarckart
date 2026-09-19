@@ -1155,7 +1155,14 @@
     }
 
     if (options && options.newTab && typeof window.open === 'function') {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+      if (openedWindow && typeof openedWindow === 'object') {
+        try {
+          openedWindow.opener = null;
+        } catch (error) {
+          return;
+        }
+      }
       return;
     }
 
@@ -1717,54 +1724,38 @@
 
     const currentMinutesOfWeek = (parts.weekday * 1440) + (parts.hours * 60) + parts.minutes;
     const weekMinutes = 7 * 1440;
-    const occurrenceEntries = [];
     let currentOccurrence = null;
 
-    entries.forEach((entry) => {
+    const upcomingOccurrences = entries.map((entry) => {
       const baseStart = (entry.day * 1440) + entry.startMinutes;
       const baseEnd = (entry.day * 1440) + entry.endMinutes;
-      const candidates = [-weekMinutes, 0, weekMinutes].map((offset) => ({
+      const isCurrentOccurrence = (
+        (currentMinutesOfWeek >= baseStart && currentMinutesOfWeek < baseEnd)
+        || (currentMinutesOfWeek + weekMinutes >= baseStart && currentMinutesOfWeek + weekMinutes < baseEnd)
+      );
+
+      if (isCurrentOccurrence) {
+        currentOccurrence = {
+          entry,
+          start: currentMinutesOfWeek >= baseStart ? baseStart : baseStart - weekMinutes,
+          end: currentMinutesOfWeek >= baseStart ? baseEnd : baseEnd - weekMinutes
+        };
+      }
+
+      let nextStart = baseStart;
+      while (nextStart <= currentMinutesOfWeek) {
+        nextStart += weekMinutes;
+      }
+
+      return {
         entry,
-        start: baseStart + offset,
-        end: baseEnd + offset
-      }));
-
-      candidates.forEach((candidate) => {
-        if (candidate.start <= currentMinutesOfWeek && candidate.end > currentMinutesOfWeek) {
-          currentOccurrence = candidate;
-        }
-        if (candidate.end > currentMinutesOfWeek - weekMinutes) {
-          occurrenceEntries.push(candidate);
-        }
-      });
-    });
-
-    const seenUpcomingEntries = new Set();
-    const upcomingOccurrences = occurrenceEntries
-      .filter((candidate) => candidate.end > currentMinutesOfWeek)
+        start: nextStart
+      };
+    })
       .sort((a, b) => a.start - b.start)
-      .filter((candidate) => {
-        const key = [
-          candidate.entry.day,
-          candidate.entry.start,
-          candidate.entry.end,
-          candidate.entry.title,
-          candidate.entry.host,
-          candidate.entry.genre
-        ].join('|');
-
-        if (seenUpcomingEntries.has(key)) {
-          return false;
-        }
-
-        seenUpcomingEntries.add(key);
-        return true;
-      })
       .slice(0, 6);
 
-    const nextOccurrence = upcomingOccurrences.find((candidate) => !currentOccurrence
-      || candidate.start !== currentOccurrence.start
-      || candidate.entry !== currentOccurrence.entry) || null;
+    const nextOccurrence = upcomingOccurrences[0] || null;
 
     return {
       entries,
@@ -1799,8 +1790,10 @@
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyText: 'Noch kein Sendeplan hinterlegt.',
-      hintText: 'Pflege bestätigte Termine in APP_CONFIG.content.schedule.entries. Ohne Einträge bleibt dieser Bereich bewusst leer.'
+      emptyText: snapshot.entries.length ? 'Derzeit keine laufende oder unmittelbar nächste Sendung ermittelbar.' : 'Noch kein Sendeplan hinterlegt.',
+      hintText: snapshot.entries.length
+        ? 'Die vorhandenen Einträge liefern aktuell keinen zuverlässigen Live-/Next-Treffer. Prüfe Wochentag, Start- und Endzeiten.'
+        : 'Pflege bestätigte Termine in APP_CONFIG.content.schedule.entries. Ohne Einträge bleibt dieser Bereich bewusst leer.'
     });
 
     renderCollection(scheduleList, snapshot.upcoming.map((entry) => ({
