@@ -1091,6 +1091,7 @@ function testIssueHelpPageAndTemplatesArePresent() {
   const issueHelpHtml = fs.readFileSync(path.join(__dirname, '..', 'issue-hilfe.html'), 'utf8');
   const readme = fs.readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
   const templateDir = path.join(__dirname, '..', '.github', 'ISSUE_TEMPLATE');
+  const templateConfig = fs.readFileSync(path.join(templateDir, 'config.yml'), 'utf8');
 
   assert.match(issueHelpHtml, /<link rel="canonical" href="https:\/\/stream-musik\.space\/issue-hilfe\.html">/, 'issue help page should define its canonical URL');
   assert.match(issueHelpHtml, /issues\/new\?template=bug_report\.md/, 'issue help page should link to the bug template');
@@ -1103,6 +1104,10 @@ function testIssueHelpPageAndTemplatesArePresent() {
     assert.match(issueHelpHtml, new RegExp(`id=\"${escapeRegExp(hook)}\"`), `issue help page should keep the shared app.js hook ${hook}`);
   }
   assert.match(readme, /Mitwirken über GitHub Issues/, 'README should document the GitHub issue workflow');
+
+  assert.match(templateConfig, /blank_issues_enabled:\s*false/, 'issue template config should disable blank issues');
+  assert.match(templateConfig, /name:\s*GitHub-Issue-Hilfe auf stream-musik\.space/, 'issue template config should link to the website issue help');
+  assert.match(templateConfig, /url:\s*https:\/\/stream-musik\.space\/issue-hilfe\.html/, 'issue template config should point to the issue help page');
 
   for (const file of ['bug_report.md', 'feature_request.md', 'content_request.md', 'design_ux_improvement.md', 'api_realtime_problem.md']) {
     const template = fs.readFileSync(path.join(templateDir, file), 'utf8');
