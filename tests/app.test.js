@@ -224,6 +224,7 @@ function createEnvironment(options = {}) {
   const timers = new Map();
   let timerId = 1;
   let shareCall = null;
+  let clipboardText = '';
   let openedUrl = '';
   let scrollCall = null;
   let openedWindow = null;
@@ -316,14 +317,21 @@ function createEnvironment(options = {}) {
     'now-playing-source',
     'station-status',
     'favorite-track',
+    'copy-track',
     'favorite-status',
     'favorites-list',
     'favorites-empty',
     'favorites-clear',
+    'favorites-copy',
+    'library-filter',
+    'library-filter-clear',
+    'library-summary',
     'history-list',
     'history-empty',
     'schedule-highlight',
     'schedule-list',
+    'schedule-filter',
+    'schedule-summary',
     'events-list',
     'news-list',
     'archive-list',
@@ -389,6 +397,9 @@ function createEnvironment(options = {}) {
   }
   if (elements['sleep-timer-select']) {
     elements['sleep-timer-select'].value = 'off';
+  }
+  if (elements['schedule-filter']) {
+    elements['schedule-filter'].value = 'week';
   }
   if (elements['feedback-kind']) {
     elements['feedback-kind'].value = 'song';
@@ -508,7 +519,9 @@ function createEnvironment(options = {}) {
   const navigator = {
     onLine: true,
     clipboard: {
-      async writeText() {}
+      async writeText(text) {
+        clipboardText = String(text);
+      }
     },
     share: options.share
       ? async (data) => {
@@ -560,6 +573,9 @@ function createEnvironment(options = {}) {
     metaThemeColor,
     getShareCall() {
       return shareCall;
+    },
+    getClipboardText() {
+      return clipboardText;
     },
     getOpenedUrl() {
       return openedUrl;
@@ -1254,6 +1270,109 @@ async function testScheduleUsesOfficialApiEntriesForLiveAndNext() {
   assert.match(env.elements['schedule-source'].textContent, /Letzter erfolgreicher Abruf|bereit/, 'schedule source text should expose refresh state and timing');
 }
 
+async function testScheduleFilterCanLimitUpcomingAgenda() {
+  const env = createEnvironment({
+    now: '2026-09-21T00:30:00+02:00',
+    fetch: async (url) => {
+      if (url.endsWith('/schedule')) {
+        return {
+          ok: true,
+          json: async () => ([
+            {
+              starts: '2026-09-21T02:00:00+02:00',
+              ends: '2026-09-21T03:00:00+02:00',
+              playlist: { name: 'Morgenmix' },
+              type: 'playlist'
+            },
+            {
+              starts: '2026-09-22T02:00:00+02:00',
+              ends: '2026-09-22T03:00:00+02:00',
+              playlist: { name: 'Dienstag Set' },
+              type: 'playlist'
+            },
+            {
+              starts: '2026-09-28T02:00:00+02:00',
+              ends: '2026-09-28T03:00:00+02:00',
+              playlist: { name: 'Nächste Woche' },
+              type: 'playlist'
+            }
+          ])
+        };
+      }
+      if (url.endsWith('/current_song')) {
+        return { ok: true, json: async () => ({}) };
+      }
+      if (url.endsWith('/last_songs')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 0 }) };
+      }
+      if (url.endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  assert.equal(env.elements['schedule-list'].children.length, 2, 'default week filter should exclude entries from the next calendar week');
+  assert.match(env.elements['schedule-summary'].textContent, /2 kommende Einträge für diese Woche/i, 'schedule summary should describe the current-week result set');
+
+  env.elements['schedule-filter'].value = 'tomorrow';
+  await env.elements['schedule-filter'].dispatch('change');
+
+  assert.equal(env.elements['schedule-list'].children.length, 1, 'schedule filter should reduce the upcoming agenda to the selected range');
+  assert.match(env.elements['schedule-list'].children[0].children[0].textContent, /Dienstag Set/, 'schedule filter should retain only entries that match the selected day');
+  assert.match(env.elements['schedule-summary'].textContent, /1 kommende Einträge für morgen/i, 'schedule summary should describe the active filter result');
+}
+
+async function testScheduleWeekFilterTreatsSundayAsWeekEnd() {
+  const env = createEnvironment({
+    now: '2026-09-27T10:00:00+02:00',
+    fetch: async (url) => {
+      if (url.endsWith('/schedule')) {
+        return {
+          ok: true,
+          json: async () => ([
+            {
+              starts: '2026-09-27T19:00:00+02:00',
+              ends: '2026-09-27T21:00:00+02:00',
+              playlist: { name: 'Sunday Closing' },
+              type: 'playlist'
+            },
+            {
+              starts: '2026-09-28T08:00:00+02:00',
+              ends: '2026-09-28T09:00:00+02:00',
+              playlist: { name: 'Next Monday' },
+              type: 'playlist'
+            }
+          ])
+        };
+      }
+      if (url.endsWith('/current_song')) {
+        return { ok: true, json: async () => ({}) };
+      }
+      if (url.endsWith('/last_songs')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 0 }) };
+      }
+      if (url.endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  assert.equal(env.elements['schedule-list'].children.length, 1, 'week filter should stop at Sunday instead of including the next Monday');
+  assert.match(env.elements['schedule-list'].children[0].children[0].textContent, /Sunday Closing/, 'week filter should keep the remaining entry from the current Sunday');
+}
+
 async function testKeyboardShortcutsRespectInteractiveTargets() {
   const env = createEnvironment({
     missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
@@ -1368,6 +1487,100 @@ async function testFavoritesCanBeAddedAndRemovedLocally() {
   await env.elements['favorite-track'].dispatch('click');
   assert.equal(env.elements['favorites-list'].children.length, 0, 'clicking the favorite action again should remove the current favorite');
   assert.equal(env.elements['favorites-empty'].hidden, false, 'empty state should return once all favorites are removed');
+}
+
+async function testCurrentTrackCanBeCopiedToClipboard() {
+  const env = createEnvironment({
+    fetch: async (url) => {
+      if (url.endsWith('/current_song')) {
+        return {
+          ok: true,
+          json: async () => ({
+            title: 'Mitternacht',
+            artist: { name: 'jackdarckart' },
+            album: 'Night Tape'
+          })
+        };
+      }
+      if (url.endsWith('/last_songs') || url.endsWith('/schedule') || url.endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 0 }) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  await env.elements['copy-track'].dispatch('click');
+  assert.equal(env.getClipboardText(), 'jackdarckart – Mitternacht · Night Tape', 'copy current track should include artist, title and album when available');
+  assert.match(env.elements['share-status'].textContent, /Zwischenablage kopiert/i, 'copy current track should confirm a successful copy');
+}
+
+async function testLibraryFilterAndFavoritesCopyStayInSync() {
+  const env = createEnvironment({
+    fetch: async (url) => {
+      if (url.endsWith('/current_song')) {
+        return {
+          ok: true,
+          json: async () => ({
+            title: 'Mitternacht',
+            artist: { name: 'jackdarckart' },
+            album: 'Night Tape'
+          })
+        };
+      }
+      if (url.endsWith('/last_songs')) {
+        return {
+          ok: true,
+          json: async () => ([
+            {
+              title: 'Mitternacht',
+              artist: { name: 'jackdarckart' },
+              album: 'Night Tape',
+              started_at: '2026-09-20T23:55:00+02:00'
+            },
+            {
+              title: 'Sunrise',
+              artist: { name: 'Morning Guest' },
+              album: 'Daybreak',
+              started_at: '2026-09-20T22:55:00+02:00'
+            }
+          ])
+        };
+      }
+      if (url.endsWith('/schedule') || url.endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 0 }) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  await env.elements['favorite-track'].dispatch('click');
+  env.elements['library-filter'].value = 'sunrise';
+  await env.elements['library-filter'].dispatch('input');
+
+  assert.equal(env.elements['history-list'].children.length, 1, 'library filter should narrow the visible history list');
+  assert.equal(env.elements['favorites-list'].children.length, 0, 'library filter should hide favorites that do not match');
+  assert.equal(env.elements['favorites-copy'].disabled, true, 'favorites copy should disable itself when the active filter hides all favorites');
+  assert.match(env.elements['library-summary'].textContent, /Filter aktiv: 0 Favoriten · 1 Historieneinträge/, 'library summary should reflect the filtered result counts');
+
+  await env.elements['favorites-copy'].dispatch('click');
+  assert.match(env.elements['favorite-status'].textContent, /keine Favoriten/i, 'copying favorites with a non-matching filter should explain the empty result');
+
+  await env.elements['library-filter-clear'].dispatch('click');
+  assert.equal(env.elements['history-list'].children.length, 2, 'clearing the filter should restore the full history list');
+  assert.equal(env.elements['favorites-list'].children.length, 1, 'clearing the filter should restore visible favorites');
+
+  await env.elements['favorites-copy'].dispatch('click');
+  assert.match(env.getClipboardText(), /jackdarckart – Mitternacht · Night Tape/, 'favorites copy should export the visible favorite list as plain text');
 }
 
 async function testSameOriginProxyConfigurationIsUsedWhenProvided() {
@@ -1528,10 +1741,12 @@ async function testStickyPlayerUsesPrimaryControlsForVisibility() {
 function testLivePageExposesEnhancedModulesAndHooks() {
   for (const hook of [
     'favorite-track',
+    'copy-track',
     'favorite-status',
     'favorites-list',
     'favorites-empty',
     'favorites-clear',
+    'favorites-copy',
     'history-list',
     'history-empty',
     'history-source',
@@ -1825,8 +2040,12 @@ async function main() {
   await testKeyboardShortcutsRespectInteractiveTargets();
   await testSleepTimerResetsOnManualStop();
   await testFavoritesCanBeAddedAndRemovedLocally();
+  await testCurrentTrackCanBeCopiedToClipboard();
+  await testLibraryFilterAndFavoritesCopyStayInSync();
   await testSameOriginProxyConfigurationIsUsedWhenProvided();
   await testScheduleUsesOfficialApiEntriesForLiveAndNext();
+  await testScheduleFilterCanLimitUpcomingAgenda();
+  await testScheduleWeekFilterTreatsSundayAsWeekEnd();
   await testEmptyStatesExplainHowSectionsAreMaintained();
   await testFeedbackUsesHonestFallbacksAndValidation();
   await testFeedbackUsesConfiguredMailtoTarget();

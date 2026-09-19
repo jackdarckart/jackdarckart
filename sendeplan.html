@@ -92,6 +92,18 @@
       <article class="panel content-panel">
         <h2>Kommende Sendungen</h2>
         <p>Hier erscheinen ausschließlich die nächsten geplanten Einträge aus der offiziellen laut.fm-API.</p>
+        <div class="stack-fields section-gap-top schedule-tools">
+          <label class="field-group schedule-filter-field" for="schedule-filter">
+            <span>Zeitraum wählen</span>
+            <select id="schedule-filter" aria-label="Kommende Sendungen nach Zeitraum filtern">
+              <option value="week">Diese Woche</option>
+              <option value="today">Heute</option>
+              <option value="tomorrow">Morgen</option>
+              <option value="all">Alle kommenden</option>
+            </select>
+          </label>
+        </div>
+        <p class="note compact-note" id="schedule-summary">Der Zeitraumfilter wird vorbereitet.</p>
         <div class="content-list" id="schedule-list" aria-live="polite"></div>
       </article>
     </div>

@@ -28,6 +28,7 @@
     ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' })
     : null;
   const WEEKDAY_LABELS = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+  const WEEKDAY_INDEX_BY_LABEL = Object.fromEntries(WEEKDAY_LABELS.map((label, index) => [label.toLocaleLowerCase('de-DE'), index]));
   const APP_INSTANCE_KEY = '__JACKDARCKART_APP__';
   const PERSISTENT_AUDIO_KEY = '__JACKDARCKART_PERSISTENT_AUDIO__';
   const PERSISTENT_STATE_KEY = '__JACKDARCKART_PERSISTENT_STATE__';
@@ -84,10 +85,17 @@
   const favoritesList = document.getElementById('favorites-list');
   const favoritesEmpty = document.getElementById('favorites-empty');
   const favoritesClearButton = document.getElementById('favorites-clear');
+  const favoritesCopyButton = document.getElementById('favorites-copy');
+  const copyTrackButton = document.getElementById('copy-track');
+  const libraryFilterInput = document.getElementById('library-filter');
+  const libraryFilterClearButton = document.getElementById('library-filter-clear');
+  const librarySummary = document.getElementById('library-summary');
   const historyList = document.getElementById('history-list');
   const historyEmpty = document.getElementById('history-empty');
   const scheduleHighlight = document.getElementById('schedule-highlight');
   const scheduleList = document.getElementById('schedule-list');
+  const scheduleFilterSelect = document.getElementById('schedule-filter');
+  const scheduleSummary = document.getElementById('schedule-summary');
   const eventsList = document.getElementById('events-list');
   const newsList = document.getElementById('news-list');
   const archiveList = document.getElementById('archive-list');
@@ -156,6 +164,7 @@
     schedule: null
   };
   let favoritesState = [];
+  let libraryFilterValue = '';
   let sleepTimerId = 0;
   let sleepEndAt = 0;
   let lastPauseReason = '';
@@ -1220,6 +1229,55 @@
     return parts.join(' – ');
   }
 
+  function getCurrentTrackCopyText() {
+    if (!nowPlayingState.current) {
+      return '';
+    }
+
+    return [
+      [nowPlayingState.current.artist, nowPlayingState.current.title].filter(Boolean).join(' – '),
+      nowPlayingState.current.album
+    ].filter(Boolean).join(' · ');
+  }
+
+  function normalizeSearchText(value) {
+    return String(value || '').trim().toLocaleLowerCase('de-DE');
+  }
+
+  function matchesLibraryFilter(parts) {
+    if (!libraryFilterValue) {
+      return true;
+    }
+
+    return parts.some((part) => normalizeSearchText(part).includes(libraryFilterValue));
+  }
+
+  function updateLibrarySummary() {
+    if (!librarySummary) {
+      return;
+    }
+
+    const matchingFavorites = favoritesState.filter((entry) => matchesLibraryFilter([entry.artist, entry.title, entry.meta]));
+    const matchingHistory = nowPlayingState.history.filter((entry) => matchesLibraryFilter([entry.artist, entry.title, entry.album]));
+    librarySummary.textContent = libraryFilterValue
+      ? 'Filter aktiv: ' + matchingFavorites.length + ' Favoriten · ' + matchingHistory.length + ' Historieneinträge passen zu „' + libraryFilterValue + '“.'
+      : 'Ohne Filter sichtbar: ' + matchingFavorites.length + ' Favoriten · ' + matchingHistory.length + ' Historieneinträge.';
+  }
+
+  function syncTrackActionButtons() {
+    const visibleFavoritesCount = favoritesState.filter((entry) => matchesLibraryFilter([entry.artist, entry.title, entry.meta])).length;
+    if (copyTrackButton) {
+      copyTrackButton.disabled = !getCurrentTrackCopyText();
+    }
+    if (favoritesCopyButton) {
+      favoritesCopyButton.disabled = visibleFavoritesCount === 0;
+      favoritesCopyButton.textContent = libraryFilterInput ? 'Sichtbare Favoriten kopieren' : 'Alle Favoriten kopieren';
+    }
+    if (libraryFilterClearButton) {
+      libraryFilterClearButton.disabled = !libraryFilterValue;
+    }
+  }
+
   function buildShareData(target) {
     const currentTrack = getCurrentTrackLabel();
     if (target === 'stream') {
@@ -1279,6 +1337,81 @@
       ? event.currentTarget.dataset.shareTarget || 'page'
       : 'page';
     await shareTarget(target);
+  }
+
+  async function handleCopyCurrentTrack() {
+    const trackText = getCurrentTrackCopyText();
+    if (!trackText) {
+      if (shareStatus) {
+        shareStatus.textContent = 'Für das Kopieren werden erst verlässliche Now-Playing-Daten benötigt.';
+      }
+      syncTrackActionButtons();
+      return;
+    }
+
+    try {
+      await copyToClipboard(trackText);
+      if (shareStatus) {
+        shareStatus.textContent = 'Aktueller Titel in die Zwischenablage kopiert.';
+      }
+    } catch (error) {
+      if (shareStatus) {
+        shareStatus.textContent = 'Titel konnte nicht kopiert werden. Bitte markiere den Text manuell.';
+      }
+    }
+  }
+
+  async function handleCopyFavorites() {
+    const visibleFavorites = favoritesState.filter((entry) => matchesLibraryFilter([entry.artist, entry.title, entry.meta]));
+    if (!visibleFavorites.length) {
+      if (favoriteStatus) {
+        favoriteStatus.textContent = libraryFilterValue
+          ? 'Zum Kopieren passen aktuell keine Favoriten zum aktiven Filter.'
+          : 'Es sind noch keine lokalen Favoriten zum Kopieren gespeichert.';
+      }
+      syncTrackActionButtons();
+      return;
+    }
+
+    const exportText = visibleFavorites
+      .map((entry, index) => String(index + 1) + '. ' + ([entry.artist, entry.title].filter(Boolean).join(' – ') || 'Ohne Titelangabe') + (entry.meta ? ' · ' + entry.meta : ''))
+      .join('\n');
+
+    try {
+      await copyToClipboard(exportText);
+      if (favoriteStatus) {
+        favoriteStatus.textContent = libraryFilterValue
+          ? 'Sichtbare Favoritenliste in die Zwischenablage kopiert.'
+          : (libraryFilterInput ? 'Sichtbare Favoritenliste in die Zwischenablage kopiert.' : 'Komplette Favoritenliste in die Zwischenablage kopiert.');
+      }
+    } catch (error) {
+      if (favoriteStatus) {
+        favoriteStatus.textContent = 'Favoritenliste konnte nicht kopiert werden.';
+      }
+    }
+  }
+
+  function rerenderLibraryCollections() {
+    renderFavorites();
+    renderHistory(
+      nowPlayingState.history,
+      liveDataStatusState.nowPlaying.lastError
+        ? 'Letzte Titel konnten momentan nicht frisch geladen werden. Letzter erfolgreicher Abruf: ' + (liveDataStatusState.nowPlaying.lastSuccessAt ? formatDateTime(liveDataStatusState.nowPlaying.lastSuccessAt) : 'noch keiner') + '.'
+        : 'Die offizielle laut.fm-API liefert aktuell keine letzten Songs.'
+    );
+  }
+
+  function handleLibraryFilterInput(event) {
+    libraryFilterValue = normalizeSearchText(event && event.target ? event.target.value : '');
+    rerenderLibraryCollections();
+  }
+
+  function clearLibraryFilter() {
+    libraryFilterValue = '';
+    if (libraryFilterInput) {
+      libraryFilterInput.value = '';
+    }
+    rerenderLibraryCollections();
   }
 
   function setFieldValidity(field, isValid) {
@@ -2462,6 +2595,7 @@
     favoriteTrackButton.disabled = !hasTrack;
     favoriteTrackButton.textContent = active ? 'Favorit entfernen' : 'Zu Favoriten';
     favoriteTrackButton.dataset.state = active ? 'active' : 'ready';
+    syncTrackActionButtons();
   }
 
   function renderFavorites() {
@@ -2469,6 +2603,7 @@
       return;
     }
 
+    const visibleFavorites = favoritesState.filter((entry) => matchesLibraryFilter([entry.artist, entry.title, entry.meta]));
     clearElement(favoritesList);
 
     if (!favoritesState.length) {
@@ -2479,16 +2614,20 @@
         favoritesClearButton.disabled = true;
       }
       syncFavoriteButton();
+      updateLibrarySummary();
       return;
     }
 
     favoritesList.hidden = false;
-    favoritesEmpty.hidden = true;
+    favoritesEmpty.hidden = visibleFavorites.length > 0;
     if (favoritesClearButton) {
       favoritesClearButton.disabled = false;
     }
+    if (!visibleFavorites.length) {
+      favoritesEmpty.textContent = 'Kein gespeicherter Favorit passt aktuell zum gesetzten Filter.';
+    }
 
-    favoritesState.forEach((entry) => {
+    visibleFavorites.forEach((entry) => {
       const item = document.createElement('li');
       item.className = 'favorite-item';
 
@@ -2508,6 +2647,7 @@
     });
 
     syncFavoriteButton();
+    updateLibrarySummary();
   }
 
   function removeFavoriteByKey(favoriteKey) {
@@ -2607,6 +2747,140 @@
       || 'Europe/Berlin';
   }
 
+  function getCalendarPartsInTimeZone(value, timeZone) {
+    const timestamp = value ? new Date(value) : null;
+    if (!timestamp || Number.isNaN(timestamp.getTime())) {
+      return null;
+    }
+
+    try {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      if (typeof formatter.formatToParts === 'function') {
+        const parts = formatter.formatToParts(timestamp);
+        const year = parts.find((part) => part.type === 'year');
+        const month = parts.find((part) => part.type === 'month');
+        const day = parts.find((part) => part.type === 'day');
+        if (year && month && day) {
+          return {
+            year: Number.parseInt(year.value, 10),
+            month: Number.parseInt(month.value, 10),
+            day: Number.parseInt(day.value, 10)
+          };
+        }
+      }
+      const formatted = formatter.format(timestamp);
+      const match = formatted.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (match) {
+        return {
+          year: Number.parseInt(match[1], 10),
+          month: Number.parseInt(match[2], 10),
+          day: Number.parseInt(match[3], 10)
+        };
+      }
+      return null;
+    } catch (error) {
+      return {
+        year: timestamp.getUTCFullYear(),
+        month: timestamp.getUTCMonth() + 1,
+        day: timestamp.getUTCDate()
+      };
+    }
+  }
+
+  function buildDateKeyFromCalendarParts(parts, dayOffset) {
+    if (!parts) {
+      return '';
+    }
+
+    return new Date(Date.UTC(parts.year, parts.month - 1, parts.day + dayOffset)).toISOString().slice(0, 10);
+  }
+
+  function getWeekdayIndexFromCalendarParts(parts) {
+    if (!parts) {
+      return new Date().getDay();
+    }
+
+    return new Date(Date.UTC(parts.year, parts.month - 1, parts.day, 12)).getUTCDay();
+  }
+
+  function getDateKeyInTimeZone(value, timeZone) {
+    return buildDateKeyFromCalendarParts(getCalendarPartsInTimeZone(value, timeZone), 0);
+  }
+
+  function getWeekdayIndexInTimeZone(value, timeZone) {
+    const timestamp = value ? new Date(value) : null;
+    if (!timestamp || Number.isNaN(timestamp.getTime())) {
+      return new Date().getDay();
+    }
+
+    const calendarParts = getCalendarPartsInTimeZone(timestamp, timeZone);
+
+    try {
+      const label = new Intl.DateTimeFormat('de-DE', { weekday: 'long', timeZone }).format(timestamp);
+      return Object.prototype.hasOwnProperty.call(WEEKDAY_INDEX_BY_LABEL, label.toLocaleLowerCase('de-DE'))
+        ? WEEKDAY_INDEX_BY_LABEL[label.toLocaleLowerCase('de-DE')]
+        : getWeekdayIndexFromCalendarParts(calendarParts);
+    } catch (error) {
+      return getWeekdayIndexFromCalendarParts(calendarParts);
+    }
+  }
+
+  function getScheduleFilterValue() {
+    if (!scheduleFilterSelect) {
+      return 'all';
+    }
+    return ['today', 'tomorrow', 'week', 'all'].includes(scheduleFilterSelect.value)
+      ? scheduleFilterSelect.value
+      : 'week';
+  }
+
+  function getFilteredScheduleUpcoming(snapshot) {
+    const filterValue = getScheduleFilterValue();
+    const timeZone = snapshot.timeZone;
+    const todayParts = getCalendarPartsInTimeZone(new Date(), timeZone);
+    const todayKey = buildDateKeyFromCalendarParts(todayParts, 0);
+    const tomorrowKey = buildDateKeyFromCalendarParts(todayParts, 1);
+
+    if (filterValue === 'today') {
+      return snapshot.allUpcoming.filter((entry) => getDateKeyInTimeZone(entry.startsAt, timeZone) === todayKey);
+    }
+    if (filterValue === 'tomorrow') {
+      return snapshot.allUpcoming.filter((entry) => getDateKeyInTimeZone(entry.startsAt, timeZone) === tomorrowKey);
+    }
+    if (filterValue === 'week') {
+      const todayWeekday = getWeekdayIndexInTimeZone(new Date(), timeZone);
+      const localizedWeekday = todayWeekday === 0 ? 7 : todayWeekday;
+      const allowedDateKeys = new Set();
+      for (let offset = 0; offset <= (7 - localizedWeekday); offset += 1) {
+        allowedDateKeys.add(buildDateKeyFromCalendarParts(todayParts, offset));
+      }
+      return snapshot.allUpcoming.filter((entry) => allowedDateKeys.has(getDateKeyInTimeZone(entry.startsAt, timeZone)));
+    }
+    return snapshot.allUpcoming;
+  }
+
+  function renderScheduleSummary(snapshot, filteredEntries) {
+    if (!scheduleSummary) {
+      return;
+    }
+
+    const labels = {
+      today: 'heute',
+      tomorrow: 'morgen',
+      week: 'diese Woche',
+      all: 'alle bestätigten kommenden API-Einträge'
+    };
+    const filterValue = getScheduleFilterValue();
+    scheduleSummary.textContent = filteredEntries.length
+      ? 'Zeige ' + filteredEntries.length + ' kommende Einträge für ' + labels[filterValue] + ' · Zeitzone ' + snapshot.timeZone + '.'
+      : 'Für ' + labels[filterValue] + ' liegen aktuell keine bestätigten kommenden API-Einträge vor.';
+  }
+
   function buildScheduleSnapshot() {
     const entries = Array.isArray(scheduleState) ? scheduleState : [];
     const timeZone = getScheduleTimeZone();
@@ -2614,9 +2888,9 @@
     let current = null;
     let next = null;
 
-    const upcoming = entries
+    const allUpcoming = entries
       .filter((entry) => Date.parse(entry.endsAt) >= now)
-      .slice(0, 8);
+      .slice(0, 24);
 
     entries.forEach((entry) => {
       const startsAt = Date.parse(entry.startsAt);
@@ -2633,7 +2907,8 @@
       entries,
       current,
       next,
-      upcoming: upcoming.length ? upcoming : entries.slice(0, 8),
+      allUpcoming,
+      upcoming: allUpcoming.slice(0, 8),
       timeZone
     };
   }
@@ -2658,6 +2933,7 @@
   function renderSchedule() {
     const snapshot = buildScheduleSnapshot();
     const highlightItems = [];
+    const filteredUpcoming = getFilteredScheduleUpcoming(snapshot);
     const scheduleStatus = liveDataStatusState.schedule;
 
     if (snapshot.current) {
@@ -2703,7 +2979,7 @@
       ]
     });
 
-    renderCollection(scheduleList, snapshot.upcoming.map((entry) => ({
+    renderCollection(scheduleList, filteredUpcoming.map((entry) => ({
       title: entry.title,
       meta: formatScheduleMeta(entry, 'Geplant', snapshot.timeZone),
       description: entry.description || 'Kommender Programmeintrag aus der offiziellen laut.fm-API.',
@@ -2713,10 +2989,10 @@
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyTitle: scheduleStatus.lastError && !snapshot.upcoming.length ? 'Kommende Sendungen konnten momentan nicht geladen werden.' : 'Die API liefert derzeit keine kommenden Sendungen.',
-      emptyText: scheduleStatus.lastError && !snapshot.upcoming.length
+      emptyTitle: scheduleStatus.lastError && !filteredUpcoming.length ? 'Kommende Sendungen konnten momentan nicht geladen werden.' : 'Die API liefert derzeit keine passenden kommenden Sendungen.',
+      emptyText: scheduleStatus.lastError && !filteredUpcoming.length
         ? 'Aktuell ist kein verlässlicher API-Abruf für den Wochenplan möglich.'
-        : 'Das bedeutet nicht automatisch, dass der Stream offline ist – nur, dass die API momentan keine kommenden Programmeinträge bereitstellt.',
+        : 'Das bedeutet nicht automatisch, dass der Stream offline ist – nur, dass im gewählten Zeitraum momentan keine passenden kommenden Programmeinträge vorliegen.',
       hintText: scheduleStatus.lastError && scheduleStatus.lastSuccessAt
         ? 'Aktualisierung fehlgeschlagen · Es werden zuletzt erfolgreich geladene Programmeinträge vom ' + formatDateTime(scheduleStatus.lastSuccessAt) + ' gezeigt.'
         : 'Quelle: offizielle laut.fm-API · Zeitzone: ' + snapshot.timeZone + '.',
@@ -2725,6 +3001,7 @@
         'Bei API-Problemen bleibt dieser Bereich ehrlich leer statt Beispielinhalte zu zeigen.'
       ]
     });
+    renderScheduleSummary(snapshot, filteredUpcoming);
 
     if (scheduleSource) {
       scheduleSource.textContent = scheduleStatus.lastError
@@ -3036,18 +3313,23 @@
     }
 
     clearElement(historyList);
+    const visibleEntries = (Array.isArray(entries) ? entries : []).filter((entry) => matchesLibraryFilter([entry.artist, entry.title, entry.album]));
 
     if (!Array.isArray(entries) || entries.length === 0) {
       historyList.hidden = true;
       historyEmpty.hidden = false;
       historyEmpty.textContent = sourceMessage;
+      updateLibrarySummary();
       return;
     }
 
     historyList.hidden = false;
-    historyEmpty.hidden = true;
+    historyEmpty.hidden = visibleEntries.length > 0;
+    if (!visibleEntries.length) {
+      historyEmpty.textContent = 'Kein Historieneintrag passt aktuell zum gesetzten Filter.';
+    }
 
-    entries.forEach((entry) => {
+    visibleEntries.forEach((entry) => {
       const item = document.createElement('li');
       item.className = 'history-item';
 
@@ -3065,6 +3347,7 @@
 
       historyList.appendChild(item);
     });
+    updateLibrarySummary();
   }
 
   function renderNowPlayingFallback(messageText, sourceText) {
@@ -3584,6 +3867,10 @@
   if (shareStreamButton) {
     bindManagedEvent(shareStreamButton, 'click', handleShare);
   }
+  if (copyTrackButton) {
+    bindManagedEvent(copyTrackButton, 'click', handleCopyCurrentTrack);
+    copyTrackButton.disabled = true;
+  }
   if (playButton) {
     bindManagedEvent(playButton, 'click', togglePlayback);
   }
@@ -3653,8 +3940,21 @@
   if (liveDataRefreshButton) {
     bindManagedEvent(liveDataRefreshButton, 'click', refreshAllLiveData);
   }
+  if (scheduleFilterSelect) {
+    bindManagedEvent(scheduleFilterSelect, 'change', renderSchedule);
+  }
   if (favoritesClearButton) {
     bindManagedEvent(favoritesClearButton, 'click', clearFavorites);
+  }
+  if (favoritesCopyButton) {
+    bindManagedEvent(favoritesCopyButton, 'click', handleCopyFavorites);
+  }
+  if (libraryFilterInput) {
+    bindManagedEvent(libraryFilterInput, 'input', handleLibraryFilterInput);
+  }
+  if (libraryFilterClearButton) {
+    bindManagedEvent(libraryFilterClearButton, 'click', clearLibraryFilter);
+    libraryFilterClearButton.disabled = true;
   }
   if (favoritesList) {
     bindManagedEvent(favoritesList, 'click', (event) => {
