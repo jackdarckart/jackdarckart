@@ -11,8 +11,8 @@
   const MAX_AUTO_RECONNECTS = 2;
   const STATE_LABELS = {
     ready: 'Bereit',
-    loading: 'Lädt',
-    playing: 'Spielt',
+    loading: 'Verbindet',
+    playing: 'Live',
     paused: 'Pausiert',
     blocked: 'Blockiert',
     error: 'Fehler'
@@ -41,6 +41,9 @@
   const stickyPlayButton = document.getElementById('sticky-play');
   const stickyStatusText = document.getElementById('sticky-status-text');
   const stickyMessage = document.getElementById('sticky-message');
+  const stickyNetworkState = document.getElementById('sticky-network-state');
+  const stickyPlayerState = document.getElementById('sticky-player-state');
+  const stickyRetryState = document.getElementById('sticky-retry-state');
 
   let currentState = 'ready';
   let loadTimer = 0;
@@ -92,6 +95,7 @@
       buttons.forEach((button) => {
         button.textContent = 'Stream pausieren';
         button.setAttribute('aria-pressed', 'true');
+        button.dataset.state = 'playing';
       });
       return;
     }
@@ -99,11 +103,13 @@
     buttons.forEach((button) => {
       button.textContent = currentState === 'loading' ? 'Verbindung läuft …' : 'Stream starten';
       button.setAttribute('aria-pressed', 'false');
+      button.dataset.state = currentState === 'loading' ? 'loading' : 'ready';
     });
   }
 
   function updateRetryButton() {
     retryButton.hidden = currentState !== 'error' && currentState !== 'blocked';
+    retryButton.dataset.state = retryButton.hidden ? 'hidden' : 'action-needed';
   }
 
   function updateNetworkStatus() {
@@ -113,17 +119,24 @@
 
     const isOffline = typeof navigator.onLine === 'boolean' && !navigator.onLine;
     networkStatus.textContent = isOffline ? 'Browser meldet offline' : 'Browser meldet online';
+    if (networkStatus.parentElement) {
+      networkStatus.parentElement.dataset.state = isOffline ? 'offline' : 'online';
+    }
+    if (stickyNetworkState) {
+      stickyNetworkState.textContent = isOffline ? 'Netz offline' : 'Netz online';
+      stickyNetworkState.dataset.state = isOffline ? 'offline' : 'online';
+    }
   }
 
   function getRetryStatusText() {
     if (currentState === 'loading') {
       return reconnectAttempts > 0
         ? 'Automatik ' + reconnectAttempts + '/' + MAX_AUTO_RECONNECTS
-        : 'Start wird überwacht';
+        : 'Start wird geprüft';
     }
 
     if (currentState === 'playing') {
-      return MAX_AUTO_RECONNECTS > 0 ? 'Auto-Reconnect aktiv' : 'Nur manuell';
+      return MAX_AUTO_RECONNECTS > 0 ? 'Auto-Reconnect bereit' : 'Nur manuell';
     }
 
     if (currentState === 'error' || currentState === 'blocked') {
@@ -136,10 +149,22 @@
   function syncStatusMirrors() {
     if (playerStateLabel) {
       playerStateLabel.textContent = STATE_LABELS[currentState] || STATE_LABELS.ready;
+      if (playerStateLabel.parentElement) {
+        playerStateLabel.parentElement.dataset.state = currentState;
+      }
     }
 
     if (retryStatus) {
       retryStatus.textContent = getRetryStatusText();
+      if (retryStatus.parentElement) {
+        if (currentState === 'error' || currentState === 'blocked') {
+          retryStatus.parentElement.dataset.state = 'action-needed';
+        } else if (currentState === 'loading' || reconnectAttempts > 0) {
+          retryStatus.parentElement.dataset.state = 'active';
+        } else {
+          retryStatus.parentElement.dataset.state = 'manual';
+        }
+      }
     }
 
     if (stickyStatusText) {
@@ -148,6 +173,22 @@
 
     if (stickyMessage) {
       stickyMessage.textContent = message.textContent;
+    }
+
+    if (stickyPlayerState) {
+      stickyPlayerState.textContent = STATE_LABELS[currentState] || STATE_LABELS.ready;
+      stickyPlayerState.dataset.state = currentState;
+    }
+
+    if (stickyRetryState) {
+      stickyRetryState.textContent = getRetryStatusText();
+      if (currentState === 'error' || currentState === 'blocked') {
+        stickyRetryState.dataset.state = 'action-needed';
+      } else if (currentState === 'loading' || reconnectAttempts > 0) {
+        stickyRetryState.dataset.state = 'active';
+      } else {
+        stickyRetryState.dataset.state = 'manual';
+      }
     }
 
     if (stickyPlayer) {
@@ -173,6 +214,7 @@
     muteButton.textContent = muted ? 'Ton an' : 'Stumm';
     muteButton.setAttribute('aria-pressed', String(muted));
     muteButton.setAttribute('aria-label', muted ? 'Ton wieder einschalten' : 'Ton stummschalten');
+    muteButton.dataset.state = muted ? 'muted' : 'active';
   }
 
   function updateVolume(value) {
@@ -214,20 +256,20 @@
     const isOffline = typeof navigator.onLine === 'boolean' && !navigator.onLine;
 
     if (isOffline) {
-      return 'Dein Browser meldet gerade keine Verbindung. Sobald du wieder online bist, kannst du direkt erneut starten.';
+      return 'Dein Browser meldet aktuell keine Verbindung. Sobald du wieder online bist, kannst du den Stream direkt neu starten.';
     }
 
     return forceReload
-      ? 'Die Verbindung zum Livestream wird neu aufgebaut.'
-      : 'Der Livestream wird mit deiner Aktion gestartet.';
+      ? 'Die Verbindung zum Livestream wird kontrolliert neu aufgebaut.'
+      : 'Der Livestream wird jetzt nach deiner Aktion direkt im Browser vorbereitet.';
   }
 
   function getNetworkFailureText() {
     if (typeof navigator.onLine === 'boolean' && !navigator.onLine) {
-      return 'Dein Browser meldet aktuell Offline. Bitte prüfe die Verbindung und tippe dann erneut auf den Stream.';
+      return 'Dein Browser meldet aktuell Offline. Prüfe die Verbindung und starte den Stream danach erneut.';
     }
 
-    return 'Bitte versuche es erneut oder öffne den Stream direkt auf laut.fm.';
+    return 'Bitte versuche es erneut oder wechsle über den Direktstream beziehungsweise laut.fm auf einen externen Hörweg.';
   }
 
   function stopAudioAfterFailure() {
@@ -270,7 +312,7 @@
         setState(
           'loading',
           'Verbindung wird erneut aufgebaut …',
-          'Der Stream antwortet noch nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' startet jetzt.'
+          'Der Stream antwortet noch nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' startet jetzt direkt im Player.'
         );
         clearReconnectTimer();
         reconnectTimer = window.setTimeout(() => {
@@ -304,7 +346,7 @@
       setState(
         'blocked',
         'Browser blockiert die Wiedergabe.',
-        'Bitte tippe erneut auf „Stream starten“ oder „Erneut versuchen“. Erst danach darf der Browser den Livestream freigeben.'
+        'Bitte tippe erneut auf „Stream starten“ oder „Erneut versuchen“. Erst danach gibt der Browser den Livestream für diese Seite frei.'
       );
       return;
     }
@@ -342,7 +384,7 @@
   async function togglePlayback() {
     if (currentState === 'loading') {
       pausePlayback();
-      setState('paused', 'Start wurde abgebrochen.', 'Tippe auf „Stream starten“, um den Livestream neu aufzubauen.');
+      setState('paused', 'Start wurde abgebrochen.', 'Tippe auf „Stream starten“, um den Streamzugang direkt neu aufzubauen.');
       return;
     }
 
@@ -474,7 +516,7 @@
   updateVolume(getStoredVolume());
   audio.muted = getStoredMuted() || audio.volume === 0;
   updateMuteButton();
-  setState('ready', 'Bereit zum Start', 'Der Stream startet erst nach deinem Klick.');
+  setState('ready', 'Bereit zum Start', 'Die Wiedergabe startet erst nach deiner Aktion und meldet Status sowie Neuversuche direkt im Player.');
   setupMediaSession();
   bindNavigation();
   setBackToTopVisibility();
@@ -502,7 +544,7 @@
     if (!wantsPlayback) {
       return;
     }
-    setState('loading', 'Verbindung wird aufgebaut …', 'Der Livestream wird geladen und die Verbindung geprüft.');
+    setState('loading', 'Verbindung wird aufgebaut …', 'Der Livestream wird geladen, die Verbindung geprüft und der Browser-Start vorbereitet.');
     scheduleLoadTimeout();
   });
 
@@ -512,7 +554,7 @@
     reconnectAttempts = 0;
     hasConfirmedPlayback = true;
     wantsPlayback = true;
-    setState('playing', 'Der Livestream läuft.', 'Du hörst jetzt jackdarckart über den offiziellen laut.fm-Stream.');
+    setState('playing', 'Der Livestream läuft.', 'Du hörst jetzt jackdarckart direkt über den offiziellen laut.fm-Stream im Browser.');
     if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'playing';
     }
@@ -524,7 +566,7 @@
     if (wantsPlayback || audio.ended || currentState === 'error' || currentState === 'blocked') {
       return;
     }
-    setState('paused', 'Der Stream ist pausiert.', 'Starte die Wiedergabe jederzeit erneut.');
+    setState('paused', 'Der Stream ist pausiert.', 'Starte die Wiedergabe jederzeit erneut oder wechsle auf einen externen Hörweg.');
     if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'paused';
     }
@@ -534,7 +576,7 @@
     if (!wantsPlayback) {
       return;
     }
-    setState('loading', 'Stream puffert …', 'Die Verbindung wird stabilisiert. Wenn nötig, folgt automatisch ein Neuversuch.');
+    setState('loading', 'Stream puffert …', 'Die Verbindung wird stabilisiert. Falls nötig, folgt automatisch ein Neuversuch im Player.');
     scheduleLoadTimeout();
   });
 
@@ -548,7 +590,7 @@
       setState(
         'loading',
         'Stream verbindet sich neu …',
-        'Die Verbindung stockt. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft.'
+        'Die Verbindung stockt. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft direkt im Player.'
       );
       clearReconnectTimer();
       reconnectTimer = window.setTimeout(() => {
@@ -559,7 +601,7 @@
 
     wantsPlayback = false;
     stopAudioAfterFailure();
-    setState('error', 'Die Verbindung stockt.', 'Bitte tippe auf „Erneut versuchen“ oder öffne den Stream direkt auf laut.fm.');
+    setState('error', 'Die Verbindung stockt.', 'Bitte tippe auf „Erneut versuchen“ oder wechsle auf den Direktstream beziehungsweise die offizielle Senderseite.');
   });
 
   audio.addEventListener('error', () => {
@@ -571,7 +613,7 @@
       setState(
         'loading',
         'Stream verbindet sich neu …',
-        'Der Stream antwortet nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft.'
+        'Der Stream antwortet nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft direkt im Player.'
       );
       reconnectTimer = window.setTimeout(() => {
         attemptPlayback(true);
