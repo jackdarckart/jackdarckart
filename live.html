@@ -66,9 +66,9 @@
     <li aria-current="page">Live hören</li>
   </ol>
 </nav>
-      <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Listening Console</span>
-      <h1>Die immersive Zentrale für Wiedergabe, Signalstatus und Steuerung.</h1>
-      <p>Hier liegt die stärkste Funktion der Website: ein großer Live-Player mit Diagnose-Dashboard, Fallback-Wegen und lokalen Session-Tools. Alles bleibt transparent, ohne Autoplay und ohne erfundene Metadaten.</p>
+      <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Live Studio</span>
+      <h1>Live hören mit modernem Player, klarer Diagnose und schnellen Werkzeugen.</h1>
+      <p>Die Live-Seite bündelt Wiedergabe, API-Status, lokale Favoriten und Programmvorschau in einer responsiven Oberfläche für Desktop, Tablet und Mobile – ohne Autoplay und ohne erfundene Daten.</p>
     </div>
   </section>
 
@@ -140,6 +140,7 @@
           <button class="button play-button" id="play" type="button" aria-pressed="false">Stream starten</button>
           <button class="button icon-button" id="mute" type="button" aria-pressed="false" aria-label="Ton stummschalten">Ton an</button>
           <button class="button icon-button" id="retry" type="button" hidden>Erneut versuchen</button>
+          <button class="button icon-button" id="favorite-track" type="button" data-state="ready" disabled>Zu Favoriten</button>
           <button class="button icon-button" id="share" type="button" data-share-target="page">Live-Seite teilen</button>
         </div>
 
@@ -188,6 +189,14 @@
             <p class="note compact-note">Der Sleep-Timer läuft ausschließlich lokal in diesem Browserfenster. Er stoppt die Wiedergabe nach Ablauf, sendet nichts an Server und beginnt nach einem Reload nicht automatisch neu.</p>
           </section>
 
+          <section class="subpanel compact-panel favorites-panel" aria-labelledby="favorites-title">
+            <div class="subpanel-head compact-head"><h3 id="favorites-title">Lokale Favoriten</h3><span class="subpanel-label">nur in diesem Browser</span></div>
+            <p class="share-status note" id="favorite-status" aria-live="polite">Favoriten-Status: bereit.</p>
+            <ul class="favorites-list" id="favorites-list" hidden></ul>
+            <p class="note compact-note" id="favorites-empty">Noch keine lokalen Favoriten gespeichert.</p>
+            <button class="button secondary" id="favorites-clear" type="button" disabled>Favoritenliste leeren</button>
+          </section>
+
           <section class="subpanel compact-panel" aria-labelledby="shortcuts-title">
             <div class="subpanel-head compact-head"><h3 id="shortcuts-title">Tastaturkürzel</h3><span class="subpanel-label">nur außerhalb von Eingabefeldern</span></div>
             <ul class="shortcut-list">
@@ -212,6 +221,35 @@
       </aside>
 
       <div class="live-side-column">
+        <section class="panel content-panel station-profile-live" data-reveal aria-labelledby="station-profile-title">
+          <div class="subpanel-head">
+            <h2 id="station-profile-title">Senderprofil wird geladen</h2>
+            <span class="subpanel-label">Endpoint <code>/station/jackdarckart</code></span>
+          </div>
+          <div class="station-profile-grid">
+            <div class="station-media" id="station-profile-image-wrap" hidden>
+              <img class="station-art" id="station-profile-image" src="" alt="">
+            </div>
+            <p class="note compact-note" id="station-profile-image-fallback">Kein verifiziertes Senderbild von der API geliefert.</p>
+            <div>
+              <p class="now-playing-artist" id="station-profile-description">Verifizierte Senderinformationen werden aus der offiziellen laut.fm-API geladen.</p>
+              <p class="content-meta" id="station-profile-meta">Genres, Website und weitere verifizierte Details erscheinen nur, wenn die API sie liefert.</p>
+              <p class="content-meta" id="station-profile-listeners">Listener-Wert wird nur angezeigt, wenn die API einen gültigen Zahlenwert liefert.</p>
+              <p class="content-meta" id="station-profile-next-artists">Keine verifizierten Next-Artists-Daten verfügbar.</p>
+              <a class="content-link" id="station-profile-link" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer" aria-label="Offizielle Senderseite öffnen (neuer Tab)">Offizielle Senderseite öffnen (neuer Tab)</a>
+            </div>
+          </div>
+        </section>
+        <section class="panel content-panel live-history-panel" data-reveal aria-labelledby="history-title">
+          <div class="subpanel-head">
+            <h2 id="history-title">Zuletzt gespielt</h2>
+            <span class="subpanel-label">Endpoint <code>/last_songs</code></span>
+          </div>
+          <ul class="history-list" id="history-list" hidden></ul>
+          <p class="note compact-note" id="history-empty">Die letzten Titel werden vorbereitet.</p>
+          <p class="share-status note" id="history-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
+          <a class="button secondary" href="./titel.html">Komplette Titelansicht öffnen</a>
+        </section>
         <section class="panel editorial-module" data-reveal>
           <span class="eyebrow">Wenn etwas nicht funktioniert</span>
           <h2>Schneller Leitfaden für Blockierung, Buffering und Retry.</h2>
@@ -241,6 +279,26 @@
     </div>
   </section>
   <section class="section section-muted live-data-section" data-reveal>
+    <div class="wrap content-columns live-insights-grid">
+      <h2 class="live-insights-heading">Live-Insights</h2>
+      <article class="panel content-panel">
+        <div class="subpanel-head">
+          <h3>Sendeplan-Vorschau</h3>
+          <span class="subpanel-label">Endpoint <code>/schedule</code></span>
+        </div>
+        <div class="content-list single-column" id="schedule-highlight"></div>
+        <p class="live-subheading">Kommende Sendungen</p>
+        <div class="content-list single-column" id="schedule-list"></div>
+        <p class="share-status note" id="schedule-source" aria-live="polite">Sendeplan-API-Status wird geladen.</p>
+      </article>
+      <article class="panel content-panel">
+        <div class="subpanel-head">
+          <h3>Schnelle Plattform-Wege</h3>
+          <span class="subpanel-label">statisch gepflegt</span>
+        </div>
+        <div class="content-list single-column" id="platform-links"></div>
+      </article>
+    </div>
     <div class="wrap">
       <article class="panel content-panel live-data-panel">
         <div class="subpanel-head">

@@ -1484,6 +1484,28 @@ html[data-theme="light"] .nav-cluster {
   min-width: 0;
 }
 
+.station-profile-live .station-profile-grid {
+  margin-top: 0.4rem;
+}
+
+.live-history-panel .button {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.live-insights-grid {
+  margin-bottom: 1rem;
+}
+
+.live-insights-heading {
+  margin: 0 0 0.25rem;
+  grid-column: 1 / -1;
+}
+
+.live-subheading {
+  margin: 1rem 0 0.7rem;
+}
+
 .legal-placeholder strong {
   display: block;
   margin-bottom: 0.9rem;
@@ -1493,6 +1515,12 @@ html[data-theme="light"] .nav-cluster {
   .live-layout,
   .title-layout,
   .legal-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1120px) {
+  .live-layout {
     grid-template-columns: 1fr;
   }
 }
@@ -2008,5 +2036,13 @@ html[data-theme="light"] .sticky-player {
 
   .sticky-player-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-height: 540px) {
+  .sticky-player {
+    bottom: max(0.45rem, env(safe-area-inset-bottom, 0px));
+    min-height: 3.4rem;
+    padding: 0.5rem;
   }
 }

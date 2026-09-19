@@ -6,6 +6,7 @@ const vm = require('node:vm');
 const appCode = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
 const swCode = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 const stylesCode = fs.readFileSync(path.join(__dirname, '..', 'styles.css'), 'utf8');
+const liveHtmlCode = fs.readFileSync(path.join(__dirname, '..', 'live.html'), 'utf8');
 const expectedStreamUrl = 'https://jackdarckart.stream.laut.fm/jackdarckart';
 const htmlPages = [
   'index.html',
@@ -1491,6 +1492,50 @@ function testStickyPlayerCssKeepsPlayerWithinViewport() {
     /@media \(max-width:\s*720px\)\s*\{[\s\S]*\.sticky-player\s*\{[\s\S]*width:\s*calc\(100vw - \(var\(--sticky-edge\) \* 2\)\);[\s\S]*max-width:\s*calc\(100vw - \(var\(--sticky-edge\) \* 2\)\);[\s\S]*\}[\s\S]*\.sticky-player-actions\s*\{[\s\S]*grid-template-columns:\s*1fr;/,
     'mobile sticky player should use full safe viewport width and stack quick actions into one column'
   );
+  assert.match(
+    stylesCode,
+    /@media \(max-height:\s*540px\)\s*\{[\s\S]*\.sticky-player\s*\{[\s\S]*bottom:\s*max\(0\.45rem,\s*env\(safe-area-inset-bottom,\s*0px\)\);[\s\S]*min-height:\s*3\.4rem;/,
+    'short viewports should tighten sticky-player bottom spacing and height to keep actions visible'
+  );
+}
+
+function testLivePageExposesEnhancedModulesAndHooks() {
+  for (const hook of [
+    'favorite-track',
+    'favorite-status',
+    'favorites-list',
+    'favorites-empty',
+    'favorites-clear',
+    'history-list',
+    'history-empty',
+    'history-source',
+    'schedule-highlight',
+    'schedule-list',
+    'schedule-source',
+    'platform-links',
+    'station-profile-title',
+    'station-profile-description',
+    'station-profile-meta',
+    'station-profile-link',
+    'station-profile-listeners',
+    'station-profile-next-artists',
+    'station-profile-image',
+    'station-profile-image-wrap',
+    'station-profile-image-fallback'
+  ]) {
+    const escapedHook = hook.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assert.match(
+      liveHtmlCode,
+      new RegExp(`id\\s*=\\s*["']${escapedHook}["']`),
+      `live page should expose ${hook} for the redesigned live modules`
+    );
+  }
+
+  assert.match(
+    liveHtmlCode,
+    /class\s*=\s*["'](?=[^"']*\bwrap\b)(?=[^"']*\bcontent-columns\b)(?=[^"']*\blive-insights-grid\b)[^"']*["']/,
+    'live page should include the responsive insights grid layout'
+  );
 }
 
 function testServiceWorkerCachesAllHtmlPages() {
@@ -1726,6 +1771,7 @@ function testIssueHelpPageAndTemplatesArePresent() {
 
 async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
+  testLivePageExposesEnhancedModulesAndHooks();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();
