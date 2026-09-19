@@ -158,6 +158,9 @@ function createEnvironment(options = {}) {
   const timers = new Map();
   let timerId = 1;
   let shareCall = null;
+  let openedUrl = '';
+  let scrollCall = null;
+  let openedWindow = null;
   const metaThemeColor = new MockElement('meta-theme-color');
   metaThemeColor.setAttribute('content', '#070b18');
 
@@ -231,16 +234,37 @@ function createEnvironment(options = {}) {
     'install-prompt',
     'install-app',
     'install-status',
+    'sleep-timer-select',
+    'sleep-custom-wrap',
+    'sleep-custom-minutes',
+    'sleep-apply',
+    'sleep-cancel',
+    'sleep-remaining',
     'now-playing-track',
     'now-playing-artist',
     'now-playing-source',
     'station-status',
+    'favorite-track',
+    'favorite-status',
+    'favorites-list',
+    'favorites-empty',
+    'favorites-clear',
     'history-list',
     'history-empty',
+    'schedule-highlight',
+    'schedule-list',
     'events-list',
     'news-list',
     'archive-list',
-    'platform-links'
+    'platform-links',
+    'feedback-kind',
+    'feedback-name',
+    'feedback-subject',
+    'feedback-message',
+    'feedback-email',
+    'feedback-issue',
+    'feedback-status',
+    'feedback-email-hint'
   ];
 
   for (const id of ids) {
@@ -273,8 +297,27 @@ function createEnvironment(options = {}) {
   if (elements['theme-select']) {
     elements['theme-select'].value = 'auto';
   }
+  if (elements['sleep-timer-select']) {
+    elements['sleep-timer-select'].value = 'off';
+  }
+  if (elements['feedback-kind']) {
+    elements['feedback-kind'].value = 'song';
+  }
 
   const localStorageState = new Map();
+  const RealDate = Date;
+  const fixedNow = options.now ? new RealDate(options.now).getTime() : null;
+  const MockDate = fixedNow === null
+    ? RealDate
+    : class MockDate extends RealDate {
+        constructor(...args) {
+          super(...(args.length ? args : [fixedNow]));
+        }
+
+        static now() {
+          return fixedNow;
+        }
+      };
   const locationUrl = new URL('https://stream-musik.space/');
   const location = {
     href: locationUrl.href,
@@ -318,7 +361,14 @@ function createEnvironment(options = {}) {
         await listener(event);
       }
     },
-    scrollTo() {},
+    scrollTo(options) {
+      scrollCall = options;
+    },
+    open(url) {
+      openedUrl = url;
+      openedWindow = { opener: {} };
+      return openedWindow;
+    },
     MediaMetadata: function MediaMetadata(data) {
       Object.assign(this, data);
     },
@@ -365,7 +415,7 @@ function createEnvironment(options = {}) {
     Math,
     Number,
     String,
-    Date,
+    Date: MockDate,
     Promise,
     Error,
     Boolean,
@@ -388,6 +438,15 @@ function createEnvironment(options = {}) {
     metaThemeColor,
     getShareCall() {
       return shareCall;
+    },
+    getOpenedUrl() {
+      return openedUrl;
+    },
+    getScrollCall() {
+      return scrollCall;
+    },
+    getOpenedWindow() {
+      return openedWindow;
     },
     async runTimer(id) {
       const callback = timers.get(id);
@@ -618,6 +677,291 @@ function testUsesStationSpecificHttpsStreamUrl() {
   );
 }
 
+function getBerlinParts() {
+  const formatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Berlin',
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+  });
+  const values = {};
+  for (const part of formatter.formatToParts(new Date())) {
+    if (part.type !== 'literal') {
+      values[part.type] = part.value;
+    }
+  }
+
+  const weekdayMap = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6
+  };
+
+  return {
+    day: weekdayMap[values.weekday],
+    hour: Number.parseInt(values.hour, 10),
+    minute: Number.parseInt(values.minute, 10)
+  };
+}
+
+function toTimeString(totalMinutes) {
+  const normalized = ((totalMinutes % 1440) + 1440) % 1440;
+  return String(Math.floor(normalized / 60)).padStart(2, '0') + ':' + String(normalized % 60).padStart(2, '0');
+}
+
+async function testScheduleHandlesOvernightWraparound() {
+  const env = createEnvironment({
+    now: '2026-09-21T00:30:00+02:00',
+    appConfig: {
+      content: {
+        schedule: {
+          timeZone: 'Europe/Berlin',
+          entries: [
+            {
+              day: 'Sonntag',
+              start: '23:00',
+              end: '01:00',
+              title: 'Late Night'
+            },
+            {
+              day: 'Montag',
+              start: '02:00',
+              end: '03:00',
+              title: 'Morgenmix'
+            }
+          ]
+        }
+      }
+    }
+  });
+
+  const highlightCards = env.elements['schedule-highlight'].children;
+  assert.equal(highlightCards.length, 2, 'overnight entries should still yield live and next highlight cards');
+  assert.match(highlightCards[0].children[0].textContent, /Late Night/, 'overnight entry should be detected as currently live after midnight');
+  assert.match(highlightCards[1].children[0].textContent, /Morgenmix/, 'next entry should still be identified after an overnight live slot');
+}
+
+async function testScheduleRespectsConfiguredTimezone() {
+  const env = createEnvironment({
+    now: '2026-09-21T00:30:00Z',
+    appConfig: {
+      content: {
+        schedule: {
+          timeZone: 'UTC',
+          entries: [
+            {
+              day: 'Sonntag',
+              start: '23:00',
+              end: '01:00',
+              title: 'UTC Late Show'
+            },
+            {
+              day: 'Montag',
+              start: '02:00',
+              end: '03:00',
+              title: 'UTC Next'
+            }
+          ]
+        }
+      }
+    }
+  });
+
+  const highlightCards = env.elements['schedule-highlight'].children;
+  assert.equal(highlightCards.length, 2, 'configured timezone should still produce live and next highlights');
+  assert.match(highlightCards[0].children[0].textContent, /UTC Late Show/, 'schedule should evaluate the current show in the configured timezone');
+  assert.match(highlightCards[1].children[0].textContent, /UTC Next/, 'schedule should compute the next show in the configured timezone');
+}
+
+async function testKeyboardShortcutsRespectInteractiveTargets() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
+    share: async () => undefined
+  });
+  const { elements, document } = env;
+
+  await document.dispatch('keydown', {
+    key: ' ',
+    target: { tagName: 'DIV' },
+    preventDefault() {}
+  });
+  assert.equal(elements.audio.playCount, 1, 'space outside interactive fields should toggle playback');
+
+  await elements.audio.dispatch('playing');
+
+  await document.dispatch('keydown', {
+    key: 'ArrowUp',
+    target: { tagName: 'DIV' },
+    preventDefault() {}
+  });
+  assert.equal(elements['volume-text'].textContent, '75%', 'arrow up shortcut should raise the volume');
+
+  await document.dispatch('keydown', {
+    key: 'M',
+    target: { tagName: 'DIV' },
+    preventDefault() {}
+  });
+  assert.equal(elements.audio.muted, true, 'M shortcut should toggle mute');
+
+  await document.dispatch('keydown', {
+    key: 'S',
+    target: { tagName: 'DIV' },
+    preventDefault() {}
+  });
+  await flushMicrotasks();
+  assert.ok(env.getShareCall(), 'S shortcut should trigger the share flow');
+
+  await document.dispatch('keydown', {
+    key: 'T',
+    target: { tagName: 'DIV' },
+    preventDefault() {}
+  });
+  assert.equal(env.getScrollCall().top, 0, 'T shortcut should scroll back to the top');
+  assert.equal(env.getScrollCall().behavior, 'smooth', 'T shortcut should use smooth scrolling by default');
+
+  await document.dispatch('keydown', {
+    key: ' ',
+    target: { tagName: 'INPUT' },
+    preventDefault() {}
+  });
+  assert.equal(elements.audio.playCount, 1, 'shortcuts should stay inactive while typing in inputs');
+
+  await document.dispatch('keydown', {
+    key: 'S',
+    target: { tagName: 'DIV' },
+    defaultPrevented: true,
+    preventDefault() {}
+  });
+  assert.equal(env.getShareCall().url, 'https://stream-musik.space/', 'already prevented keyboard events should not trigger a second shortcut action');
+}
+
+async function testSleepTimerResetsOnManualStop() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year']
+  });
+  const { elements } = env;
+
+  elements['sleep-timer-select'].value = '15';
+  await elements['sleep-apply'].dispatch('click');
+  assert.match(elements['sleep-remaining'].textContent, /Sleep-Timer aktiv/, 'applying a sleep timer should show a visible countdown state');
+
+  await elements.play.dispatch('click');
+  await elements.audio.dispatch('playing');
+  await elements.play.dispatch('click');
+
+  assert.equal(elements.audio.paused, true, 'manual stop should still pause the audio');
+  assert.equal(elements['sleep-remaining'].textContent, 'Sleep-Timer zurückgesetzt.', 'manual stop should reset the active sleep timer');
+}
+
+async function testFavoritesCanBeAddedAndRemovedLocally() {
+  const env = createEnvironment({
+    appConfig: {
+      nowPlaying: {
+        endpoint: 'metadata/now-playing.json'
+      }
+    },
+    fetch: async () => ({
+      ok: true,
+      json: async () => ({
+        current: {
+          title: 'Mitternacht',
+          artist: 'jackdarckart'
+        }
+      })
+    })
+  });
+
+  await flushMicrotasks();
+
+  await env.elements['favorite-track'].dispatch('click');
+  assert.equal(env.elements['favorites-list'].children.length, 1, 'current track should be storable as a local favorite');
+  assert.match(env.window.localStorage.getItem('jackdarckart-favorites'), /Mitternacht/, 'favorites should be persisted in localStorage');
+
+  await env.elements['favorite-track'].dispatch('click');
+  assert.equal(env.elements['favorites-list'].children.length, 0, 'clicking the favorite action again should remove the current favorite');
+  assert.equal(env.elements['favorites-empty'].hidden, false, 'empty state should return once all favorites are removed');
+}
+
+async function testScheduleShowsLiveAndNextWhenConfigured() {
+  const berlin = getBerlinParts();
+  const currentMinutes = berlin.hour * 60 + berlin.minute;
+  const nextMinutes = currentMinutes + 60;
+  const nextDay = berlin.day + Math.floor(nextMinutes / 1440);
+
+  const env = createEnvironment({
+    appConfig: {
+      content: {
+        schedule: {
+          timeZone: 'Europe/Berlin',
+          entries: [
+            {
+              day: berlin.day,
+              start: toTimeString(currentMinutes),
+              end: toTimeString(currentMinutes + 15),
+              title: 'Live-Test'
+            },
+            {
+              day: nextDay % 7,
+              start: toTimeString(nextMinutes),
+              end: toTimeString(nextMinutes + 60),
+              title: 'Next-Test'
+            }
+          ]
+        }
+      }
+    }
+  });
+
+  const highlightCards = env.elements['schedule-highlight'].children;
+  assert.equal(highlightCards.length, 2, 'configured schedule should render live and next highlight cards');
+  assert.match(highlightCards[0].children[1].textContent, /Jetzt live/, 'highlight should identify the currently live show');
+  assert.equal(env.elements['schedule-list'].children.length >= 2, true, 'configured schedule should render upcoming schedule cards');
+}
+
+async function testFeedbackUsesHonestFallbacksAndValidation() {
+  const env = createEnvironment();
+
+  assert.equal(env.elements['feedback-email'].disabled, true, 'email action should stay disabled without configured address');
+
+  env.elements['feedback-subject'].value = 'Songwunsch';
+  env.elements['feedback-message'].value = 'Bitte spiele einen ruhigen Night-Track.';
+  await env.elements['feedback-email'].dispatch('click');
+  assert.match(env.elements['feedback-status'].textContent, /keine Mailadresse/i, 'UI should honestly explain when no email target is configured');
+
+  env.elements['feedback-kind'].value = 'feedback';
+  env.elements['feedback-subject'].value = 'Kurzes Feedback';
+  env.elements['feedback-message'].value = 'Bitte mehr nächtliche Sets.';
+  await env.elements['feedback-issue'].dispatch('click');
+
+  assert.match(env.getOpenedUrl(), /title=Feedback%3A%20Kurzes%20Feedback/, 'issue fallback should prepare a GitHub issue with encoded content');
+  assert.equal(env.getOpenedWindow().opener, null, 'issue fallback should defensively clear opener on returned window handles');
+}
+
+async function testFeedbackUsesConfiguredMailtoTarget() {
+  const env = createEnvironment({
+    appConfig: {
+      content: {
+        contact: {
+          email: 'radio@example.com'
+        }
+      }
+    }
+  });
+
+  env.elements['feedback-kind'].value = 'song';
+  env.elements['feedback-subject'].value = 'Night Track';
+  env.elements['feedback-message'].value = 'Bitte spiele Night Track im nächsten Set.';
+  await env.elements['feedback-email'].dispatch('click');
+
+  assert.equal(env.elements['feedback-email'].disabled, false, 'email action should become available when a configured address exists');
+  assert.match(env.window.location.href, /^mailto:radio@example\.com\?subject=/, 'mailto flow should keep the mailbox path readable and encode only query values');
+}
+
 async function main() {
   testUsesStationSpecificHttpsStreamUrl();
   await testReusesExistingSourceWithoutForcedReload();
@@ -629,6 +973,14 @@ async function main() {
   await testThemeSelectionUpdatesDatasetAndThemeColor();
   await testOfflineRecoveryShowsDedicatedRetryAction();
   await testExternalNowPlayingEndpointStaysDisabledByDefaultCsp();
+  await testKeyboardShortcutsRespectInteractiveTargets();
+  await testSleepTimerResetsOnManualStop();
+  await testFavoritesCanBeAddedAndRemovedLocally();
+  await testScheduleShowsLiveAndNextWhenConfigured();
+  await testScheduleHandlesOvernightWraparound();
+  await testScheduleRespectsConfiguredTimezone();
+  await testFeedbackUsesHonestFallbacksAndValidation();
+  await testFeedbackUsesConfiguredMailtoTarget();
   console.log('app.js player tests passed');
 }
 
