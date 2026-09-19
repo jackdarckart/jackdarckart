@@ -1105,11 +1105,12 @@ code {
 
 .sticky-player {
   position: fixed;
-  left: 50%;
-  right: auto;
-  bottom: 1rem;
-  width: min(34rem, calc(100vw - 2rem));
-  max-width: 34rem;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  width: min(34rem, 100%);
+  max-width: min(34rem, calc(100% - 2rem));
+  margin-inline: auto;
   z-index: 18;
   display: flex;
   align-items: center;
@@ -1123,7 +1124,7 @@ code {
   backdrop-filter: blur(18px);
   opacity: 0;
   pointer-events: none;
-  transform: translateX(-50%) translateY(1rem);
+  transform: translateY(1rem);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -1139,7 +1140,7 @@ html[data-theme="light"] .sticky-player {
 .sticky-player.is-visible {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 
 .sticky-player-actions {
@@ -1320,17 +1321,25 @@ html[data-theme="light"] .back-to-top {
   }
 
   .sticky-player {
-    left: 50%;
-    right: auto;
-    bottom: 0.75rem;
-    width: min(30rem, calc(100vw - 1rem));
-    max-width: 30rem;
-    transform: translateX(-50%) translateY(1rem);
+    left: max(0.75rem, env(safe-area-inset-left, 0px));
+    right: max(0.75rem, env(safe-area-inset-right, 0px));
+    bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+    width: min(30rem, 100%);
+    max-width: min(30rem, calc(100% - 1.5rem));
+    transform: translateY(1rem);
     align-items: center;
   }
 
-  .sticky-player.is-visible { transform: translateX(-50%) translateY(0); }
-  .sticky-player-actions > * { flex: 0 1 auto; }
+  .sticky-player.is-visible { transform: translateY(0); }
+  .sticky-player-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .sticky-play-button {
+    min-width: 0;
+    flex: 1 1 11rem;
+  }
+  .sticky-player-actions > * { flex: 1 1 11rem; }
 }
 
 @media (min-width: 1400px) {
