@@ -36,8 +36,10 @@
       </button>
       <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
         <a href="#player">Player</a>
+        <a href="#listen">Hören</a>
         <a href="#about">Über den Sender</a>
-        <a href="#highlights">Highlights</a>
+        <a href="#faq">FAQ</a>
+        <a href="#security">Sicherheit</a>
         <a href="#contact">Kontakt</a>
       </nav>
     </div>
@@ -50,24 +52,24 @@
           <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Livestream auf laut.fm</span>
           <h1>Dein Sound.<br><span class="gradient">Klar. Direkt. Sicher.</span></h1>
           <p>
-            Willkommen bei <strong>jackdarckart</strong> auf stream-musik.space. Starte den Webradio-Livestream direkt im Browser oder öffne die offizielle Senderseite auf laut.fm.
+            stream-musik.space bündelt den offiziellen laut.fm-Stream von <strong>jackdarckart</strong> in einer schnellen, statischen Landingpage: ohne Build-Schritt, ohne Tracker und ohne erfundene Now-Playing-Daten.
           </p>
           <div class="actions">
-            <a class="button primary" href="#player">Player öffnen</a>
+            <a class="button primary" href="#player">Jetzt streamen</a>
             <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Offizielle laut.fm-Seite</a>
           </div>
           <div class="mini-grid" aria-label="Vorteile">
             <article class="panel card">
-              <h2>Direkt hören</h2>
-              <p>Der Stream startet nur nach deinem Klick — ohne Autoplay beim Seitenaufruf.</p>
+              <h2>Stabil starten</h2>
+              <p>Der Stream beginnt erst nach echter Nutzeraktion und erklärt Blockaden, Fehler und Neuversuche sichtbar.</p>
             </article>
             <article class="panel card">
-              <h2>Modern lesen</h2>
-              <p>Klare Typografie, gute Kontraste und dezente Glow-Effekte für lange Sessions.</p>
+              <h2>Klar orientiert</h2>
+              <p>Fokussierte CTAs, Mobile-Navigation, Sticky-Quick-Access und ruhige Bewegungen sorgen für bessere Nutzung.</p>
             </article>
             <article class="panel card">
-              <h2>Sicher surfen</h2>
-              <p>Ohne Tracker, ohne Fremdbibliotheken und mit restriktiver Content Security Policy.</p>
+              <h2>Privat hören</h2>
+              <p>Ohne Fremdbibliotheken, ohne Analytics und mit restriktiver Meta-CSP für statisches Hosting auf GitHub Pages.</p>
             </article>
           </div>
         </div>
@@ -75,7 +77,7 @@
         <aside class="panel player-card" id="player" aria-labelledby="player-title">
           <div class="player-head">
             <div>
-              <span class="eyebrow">Live-Player</span>
+              <span class="eyebrow">Live-Player · GitHub Pages</span>
               <h2 id="player-title">jackdarckart Radio</h2>
             </div>
             <div class="eq" id="equalizer" aria-hidden="true">
@@ -89,6 +91,21 @@
           </div>
 
           <p class="note" id="message">Der Stream lädt erst nach deinem Klick. Wenn dein Browser blockiert oder die Verbindung stockt, kannst du direkt erneut versuchen.</p>
+
+          <div class="status-grid" aria-label="Player-Diagnose">
+            <p class="status-meta">
+              <span class="meta-label">Verbindung</span>
+              <span id="network-status">Wird geprüft</span>
+            </p>
+            <p class="status-meta">
+              <span class="meta-label">Player</span>
+              <span id="player-state-label">Bereit</span>
+            </p>
+            <p class="status-meta">
+              <span class="meta-label">Neuversuch</span>
+              <span id="retry-status">Manuell verfügbar</span>
+            </p>
+          </div>
 
           <div class="controls">
             <button class="button play-button" id="play" type="button" aria-pressed="false">Stream starten</button>
@@ -105,6 +122,11 @@
 
           <p class="share-status note" id="share-status" aria-live="polite">Aktuelle Titelinformationen findest du direkt auf laut.fm.</p>
 
+          <div class="player-links">
+            <a class="button secondary" href="https://stream.laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Stream direkt öffnen</a>
+            <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Senderseite auf laut.fm</a>
+          </div>
+
           <audio id="audio" preload="none" playsinline>
             Dein Browser unterstützt Audio nicht.
           </audio>
@@ -112,49 +134,105 @@
       </div>
     </section>
 
+    <section class="section section-muted" id="listen">
+      <div class="wrap">
+        <div class="section-title">
+          <span class="eyebrow">Jetzt hören</span>
+          <h2>Ein klarer Weg zum Stream — im Browser oder direkt über laut.fm.</h2>
+          <p>Die Website bleibt bewusst statisch und konzentriert sich auf sichere, nachvollziehbare Hörwege ohne zusätzliche Dienste oder künstliche Inhalte.</p>
+        </div>
+        <div class="cards">
+          <article class="panel card">
+            <h3>1. Starten</h3>
+            <p>Nutze <strong>Jetzt streamen</strong> oder den Sticky-Quick-Access, damit der Browser die Wiedergabe als echte Nutzeraktion erkennt.</p>
+          </article>
+          <article class="panel card">
+            <h3>2. Verstehen</h3>
+            <p>Der Player zeigt, ob der Stream lädt, puffert, blockiert wurde oder eine erneute Verbindung versucht.</p>
+          </article>
+          <article class="panel card">
+            <h3>3. Ausweichen</h3>
+            <p>Falls die Browserwiedergabe scheitert, kannst du den Stream oder die offizielle laut.fm-Seite direkt öffnen.</p>
+          </article>
+        </div>
+        <div class="actions section-actions">
+          <a class="button primary" href="#player">Zum Live-Player</a>
+          <a class="button secondary" href="https://stream.laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Direktlink zum Stream</a>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="about">
       <div class="wrap">
         <div class="section-title">
           <span class="eyebrow">Über den Sender</span>
-          <h2>Ein klarer Einstieg in das bestehende Webradio.</h2>
-          <p>Die Website fokussiert sich bewusst auf den sicheren Direktzugang zum laut.fm-Stream — ohne erfundene Sendepläne, Titelquellen oder Plattformdaten.</p>
+          <h2>Eine fokussierte Oberfläche rund um den bestehenden laut.fm-Stream.</h2>
+          <p>Diese Website ergänzt die vorhandene Senderpräsenz von jackdarckart um einen schnellen Direktplayer, klare Nutzungshinweise und sichtbare Sicherheitsprinzipien — ohne eigene Programmversprechen oder unbestätigte Metadaten.</p>
         </div>
         <div class="cards">
           <article class="panel card">
-            <h3>Hören</h3>
-            <p>Ein kompakter Player mit sichtbaren Zuständen für bereit, lädt, spielt, pausiert und Fehler.</p>
+            <h3>Direktzugang</h3>
+            <p>Im Mittelpunkt steht ein browserfreundlicher Livestream-Zugang mit verständlichen Zuständen statt versteckter Automatiken.</p>
           </article>
           <article class="panel card">
-            <h3>Bedienen</h3>
-            <p>Mobile Navigation, Tastaturbedienung, Outside-Click-Logik und reduzierte Bewegung sind berücksichtigt.</p>
+            <h3>Barrierearm</h3>
+            <p>Tastaturbedienung, kontrastreiche Oberfläche, Sticky-Schnellzugriff und <code>prefers-reduced-motion</code> bleiben Teil des Designs.</p>
           </article>
           <article class="panel card">
-            <h3>Schützen</h3>
-            <p>Externe Ressourcen bleiben auf das Notwendige beschränkt: die Website selbst und der laut.fm-Stream.</p>
+            <h3>Fakten statt Fülltext</h3>
+            <p>Es werden bewusst keine erfundenen Sendungs-, Titel- oder Zeitplandaten eingeblendet, solange dafür keine verlässliche Quelle eingebunden ist.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section" id="highlights">
+    <section class="section section-muted" id="faq">
       <div class="wrap">
         <div class="section-title">
-          <span class="eyebrow">Highlights</span>
-          <h2>Weniger Angriffsfläche, bessere Nutzung.</h2>
-          <p>Die Seite bleibt GitHub-Pages-kompatibel ohne Build-Schritt und setzt auf semantisches HTML5, fokussierte JavaScript-Logik und defensive Browser-APIs.</p>
+          <span class="eyebrow">FAQ</span>
+          <h2>Wichtige Antworten vor dem Start.</h2>
+          <p>Die häufigsten Fragen drehen sich um Browser-Beschränkungen, mobile Wiedergabe und den Unterschied zwischen Direktplayer und offizieller Senderseite.</p>
+        </div>
+        <div class="faq-list">
+          <details class="panel faq-item">
+            <summary>Warum startet der Stream nicht automatisch?</summary>
+            <p>Autoplay bleibt bewusst deaktiviert. Viele Browser blockieren Livestreams ohne echte Nutzeraktion, deshalb startet der Player erst nach einem Klick auf einen sichtbaren Bedienknopf.</p>
+          </details>
+          <details class="panel faq-item">
+            <summary>Was bedeutet „Browser blockiert die Wiedergabe“?</summary>
+            <p>Das ist meist eine Schutzfunktion deines Browsers oder Geräts. Tippe erneut auf <strong>Stream starten</strong> oder <strong>Erneut versuchen</strong>; alternativ kannst du die offizielle laut.fm-Seite öffnen.</p>
+          </details>
+          <details class="panel faq-item">
+            <summary>Werden aktuelle Titel oder Sendepläne angezeigt?</summary>
+            <p>Nein. Die Seite zeigt absichtlich keine Now-Playing- oder Programmdaten an, solange dafür keine belastbare Quelle direkt angebunden ist.</p>
+          </details>
+          <details class="panel faq-item">
+            <summary>Kann ich den Stream direkt teilen?</summary>
+            <p>Ja. Der Teilen-Button nutzt die Browserfreigabe, wenn vorhanden, und fällt sonst sicher auf das Kopieren des Seitenlinks zurück.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="security">
+      <div class="wrap">
+        <div class="section-title">
+          <span class="eyebrow">Sicherheit & Datenschutz</span>
+          <h2>Wenig Angriffsfläche, klare Grenzen.</h2>
+          <p>Die Seite bleibt bewusst klein: statische Dateien, defensive DOM-Updates, restriktive Meta-CSP und nur die notwendigen externen Ziele rund um laut.fm.</p>
         </div>
         <div class="cards">
           <article class="panel card">
-            <h3>Kein Autoplay</h3>
-            <p>Die Wiedergabe startet ausschließlich nach Nutzeraktion und behandelt Browser-Beschränkungen verständlich.</p>
+            <h3>Keine Tracker</h3>
+            <p>Es werden keine Analytics-, Werbe- oder Profiling-Skripte nachgeladen. Externe Anfragen beschränken sich auf den Stream und offizielle Links.</p>
           </article>
           <article class="panel card">
-            <h3>Persistente Einstellungen</h3>
-            <p>Lautstärke und Stummschaltung werden defensiv aus dem Browser-Speicher gelesen und validiert.</p>
+            <h3>Keine HTML-Injektion</h3>
+            <p>Player-Updates laufen über bekannte Elemente, Attribute und <code>textContent</code> statt über unsichere HTML-Einfügungen.</p>
           </article>
           <article class="panel card">
-            <h3>Saubere Links</h3>
-            <p>Externe Ziele öffnen sicher im neuen Tab mit <code>noopener</code> und <code>noreferrer</code>.</p>
+            <h3>Pages-kompatibel</h3>
+            <p>GitHub Pages erlaubt hier nur Meta-CSP statt eigener Response-Header. Die Seite nutzt diese Grenze defensiv, ohne serverseitige Versprechen zu simulieren.</p>
           </article>
         </div>
       </div>
@@ -175,6 +253,17 @@
     </section>
   </main>
 
+  <div class="sticky-player" id="sticky-player" data-state="ready" aria-label="Schnellzugriff auf den Player">
+    <div class="sticky-player-copy">
+      <strong id="sticky-status-text">Bereit zum Start</strong>
+      <span id="sticky-message">Der Stream startet erst nach deinem Klick.</span>
+    </div>
+    <div class="sticky-player-actions">
+      <button class="button primary sticky-play-button" id="sticky-play" type="button" aria-pressed="false">Stream starten</button>
+      <a class="button secondary" href="#player">Zum Player</a>
+    </div>
+  </div>
+
   <footer class="site-footer">
     <div class="wrap footer-shell">
       <span>© <span id="year"></span> jackdarckart · stream-musik.space</span>
@@ -183,6 +272,9 @@
   </footer>
 
   <button class="back-to-top" id="back-to-top" type="button" aria-label="Nach oben">↑</button>
+  <noscript>
+    <p class="noscript-banner">Für den Direktplayer wird JavaScript benötigt. Du kannst den Stream jederzeit direkt auf laut.fm öffnen.</p>
+  </noscript>
 
   <script src="./app.js" defer></script>
 </body>
