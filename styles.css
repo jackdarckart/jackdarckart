@@ -1561,6 +1561,15 @@ html[data-theme="light"] .nav-cluster {
   .page-hero-section {
     padding-top: 5rem;
   }
+
+  .player-page-section {
+    padding-top: 2.8rem;
+    padding-bottom: 2.4rem;
+  }
+
+  .live-data-section {
+    padding-top: 2.4rem;
+  }
 }
 
 .logo {
