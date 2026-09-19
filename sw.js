@@ -1,10 +1,21 @@
 'use strict';
 
-const CACHE_NAME = 'stream-musik-space-v1';
-const INDEX_URL = new URL('./index.html', self.location.href).href;
+const CACHE_NAME = 'stream-musik-space-v2';
+const OFFLINE_FALLBACK_URL = new URL('./index.html', self.location.href).href;
 const APP_SHELL = [
   './',
   './index.html',
+  './live.html',
+  './titel.html',
+  './sendeplan.html',
+  './events.html',
+  './news.html',
+  './archiv.html',
+  './ueber-uns.html',
+  './hilfe.html',
+  './kontakt.html',
+  './datenschutz.html',
+  './impressum.html',
   './styles.css',
   './app.js',
   './manifest.webmanifest',
@@ -13,6 +24,11 @@ const APP_SHELL = [
   './assets/app-icon.svg',
   './assets/social-preview.png'
 ];
+const STATIC_PAGE_PATHS = new Set(
+  APP_SHELL
+    .filter((asset) => asset === './' || asset.endsWith('.html'))
+    .map((asset) => new URL(asset, self.location.href).pathname)
+);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -50,6 +66,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const scopeUrl = new URL('./', self.location.href);
+  const scopePath = scopeUrl.pathname;
+  const relativePath = url.pathname.startsWith(scopePath)
+    ? url.pathname.slice(scopePath.length)
+    : url.pathname.replace(/^\/+/, '');
+  const useQuerylessKey = STATIC_PAGE_PATHS.has(url.pathname);
+  const normalizedPageUrl = new URL((relativePath || './') + (useQuerylessKey ? '' : url.search), scopeUrl).href;
+
   if (request.destination === 'audio') {
     return;
   }
@@ -61,12 +85,22 @@ self.addEventListener('fetch', (event) => {
           if (response && response.status === 200 && response.type === 'basic') {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(INDEX_URL, responseClone);
+              cache.put(normalizedPageUrl, responseClone);
             });
           }
           return response;
         })
-        .catch(() => caches.match(INDEX_URL))
+        .catch(async () => {
+          const cachedPage = await caches.match(normalizedPageUrl);
+          if (cachedPage) {
+            return cachedPage;
+          }
+          const exactRequestMatch = await caches.match(request);
+          if (exactRequestMatch) {
+            return exactRequestMatch;
+          }
+          return caches.match(OFFLINE_FALLBACK_URL);
+        })
     );
     return;
   }

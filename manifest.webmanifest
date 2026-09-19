@@ -1,14 +1,31 @@
 {
-  "name": "jackdarckart Radio-Web-App",
-  "short_name": "jackdarckart",
-  "description": "Installierbare, datenschutzfreundliche Radio-Web-App für den offiziellen jackdarckart laut.fm-Stream.",
+  "name": "stream-musik.space – jackdarckart Radio-Web-App",
+  "short_name": "stream-musik.space",
+  "description": "Installierbare, datenschutzfreundliche Mehrseiten-Radio-Web-App für den offiziellen jackdarckart laut.fm-Stream.",
   "lang": "de-DE",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#070b18",
   "theme_color": "#070b18",
   "categories": ["music", "entertainment"],
+  "shortcuts": [
+    {
+      "name": "Live hören",
+      "short_name": "Live",
+      "url": "./live.html"
+    },
+    {
+      "name": "Titel & Verlauf",
+      "short_name": "Titel",
+      "url": "./titel.html"
+    },
+    {
+      "name": "Hilfe",
+      "short_name": "Hilfe",
+      "url": "./hilfe.html"
+    }
+  ],
   "icons": [
     {
       "src": "./assets/app-icon-192.png",
