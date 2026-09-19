@@ -1639,8 +1639,6 @@
       document.close();
     } catch (error) {
       window[INTERNAL_NAVIGATION_KEY] = false;
-      window[PERSISTENT_AUDIO_KEY] = null;
-      window[PERSISTENT_STATE_KEY] = null;
       window.location.href = destination.href;
     }
   }
@@ -3289,7 +3287,10 @@
   initScrollReveal();
   setBackToTopVisibility();
   registerServiceWorker();
-  window[APP_INSTANCE_KEY] = { destroy: destroyApp };
+  window[APP_INSTANCE_KEY] = {
+    destroy: destroyApp,
+    navigateWithinPersistentShell
+  };
   window[INTERNAL_NAVIGATION_KEY] = false;
   refreshAllLiveData();
 
