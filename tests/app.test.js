@@ -444,6 +444,50 @@ async function testNowPlayingFallbackWhenMetadataUnavailable() {
   );
 }
 
+async function testNowPlayingSuccessfulMetadataRendering() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
+    fetchImpl: async () => ({
+      ok: true,
+      async json() {
+        return {
+          title: 'Track A',
+          artist: { name: 'Artist B' }
+        };
+      }
+    })
+  });
+  const { elements } = env;
+
+  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.equal(elements['now-playing-state'].textContent, 'Live-Daten aktiv', 'valid metadata should switch now-playing into active state');
+  assert.equal(elements['now-playing-title'].textContent, 'Track A', 'valid metadata should render title');
+  assert.equal(elements['now-playing-artist'].textContent, 'Artist B', 'valid metadata should render artist');
+}
+
+async function testNowPlayingAbortFallbackMessage() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
+    fetchImpl: async () => {
+      const abortError = new Error('aborted');
+      abortError.name = 'AbortError';
+      throw abortError;
+    }
+  });
+  const { elements } = env;
+
+  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.match(
+    elements['now-playing-artist'].textContent,
+    /Zeitüberschreitung bei der Live-Abfrage/,
+    'abort-like failures should show timeout-specific fallback detail'
+  );
+}
+
 function testUsesStationSpecificHttpsStreamUrl() {
   assert.match(
     appCode,
@@ -461,6 +505,8 @@ async function main() {
   await testVolumeInitHydrationPreservesStoredMuteState();
   await testVolumeChangeEventUpdatesAudioAndStorage();
   await testNowPlayingFallbackWhenMetadataUnavailable();
+  await testNowPlayingSuccessfulMetadataRendering();
+  await testNowPlayingAbortFallbackMessage();
   console.log('app.js player tests passed');
 }
 

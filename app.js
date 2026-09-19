@@ -328,11 +328,12 @@
     if (nowPlayingAbortController) {
       nowPlayingAbortController.abort();
     }
-    nowPlayingAbortController = typeof AbortController === 'function' ? new AbortController() : null;
+    const requestAbortController = typeof AbortController === 'function' ? new AbortController() : null;
+    nowPlayingAbortController = requestAbortController;
 
     const timeout = window.setTimeout(() => {
-      if (nowPlayingAbortController) {
-        nowPlayingAbortController.abort();
+      if (requestAbortController) {
+        requestAbortController.abort();
       }
     }, NOW_PLAYING_TIMEOUT_MS);
 
@@ -347,7 +348,7 @@
       const response = await window.fetch(NOW_PLAYING_URL, {
         method: 'GET',
         headers: { Accept: 'application/json' },
-        signal: nowPlayingAbortController ? nowPlayingAbortController.signal : undefined
+        signal: requestAbortController ? requestAbortController.signal : undefined
       });
       if (!response.ok) {
         throw new Error('http-' + response.status);

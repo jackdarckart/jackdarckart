@@ -1,20 +1,20 @@
 {
   "name": "jackdarckart Radio – stream-musik.space",
   "short_name": "jackdarckart",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#050b15",
   "theme_color": "#070b18",
   "lang": "de-DE",
   "icons": [
     {
-      "src": "/assets/icon.svg",
+      "src": "./assets/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/assets/icon-maskable.svg",
+      "src": "./assets/icon-maskable.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
