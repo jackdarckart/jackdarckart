@@ -1684,13 +1684,13 @@ html[data-theme="light"] .nav-cluster {
   transform: none;
 }
 
-html[data-js="true"] [data-reveal] {
+html[data-js="true"] [data-reveal].reveal-managed {
   opacity: 0;
   transform: translateY(22px);
   transition: opacity 0.45s ease, transform 0.45s ease;
 }
 
-html[data-js="true"] [data-reveal].is-visible {
+html[data-js="true"] [data-reveal].reveal-managed.is-visible {
   opacity: 1;
   transform: translateY(0);
 }

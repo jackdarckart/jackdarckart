@@ -2219,12 +2219,11 @@
     }
 
     if (typeof window === 'undefined' || reducedMotion || !('IntersectionObserver' in window) || typeof window.IntersectionObserver !== 'function') {
-      if (reducedMotion && document.documentElement && document.documentElement.dataset) {
-        delete document.documentElement.dataset.js;
-      }
       revealNodes.forEach((node) => node.classList && node.classList.add('is-visible'));
       return;
     }
+
+    revealNodes.forEach((node) => node.classList && node.classList.add('reveal-managed'));
 
     const observer = new window.IntersectionObserver((entries) => {
       entries.forEach((entry) => {
