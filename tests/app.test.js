@@ -1525,7 +1525,7 @@ function testLivePageExposesEnhancedModulesAndHooks() {
   ]) {
     assert.match(
       liveHtmlCode,
-      new RegExp(`id\\s*=\\s*["']${escapeRegExp(hook)}["']`),
+      new RegExp(`id\\s*=\\s*["']${hook}["']`),
       `live page should expose ${hook} for the redesigned live modules`
     );
   }
