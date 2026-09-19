@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  function bootstrapApp() {
   const STORAGE_KEYS = {
     volume: 'jackdarckart-volume',
     muted: 'jackdarckart-muted',
@@ -1632,6 +1633,64 @@
     return true;
   }
 
+  function parsePersistentShellDocument(html) {
+    if (typeof window.DOMParser !== 'function') {
+      return null;
+    }
+
+    try {
+      return new window.DOMParser().parseFromString(html, 'text/html');
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function replacePersistentShellDocument(parsedDocument) {
+    if (!parsedDocument || !document || !document.body) {
+      return false;
+    }
+
+    const nextBodyHtml = parsedDocument.body && typeof parsedDocument.body.innerHTML === 'string'
+      ? parsedDocument.body.innerHTML
+      : '';
+    if (!nextBodyHtml) {
+      return false;
+    }
+
+    if (document.documentElement && parsedDocument.documentElement && typeof parsedDocument.documentElement.getAttribute === 'function') {
+      const nextLanguage = parsedDocument.documentElement.getAttribute('lang');
+      if (nextLanguage && typeof document.documentElement.setAttribute === 'function') {
+        document.documentElement.setAttribute('lang', nextLanguage);
+      }
+    }
+
+    if (typeof parsedDocument.title === 'string' && typeof document.title === 'string') {
+      document.title = parsedDocument.title;
+    }
+
+    document.body.innerHTML = nextBodyHtml;
+    return true;
+  }
+
+  function finalizePersistentNavigation(destination) {
+    if (destination && destination.hash) {
+      const targetId = decodeURIComponent(destination.hash.slice(1));
+      const target = targetId ? document.getElementById(targetId) : null;
+      if (target && typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView();
+      }
+    } else if (typeof window.scrollTo === 'function') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+
+    if (typeof window.__JACKDARCKART_BOOTSTRAP__ !== 'function') {
+      throw new Error('shell-bootstrap-missing');
+    }
+
+    window[INTERNAL_NAVIGATION_KEY] = false;
+    window.__JACKDARCKART_BOOTSTRAP__();
+  }
+
   async function navigateWithinPersistentShell(targetUrl, options) {
     const destination = new window.URL(targetUrl, window.location.href);
 
@@ -1656,6 +1715,10 @@
       if (!isTrustedShellResponseHtml(html)) {
         throw new Error('page-untrusted');
       }
+      const parsedDocument = parsePersistentShellDocument(html);
+      if (!parsedDocument) {
+        throw new Error('page-unparsable');
+      }
       destroyApp({ preserveAudio: true });
 
       if (!options || !options.fromPopState) {
@@ -1666,9 +1729,10 @@
         }
       }
 
-      document.open();
-      document.write(html);
-      document.close();
+      if (!replacePersistentShellDocument(parsedDocument)) {
+        throw new Error('page-replace-failed');
+      }
+      finalizePersistentNavigation(destination);
     } catch (error) {
       window[INTERNAL_NAVIGATION_KEY] = false;
       window[PERSISTENT_AUDIO_KEY] = null;
@@ -3582,4 +3646,8 @@
   if (backToTopButton) {
     bindManagedEvent(backToTopButton, 'click', scrollToTop);
   }
+  }
+
+  window.__JACKDARCKART_BOOTSTRAP__ = bootstrapApp;
+  bootstrapApp();
 }());
