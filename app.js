@@ -640,8 +640,10 @@
 
       if (audio.muted && audio.volume === 0) {
         updateVolume(lastAudibleVolume || 70);
+        audio.muted = false;
+      } else {
+        audio.muted = !audio.muted;
       }
-      audio.muted = !audio.muted;
       updateMuteButton();
       writeStorage(STORAGE_KEYS.muted, String(audio.muted));
     });

@@ -371,10 +371,28 @@ async function testMissingAudioElementShowsGuardedErrorState() {
   );
 }
 
+async function testMuteButtonRestoresAudiblePlaybackFromZeroVolume() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year']
+  });
+  const { elements } = env;
+
+  elements.volume.value = '0';
+  await elements.volume.dispatch('input');
+  assert.equal(elements.audio.muted, true, 'dragging volume to zero should mute the audio element');
+
+  await elements.mute.dispatch('click');
+
+  assert.equal(elements.audio.muted, false, 'mute toggle should unmute again when restoring from zero volume');
+  assert.equal(elements.audio.volume, 0.7, 'mute toggle should restore the last audible volume level');
+  assert.equal(elements['volume-text'].textContent, '70%', 'restoring audio should refresh the visible volume label');
+}
+
 async function main() {
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();
+  await testMuteButtonRestoresAudiblePlaybackFromZeroVolume();
   console.log('app.js player tests passed');
 }
 
