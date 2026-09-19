@@ -333,6 +333,10 @@
     return forceReload;
   }
 
+  function shouldForceReloadOnStart() {
+    return currentState === 'error' || currentState === 'blocked' || !hasStreamSource();
+  }
+
   function scheduleLoadTimeout() {
     clearLoadTimer();
     loadTimer = window.setTimeout(() => {
@@ -444,7 +448,7 @@
       return;
     }
 
-    await startPlayback(true, false);
+    await startPlayback(true, shouldForceReloadOnStart());
   }
 
   async function startPlayback(resetReconnectBudget, forceReload) {
@@ -543,7 +547,7 @@
     });
 
     try {
-      navigator.mediaSession.setActionHandler('play', () => startPlayback(false, false));
+      navigator.mediaSession.setActionHandler('play', () => startPlayback(false, shouldForceReloadOnStart()));
       navigator.mediaSession.setActionHandler('pause', pausePlayback);
     } catch (error) {
       return;
