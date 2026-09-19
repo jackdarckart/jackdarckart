@@ -10,7 +10,8 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 - sichtbare Status-, Fehler-, Retry-, Puffer- und Offline-Hinweise
 - kompakte Startseite plus getrennte Inhaltsseiten für Live, Titel, Sendeplan, Events, News, Archiv, Hilfe, Kontakt, Datenschutz und Impressum
 - Sleep-Timer, Tastaturkürzel, Theme-Umschaltung, lokale Favoriten und Share-Funktionen
-- informative Empty States ohne erfundene Termine, Titel oder Archivdaten
+- Live-Daten aus der offiziellen laut.fm-API für Songs, Senderprofil, Hörerzahl, Next Artists und Sendeplan
+- informative Fehler-/Leerzustände ohne erfundene Termine, Titel, Hörerzahlen oder Archivdaten
 - installierbare PWA mit Service Worker für statische App-Shell-Ressourcen
 - GitHub-Pages-kompatible relative Links, restriktive CSP und barrierearme Navigation
 
@@ -56,43 +57,81 @@ Damit keine erfundenen Inhalte erscheinen:
 - `sw.js` – App-Shell-Cache für alle HTML-Seiten und statischen Assets, ohne Stream-Caching
 - `tests/app.test.js` – Node-basierte Regressionstests für kritische UI-/Player- und Strukturregeln
 
-## Konfiguration
+## Live-Daten aus der offiziellen laut.fm-API
 
-`app.js` baut seine Laufzeitkonfiguration aus `window.__JACKDARCKART_CONFIG__ || {}` auf und mischt diese Overrides in die eingebauten Defaults.
+`app.js` baut seine Laufzeitkonfiguration aus `window.__JACKDARCKART_CONFIG__ || {}` auf und nutzt standardmäßig **direkt** die offiziellen Endpunkte für die Station `jackdarckart`:
 
-### Now Playing
+- `https://api.laut.fm/station/jackdarckart/current_song`
+- `https://api.laut.fm/station/jackdarckart/last_songs`
+- `https://api.laut.fm/station/jackdarckart/schedule`
+- `https://api.laut.fm/station/jackdarckart`
+- `https://api.laut.fm/station/jackdarckart/listeners`
+- `https://api.laut.fm/station/jackdarckart/next_artists`
 
-Standardmäßig wird keine externe Now-Playing-Quelle abgefragt. Erst eine bewusst konfigurierte **same-origin**-Quelle aktiviert Titelinfos und Historie.
+### Tatsächlich ausgewertete API-Felder
+
+Die Frontend-Validierung verwendet nur bestätigte, defensive Feldnamen und ignoriert alles andere:
+
+- `current_song`: `title`, `artist.name`, `album`, `art`, `started_at`, `ends_at`
+- `last_songs`: Array aus Songobjekten mit denselben relevanten Songfeldern
+- `schedule`: `starts`, `ends`, `playlist.name`, `description`, `type`, optionale URLs
+- `station`: `display_name`, `name`, `description`, `genres`, `page_url`, `stream_url`, `images`/`logo`
+- `listeners`: `listeners`
+- `next_artists`: `name`
+
+Wenn Felder fehlen, werden sie **nicht** frei ergänzt. Cover, Listener-Zahl, Genres oder Next Artists erscheinen nur bei gültigen API-Werten.
+
+### Polling, Timeout und Fehlerverhalten
+
+- Songs / letzte Titel / Listener / Next Artists: Standard-Polling `45000 ms`
+- Station-Profil: Standard-Polling `180000 ms`
+- Sendeplan: Standard-Polling `180000 ms`
+- Request-Timeout: `12000 ms`
+- Race-Protection: veraltete API-Antworten werden verworfen
+- Cleanup: Polling-Timer werden auf `pagehide` beendet
+
+Bei API-Fehlern gilt:
+
+- **Now Playing** zeigt keinen erfundenen Titel
+- der letzte erfolgreiche Abrufzeitpunkt bleibt sichtbar
+- ein manueller **„Jetzt aktualisieren“**-Button bleibt verfügbar
+- Historie und Sendeplan melden ehrlich, wenn die API gerade leer oder unerreichbar ist
+
+### Optionale Same-Origin-Proxy-Konfiguration
+
+Falls der direkte Browserzugriff wegen CORS, DNS oder Netzrestriktionen in deiner Zielumgebung fehlschlägt, kann ein echter Same-Origin-Proxy vorgeschaltet werden. GitHub Pages selbst liefert keinen Backend-Proxy mit; deshalb wird kein Fake-Fallback behauptet.
 
 Beispiel:
 
 ```js
 window.__JACKDARCKART_CONFIG__ = {
-  nowPlaying: {
-    endpoint: './data/now-playing.json',
+  lautFm: {
+    proxyBase: '/api/lautfm/station/jackdarckart',
     pollIntervalMs: 45000,
-    requestInit: {
-      headers: {
-        Accept: 'application/json'
-      }
-    },
-    adapter: 'generic-json'
+    stationPollIntervalMs: 180000,
+    schedulePollIntervalMs: 180000,
+    requestTimeoutMs: 12000,
+    scheduleTimeZone: 'Europe/Berlin'
   }
 };
 ```
+
+`proxyBase` muss dieselben offiziellen Endpunkte spiegeln, also z. B.:
+
+- `/api/lautfm/station/jackdarckart/current_song`
+- `/api/lautfm/station/jackdarckart/last_songs`
+- `/api/lautfm/station/jackdarckart/schedule`
+- …
 
 ### Statische Inhaltsbereiche
 
 Folgende Inhalte bleiben zentral über `APP_CONFIG.content` pflegbar:
 
-- `schedule.entries`
 - `events`
 - `news`
 - `archive`
 - `platformLinks`
 - `contact`
-
-Für `schedule.entries` gelten mindestens `day`, `start`, `end` und `title`. Die Live-/Next-Berechnung nutzt standardmäßig `Europe/Berlin`.
 
 ## Lokale Vorschau
 
@@ -116,16 +155,19 @@ Leichtgewichtige Regressionstests laufen mit:
 
 ```bash
 cd /home/runner/work/jackdarckart/jackdarckart
+node --check app.js
 node tests/app.test.js
 ```
 
 Sinnvolle manuelle Prüfungen:
 
 1. Navigation, aktive Seitenmarkierung und Mobile-Drawer auf mehreren Seiten prüfen
-2. Live-Player auf `live.html` starten, pausieren, stummschalten, Retry + Offline-Hinweise testen
-3. Theme wechseln und Seitenreload auf anderer Unterseite prüfen
-4. Sticky-Quick-Access, Scroll-Reveal und Reduced-Motion-Fallback prüfen
-5. PWA/Service Worker in Browser-DevTools prüfen (kein Stream-Caching)
+2. `index.html`, `live.html`, `titel.html` und `sendeplan.html` mit erreichbarer laut.fm-API prüfen: Song, Historie, Sendeplan, Senderdaten, Listener und Next Artists
+3. API-Fehlerfall simulieren: Browser offline oder Proxy deaktivieren und auf ehrliche Fehlerzustände mit letztem erfolgreichen Abruf achten
+4. Live-Player auf `live.html` starten, pausieren, stummschalten, Retry + Offline-Hinweise testen
+5. Theme wechseln und Seitenreload auf anderer Unterseite prüfen
+6. Sticky-Quick-Access, Scroll-Reveal und Reduced-Motion-Fallback prüfen
+7. PWA/Service Worker in Browser-DevTools prüfen (kein Stream-Caching)
 
 ## PWA / Offline
 
@@ -139,7 +181,7 @@ Die Website wird direkt aus dem Repository-Root über GitHub Pages veröffentlic
 
 ## Bekannte offene Konfigurationspunkte
 
-- echte same-origin-Quelle für Now Playing / Historie hinterlegen, falls Titelinfos gewünscht sind
 - bestätigte Sendeplan-, Event-, News- und Archivdaten pflegen
 - reale Kontaktadresse und rechtlich geprüfte Impressumsangaben eintragen
 - optional Social-/Plattform-Links nur nach Verifikation ergänzen
+- optional echten Same-Origin-Proxy ergänzen, falls direkter Browserzugriff auf `api.laut.fm` in der Zielumgebung nicht möglich ist

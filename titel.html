@@ -7,7 +7,7 @@
   <meta name="description" content="Aktueller Titel und zuletzt gespielte Titel auf stream-musik.space mit ehrlichem Now-Playing-Fallback, lokalen Favoriten und datenschutzfreundlichen Teilen-Funktionen.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="dark light">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm https://api.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/titel.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
@@ -77,13 +77,17 @@
       <article class="panel content-panel hero-led">
         <div class="subpanel-head">
           <h2>Now Playing</h2>
-          <span class="subpanel-label">ehrlicher Fallback statt Fantasiedaten</span>
+          <span class="subpanel-label">offizielle laut.fm-API · ehrlicher Fehlerzustand statt Fantasiedaten</span>
         </div>
         <div class="signal-lines" aria-hidden="true"></div>
+        <div class="media-art-shell" id="now-playing-artwork-wrap" hidden>
+          <img class="media-art" id="now-playing-artwork" src="" alt="">
+        </div>
+        <p class="note compact-note" id="now-playing-artwork-fallback">Kein verifiziertes Cover von der API geliefert.</p>
         <p class="now-playing-track" id="now-playing-track">Titelinformationen derzeit nicht verfügbar</p>
-        <p class="now-playing-artist" id="now-playing-artist">Live-Metadaten bleiben deaktiviert, bis eine echte Quelle konfiguriert ist.</p>
+        <p class="now-playing-artist" id="now-playing-artist">Die offiziellen Songdaten werden geladen.</p>
         <p class="status-line"><span class="meta-label">Senderstatus</span><span id="station-status">Bereit für manuellen Start</span></p>
-        <p class="share-status note" id="now-playing-source" aria-live="polite">Keine Now-Playing-Quelle konfiguriert.</p>
+        <p class="share-status note" id="now-playing-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
         <div class="share-actions section-gap-top">
           <button class="button secondary" id="favorite-track" type="button" disabled>Zu Favoriten</button>
           <button class="button secondary" id="share" type="button" data-share-target="page">Titelansicht teilen</button>
@@ -122,17 +126,17 @@
       <article class="panel content-panel timeline-strip">
         <div class="subpanel-head">
           <h2>Zuletzt gespielt</h2>
-          <span class="subpanel-label">gleiche Quelle wie Now Playing</span>
+          <span class="subpanel-label">Endpoint <code>/station/jackdarckart/last_songs</code></span>
         </div>
-        <p class="note compact-note">Die Historie listet frühere Einträge derselben Metadatenquelle. Zeitstempel dürfen leicht verzögert eintreffen.</p>
+        <p class="note compact-note" id="history-source">Die Historie wird live aus derselben offiziellen API geladen. Bei Nichterreichbarkeit wird der Grund erklärt und kein leerer Pseudozustand erzeugt.</p>
         <ol class="history-list" id="history-list" hidden></ol>
-        <p class="empty-history note" id="history-empty">Noch keine Historie verfügbar. Sobald eine verlässliche Quelle eingerichtet ist, erscheinen hier zuletzt gespielte Titel.</p>
+        <p class="empty-history note" id="history-empty">Noch keine Historie verfügbar. Sobald die offizielle API erreichbar ist, erscheinen hier zuletzt gespielte Titel.</p>
         <details class="inline-details">
           <summary>Was tun, wenn die Historie leer bleibt?</summary>
           <div class="details-copy">
             <ul class="inline-list">
-              <li>Prüfe, ob eine same-origin-Quelle konfiguriert ist.</li>
-              <li>Stelle sicher, dass neben dem aktuellen Titel auch ältere Einträge ausgeliefert werden.</li>
+              <li>Nutze „Jetzt aktualisieren“, um die offiziellen API-Endpunkte erneut abzurufen.</li>
+              <li>Prüfe bei Problemen CORS oder einen optionalen Same-Origin-Proxy.</li>
               <li>Auch ohne Historie bleibt die Wiedergabe uneingeschränkt nutzbar.</li>
             </ul>
           </div>
@@ -155,6 +159,19 @@
       <a class="button primary" href="./live.html#player">Zum Live-Player</a>
       <a class="button secondary" href="./hilfe.html">Mehr zu Now Playing &amp; Historie</a>
       <a class="button secondary" href="./kontakt.html">Metadatenproblem melden</a>
+    </div>
+  </section>
+  <section class="section section-muted live-data-section" data-reveal>
+    <div class="wrap">
+      <article class="panel content-panel live-data-panel">
+        <div class="subpanel-head">
+          <h2>Live-Datenstatus</h2>
+          <button class="button secondary" id="live-data-refresh" type="button">Jetzt aktualisieren</button>
+        </div>
+        <p class="status-line"><span class="meta-label">Status</span><span id="live-data-status">Live-Daten werden vorbereitet</span></p>
+        <p class="status-line"><span class="meta-label">Zuletzt aktualisiert</span><span id="live-data-updated">Noch kein erfolgreicher API-Abruf</span></p>
+        <p class="share-status note" id="live-data-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
+      </article>
     </div>
   </section>
 </main>

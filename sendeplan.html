@@ -7,7 +7,7 @@
   <meta name="description" content="Sendeplan von stream-musik.space mit Jetzt-live-/Als-Nächstes-Hinweisen, Zeitzonenbezug und pflegbarem Leerzustand für bestätigte Programmeinträge.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="dark light">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm https://api.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/sendeplan.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
@@ -80,18 +80,18 @@
       </article>
       <aside class="editorial-note">
         <h3>Zeitzonenhinweis</h3>
-        <p>Standardmäßig rechnet die Seite in Europe/Berlin. Bei Änderungen sollte der Pflegehinweis in der Konfiguration angepasst werden.</p>
+        <p>Der Wochenplan wird live aus <code>/station/jackdarckart/schedule</code> geladen. Zeiten werden transparent mit der auf der Website verwendeten Anzeigezeitzone ausgewiesen.</p>
       </aside>
     </div>
     <div class="wrap content-columns">
       <article class="panel content-panel timeline-strip">
         <h2>Jetzt live / Als Nächstes</h2>
-        <p>Dieser Bereich hebt nur dann echte Treffer hervor, wenn Datum, Uhrzeit, Wochentag und Zeitzone zusammenpassen.</p>
+        <p id="schedule-source">Dieser Bereich hebt nur dann echte Treffer hervor, wenn die offizielle API lesbare Zeitfenster für Datum, Uhrzeit und Zeitzone liefert.</p>
         <div class="content-list single-column" id="schedule-highlight" aria-live="polite"></div>
       </article>
       <article class="panel content-panel">
         <h2>Kommende Sendungen</h2>
-        <p>Hier erscheinen die nächsten geplanten Einträge. Beispiel- oder Platzhaltereinträge müssen klar gekennzeichnet bleiben.</p>
+        <p>Hier erscheinen ausschließlich die nächsten geplanten Einträge aus der offiziellen laut.fm-API.</p>
         <div class="content-list" id="schedule-list" aria-live="polite"></div>
       </article>
     </div>
@@ -102,18 +102,31 @@
       <article class="panel content-panel">
         <h2>Pflegehinweise</h2>
         <ul class="support-list">
-          <li><code>day</code>, <code>start</code>, <code>end</code> und <code>title</code> sind die Mindestfelder.</li>
-          <li>Übernacht-Slots bleiben möglich, wenn die Endzeit numerisch vor der Startzeit liegt.</li>
-          <li>Unbestätigte Reihen, Hosts oder Genres sollten nicht veröffentlicht werden.</li>
+          <li>Diese Seite erfindet keine Sendungen, wenn die API keine verifizierten Daten liefert.</li>
+          <li>Bei API-Fehlern zeigt der Bereich einen technischen Fehlerzustand mit Retry.</li>
+          <li>Wenn direkter Browserzugriff scheitert, kann optional ein echter Same-Origin-Proxy konfiguriert werden.</li>
         </ul>
       </article>
       <article class="panel content-panel">
         <h2>Passende nächste Schritte</h2>
-        <p>Wenn du einen aktuellen Termin ergänzen oder einen Fehler melden möchtest, nutze bitte die Kontaktseite oder pflege die statische Konfiguration direkt im Projekt.</p>
+        <p>Wenn du einen API-Fehler oder einen falschen Programmpunkt melden möchtest, nutze bitte die Kontaktseite oder prüfe die offizielle laut.fm-Quelle direkt.</p>
         <div class="actions section-actions">
           <a class="button primary" href="./kontakt.html">Kontakt &amp; Feedback</a>
-          <a class="button secondary" href="./hilfe.html">FAQ zu Planung &amp; Wiedergabe</a>
+          <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">laut.fm öffnen</a>
         </div>
+      </article>
+    </div>
+  </section>
+  <section class="section section-muted live-data-section" data-reveal>
+    <div class="wrap">
+      <article class="panel content-panel live-data-panel">
+        <div class="subpanel-head">
+          <h2>Live-Datenstatus</h2>
+          <button class="button secondary" id="live-data-refresh" type="button">Jetzt aktualisieren</button>
+        </div>
+        <p class="status-line"><span class="meta-label">Status</span><span id="live-data-status">Live-Daten werden vorbereitet</span></p>
+        <p class="status-line"><span class="meta-label">Zuletzt aktualisiert</span><span id="live-data-updated">Noch kein erfolgreicher API-Abruf</span></p>
+        <p class="share-status note" id="live-data-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
       </article>
     </div>
   </section>

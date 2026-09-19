@@ -7,7 +7,7 @@
   <meta name="description" content="Hilfe und FAQ zu Wiedergabe, Browserblockaden, PWA, Datenverbrauch, Favoriten, Timer, Theme und Tastatursteuerung auf stream-musik.space.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="dark light">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm https://api.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/hilfe.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
@@ -91,7 +91,7 @@
       <details class="panel faq-item" open><summary>Der Stream startet nicht. Was kann ich sofort tun?</summary><p>Öffne zuerst <a href="./live.html#player">die Live-Seite</a>, klicke auf <strong>Stream starten</strong> oder <strong>Erneut versuchen</strong> und achte darauf, ob der Status eher auf <em>Blockiert</em>, <em>Puffern</em> oder <em>Fehler</em> steht. Wenn dein Browser den Start nicht freigibt, helfen oft ein erneuter Klick, ein anderer Browser oder der Wechsel zum Direktstream beziehungsweise zur offiziellen laut.fm-Seite.</p></details>
       <details class="panel faq-item"><summary>Warum startet die Website nicht automatisch Ton?</summary><p>Viele Browser blockieren Livestreams ohne direkte Nutzeraktion. Die Website respektiert diese Regeln bewusst, damit kein verstecktes Autoplay entsteht und du die Kontrolle über die Wiedergabe behältst.</p></details>
       <details class="panel faq-item"><summary>Wie funktionieren Retry, Offline-Hinweis und Diagnose?</summary><p>Die Wiedergabelogik versucht kurze Aussetzer kontrolliert erneut zu verbinden. Gleichzeitig zeigt sie Netzstatus, Retry-Zähler, letzte Fehler und Hinweise nach einer Offline-Rückkehr transparent an. Alle Details liegen auf der Live-Seite sichtbar bereit.</p></details>
-      <details class="panel faq-item"><summary>Warum ist Now Playing oder „Zuletzt gespielt“ leer?</summary><p>Diese Bereiche zeigen nur echte, bewusst konfigurierte same-origin-Metadaten. Ohne geeignete Quelle oder bei vorübergehenden Fehlern bleibt der Bereich ehrlich leer, damit keine erfundenen Titel erscheinen.</p></details>
+      <details class="panel faq-item"><summary>Warum ist Now Playing oder „Zuletzt gespielt“ leer?</summary><p>Diese Bereiche zeigen nur echte Daten aus der offiziellen laut.fm-API. Wenn die API vorübergehend leer bleibt, blockiert wird oder nicht erreichbar ist, zeigt die Seite bewusst einen technischen Fehlerzustand mit letztem erfolgreichen Abruf statt erfundener Titel.</p></details>
       <details class="panel faq-item"><summary>Wie funktionieren lokale Favoriten?</summary><p>Favoriten werden ausschließlich im Browser via <code>localStorage</code> gespeichert. Sie werden nicht an Server gesendet, nicht zwischen Geräten synchronisiert und können verschwinden, wenn du Browserdaten löschst oder privaten Modus nutzt.</p></details>
       <details class="panel faq-item"><summary>Was macht der Sleep-Timer?</summary><p>Der Sleep-Timer zählt lokal im aktiven Browserfenster herunter und pausiert danach die Wiedergabe. Er beeinflusst keine anderen Geräte, läuft nach einem Reload nicht automatisch weiter und sendet keine Daten an externe Dienste.</p></details>
       <details class="panel faq-item"><summary>Welche Tastaturkürzel gibt es?</summary><p><kbd>Leertaste</kbd> startet oder pausiert, <kbd>M</kbd> schaltet stumm, <kbd>↑</kbd>/<kbd>↓</kbd> ändern die Lautstärke, <kbd>S</kbd> teilt die Website und <kbd>T</kbd> springt nach oben. In Formularen, Links, Buttons und editierbaren Feldern bleiben die Kürzel absichtlich inaktiv.</p></details>
@@ -99,6 +99,19 @@
       <details class="panel faq-item"><summary>Wie sieht es mit Datenverbrauch aus?</summary><p>Streaming verbraucht Datenvolumen, vor allem mobil. Die Website nennt absichtlich keine pauschalen Verbrauchszahlen, weil Qualität, Verbindung und Gerät schwanken. Wenn du unterwegs sparsam sein möchtest, nutze WLAN oder kontrolliere dein Gerät direkt.</p></details>
       <details class="panel faq-item"><summary>Was bewirken Theme, PWA und Service Worker?</summary><p>Das Theme merkt sich deine Präferenz lokal. Der Service Worker cached nur statische Seiten und Assets, nicht den Audiostream. Die PWA macht die Website installierbar und offline lesbar, ersetzt aber keinen vollwertigen Offline-Audiozugang.</p></details>
       <details class="panel faq-item"><summary>Wo melde ich technische Probleme oder Sicherheitsfragen?</summary><p>Nutze <a href="./kontakt.html">kontakt.html</a>. Dort werden Mailto- oder GitHub-Issue-Links nur lokal vorbereitet; ohne deine abschließende Aktion wird nichts gesendet.</p></details>
+    </div>
+  </section>
+  <section class="section section-muted live-data-section" data-reveal>
+    <div class="wrap">
+      <article class="panel content-panel live-data-panel">
+        <div class="subpanel-head">
+          <h2>Live-Datenstatus</h2>
+          <button class="button secondary" id="live-data-refresh" type="button">Jetzt aktualisieren</button>
+        </div>
+        <p class="status-line"><span class="meta-label">Status</span><span id="live-data-status">Live-Daten werden vorbereitet</span></p>
+        <p class="status-line"><span class="meta-label">Zuletzt aktualisiert</span><span id="live-data-updated">Noch kein erfolgreicher API-Abruf</span></p>
+        <p class="share-status note" id="live-data-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
+      </article>
     </div>
   </section>
 </main>
