@@ -1476,7 +1476,7 @@ function testServiceWorkerCachesAllHtmlPages() {
   assert.match(swCode, /function isStaticPageRequest\(request, url\)/, 'service worker should centralize app-shell page detection');
   assert.match(swCode, /request\.mode === 'navigate'/, 'service worker should handle navigations explicitly');
   assert.match(swCode, /STATIC_PAGE_PATHS\.has\(url\.pathname\)/, 'service worker should also recognize static page fetches beyond browser navigation mode');
-  assert.match(swCode, /cache\.put\(normalizedPageUrl, responseClone\)/, 'navigation responses should be cached under a stable page key');
+  assert.match(swCode, /scheduleCachePut\(event, normalizedPageUrl, responseClone\)/, 'navigation responses should be cached under a stable page key');
   assert.match(swCode, /caches\.match\(normalizedPageUrl\)/, 'offline navigation should try the normalized cached page first');
   assert.match(swCode, /OFFLINE_FALLBACK_URL/, 'service worker should keep an explicit offline fallback entry point');
 }
@@ -1527,6 +1527,147 @@ async function testServiceWorkerServesCachedStaticPageRequestsOffline() {
   assert.equal(await response.text(), '<main id="content">offline</main>', 'service worker should return the cached static page response when the network is unavailable');
 }
 
+async function testServiceWorkerExtendsFetchLifetimeForCacheWrites() {
+  const listeners = new Map();
+  let putCalls = 0;
+  const waitUntilPromises = [];
+  const selfObject = {
+    location: new URL('https://stream-musik.space/sw.js'),
+    addEventListener(type, listener) {
+      listeners.set(type, listener);
+    },
+    skipWaiting() {},
+    clients: {
+      claim() {}
+    }
+  };
+  const context = vm.createContext({
+    self: selfObject,
+    caches: {
+      async open() {
+        return {
+          async add() {},
+          async put() {
+            putCalls += 1;
+          }
+        };
+      },
+      async match() {
+        return null;
+      },
+      async keys() {
+        return ['stream-musik-space-v3'];
+      },
+      async delete() {
+        return true;
+      }
+    },
+    fetch: async () => ({
+      status: 200,
+      type: 'basic',
+      clone() {
+        return this;
+      }
+    }),
+    URL,
+    Promise,
+    console
+  });
+
+  vm.runInContext(swCode, context, { filename: 'sw.js' });
+
+  let responsePromise = null;
+  listeners.get('fetch')({
+    request: {
+      method: 'GET',
+      url: 'https://stream-musik.space/live.html?utm=autotest',
+      mode: 'navigate',
+      destination: 'document'
+    },
+    respondWith(promise) {
+      responsePromise = Promise.resolve(promise);
+    },
+    waitUntil(promise) {
+      waitUntilPromises.push(Promise.resolve(promise));
+    }
+  });
+
+  const response = await responsePromise;
+  assert.ok(response, 'service worker should still return the network response while scheduling cache writes');
+  assert.equal(waitUntilPromises.length, 1, 'service worker should extend fetch lifetime while writing navigation responses to cache');
+  await Promise.all(waitUntilPromises);
+  assert.equal(putCalls, 1, 'service worker should persist exactly one cache write for a successful page response');
+}
+
+async function testServiceWorkerIgnoresCacheWriteFailures() {
+  const listeners = new Map();
+  const waitUntilPromises = [];
+  const selfObject = {
+    location: new URL('https://stream-musik.space/sw.js'),
+    addEventListener(type, listener) {
+      listeners.set(type, listener);
+    },
+    skipWaiting() {},
+    clients: {
+      claim() {}
+    }
+  };
+  const context = vm.createContext({
+    self: selfObject,
+    caches: {
+      async open() {
+        return {
+          async add() {},
+          async put() {
+            throw new Error('quota-exceeded');
+          }
+        };
+      },
+      async match() {
+        return null;
+      },
+      async keys() {
+        return ['stream-musik-space-v3'];
+      },
+      async delete() {
+        return true;
+      }
+    },
+    fetch: async () => ({
+      status: 200,
+      type: 'basic',
+      clone() {
+        return this;
+      }
+    }),
+    URL,
+    Promise,
+    console
+  });
+
+  vm.runInContext(swCode, context, { filename: 'sw.js' });
+
+  let responsePromise = null;
+  listeners.get('fetch')({
+    request: {
+      method: 'GET',
+      url: 'https://stream-musik.space/live.html?utm=quota',
+      mode: 'navigate',
+      destination: 'document'
+    },
+    respondWith(promise) {
+      responsePromise = Promise.resolve(promise);
+    },
+    waitUntil(promise) {
+      waitUntilPromises.push(Promise.resolve(promise));
+    }
+  });
+
+  const response = await responsePromise;
+  assert.ok(response, 'cache write failures should not prevent the service worker from returning the successful network response');
+  await Promise.all(waitUntilPromises);
+}
+
 function testIssueHelpPageAndTemplatesArePresent() {
   const issueHelpHtml = fs.readFileSync(path.join(__dirname, '..', 'issue-hilfe.html'), 'utf8');
   const readme = fs.readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
@@ -1563,6 +1704,8 @@ async function main() {
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();
+  await testServiceWorkerExtendsFetchLifetimeForCacheWrites();
+  await testServiceWorkerIgnoresCacheWriteFailures();
   testIssueHelpPageAndTemplatesArePresent();
   testUsesStationSpecificHttpsStreamUrl();
   testAppProvidesPersistentInternalNavigationShell();
