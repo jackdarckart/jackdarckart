@@ -5,11 +5,15 @@
     volume: 'jackdarckart-volume',
     muted: 'jackdarckart-muted'
   };
-  const LOAD_TIMEOUT_MS = 12000;
+  const STREAM_URL = 'https://stream.laut.fm/jackdarckart';
+  const LOAD_TIMEOUT_MS = 8000;
+  const RECONNECT_DELAY_MS = 1200;
+  const MAX_AUTO_RECONNECTS = 1;
 
   const audio = document.getElementById('audio');
   const playButton = document.getElementById('play');
   const muteButton = document.getElementById('mute');
+  const retryButton = document.getElementById('retry');
   const shareButton = document.getElementById('share');
   const volumeInput = document.getElementById('volume');
   const volumeText = document.getElementById('volume-text');
@@ -23,7 +27,12 @@
   const backToTopButton = document.getElementById('back-to-top');
   const year = document.getElementById('year');
 
+  let currentState = 'ready';
   let loadTimer = 0;
+  let reconnectTimer = 0;
+  let reconnectAttempts = 0;
+  let wantsPlayback = false;
+  let hasConfirmedPlayback = false;
   let lastAudibleVolume = 70;
 
   function readStorage(key) {
@@ -55,18 +64,41 @@
     return readStorage(STORAGE_KEYS.muted) === 'true';
   }
 
+  function updateEqualizer(isPlaying) {
+    equalizer.querySelectorAll('i').forEach((bar) => {
+      bar.style.animationPlayState = isPlaying ? 'running' : 'paused';
+    });
+  }
+
+  function updatePlayButton() {
+    if (currentState === 'playing') {
+      playButton.textContent = 'Stream pausieren';
+      playButton.setAttribute('aria-pressed', 'true');
+      return;
+    }
+
+    playButton.textContent = currentState === 'loading' ? 'Verbindung läuft …' : 'Stream starten';
+    playButton.setAttribute('aria-pressed', 'false');
+  }
+
+  function updateRetryButton() {
+    retryButton.hidden = currentState !== 'error' && currentState !== 'blocked';
+  }
+
   function setState(type, title, detail) {
+    currentState = type;
     status.dataset.state = type;
+    status.setAttribute('aria-busy', String(type === 'loading'));
     statusText.textContent = title;
     message.textContent = detail;
-    equalizer.querySelectorAll('i').forEach((bar) => {
-      bar.style.animationPlayState = type === 'playing' ? 'running' : 'paused';
-    });
+    updateEqualizer(type === 'playing');
+    updatePlayButton();
+    updateRetryButton();
   }
 
   function updateMuteButton() {
     const muted = audio.muted;
-    muteButton.textContent = muted ? 'Stumm' : 'Ton an';
+    muteButton.textContent = muted ? 'Ton an' : 'Stumm';
     muteButton.setAttribute('aria-pressed', String(muted));
     muteButton.setAttribute('aria-label', muted ? 'Ton wieder einschalten' : 'Ton stummschalten');
   }
@@ -76,13 +108,17 @@
     volumeInput.value = String(normalized);
     volumeText.textContent = normalized + '%';
     audio.volume = normalized / 100;
+
     if (normalized > 0) {
       lastAudibleVolume = normalized;
     }
-    audio.muted = normalized === 0 ? true : audio.muted;
-    if (normalized > 0 && audio.muted) {
+
+    if (normalized === 0) {
+      audio.muted = true;
+    } else if (audio.muted) {
       audio.muted = false;
     }
+
     updateMuteButton();
     writeStorage(STORAGE_KEYS.volume, String(normalized));
     writeStorage(STORAGE_KEYS.muted, String(audio.muted));
@@ -95,18 +131,136 @@
     }
   }
 
-  function startLoadTimeout() {
+  function clearReconnectTimer() {
+    if (reconnectTimer) {
+      window.clearTimeout(reconnectTimer);
+      reconnectTimer = 0;
+    }
+  }
+
+  function stopAudioAfterFailure() {
+    if (!audio.paused) {
+      audio.pause();
+    }
+  }
+
+  function pausePlayback() {
+    wantsPlayback = false;
+    reconnectAttempts = 0;
+    clearLoadTimer();
+    clearReconnectTimer();
+    if (!audio.paused) {
+      audio.pause();
+    }
+  }
+
+  function ensureStreamSource(forceReload) {
+    const hasSource = audio.getAttribute('src') === STREAM_URL;
+    if (!hasSource) {
+      audio.setAttribute('src', STREAM_URL);
+      forceReload = true;
+    }
+
+    if (forceReload) {
+      audio.load();
+    }
+  }
+
+  function scheduleLoadTimeout() {
     clearLoadTimer();
     loadTimer = window.setTimeout(() => {
-      if (!audio.paused) {
-        setState('error', 'Verbindung dauert zu lange.', 'Bitte prüfe deine Verbindung oder öffne den Stream direkt auf laut.fm.');
+      if (!wantsPlayback || currentState !== 'loading') {
+        return;
       }
+
+      if (hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
+        reconnectAttempts += 1;
+        setState(
+          'loading',
+          'Verbindung wird erneut aufgebaut …',
+          'Der Stream antwortet noch nicht. Ein weiterer Versuch startet jetzt.'
+        );
+        clearReconnectTimer();
+        reconnectTimer = window.setTimeout(() => {
+          attemptPlayback(true);
+        }, RECONNECT_DELAY_MS);
+        return;
+      }
+
+      wantsPlayback = false;
+      stopAudioAfterFailure();
+      setState(
+        'error',
+        'Der Stream startet gerade nicht.',
+        'Bitte tippe auf „Erneut versuchen“ oder öffne den Stream direkt auf laut.fm.'
+      );
     }, LOAD_TIMEOUT_MS);
   }
 
-  function updatePlayButton(isPlaying) {
-    playButton.textContent = isPlaying ? 'Stream pausieren' : 'Stream starten';
-    playButton.setAttribute('aria-pressed', String(isPlaying));
+  function handlePlaybackFailure(error) {
+    clearLoadTimer();
+    clearReconnectTimer();
+
+    if (error && error.name === 'AbortError' && !wantsPlayback) {
+      return;
+    }
+
+    wantsPlayback = false;
+
+    if (error && error.name === 'NotAllowedError') {
+      stopAudioAfterFailure();
+      setState(
+        'blocked',
+        'Browser blockiert die Wiedergabe.',
+        'Bitte tippe erneut auf „Stream starten“ oder „Erneut versuchen“.'
+      );
+      return;
+    }
+
+    stopAudioAfterFailure();
+    setState(
+      'error',
+      'Wiedergabe konnte nicht starten.',
+      'Bitte versuche es erneut oder öffne den Stream direkt auf laut.fm.'
+    );
+  }
+
+  async function attemptPlayback(forceReload) {
+    wantsPlayback = true;
+    clearReconnectTimer();
+    setState(
+      'loading',
+      forceReload ? 'Verbindung wird aufgebaut …' : 'Wiedergabe wird vorbereitet …',
+      'Der Livestream wird mit deiner Aktion gestartet.'
+    );
+    scheduleLoadTimeout();
+
+    try {
+      if (forceReload && !audio.paused) {
+        audio.pause();
+      }
+
+      ensureStreamSource(forceReload);
+      await audio.play();
+    } catch (error) {
+      handlePlaybackFailure(error);
+    }
+  }
+
+  async function togglePlayback() {
+    if (currentState === 'loading') {
+      pausePlayback();
+      setState('paused', 'Start wurde abgebrochen.', 'Tippe auf „Stream starten“, um den Livestream neu aufzubauen.');
+      return;
+    }
+
+    if (!audio.paused) {
+      pausePlayback();
+      return;
+    }
+
+    reconnectAttempts = 0;
+    await attemptPlayback(audio.getAttribute('src') !== STREAM_URL);
   }
 
   function closeMenu() {
@@ -162,31 +316,6 @@
     }
   }
 
-  async function togglePlayback() {
-    if (!audio.paused) {
-      audio.pause();
-      return;
-    }
-
-    setState('loading', 'Verbindung wird aufgebaut …', 'Der Livestream wird geladen.');
-    startLoadTimeout();
-
-    try {
-      await audio.play();
-    } catch (error) {
-      clearLoadTimer();
-      const blocked = error && (error.name === 'NotAllowedError' || error.name === 'AbortError');
-      setState(
-        'error',
-        blocked ? 'Wiedergabe benötigt deine Bestätigung.' : 'Wiedergabe konnte nicht starten.',
-        blocked
-          ? 'Bitte erneut klicken oder den Stream direkt auf laut.fm öffnen.'
-          : 'Bitte prüfe deine Verbindung oder versuche es erneut.'
-      );
-      updatePlayButton(false);
-    }
-  }
-
   function setupMediaSession() {
     if (!('mediaSession' in navigator) || !('MediaMetadata' in window)) {
       return;
@@ -197,8 +326,13 @@
       artist: 'laut.fm',
       album: 'stream-musik.space'
     });
-    navigator.mediaSession.setActionHandler('play', togglePlayback);
-    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+
+    try {
+      navigator.mediaSession.setActionHandler('play', togglePlayback);
+      navigator.mediaSession.setActionHandler('pause', pausePlayback);
+    } catch (error) {
+      return;
+    }
   }
 
   function setBackToTopVisibility() {
@@ -241,13 +375,17 @@
   updateVolume(getStoredVolume());
   audio.muted = getStoredMuted() || audio.volume === 0;
   updateMuteButton();
-  updatePlayButton(false);
+  setState('ready', 'Bereit zum Start', 'Der Stream startet erst nach deinem Klick.');
   setupMediaSession();
   bindNavigation();
   setBackToTopVisibility();
 
   shareButton.addEventListener('click', handleShare);
   playButton.addEventListener('click', togglePlayback);
+  retryButton.addEventListener('click', () => {
+    reconnectAttempts = 0;
+    attemptPlayback(true);
+  });
   muteButton.addEventListener('click', () => {
     if (audio.muted && audio.volume === 0) {
       updateVolume(lastAudibleVolume || 70);
@@ -259,13 +397,19 @@
   volumeInput.addEventListener('input', () => updateVolume(volumeInput.value));
 
   audio.addEventListener('loadstart', () => {
+    if (!wantsPlayback) {
+      return;
+    }
     setState('loading', 'Verbindung wird aufgebaut …', 'Der Livestream wird geladen.');
-    startLoadTimeout();
+    scheduleLoadTimeout();
   });
 
   audio.addEventListener('playing', () => {
     clearLoadTimer();
-    updatePlayButton(true);
+    clearReconnectTimer();
+    reconnectAttempts = 0;
+    hasConfirmedPlayback = true;
+    wantsPlayback = true;
     setState('playing', 'Der Livestream läuft.', 'Du hörst jetzt jackdarckart.');
     if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'playing';
@@ -274,28 +418,60 @@
 
   audio.addEventListener('pause', () => {
     clearLoadTimer();
-    updatePlayButton(false);
-    if (!audio.ended) {
-      setState('paused', 'Der Stream ist pausiert.', 'Starte die Wiedergabe jederzeit erneut.');
+    clearReconnectTimer();
+    if (wantsPlayback || audio.ended || currentState === 'error' || currentState === 'blocked') {
+      return;
     }
+    setState('paused', 'Der Stream ist pausiert.', 'Starte die Wiedergabe jederzeit erneut.');
     if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'paused';
     }
   });
 
   audio.addEventListener('waiting', () => {
+    if (!wantsPlayback) {
+      return;
+    }
     setState('loading', 'Stream puffert …', 'Die Verbindung wird stabilisiert.');
-    startLoadTimeout();
+    scheduleLoadTimeout();
   });
 
   audio.addEventListener('stalled', () => {
-    setState('error', 'Die Verbindung stockt.', 'Bitte warte kurz oder versuche es erneut.');
+    if (!wantsPlayback) {
+      return;
+    }
+
+    if (hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
+      reconnectAttempts += 1;
+      setState('loading', 'Stream verbindet sich neu …', 'Die Verbindung stockt. Ein neuer Versuch läuft.');
+      clearReconnectTimer();
+      reconnectTimer = window.setTimeout(() => {
+        attemptPlayback(true);
+      }, RECONNECT_DELAY_MS);
+      return;
+    }
+
+    wantsPlayback = false;
+    stopAudioAfterFailure();
+    setState('error', 'Die Verbindung stockt.', 'Bitte tippe auf „Erneut versuchen“.');
   });
 
   audio.addEventListener('error', () => {
     clearLoadTimer();
-    updatePlayButton(false);
-    setState('error', 'Stream momentan nicht verfügbar.', 'Bitte prüfe deine Verbindung oder öffne laut.fm.');
+    clearReconnectTimer();
+
+    if (wantsPlayback && hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
+      reconnectAttempts += 1;
+      setState('loading', 'Stream verbindet sich neu …', 'Der Stream antwortet nicht. Ein weiterer Versuch läuft.');
+      reconnectTimer = window.setTimeout(() => {
+        attemptPlayback(true);
+      }, RECONNECT_DELAY_MS);
+      return;
+    }
+
+    wantsPlayback = false;
+    stopAudioAfterFailure();
+    setState('error', 'Stream momentan nicht verfügbar.', 'Bitte prüfe deine Verbindung oder versuche es erneut.');
   });
 
   window.addEventListener('scroll', setBackToTopVisibility, { passive: true });

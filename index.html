@@ -83,16 +83,17 @@
             </div>
           </div>
 
-          <div class="status" id="status" data-state="ready" aria-live="polite">
+          <div class="status" id="status" data-state="ready" role="status" aria-live="polite" aria-busy="false">
             <span class="status-dot" aria-hidden="true"></span>
             <span id="status-text">Bereit zum Start</span>
           </div>
 
-          <p class="note" id="message">Der Stream lädt erst nach deinem Klick. Browser können die Wiedergabe zusätzlich schützen.</p>
+          <p class="note" id="message">Der Stream lädt erst nach deinem Klick. Wenn dein Browser blockiert oder die Verbindung stockt, kannst du direkt erneut versuchen.</p>
 
           <div class="controls">
             <button class="button play-button" id="play" type="button" aria-pressed="false">Stream starten</button>
             <button class="button icon-button" id="mute" type="button" aria-pressed="false" aria-label="Ton stummschalten">Ton an</button>
+            <button class="button icon-button" id="retry" type="button" hidden>Erneut versuchen</button>
             <button class="button icon-button" id="share" type="button">Teilen</button>
           </div>
 
@@ -105,7 +106,6 @@
           <p class="share-status note" id="share-status" aria-live="polite">Aktuelle Titelinformationen findest du direkt auf laut.fm.</p>
 
           <audio id="audio" preload="none" playsinline>
-            <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
             Dein Browser unterstützt Audio nicht.
           </audio>
         </aside>
