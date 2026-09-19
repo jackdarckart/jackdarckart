@@ -1255,6 +1255,9 @@ html[data-theme="light"] .back-to-top {
     animation: none !important;
     transition: none !important;
   }
+  .logo::before {
+    animation: none !important;
+  }
 }
 
 
@@ -1424,6 +1427,7 @@ body::after {
   background:
     repeating-linear-gradient(90deg, rgba(118, 143, 180, 0.05) 0 1px, transparent 1px 72px),
     linear-gradient(180deg, rgba(77, 220, 255, 0.08), transparent 22%, transparent 78%, rgba(139, 92, 246, 0.08));
+  -webkit-mask-image: radial-gradient(circle at 50% 12%, black, transparent 72%);
   mask-image: radial-gradient(circle at 50% 12%, black, transparent 72%);
   z-index: 0;
 }
@@ -1719,6 +1723,10 @@ html[data-reduced-motion="true"] [data-reveal] {
   opacity: 1;
   transform: none;
   transition: none;
+}
+
+html[data-reduced-motion="true"] .logo::before {
+  animation: none;
 }
 
 @media (max-width: 1020px) {
