@@ -77,7 +77,7 @@ Beispiel für eine echte Override-Konfiguration:
 ```js
 window.__JACKDARCKART_CONFIG__ = {
   nowPlaying: {
-    endpoint: 'https://example.invalid/api/now-playing',
+    endpoint: './data/now-playing.json',
     pollIntervalMs: 45000,
     requestInit: {
       headers: {

@@ -1,6 +1,7 @@
 'use strict';
 
 const CACHE_NAME = 'stream-musik-space-v1';
+const INDEX_URL = new URL('./index.html', self.location.href).href;
 const APP_SHELL = [
   './',
   './index.html',
@@ -60,12 +61,12 @@ self.addEventListener('fetch', (event) => {
           if (response && response.status === 200 && response.type === 'basic') {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put('./index.html', responseClone);
+              cache.put(INDEX_URL, responseClone);
             });
           }
           return response;
         })
-        .catch(() => caches.match('./index.html'))
+        .catch(() => caches.match(INDEX_URL))
     );
     return;
   }
