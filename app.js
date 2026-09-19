@@ -2218,7 +2218,7 @@
       document.documentElement.dataset.reducedMotion = reducedMotion ? 'true' : 'false';
     }
 
-    if (reducedMotion || !('IntersectionObserver' in window) || typeof window.IntersectionObserver !== 'function') {
+    if (typeof window === 'undefined' || reducedMotion || !('IntersectionObserver' in window) || typeof window.IntersectionObserver !== 'function') {
       revealNodes.forEach((node) => node.classList && node.classList.add('is-visible'));
       return;
     }
