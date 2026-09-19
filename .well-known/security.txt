@@ -1,0 +1,6 @@
+Contact: https://github.com/jackdarckart/jackdarckart/security/advisories/new
+Contact: https://github.com/jackdarckart/jackdarckart/issues
+Expires: 2027-09-19T00:00:00.000Z
+Canonical: https://stream-musik.space/.well-known/security.txt
+Policy: https://stream-musik.space/#security
+Preferred-Languages: de, en

@@ -445,6 +445,44 @@ button { cursor: pointer; }
   margin: 1.2rem 0 0;
 }
 
+.now-playing {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(8, 15, 30, 0.82), rgba(2, 6, 23, 0.58));
+}
+
+.now-playing-state {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.86rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.now-playing-title {
+  margin: 0.55rem 0 0;
+  font-weight: 700;
+  color: #eef6ff;
+}
+
+.now-playing-artist,
+.now-playing-updated-at {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+}
+
+.now-playing-updated-at {
+  font-size: 0.9rem;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.now-playing[data-state="loading"] { border-color: rgba(77, 220, 255, 0.28); }
+.now-playing[data-state="available"] { border-color: rgba(55, 211, 154, 0.28); }
+.now-playing[data-state="error"] { border-color: rgba(255, 107, 125, 0.32); }
+
 .status-meta {
   margin: 0;
   padding: 0.9rem 1rem;
@@ -576,7 +614,7 @@ code {
   position: fixed;
   left: 50%;
   right: auto;
-  bottom: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   width: min(34rem, calc(100vw - 2rem));
   max-width: 34rem;
   z-index: 18;
@@ -617,7 +655,7 @@ code {
 .sticky-play-button { min-width: 10.5rem; }
 
 .site-footer {
-  padding: 1.3rem 0 3rem;
+  padding: 1.3rem 0 calc(3rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--line);
 }
 
@@ -709,12 +747,19 @@ code {
   .site-nav a { padding: 0.8rem 0.95rem; }
 
   .controls > * { flex: 1 1 100%; }
+  .controls .button { min-height: 3.35rem; }
   .player-links > * { flex: 1 1 100%; }
+
+  .volume-control {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
 
   .sticky-player {
     left: 50%;
     right: auto;
-    bottom: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
     width: min(30rem, calc(100vw - 1rem));
     max-width: 30rem;
     transform: translateX(-50%) translateY(1rem);
@@ -723,6 +768,11 @@ code {
 
   .sticky-player.is-visible { transform: translateX(-50%) translateY(0); }
   .sticky-player-actions > * { flex: 0 1 auto; }
+
+  .back-to-top {
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 @media (min-width: 1400px) {

@@ -198,7 +198,11 @@ function createEnvironment(options = {}) {
     'player-state-label',
     'retry-status',
     'sticky-player',
-    'sticky-play'
+    'sticky-play',
+    'now-playing-state',
+    'now-playing-title',
+    'now-playing-artist',
+    'now-playing-updated-at'
   ];
 
   for (const id of ids) {
@@ -219,7 +223,7 @@ function createEnvironment(options = {}) {
     elements['site-nav'].appendChild(new MockElement('nav-link', document));
   }
 
-  const localStorageState = new Map();
+  const localStorageState = new Map(Object.entries(options.localStorage || {}));
   const location = { href: 'https://stream-musik.space/' };
   const windowObject = {
     location,
@@ -259,7 +263,8 @@ function createEnvironment(options = {}) {
     scrollTo() {},
     MediaMetadata: function MediaMetadata(data) {
       Object.assign(this, data);
-    }
+    },
+    fetch: options.fetchImpl
   };
   windowObject.window = windowObject;
   windowObject.document = document;
@@ -389,6 +394,56 @@ async function testMuteButtonRestoresAudiblePlaybackFromZeroVolume() {
   assert.equal(elements['volume-text'].textContent, '70%', 'restoring audio should refresh the visible volume label');
 }
 
+async function testVolumeInitHydrationPreservesStoredMuteState() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
+    localStorage: {
+      'jackdarckart-volume': '42',
+      'jackdarckart-muted': 'true'
+    }
+  });
+  const { elements, window } = env;
+
+  assert.equal(elements.audio.volume, 0.42, 'initial hydration should apply stored volume');
+  assert.equal(elements.audio.muted, true, 'initial hydration should keep stored mute state');
+  assert.equal(window.localStorage.getItem('jackdarckart-muted'), 'true', 'initial hydration must not overwrite stored mute state');
+}
+
+async function testVolumeChangeEventUpdatesAudioAndStorage() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year']
+  });
+  const { elements, window } = env;
+
+  elements.volume.value = '35';
+  await elements.volume.dispatch('change');
+
+  assert.equal(elements.audio.volume, 0.35, 'change event should update audio volume');
+  assert.equal(elements.audio.muted, false, 'change event should keep mute status in sync');
+  assert.equal(elements['volume-text'].textContent, '35%', 'change event should update visible percentage');
+  assert.equal(window.localStorage.getItem('jackdarckart-volume'), '35', 'change event should persist volume');
+}
+
+async function testNowPlayingFallbackWhenMetadataUnavailable() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
+    fetchImpl: async () => {
+      throw new Error('network-failure');
+    }
+  });
+  const { elements } = env;
+
+  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.equal(elements['now-playing-state'].textContent, 'Nicht verfügbar', 'metadata errors should keep an honest unavailable state');
+  assert.match(
+    elements['now-playing-title'].textContent,
+    /Keine verlässlichen Live-Metadaten verfügbar/,
+    'metadata errors should show a safe fallback title'
+  );
+}
+
 function testUsesStationSpecificHttpsStreamUrl() {
   assert.match(
     appCode,
@@ -403,6 +458,9 @@ async function main() {
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();
   await testMuteButtonRestoresAudiblePlaybackFromZeroVolume();
+  await testVolumeInitHydrationPreservesStoredMuteState();
+  await testVolumeChangeEventUpdatesAudioAndStorage();
+  await testNowPlayingFallbackWhenMetadataUnavailable();
   console.log('app.js player tests passed');
 }
 

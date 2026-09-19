@@ -1,0 +1,23 @@
+name: Validate static player
+
+on:
+  push:
+    branches:
+      - main
+      - 'copilot/**'
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Syntax check app.js
+        run: node --check app.js
+      - name: Run player regression tests
+        run: node tests/app.test.js

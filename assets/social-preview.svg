@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">stream-musik.space Social Preview</title>
+  <desc id="desc">Vorschaubild für den jackdarckart Browser-Player.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#050b15"/>
+      <stop offset="100%" stop-color="#101d2d"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#4ddcff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="80" y="80" width="1040" height="470" rx="40" fill="#0d1727" stroke="#4ddcff" stroke-opacity="0.35"/>
+  <circle cx="170" cy="170" r="28" fill="#ff6b7d"/>
+  <text x="240" y="190" fill="#eef6ff" font-size="54" font-family="Inter, Arial, sans-serif" font-weight="800">jackdarckart</text>
+  <text x="240" y="248" fill="#b7c7dd" font-size="34" font-family="Inter, Arial, sans-serif">Direkter Browser-Player auf laut.fm-Basis</text>
+  <rect x="120" y="310" width="470" height="96" rx="48" fill="url(#accent)"/>
+  <text x="355" y="372" text-anchor="middle" fill="#ffffff" font-size="38" font-family="Inter, Arial, sans-serif" font-weight="700">Jetzt streamen</text>
+  <text x="120" y="500" fill="#b7c7dd" font-size="30" font-family="Inter, Arial, sans-serif">stream-musik.space</text>
+</svg>
