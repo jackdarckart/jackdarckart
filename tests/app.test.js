@@ -295,6 +295,7 @@ function createEnvironment(options = {}) {
     Boolean,
     Array,
     Object,
+    Intl: options.intl || Intl,
     setTimeout: windowObject.setTimeout,
     clearTimeout: windowObject.clearTimeout
   });
@@ -488,6 +489,30 @@ async function testNowPlayingAbortFallbackMessage() {
   );
 }
 
+async function testNowPlayingTimestampFallbackWithoutIntlFormatter() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
+    fetchImpl: async () => {
+      throw new Error('network-failure');
+    },
+    intl: {
+      DateTimeFormat() {
+        throw new Error('intl-unsupported');
+      }
+    }
+  });
+  const { elements } = env;
+
+  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.match(
+    elements['now-playing-updated-at'].textContent,
+    /^Letzte Prüfung: /,
+    'timestamp rendering should fall back safely when Intl formatting is unavailable'
+  );
+}
+
 function testUsesStationSpecificHttpsStreamUrl() {
   assert.match(
     appCode,
@@ -507,6 +532,7 @@ async function main() {
   await testNowPlayingFallbackWhenMetadataUnavailable();
   await testNowPlayingSuccessfulMetadataRendering();
   await testNowPlayingAbortFallbackMessage();
+  await testNowPlayingTimestampFallbackWithoutIntlFormatter();
   console.log('app.js player tests passed');
 }
 

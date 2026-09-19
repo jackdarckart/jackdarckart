@@ -482,6 +482,7 @@ button { cursor: pointer; }
 .now-playing[data-state="loading"] { border-color: rgba(77, 220, 255, 0.28); }
 .now-playing[data-state="available"] { border-color: rgba(55, 211, 154, 0.28); }
 .now-playing[data-state="error"] { border-color: rgba(255, 107, 125, 0.32); }
+.now-playing[data-state="unavailable"] { border-color: rgba(148, 163, 184, 0.28); }
 
 .status-meta {
   margin: 0;

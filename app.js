@@ -284,10 +284,18 @@
   }
 
   function formatNowPlayingTimestamp(date) {
-    return new Intl.DateTimeFormat('de-DE', {
-      dateStyle: 'short',
-      timeStyle: 'medium'
-    }).format(date);
+    try {
+      if (typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function') {
+        return new Intl.DateTimeFormat('de-DE', {
+          dateStyle: 'short',
+          timeStyle: 'medium'
+        }).format(date);
+      }
+    } catch (error) {
+      return date.toISOString();
+    }
+
+    return typeof date.toLocaleString === 'function' ? date.toLocaleString('de-DE') : date.toISOString();
   }
 
   function getNowPlayingFallbackMessage(error) {
