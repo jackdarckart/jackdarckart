@@ -1380,6 +1380,49 @@
     return element;
   }
 
+  function appendOptionalText(parent, tagName, className, text) {
+    if (!parent || !text) {
+      return;
+    }
+
+    parent.appendChild(createDetailBlock(tagName, className, text));
+  }
+
+  function createListBlock(className, items) {
+    if (!Array.isArray(items) || !items.length) {
+      return null;
+    }
+
+    const list = document.createElement('ul');
+    list.className = className;
+    items.forEach((item) => {
+      if (!item) {
+        return;
+      }
+      list.appendChild(createDetailBlock('li', '', item));
+    });
+    return list;
+  }
+
+  function createDetailsDisclosure(config) {
+    if (!config || !config.summary) {
+      return null;
+    }
+
+    const details = document.createElement('details');
+    details.className = 'empty-state-details';
+    details.appendChild(createDetailBlock('summary', '', config.summary));
+    const body = document.createElement('div');
+    body.className = 'details-copy';
+    appendOptionalText(body, 'p', '', config.text || '');
+    const list = createListBlock('inline-list', config.items || []);
+    if (list) {
+      body.appendChild(list);
+    }
+    details.appendChild(body);
+    return details;
+  }
+
   function renderCollection(container, items, options) {
     if (!container) {
       return;
@@ -1388,9 +1431,20 @@
     clearElement(container);
 
     if (!Array.isArray(items) || items.length === 0) {
-      const emptyState = createDetailBlock('div', 'empty-state', options.emptyText);
-      const hint = createDetailBlock('p', 'empty-state-hint', options.hintText);
-      emptyState.appendChild(hint);
+      const emptyState = document.createElement('div');
+      emptyState.className = 'empty-state';
+      appendOptionalText(emptyState, 'h4', 'empty-state-title', options.emptyTitle || 'Aktuell keine Einträge');
+      appendOptionalText(emptyState, 'p', 'empty-state-copy', options.emptyText || '');
+      appendOptionalText(emptyState, 'p', 'empty-state-hint', options.hintText || '');
+      const bulletList = createListBlock('empty-state-list', options.emptyItems || []);
+      if (bulletList) {
+        emptyState.appendChild(bulletList);
+      }
+      appendOptionalText(emptyState, 'p', 'empty-state-note', options.noteText || '');
+      const details = createDetailsDisclosure(options.emptyDetails);
+      if (details) {
+        emptyState.appendChild(details);
+      }
       container.appendChild(emptyState);
       return;
     }
@@ -1429,8 +1483,13 @@
       itemTag: 'article',
       itemClassName: 'platform-link-card',
       headingTag: 'h3',
-      emptyText: 'Noch keine zusätzlichen Plattform-Links gepflegt.',
-      hintText: 'Pflege Plattform-Links in der Konfiguration in app.js, sobald verifizierte Profile oder Ziele feststehen.'
+      emptyTitle: 'Noch keine zusätzlichen Plattform-Links gepflegt.',
+      emptyText: 'Dieser Bereich zeigt nur bewusst hinterlegte Ziele wie laut.fm, Direktstream, Support- oder verifizierte Profil-Links.',
+      hintText: 'Pflege Plattform-Links in APP_CONFIG.content.platformLinks, sobald ein Ziel wirklich geprüft und veröffentlicht werden soll.',
+      emptyItems: [
+        'Keine Social-Profile oder Kontaktwege werden hier automatisch erfunden.',
+        'Leere Zustände bedeuten daher: aktuell nichts zusätzlich bestätigt.'
+      ]
     });
   }
 
@@ -1794,10 +1853,16 @@
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyText: snapshot.entries.length ? 'Derzeit keine laufende oder unmittelbar nächste Sendung ermittelbar.' : 'Noch kein Sendeplan hinterlegt.',
+      emptyTitle: snapshot.entries.length ? 'Derzeit kein eindeutiger Live-/Next-Treffer.' : 'Noch kein Sendeplan hinterlegt.',
+      emptyText: snapshot.entries.length
+        ? 'Die vorhandenen Einträge ergeben im Moment keinen verlässlichen Treffer für „Jetzt live“ oder „Als Nächstes“.'
+        : 'Ohne bestätigte Termine zeigt die Website absichtlich keinen erfundenen Programmstatus an.',
       hintText: snapshot.entries.length
-        ? 'Die vorhandenen Einträge liefern aktuell keinen zuverlässigen Live-/Next-Treffer. Prüfe Wochentag, Start- und Endzeiten.'
-        : 'Pflege bestätigte Termine in APP_CONFIG.content.schedule.entries. Ohne Einträge bleibt dieser Bereich bewusst leer.'
+        ? 'Prüfe Wochentag, Start- und Endzeit, Zeitzone und mögliche Übernacht-Slots.'
+        : 'Pflege bestätigte Termine in APP_CONFIG.content.schedule.entries. Zeiten werden in ' + snapshot.timeZone + ' interpretiert.',
+      emptyItems: snapshot.entries.length
+        ? ['Übernacht-Sendungen sind erlaubt, wenn die Endzeit numerisch vor der Startzeit liegt.', 'Fehlende oder unlesbare Zeiten verhindern einen Live-/Next-Hinweis.']
+        : ['Benötigt werden mindestens day, start, end und title.', 'Optional helfen host, genre, description, url und linkLabel für mehr Kontext.']
     });
 
     renderCollection(scheduleList, snapshot.upcoming.map((entry) => ({
@@ -1810,8 +1875,13 @@
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyText: 'Derzeit sind keine kommenden Sendungen eingetragen.',
-      hintText: 'Lege bestätigte Wochentage und Start-/Endzeiten in der statischen Schedule-Konfiguration fest.'
+      emptyTitle: 'Derzeit sind keine kommenden Sendungen eingetragen.',
+      emptyText: 'Dieser Bereich zeigt erst dann Karten, wenn bestätigte Programmeinträge statisch gepflegt wurden.',
+      hintText: 'Lege bestätigte Wochentage sowie Start- und Endzeiten in APP_CONFIG.content.schedule.entries fest.',
+      emptyItems: [
+        'Zeiten werden in der konfigurierten Zeitzone ausgewertet.',
+        'Fehlende Einträge bedeuten nicht, dass der Stream offline ist – nur, dass kein Plan hinterlegt wurde.'
+      ]
     });
   }
 
@@ -1821,41 +1891,69 @@
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyText: 'Derzeit sind keine kommenden Live-Events eingetragen.',
-      hintText: 'Neue Termine lassen sich als statische Einträge in der Konfiguration in app.js pflegen.'
+      emptyTitle: 'Derzeit sind keine kommenden Live-Events eingetragen.',
+      emptyText: 'Hier erscheinen nur bestätigte Hinweise auf besondere Termine, Specials oder externe Anlässe.',
+      hintText: 'Neue Termine lassen sich als statische Einträge in APP_CONFIG.content.events pflegen.',
+      emptyItems: [
+        'Ohne verifizierte Angaben bleibt der Bereich bewusst leer und ehrlich.',
+        'Events sind nicht dasselbe wie reguläre Sendeplan-Einträge oder Now-Playing-Daten.'
+      ]
     });
 
     renderCollection(newsList, APP_CONFIG.content.news, {
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyText: 'Momentan sind keine News veröffentlicht.',
-      hintText: 'News können als statische Meldungen in der Konfiguration in app.js ergänzt werden.'
+      emptyTitle: 'Momentan sind keine News veröffentlicht.',
+      emptyText: 'News sind kurze statische Mitteilungen zu Änderungen, Hinweisen oder neuen Inhalten.',
+      hintText: 'News können in APP_CONFIG.content.news ergänzt werden, sobald eine Meldung wirklich freigegeben ist.',
+      emptyItems: [
+        'Keine News bedeutet nicht automatisch, dass nichts gesendet wird.',
+        'Der Bereich ersetzt weder Live-Metadaten noch einen Sendeplan.'
+      ]
     });
 
     renderCollection(archiveList, APP_CONFIG.content.archive, {
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyText: 'Noch kein Mix- oder Sendungsarchiv gepflegt.',
-      hintText: 'Archiv-Einträge lassen sich statisch in der Konfiguration in app.js ergänzen.'
+      emptyTitle: 'Noch kein Mix- oder Sendungsarchiv gepflegt.',
+      emptyText: 'Archivkarten erscheinen erst, wenn Mitschnitte, Mixes oder Referenzlinks verifiziert eingetragen wurden.',
+      hintText: 'Archiv-Einträge lassen sich statisch in APP_CONFIG.content.archive ergänzen.',
+      emptyItems: [
+        'Externe Links sollten vor Veröffentlichung geprüft werden.',
+        'Ohne bestätigte Inhalte wird hier bewusst nichts als echt dargestellt.'
+      ],
+      emptyDetails: {
+        summary: 'Archiv vorbereiten',
+        items: ['Titel und Quelle prüfen', 'Kurze Beschreibung ergänzen', 'Nur bestätigte Veröffentlichungen verlinken']
+      }
     });
 
     renderPlatformLinks();
+  }
+
+  function formatNowPlayingIntervalLabel() {
+    const interval = Math.max(15000, Number.parseInt(String(APP_CONFIG.nowPlaying.pollIntervalMs), 10) || 60000);
+    const seconds = Math.round(interval / 1000);
+    return seconds >= 60 && seconds % 60 === 0
+      ? 'ca. alle ' + String(seconds / 60) + ' min'
+      : 'ca. alle ' + String(seconds) + ' s';
   }
 
   function getNowPlayingSourceLabel() {
     const endpoint = getNowPlayingEndpoint();
     if (!endpoint) {
       return hasExternalNowPlayingEndpoint()
-        ? 'Externe Now-Playing-Quelle erfordert same-origin oder eine bewusst angepasste CSP.'
-        : 'Keine Now-Playing-Quelle konfiguriert.';
+        ? 'Externe Now-Playing-Quelle erkannt, aber ohne same-origin-Freigabe bzw. bewusste CSP-Anpassung deaktiviert.'
+        : 'Keine Now-Playing-Quelle konfiguriert. Für Titelinfos und Historie kann eine same-origin-Quelle gepflegt werden; der Stream funktioniert trotzdem.';
     }
 
     try {
-      return 'Datenquelle: ' + new window.URL(endpoint).hostname;
+      const url = new window.URL(endpoint);
+      return 'Datenquelle: ' + url.host + url.pathname + url.search + ' · Aktualisierung ' + formatNowPlayingIntervalLabel() + '.';
     } catch (error) {
-      return 'Datenquelle konfiguriert.';
+      return 'Datenquelle konfiguriert · Aktualisierung ' + formatNowPlayingIntervalLabel() + '.';
     }
   }
 
@@ -1998,7 +2096,7 @@
     setText(nowPlayingTitle, 'Titelinformationen derzeit nicht verfügbar');
     setText(nowPlayingArtist, messageText);
     setText(nowPlayingSource, sourceText);
-    renderHistory([], 'Noch keine Historie verfügbar. Sobald eine verlässliche Quelle eingerichtet ist, erscheinen hier zuletzt gespielte Titel.');
+    renderHistory([], 'Noch keine Historie verfügbar. Ohne same-origin-Metadatenquelle bleibt dieser Bereich leer; der Stream selbst funktioniert weiterhin normal.');
     nowPlayingState = {
       current: null,
       history: []
@@ -2025,7 +2123,7 @@
       setText(nowPlayingSource, getNowPlayingSourceLabel());
     }
 
-    renderHistory(history, 'Die Datenquelle meldet derzeit noch keine Historie.');
+    renderHistory(history, 'Die Datenquelle liefert aktuell noch keine Historie. Prüfe bei Bedarf JSON-Felder, Aktualisierungstakt und Zeitstempel.');
     syncFavoriteButton();
     updateMediaSessionMetadata();
     updateStationStatus();
@@ -2036,7 +2134,7 @@
       renderNowPlayingFallback(
         hasExternalNowPlayingEndpoint()
           ? 'Die konfigurierte Now-Playing-Quelle liegt außerhalb der eigenen Origin und bleibt ohne bewusste CSP-Anpassung deaktiviert.'
-          : 'Live-Metadaten bleiben deaktiviert, bis in der Konfiguration eine echte Quelle hinterlegt ist.',
+          : 'Live-Metadaten bleiben deaktiviert, bis in der Konfiguration eine echte same-origin-Quelle hinterlegt ist. Der Stream selbst ist davon unabhängig nutzbar.',
         getNowPlayingSourceLabel()
       );
       return;
@@ -2057,7 +2155,7 @@
       applyNowPlayingData(parsed);
     } catch (error) {
       renderNowPlayingFallback(
-        'Die konfigurierte Quelle ist derzeit nicht erreichbar oder liefert keine lesbaren Titeldaten.',
+        'Die konfigurierte Quelle ist derzeit nicht erreichbar oder liefert keine lesbaren Titeldaten. Prüfe Pfad, Antwortformat und ob die Quelle unter derselben Origin erreichbar bleibt.',
         getNowPlayingSourceLabel()
       );
     } finally {
@@ -2169,8 +2267,8 @@
   applyTheme(getStoredThemePreference());
   setState('ready', 'Bereit zum Start', 'Die Wiedergabe startet erst nach deiner Aktion und meldet Status sowie Neuversuche direkt im Player.');
   renderNowPlayingFallback(
-    'Live-Metadaten bleiben deaktiviert, bis in der Konfiguration eine echte Quelle hinterlegt ist.',
-    'Keine Now-Playing-Quelle konfiguriert.'
+    'Live-Metadaten bleiben deaktiviert, bis in der Konfiguration eine echte same-origin-Quelle hinterlegt ist. Der Stream selbst ist davon unabhängig nutzbar.',
+    'Keine Now-Playing-Quelle konfiguriert. Für Titelinfos und Historie kann eine same-origin-Quelle gepflegt werden.'
   );
   setupMediaSession();
   bindNavigation();

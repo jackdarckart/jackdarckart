@@ -7,21 +7,23 @@ Statische GitHub-Pages-Website für das Webradio **jackdarckart** auf laut.fm.
 Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipeline und ohne externe Frontend-Abhängigkeiten. Sie bündelt den offiziellen laut.fm-Stream in einem browserfreundlichen Direktplayer und ergänzt ihn um:
 
 - direkte Browser-Wiedergabe nach echter Nutzeraktion
-- sichtbare Status-, Fehler-, Retry- und Offline-Hinweise
+- sichtbare Status-, Fehler-, Retry-, Puffer- und Offline-Hinweise mit verständlichen Diagnosehilfen
+- ausgebauten Hero-/Startbereich mit Einordnung, Funktionsschritten und ehrlichen Eigenschaften statt Fantasiezahlen
 - Now-Playing- und Historienbereich mit ehrlichem Fallback ohne erfundene Live-Daten
-- Sleep-Timer, dokumentierte Tastaturkürzel und lokale Favoriten ohne Backend
+- Sleep-Timer, dokumentierte Tastaturkürzel, Theme-Hinweise, PWA-Erklärungen und lokale Favoriten ohne Backend
 - Share-Funktionen für Website und Direktstream mit nativer Browser-API plus Clipboard-Fallback
 - statischen Sendeplan sowie Songwunsch-/Feedback-Bereich via `mailto:` oder GitHub-Issue-Fallback
+- informative Empty States für Sendeplan, Events, News, Archiv und Plattform-Links mit Pflegehinweisen statt Platzhalterwirkung
+- ausgebauten FAQ-, Sicherheits-, Datenschutz-, Kontakt- und Footer-Bereich mit klarer Abgrenzung zwischen verifizierten Fakten und konfigurierbaren Inhalten
 - installierbare PWA mit Manifest, Service Worker und App-Shell-Caching
 - Dark/Light/Auto-Theme mit defensiver `localStorage`-Nutzung
-- statische Bereiche für Events, News, Archiv sowie Plattform-Links
 - kontraststarkes, responsives Layout für Mobile, Tablet und Desktop
 
 ## Struktur
 
-- `index.html` – semantische Startseite mit Meta-Tags, Direktplayer-Markup, Sleep-Timer-/Favoriten-/Feedback-UI, PWA-/Now-Playing-/Historienbereichen und Inhaltssektionen
-- `styles.css` – responsives Layout, Theme-Varianten, Player-UI, Statuskarten, Formular-/Schedule-Karten und Inhaltsdarstellung
-- `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-/Sleep-Timer-Verhalten, Theme/PWA/Share-/Favoriten-Logik, defensive Storage-Zugriffe und konfigurierbare Datenquellen
+- `index.html` – semantische Startseite mit Meta-Tags, erweitertem Hero, Direktplayer-Markup, Sleep-Timer-/Favoriten-/Feedback-UI, PWA-/Now-Playing-/Historienbereichen und ausführlichen Inhaltssektionen
+- `styles.css` – responsives Layout, Theme-Varianten, Player-UI, Statuskarten, Info-/Empty-State-Karten, Formular-/Schedule-Karten und Inhaltsdarstellung
+- `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-/Sleep-Timer-Verhalten, Theme/PWA/Share-/Favoriten-Logik, defensive Storage-Zugriffe, informative Empty States und konfigurierbare Datenquellen
 - `manifest.webmanifest` – PWA-Metadaten für Installation und Branding
 - `sw.js` – Service Worker für statische App-Ressourcen und Offline-Fallback ohne Audiostream-Caching
 - `assets/app-icon.svg` – SVG-App-Icon
@@ -31,6 +33,18 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 - `tests/app.test.js` – schlanker Node-basierter Regressionstest für zentrale Player-, Theme-, Share- und Fallback-Flows
 
 Die Website benötigt **keinen Build-Schritt** und wird direkt aus dem Repository-Root veröffentlicht.
+
+## Informationsbereiche & Pflege
+
+Die Seite erklärt bewusst jeden größeren Bereich auch dann, wenn noch keine Live- oder Inhaltsdaten gepflegt wurden. Das betrifft insbesondere:
+
+- Hero/Startbereich (`index.html`) – Einordnung für neue Besucher, Eigenschaften der App und kurze Schritt-für-Schritt-Erklärung
+- Player/Diagnose (`index.html`, `app.js`) – Statusbedeutungen, Retry-/Fallback-Hinweise, Autoplay-/Lautstärke-Erklärungen
+- Now Playing & Historie (`app.js`, optional gleiche-Origin-Datenquelle) – nur echte Metadaten, sonst erklärender Fallback
+- Sendeplan, Events, News, Archiv, Plattform-Links (`APP_CONFIG.content` in `app.js`) – bewusst informative Empty States statt erfundener Inhalte
+- FAQ, Sicherheit, Kontakt und Footer (`index.html`) – statische Orientierungstexte mit ehrlicher Abgrenzung zwischen bestätigten Fakten und konfigurierbaren Angaben
+
+Wichtig: Keine fiktiven Sendungen, Termine, Personen, Social-Profile oder Live-Daten eintragen. Leere Zustände sollen erklären, was hier später erscheinen kann und wo die Pflege erfolgt.
 
 ## Lokale Vorschau
 
@@ -136,7 +150,7 @@ content: {
 }
 ```
 
-Leere Arrays sind ausdrücklich erlaubt; die Seite zeigt dann automatisch professionelle Leerzustände mit Pflegehinweis.
+Leere Arrays sind ausdrücklich erlaubt; die Seite zeigt dann automatisch professionelle Leerzustände mit Pflegehinweis, Einsatzbereich und nächstem sinnvollen Schritt für die Pflege.
 
 Für `schedule.entries` gilt:
 
@@ -144,6 +158,8 @@ Für `schedule.entries` gilt:
 - `start` / `end`: `HH:MM` im 24h-Format
 - `isPlaceholder: true` kennzeichnet bewusst nur Beispiel-/Platzhalterdaten
 - der Live-/Next-Hinweis arbeitet standardmäßig mit `Europe/Berlin`
+- Endzeiten dürfen numerisch vor der Startzeit liegen, wenn eine Sendung über Mitternacht hinausgeht
+- ohne valide Zeiten oder Wochentage zeigt die Oberfläche absichtlich keinen erfundenen Live-/Next-Status
 
 ### Kontakt- und Feedback-Ziele
 
@@ -162,9 +178,9 @@ contact: {
 
 ### Lokale Browser-Funktionen
 
-- **Sleep-Timer:** Optionen `aus`, `15`, `30`, `60` Minuten sowie benutzerdefiniert `1–480` Minuten. Beim manuellen Stop wird der aktive Timer zurückgesetzt.
-- **Tastaturkürzel:** `Leertaste` Play/Pause, `M` Stumm, `↑/↓` Lautstärke, `S` Teilen, `T` nach oben. Aktiv nur außerhalb von `input`, `textarea`, `select`, `button`, `a` und `contenteditable`.
-- **Favoriten:** aktuelle Titel werden ausschließlich lokal via `localStorage` gespeichert; bei blockiertem Storage bleibt die Oberfläche funktionsfähig und meldet den Fehler defensiv.
+- **Sleep-Timer:** Optionen `aus`, `15`, `30`, `60` Minuten sowie benutzerdefiniert `1–480` Minuten. Beim manuellen Stop wird der aktive Timer zurückgesetzt. Die Logik läuft ausschließlich lokal im aktiven Browserfenster.
+- **Tastaturkürzel:** `Leertaste` Play/Pause, `M` Stumm, `↑/↓` Lautstärke, `S` Teilen, `T` nach oben. Aktiv nur außerhalb von `input`, `textarea`, `select`, `button`, `a` und `contenteditable`; mobile Nutzung erfolgt weiter über sichtbare Buttons.
+- **Favoriten:** aktuelle Titel werden ausschließlich lokal via `localStorage` gespeichert; bei blockiertem Storage bleibt die Oberfläche funktionsfähig und meldet den Fehler defensiv. Beim Löschen von Browserdaten verschwindet die Liste wieder.
 
 ### Theme
 
@@ -236,7 +252,7 @@ Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. 
 - PWA-Prüfung über Browser-DevTools (Manifest, Service Worker, Offline-Cache)
 - Wiedergabe-Flows manuell prüfen: Start, Pause, Mute, Lautstärke, Browser-Blockierung, Retry, Pufferung und Sticky-Quick-Access
 - Offline-/Online-Wechsel manuell prüfen: Hinweisbanner, Recovery-Retry und statische Offline-Oberfläche
-- Mobile/Tablet/Desktop-Layout mit Fokus auf Navigation, Player-Status, Historie und zusätzliche Inhaltssektionen prüfen
+- Mobile/Tablet/Desktop-Layout mit Fokus auf Navigation, Player-Status, Historie, Empty States und zusätzliche Inhaltssektionen prüfen
 - GitHub-Pages-Verhalten mit vorhandener Custom Domain `stream-musik.space` verifizieren
 
 ## Realistische Testhinweise

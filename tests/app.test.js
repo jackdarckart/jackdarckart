@@ -579,6 +579,7 @@ async function testNowPlayingIsNotFetchedWithoutConfiguredSource() {
   assert.equal(fetchCalls, 0, 'default configuration should not trigger now-playing fetches');
   assert.equal(env.elements['now-playing-track'].textContent, 'Titelinformationen derzeit nicht verfügbar');
   assert.match(env.elements['now-playing-artist'].textContent, /deaktiviert/);
+  assert.match(env.elements['now-playing-source'].textContent, /same-origin/i, 'default fallback should explain how a local metadata source can be configured');
 }
 
 async function testShareUsesCurrentTrackWhenMetadataIsAvailable() {
@@ -621,7 +622,7 @@ async function testShareUsesCurrentTrackWhenMetadataIsAvailable() {
   assert.equal(env.elements['history-empty'].hidden, true, 'history fallback should be hidden once entries exist');
   assert.equal(env.navigator.mediaSession.metadata.title, 'Mitternacht', 'media session metadata should reflect real now-playing data');
   assert.equal(fetchedUrl, 'https://stream-musik.space/metadata/now-playing.json', 'configured now-playing fetches should use the normalized endpoint');
-  assert.equal(env.elements['now-playing-source'].textContent, 'Datenquelle: stream-musik.space', 'configured now-playing sources should expose a stable label');
+  assert.equal(env.elements['now-playing-source'].textContent, 'Datenquelle: stream-musik.space/metadata/now-playing.json · Aktualisierung ca. alle 1 min.', 'configured now-playing sources should expose a stable label including path and polling cadence');
 }
 
 async function testThemeSelectionUpdatesDatasetAndThemeColor() {
@@ -923,6 +924,17 @@ async function testScheduleShowsLiveAndNextWhenConfigured() {
   assert.equal(env.elements['schedule-list'].children.length >= 2, true, 'configured schedule should render upcoming schedule cards');
 }
 
+async function testEmptyStatesExplainHowSectionsAreMaintained() {
+  const env = createEnvironment();
+
+  const eventsEmpty = env.elements['events-list'].children[0];
+  const archiveEmpty = env.elements['archive-list'].children[0];
+
+  assert.equal(eventsEmpty.children[0].textContent, 'Derzeit sind keine kommenden Live-Events eingetragen.', 'events empty state should start with a clear title');
+  assert.match(eventsEmpty.children[2].textContent, /APP_CONFIG\.content\.events/, 'events empty state should explain where entries are configured');
+  assert.equal(archiveEmpty.children[4].className, 'empty-state-details', 'archive empty state should include a collapsible preparation hint');
+}
+
 async function testFeedbackUsesHonestFallbacksAndValidation() {
   const env = createEnvironment();
 
@@ -979,6 +991,7 @@ async function main() {
   await testScheduleShowsLiveAndNextWhenConfigured();
   await testScheduleHandlesOvernightWraparound();
   await testScheduleRespectsConfiguredTimezone();
+  await testEmptyStatesExplainHowSectionsAreMaintained();
   await testFeedbackUsesHonestFallbacksAndValidation();
   await testFeedbackUsesConfiguredMailtoTarget();
   console.log('app.js player tests passed');
