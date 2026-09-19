@@ -20,6 +20,9 @@ class MockElement {
     this.parentElement = { dataset: {} };
     this.listeners = new Map();
     this.className = '';
+    this.href = '';
+    this.target = '';
+    this.rel = '';
     this.classList = {
       values: new Set(),
       add: (...tokens) => tokens.forEach((token) => this.classList.values.add(token)),
@@ -74,11 +77,7 @@ class MockElement {
   }
 
   querySelectorAll(selector) {
-    if (selector === 'i') {
-      return this.children;
-    }
-
-    if (selector === 'a') {
+    if (selector === 'i' || selector === 'a') {
       return this.children;
     }
 
@@ -97,6 +96,7 @@ class MockElement {
 
   removeChild(child) {
     this.children = this.children.filter((item) => item !== child);
+    return child;
   }
 
   select() {}
@@ -143,21 +143,39 @@ class MockAudioElement extends MockElement {
   }
 }
 
+function flushMicrotasks() {
+  let chain = Promise.resolve();
+  for (let index = 0; index < 6; index += 1) {
+    chain = chain.then(() => Promise.resolve());
+  }
+  return chain;
+}
+
 function createEnvironment(options = {}) {
   const missingIds = new Set(options.missingIds || []);
   const documentListeners = new Map();
   const windowListeners = new Map();
   const timers = new Map();
   let timerId = 1;
+  let shareCall = null;
+  const metaThemeColor = new MockElement('meta-theme-color');
+  metaThemeColor.setAttribute('content', '#070b18');
 
   const document = {
     title: 'jackdarckart',
     body: new MockElement('body'),
+    documentElement: new MockElement('html'),
     createElement(tagName) {
       return new MockElement(tagName, document);
     },
     getElementById(id) {
       return elements[id] || null;
+    },
+    querySelector(selector) {
+      if (selector === 'meta[name="theme-color"]') {
+        return metaThemeColor;
+      }
+      return null;
     },
     addEventListener(type, listener) {
       if (!documentListeners.has(type)) {
@@ -183,6 +201,8 @@ function createEnvironment(options = {}) {
     'mute',
     'retry',
     'share',
+    'share-website',
+    'share-stream',
     'volume',
     'volume-text',
     'status',
@@ -197,8 +217,30 @@ function createEnvironment(options = {}) {
     'network-status',
     'player-state-label',
     'retry-status',
+    'retry-counter',
+    'connection-quality',
+    'last-started',
+    'last-error',
     'sticky-player',
-    'sticky-play'
+    'sticky-play',
+    'offline-notice',
+    'offline-notice-text',
+    'offline-retry',
+    'theme-select',
+    'theme-hint',
+    'install-prompt',
+    'install-app',
+    'install-status',
+    'now-playing-track',
+    'now-playing-artist',
+    'now-playing-source',
+    'station-status',
+    'history-list',
+    'history-empty',
+    'events-list',
+    'news-list',
+    'archive-list',
+    'platform-links'
   ];
 
   for (const id of ids) {
@@ -219,8 +261,28 @@ function createEnvironment(options = {}) {
     elements['site-nav'].appendChild(new MockElement('nav-link', document));
   }
 
+  if (elements.share) {
+    elements.share.dataset.shareTarget = 'page';
+  }
+  if (elements['share-website']) {
+    elements['share-website'].dataset.shareTarget = 'website';
+  }
+  if (elements['share-stream']) {
+    elements['share-stream'].dataset.shareTarget = 'stream';
+  }
+  if (elements['theme-select']) {
+    elements['theme-select'].value = 'auto';
+  }
+
   const localStorageState = new Map();
-  const location = { href: 'https://stream-musik.space/' };
+  const locationUrl = new URL('https://stream-musik.space/');
+  const location = {
+    href: locationUrl.href,
+    origin: locationUrl.origin,
+    protocol: locationUrl.protocol,
+    hostname: locationUrl.hostname
+  };
+
   const windowObject = {
     location,
     URL,
@@ -259,7 +321,16 @@ function createEnvironment(options = {}) {
     scrollTo() {},
     MediaMetadata: function MediaMetadata(data) {
       Object.assign(this, data);
-    }
+    },
+    matchMedia() {
+      return {
+        matches: false,
+        addEventListener() {},
+        addListener() {}
+      };
+    },
+    fetch: options.fetch,
+    __JACKDARCKART_CONFIG__: options.appConfig || {}
   };
   windowObject.window = windowObject;
   windowObject.document = document;
@@ -269,9 +340,19 @@ function createEnvironment(options = {}) {
     clipboard: {
       async writeText() {}
     },
+    share: options.share
+      ? async (data) => {
+          shareCall = data;
+          return options.share(data);
+        }
+      : undefined,
     mediaSession: {
       playbackState: 'none',
+      metadata: null,
       setActionHandler() {}
+    },
+    serviceWorker: {
+      register: async () => ({ scope: './' })
     }
   };
 
@@ -290,6 +371,7 @@ function createEnvironment(options = {}) {
     Boolean,
     Array,
     Object,
+    Intl,
     setTimeout: windowObject.setTimeout,
     clearTimeout: windowObject.clearTimeout
   });
@@ -301,7 +383,20 @@ function createEnvironment(options = {}) {
   return {
     elements,
     document,
-    window: windowObject
+    navigator,
+    window: windowObject,
+    metaThemeColor,
+    getShareCall() {
+      return shareCall;
+    },
+    async runTimer(id) {
+      const callback = timers.get(id);
+      if (!callback) {
+        return;
+      }
+      timers.delete(id);
+      await callback();
+    }
   };
 }
 
@@ -341,9 +436,31 @@ async function testMissingOptionalElementsDoNotCrashInitialization() {
       'network-status',
       'player-state-label',
       'retry-status',
+      'retry-counter',
+      'connection-quality',
+      'last-started',
+      'last-error',
       'status',
       'status-text',
-      'message'
+      'message',
+      'offline-notice',
+      'offline-notice-text',
+      'offline-retry',
+      'theme-select',
+      'theme-hint',
+      'install-prompt',
+      'install-app',
+      'install-status',
+      'now-playing-track',
+      'now-playing-artist',
+      'now-playing-source',
+      'station-status',
+      'history-list',
+      'history-empty',
+      'events-list',
+      'news-list',
+      'archive-list',
+      'platform-links'
     ]
   });
   const { elements } = env;
@@ -389,6 +506,110 @@ async function testMuteButtonRestoresAudiblePlaybackFromZeroVolume() {
   assert.equal(elements['volume-text'].textContent, '70%', 'restoring audio should refresh the visible volume label');
 }
 
+async function testNowPlayingIsNotFetchedWithoutConfiguredSource() {
+  let fetchCalls = 0;
+  const env = createEnvironment({
+    fetch: async () => {
+      fetchCalls += 1;
+      return { ok: true, json: async () => ({}) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  assert.equal(fetchCalls, 0, 'default configuration should not trigger now-playing fetches');
+  assert.equal(env.elements['now-playing-track'].textContent, 'Titelinformationen derzeit nicht verfügbar');
+  assert.match(env.elements['now-playing-artist'].textContent, /deaktiviert/);
+}
+
+async function testShareUsesCurrentTrackWhenMetadataIsAvailable() {
+  let fetchedUrl = '';
+  const env = createEnvironment({
+    appConfig: {
+      nowPlaying: {
+        endpoint: 'metadata/now-playing.json'
+      }
+    },
+    fetch: async (url) => {
+      fetchedUrl = url;
+      return {
+        ok: true,
+        json: async () => ({
+          current: {
+            title: 'Mitternacht',
+            artist: 'jackdarckart'
+          },
+          history: [
+            { title: 'Mitternacht', artist: 'jackdarckart', playedAt: '2026-09-19T12:00:00.000Z' },
+            { title: 'Mitternacht', artist: 'jackdarckart', playedAt: '2026-09-19T12:00:00.000Z' },
+            { title: 'Wolkenlauf', artist: 'jackdarckart', playedAt: '2026-09-19T11:45:00.000Z' }
+          ]
+        })
+      };
+    },
+    share: async () => undefined
+  });
+
+  await flushMicrotasks();
+  await env.elements.share.dispatch('click');
+
+  const shareCall = env.getShareCall();
+  assert.ok(shareCall, 'share callback should receive data');
+  assert.equal(shareCall.title, 'jackdarckart');
+  assert.equal(shareCall.text, 'Jetzt live: jackdarckart – Mitternacht', 'share payload should include current track details when real metadata is available');
+  assert.equal(shareCall.url, 'https://stream-musik.space/');
+  assert.equal(env.elements['history-list'].children.length, 2, 'history should deduplicate repeated entries');
+  assert.equal(env.elements['history-empty'].hidden, true, 'history fallback should be hidden once entries exist');
+  assert.equal(env.navigator.mediaSession.metadata.title, 'Mitternacht', 'media session metadata should reflect real now-playing data');
+  assert.equal(fetchedUrl, 'https://stream-musik.space/metadata/now-playing.json', 'configured now-playing fetches should use the normalized endpoint');
+  assert.equal(env.elements['now-playing-source'].textContent, 'Datenquelle: stream-musik.space', 'configured now-playing sources should expose a stable label');
+}
+
+async function testThemeSelectionUpdatesDatasetAndThemeColor() {
+  const env = createEnvironment();
+  const { elements, document, metaThemeColor } = env;
+
+  elements['theme-select'].value = 'light';
+  await elements['theme-select'].dispatch('change');
+
+  assert.equal(document.documentElement.dataset.theme, 'light', 'selecting light mode should update the resolved theme');
+  assert.equal(document.documentElement.dataset.themePreference, 'light', 'theme preference should be stored on the document element');
+  assert.equal(metaThemeColor.getAttribute('content'), '#edf4ff', 'theme-color meta should follow the active theme');
+}
+
+async function testOfflineRecoveryShowsDedicatedRetryAction() {
+  const env = createEnvironment();
+  env.navigator.onLine = false;
+  await env.window.dispatch('offline');
+  assert.equal(env.elements['offline-notice'].hidden, false, 'offline notice should become visible when the browser goes offline');
+  assert.equal(env.elements['offline-retry'].hidden, true, 'offline retry should stay hidden while still offline');
+
+  env.navigator.onLine = true;
+  await env.window.dispatch('online');
+  assert.equal(env.elements['offline-notice'].hidden, false, 'recovery notice should stay visible after reconnect');
+  assert.equal(env.elements['offline-retry'].hidden, false, 'retry action should become visible once the connection returns');
+}
+
+async function testExternalNowPlayingEndpointStaysDisabledByDefaultCsp() {
+  let fetchCalls = 0;
+  const env = createEnvironment({
+    appConfig: {
+      nowPlaying: {
+        endpoint: 'https://example.com/now-playing.json'
+      }
+    },
+    fetch: async () => {
+      fetchCalls += 1;
+      return { ok: true, json: async () => ({}) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  assert.equal(fetchCalls, 0, 'external now-playing endpoints should stay disabled until CSP and code are explicitly widened');
+  assert.match(env.elements['now-playing-source'].textContent, /same-origin|CSP/, 'the UI should explain why the configured endpoint stays inactive');
+}
+
 function testUsesStationSpecificHttpsStreamUrl() {
   assert.match(
     appCode,
@@ -403,6 +624,11 @@ async function main() {
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();
   await testMuteButtonRestoresAudiblePlaybackFromZeroVolume();
+  await testNowPlayingIsNotFetchedWithoutConfiguredSource();
+  await testShareUsesCurrentTrackWhenMetadataIsAvailable();
+  await testThemeSelectionUpdatesDatasetAndThemeColor();
+  await testOfflineRecoveryShowsDedicatedRetryAction();
+  await testExternalNowPlayingEndpointStaysDisabledByDefaultCsp();
   console.log('app.js player tests passed');
 }
 

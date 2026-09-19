@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">jackdarckart App Icon</title>
+  <desc id="desc">Abstraktes JD-Monogramm für stream-musik.space</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#4ddcff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#070b18"/>
+  <rect x="56" y="56" width="400" height="400" rx="96" fill="url(#bg)" opacity="0.18"/>
+  <path d="M164 120h88v196c0 53-35 92-88 92-17 0-35-5-50-14l25-60c8 4 15 6 22 6 18 0 31-10 31-32V120Zm146 0h38c54 0 96 41 96 98 0 56-42 98-96 98h-38V120Zm74 70h-20v56h20c18 0 30-12 30-28s-12-28-30-28Z" fill="#f8fbff"/>
+</svg>
