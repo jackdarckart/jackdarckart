@@ -353,9 +353,28 @@ async function testMissingOptionalElementsDoNotCrashInitialization() {
   assert.equal(elements.audio.src, 'https://stream.laut.fm/jackdarckart', 'the stream URL should still be assigned');
 }
 
+async function testMissingAudioElementShowsGuardedErrorState() {
+  const env = createEnvironment({
+    missingIds: ['audio', 'menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year']
+  });
+  const { elements } = env;
+
+  await elements.play.dispatch('click');
+
+  assert.equal(elements.status.dataset.state, 'error', 'missing audio should switch the player into an error state');
+  assert.equal(elements.status.textContent, '', 'status container text should remain managed through the dedicated status label');
+  assert.equal(elements['status-text'].textContent, 'Player nicht verfügbar.', 'missing audio should expose a clear failure headline');
+  assert.match(
+    elements.message.textContent,
+    /Audio-Komponente fehlt/,
+    'missing audio should produce a user-facing recovery hint instead of throwing'
+  );
+}
+
 async function main() {
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();
+  await testMissingAudioElementShowsGuardedErrorState();
   console.log('app.js player tests passed');
 }
 

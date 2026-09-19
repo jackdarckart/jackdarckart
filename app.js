@@ -706,6 +706,7 @@
           'Stream verbindet sich neu …',
           'Der Stream antwortet nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft direkt im Player.'
         );
+        clearReconnectTimer();
         reconnectTimer = window.setTimeout(() => {
           attemptPlayback(true);
         }, RECONNECT_DELAY_MS);
