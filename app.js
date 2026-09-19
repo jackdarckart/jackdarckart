@@ -1180,7 +1180,7 @@
         return;
       }
 
-      const mailtoUrl = 'mailto:' + encodeURIComponent(email)
+      const mailtoUrl = 'mailto:' + email
         + '?subject=' + encodeURIComponent(title)
         + '&body=' + encodeURIComponent(body);
       setText(feedbackStatus, 'E-Mail wird lokal in deinem Mailprogramm vorbereitet.');
@@ -1723,7 +1723,7 @@
     entries.forEach((entry) => {
       const baseStart = (entry.day * 1440) + entry.startMinutes;
       const baseEnd = (entry.day * 1440) + entry.endMinutes;
-      const candidates = [0, weekMinutes].map((offset) => ({
+      const candidates = [-weekMinutes, 0, weekMinutes].map((offset) => ({
         entry,
         start: baseStart + offset,
         end: baseEnd + offset
