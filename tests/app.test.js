@@ -220,6 +220,10 @@ function createEnvironment(options = {}) {
   }
 
   const localStorageState = new Map();
+  const seededStorage = options.localStorage || {};
+  Object.entries(seededStorage).forEach(([key, value]) => {
+    localStorageState.set(key, String(value));
+  });
   const location = { href: 'https://stream-musik.space/' };
   const windowObject = {
     location,
@@ -389,6 +393,34 @@ async function testMuteButtonRestoresAudiblePlaybackFromZeroVolume() {
   assert.equal(elements['volume-text'].textContent, '70%', 'restoring audio should refresh the visible volume label');
 }
 
+function testRestoresPersistedMutedStateWithoutOverwritingStorage() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
+    localStorage: {
+      'jackdarckart-volume': '35',
+      'jackdarckart-muted': 'true'
+    }
+  });
+  const { elements } = env;
+
+  assert.equal(elements.audio.volume, 0.35, 'stored slider level should be applied on load');
+  assert.equal(elements.audio.muted, true, 'stored muted state should be restored on load');
+  assert.equal(elements.mute.textContent, 'Ton an', 'mute button should reflect restored muted state');
+}
+
+async function testVolumeSliderChangeEventUpdatesAudioVolume() {
+  const env = createEnvironment({
+    missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year']
+  });
+  const { elements } = env;
+
+  elements.volume.value = '33';
+  await elements.volume.dispatch('change');
+
+  assert.equal(elements.audio.volume, 0.33, 'change event should update audio volume');
+  assert.equal(elements['volume-text'].textContent, '33%', 'change event should update visible slider text');
+}
+
 function testUsesStationSpecificHttpsStreamUrl() {
   assert.match(
     appCode,
@@ -403,6 +435,8 @@ async function main() {
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();
   await testMuteButtonRestoresAudiblePlaybackFromZeroVolume();
+  testRestoresPersistedMutedStateWithoutOverwritingStorage();
+  await testVolumeSliderChangeEventUpdatesAudioVolume();
   console.log('app.js player tests passed');
 }
 
