@@ -926,7 +926,7 @@ async function testInternalNavigationPreservesAudioAcrossPages() {
 
   assert.match(env.document.body.innerHTML, /<main id="content"><h1>Live hören<\/h1><\/main>/, 'same-origin page clicks should swap the current shell body without forcing a full browser navigation');
   assert.equal(env.window.history.pushed, 'https://stream-musik.space/live.html', 'internal navigation should push the requested HTML page into history');
-  assert.equal(env.window.__JACKDARCKART_PERSISTENT_AUDIO__, null, 'persistent audio handoff should be consumed again after the shell finishes re-initializing');
+  assert.ok(env.window.__JACKDARCKART_PERSISTENT_AUDIO__ == null, 'persistent audio handoff should be consumed again after the shell finishes re-initializing');
   assert.equal(env.elements.audio.paused, false, 'the original audio element instance should still be playing after internal navigation');
   assert.equal(env.elements.status.dataset.state, 'playing', 'the player UI should rehydrate the active playback state after internal navigation');
 }
