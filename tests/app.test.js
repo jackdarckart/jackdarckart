@@ -1497,6 +1497,32 @@ function testStickyPlayerCssKeepsPlayerWithinViewport() {
     /@media \(max-height:\s*540px\)\s*\{[\s\S]*\.sticky-player\s*\{[\s\S]*bottom:\s*max\(0\.45rem,\s*env\(safe-area-inset-bottom,\s*0px\)\);[\s\S]*min-height:\s*3\.4rem;/,
     'short viewports should tighten sticky-player bottom spacing and height to keep actions visible'
   );
+  assert.match(
+    stylesCode,
+    /@media \(max-width:\s*720px\)\s*\{[\s\S]*\.subpanel-head,\s*\.compact-head\s*\{[\s\S]*flex-wrap:\s*wrap;[\s\S]*\}[\s\S]*\.subpanel-label\s*\{[\s\S]*max-width:\s*100%;/,
+    'mobile live subpanel headings should wrap endpoint labels instead of overflowing narrow viewports'
+  );
+  assert.match(
+    stylesCode,
+    /\.subpanel-label code\s*\{[\s\S]*overflow-wrap:\s*anywhere;/,
+    'inline endpoint labels should be allowed to wrap instead of forcing horizontal overflow'
+  );
+}
+
+async function testStickyPlayerUsesPrimaryControlsForVisibility() {
+  const env = createEnvironment();
+  env.window.scrollY = 320;
+  env.window.innerHeight = 780;
+  env.elements.status.getBoundingClientRect = () => ({ top: 80, bottom: 140 });
+  env.elements.play.getBoundingClientRect = () => ({ top: -120, bottom: -40 });
+
+  await env.window.dispatch('scroll');
+
+  assert.equal(
+    env.elements['sticky-player'].classList.contains('is-visible'),
+    true,
+    'sticky player should appear once the main play control has scrolled out of view, even if the status block is still visible'
+  );
 }
 
 function testLivePageExposesEnhancedModulesAndHooks() {
@@ -1804,6 +1830,7 @@ async function main() {
   await testEmptyStatesExplainHowSectionsAreMaintained();
   await testFeedbackUsesHonestFallbacksAndValidation();
   await testFeedbackUsesConfiguredMailtoTarget();
+  await testStickyPlayerUsesPrimaryControlsForVisibility();
   console.log('app.js player tests passed');
 }
 
