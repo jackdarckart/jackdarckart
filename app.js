@@ -205,14 +205,6 @@
     return document.querySelector(selector);
   }
 
-  function getCanonicalPageUrl() {
-    const canonicalLink = safeQuerySelector('link[rel="canonical"]');
-    const canonicalHref = canonicalLink && typeof canonicalLink.getAttribute === 'function'
-      ? normalizeUrl(canonicalLink.getAttribute('href'))
-      : '';
-    return canonicalHref || normalizeUrl(window.location.href) || window.location.href;
-  }
-
   function hasStreamSource() {
     if (!audio) {
       return false;
@@ -1052,14 +1044,14 @@
       return {
         title: document.title,
         text: currentTrack ? 'Jetzt live auf stream-musik.space: ' + currentTrack : 'jackdarckart Webradio auf stream-musik.space',
-        url: getCanonicalPageUrl()
+        url: window.location.href
       };
     }
 
     return {
       title: document.title,
       text: currentTrack ? 'Jetzt live: ' + currentTrack : 'jackdarckart Webradio auf stream-musik.space',
-      url: getCanonicalPageUrl()
+      url: window.location.href
     };
   }
 

@@ -20,6 +20,7 @@ const htmlPages = [
   'datenschutz.html',
   'impressum.html'
 ];
+const pageHrefByFile = Object.fromEntries(htmlPages.map((file) => [file, './' + file]));
 
 class MockElement {
   constructor(id, ownerDocument) {
@@ -992,11 +993,20 @@ async function testFeedbackUsesConfiguredMailtoTarget() {
 function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
   for (const file of htmlPages) {
     const html = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+    const siteNavMatch = html.match(/<nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">([\s\S]*?)<\/nav>/);
+    const footerNavMatch = html.match(/<nav class="footer-nav" aria-label="Footer-Navigation">([\s\S]*?)<\/nav>/);
+    const expectedHref = pageHrefByFile[file];
     assert.match(html, /<nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">/, `${file} should include the shared main navigation`);
     assert.match(html, /<nav class="footer-nav" aria-label="Footer-Navigation">/, `${file} should include the shared footer navigation`);
     assert.match(html, /<meta name="description" content="[^"]+"/, `${file} should define its own meta description`);
     assert.match(html, /<link rel="canonical" href="https:\/\/stream-musik\.space\//, `${file} should include a canonical URL`);
     assert.match(html, /<meta property="og:image" content="https:\/\/stream-musik\.space\/assets\/social-preview\.png">/, `${file} should keep the shared social preview image`);
+    assert.ok(siteNavMatch, `${file} should expose a parsable main navigation section`);
+    assert.ok(footerNavMatch, `${file} should expose a parsable footer navigation section`);
+    assert.equal((siteNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the main navigation`);
+    assert.equal((footerNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the footer navigation`);
+    assert.match(siteNavMatch[1], new RegExp(`<a href="${expectedHref.replace('.', '\\.')}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the main navigation`);
+    assert.match(footerNavMatch[1], new RegExp(`<a href="${expectedHref.replace('.', '\\.')}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the footer navigation`);
     if (file !== 'index.html') {
       assert.match(html, /<nav class="breadcrumbs" aria-label="Breadcrumb">/, `${file} should include breadcrumbs`);
     }
