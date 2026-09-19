@@ -221,6 +221,26 @@
       </aside>
 
       <div class="live-side-column">
+        <div class="content-columns live-insights-grid" aria-label="Live-Insights">
+          <h2 class="live-insights-heading">Live-Insights</h2>
+          <article class="panel content-panel">
+            <div class="subpanel-head">
+              <h3>Sendeplan-Vorschau</h3>
+              <span class="subpanel-label">Endpoint <code>/schedule</code></span>
+            </div>
+            <div class="content-list single-column" id="schedule-highlight"></div>
+            <p class="live-subheading">Kommende Sendungen</p>
+            <div class="content-list single-column" id="schedule-list"></div>
+            <p class="share-status note" id="schedule-source" aria-live="polite">Sendeplan-API-Status wird geladen.</p>
+          </article>
+          <article class="panel content-panel">
+            <div class="subpanel-head">
+              <h3>Schnelle Plattform-Wege</h3>
+              <span class="subpanel-label">statisch gepflegt</span>
+            </div>
+            <div class="content-list single-column" id="platform-links"></div>
+          </article>
+        </div>
         <section class="panel content-panel station-profile-live" data-reveal aria-labelledby="station-profile-title">
           <div class="subpanel-head">
             <h2 id="station-profile-title">Senderprofil wird geladen</h2>
@@ -279,26 +299,6 @@
     </div>
   </section>
   <section class="section section-muted live-data-section">
-    <div class="wrap content-columns live-insights-grid">
-      <h2 class="live-insights-heading">Live-Insights</h2>
-      <article class="panel content-panel">
-        <div class="subpanel-head">
-          <h3>Sendeplan-Vorschau</h3>
-          <span class="subpanel-label">Endpoint <code>/schedule</code></span>
-        </div>
-        <div class="content-list single-column" id="schedule-highlight"></div>
-        <p class="live-subheading">Kommende Sendungen</p>
-        <div class="content-list single-column" id="schedule-list"></div>
-        <p class="share-status note" id="schedule-source" aria-live="polite">Sendeplan-API-Status wird geladen.</p>
-      </article>
-      <article class="panel content-panel">
-        <div class="subpanel-head">
-          <h3>Schnelle Plattform-Wege</h3>
-          <span class="subpanel-label">statisch gepflegt</span>
-        </div>
-        <div class="content-list single-column" id="platform-links"></div>
-      </article>
-    </div>
     <div class="wrap">
       <article class="panel content-panel live-data-panel">
         <div class="subpanel-head">
