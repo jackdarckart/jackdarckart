@@ -1639,6 +1639,8 @@
       document.close();
     } catch (error) {
       window[INTERNAL_NAVIGATION_KEY] = false;
+      window[PERSISTENT_AUDIO_KEY] = null;
+      window[PERSISTENT_STATE_KEY] = null;
       window.location.href = destination.href;
     }
   }
@@ -3200,6 +3202,7 @@
         observer.unobserve(entry.target);
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.15 });
+    listenerCleanups.push(() => observer.disconnect());
 
     revealNodes.forEach((node) => observer.observe(node));
   }

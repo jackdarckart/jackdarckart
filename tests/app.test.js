@@ -898,6 +898,53 @@ async function testInternalNavigationPreservesAudioAcrossPages() {
   assert.equal(env.window.__JACKDARCKART_PERSISTENT_STATE__.currentState, 'playing', 'persistent navigation should hand off the active playback state to the rewritten page');
 }
 
+async function testPopstateNavigationRewritesDocumentWithoutPushingHistory() {
+  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><main id="content"><h1>Live hören</h1></main><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const env = createEnvironment({
+    fetch: async (url) => {
+      if (String(url).endsWith('.html')) {
+        return { ok: true, text: async () => pageHtml };
+      }
+      if (String(url).endsWith('/current_song')) {
+        return { ok: true, json: async () => ({ title: 'Mitternacht', artist: { name: 'jackdarckart' } }) };
+      }
+      if (String(url).endsWith('/last_songs') || String(url).endsWith('/schedule') || String(url).endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (String(url).endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 1 }) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  env.window.history = {
+    pushed: null,
+    replaced: null,
+    pushState(_state, _title, url) {
+      this.pushed = url;
+    },
+    replaceState(_state, _title, url) {
+      this.replaced = url;
+    }
+  };
+  env.window.location.href = 'https://stream-musik.space/live.html';
+  env.document.openCalled = false;
+  env.document.open = () => {
+    env.document.openCalled = true;
+  };
+  env.document.write = () => {};
+  env.document.close = () => {};
+
+  await env.window.dispatch('popstate');
+  await flushMicrotasks();
+  await flushMicrotasks();
+
+  assert.equal(env.document.openCalled, true, 'popstate navigation should also rewrite the current document inside the persistent shell');
+  assert.equal(env.window.history.pushed, null, 'popstate handling should not push a new history entry');
+  assert.equal(env.window.history.replaced, null, 'popstate handling should not replace the browser-managed history entry');
+}
+
 async function testScheduleUsesOfficialApiEntriesForLiveAndNext() {
   const env = createEnvironment({
     now: '2026-09-21T00:30:00+02:00',
@@ -1212,6 +1259,7 @@ async function main() {
   testUsesStationSpecificHttpsStreamUrl();
   testAppProvidesPersistentInternalNavigationShell();
   await testInternalNavigationPreservesAudioAcrossPages();
+  await testPopstateNavigationRewritesDocumentWithoutPushingHistory();
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();
