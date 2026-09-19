@@ -617,13 +617,19 @@ code{
   color:#dcfce7;
 }
 
+.sticky-chip[data-state="online"]{
+  border-color:rgba(52,211,153,.22);
+  color:#dffcf0;
+}
+
 .sticky-chip[data-state="blocked"],
 .sticky-chip[data-state="action-needed"]{
   border-color:rgba(236,72,153,.34);
   color:#ffe4f2;
 }
 
-.sticky-chip[data-state="error"]{
+.sticky-chip[data-state="error"],
+.sticky-chip[data-state="offline"]{
   border-color:rgba(251,113,133,.34);
   color:#ffe0e6;
 }
@@ -735,6 +741,14 @@ code{
     flex-direction:column;
     align-items:stretch;
   }
+
+   .sticky-player-meta{
+     gap:.4rem;
+   }
+
+   .sticky-chip{
+     justify-content:center;
+   }
 
   .sticky-player-actions > *{
     flex:1 1 100%;

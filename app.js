@@ -41,6 +41,7 @@
   const stickyPlayButton = document.getElementById('sticky-play');
   const stickyStatusText = document.getElementById('sticky-status-text');
   const stickyMessage = document.getElementById('sticky-message');
+  const stickyNetworkState = document.getElementById('sticky-network-state');
   const stickyPlayerState = document.getElementById('sticky-player-state');
   const stickyRetryState = document.getElementById('sticky-retry-state');
 
@@ -117,6 +118,10 @@
     networkStatus.textContent = isOffline ? 'Browser meldet offline' : 'Browser meldet online';
     if (networkStatus.parentElement) {
       networkStatus.parentElement.dataset.state = isOffline ? 'offline' : 'online';
+    }
+    if (stickyNetworkState) {
+      stickyNetworkState.textContent = isOffline ? 'Netz offline' : 'Netz online';
+      stickyNetworkState.dataset.state = isOffline ? 'offline' : 'online';
     }
   }
 
