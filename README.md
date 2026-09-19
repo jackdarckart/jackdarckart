@@ -57,7 +57,9 @@ Die Custom Domain bleibt über `CNAME` auf `stream-musik.space` gesetzt.
 
 Die Seite fragt **standardmäßig keine externen Now-Playing-Daten** ab. Damit bleiben Datenschutz, CSP und GitHub-Pages-Kompatibilität im Ausgangszustand eng begrenzt.
 
-Die Konfiguration sitzt in `app.js` im Objekt `APP_CONFIG` bzw. dessen `nowPlaying`-Teil. Standardmäßig steht dort:
+`app.js` baut seine Laufzeitkonfiguration aus `window.__JACKDARCKART_CONFIG__ || {}` auf und mischt diese Overrides in die eingebauten Defaults. In dieser Repository-Version sind die Defaults direkt im Skript hinterlegt; wer lieber eine getrennte Konfigurationsdatei ausliefert, kann vor `app.js` ein eigenes, selbst gehostetes Skript laden, das `window.__JACKDARCKART_CONFIG__` setzt.
+
+Der relevante Standardblock für Now Playing sieht in `app.js` so aus:
 
 ```js
 nowPlaying: {
@@ -70,19 +72,21 @@ nowPlaying: {
 
 Erst wenn `endpoint` mit einer echten Quelle gefüllt wird, startet Polling. Der enthaltene Adapter `generic-json` versucht gängige JSON-Felder wie `current`, `track`, `song`, `history`, `recent` oder `lastPlayed` defensiv auszulesen.
 
-Beispiel für eine echte Konfiguration in `app.js`:
+Beispiel für eine echte Override-Konfiguration:
 
 ```js
-nowPlaying: {
-  endpoint: 'https://example.invalid/api/now-playing',
-  pollIntervalMs: 45000,
-  requestInit: {
-    headers: {
-      Accept: 'application/json'
-    }
-  },
-  adapter: 'generic-json'
-}
+window.__JACKDARCKART_CONFIG__ = {
+  nowPlaying: {
+    endpoint: 'https://example.invalid/api/now-playing',
+    pollIntervalMs: 45000,
+    requestInit: {
+      headers: {
+        Accept: 'application/json'
+      }
+    },
+    adapter: 'generic-json'
+  }
+};
 ```
 
 Wichtig:

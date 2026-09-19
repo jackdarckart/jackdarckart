@@ -1242,7 +1242,10 @@
     }
 
     try {
-      const response = await window.fetch(getNowPlayingEndpoint(), Object.assign({ method: 'GET', cache: 'no-store' }, APP_CONFIG.nowPlaying.requestInit || {}));
+      const response = await window.fetch(
+        getNowPlayingEndpoint(),
+        Object.assign({}, APP_CONFIG.nowPlaying.requestInit || {}, { method: 'GET', cache: 'no-store' })
+      );
       if (!response || !response.ok) {
         throw new Error('now-playing-unavailable');
       }
@@ -1285,11 +1288,10 @@
     }
 
     navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {
-      if (installPromptShell) {
-        installPromptShell.hidden = false;
-      }
-      if (installStatus) {
-        installStatus.textContent = 'Offline-Modus konnte in diesem Browser nicht registriert werden.';
+      if (shareStatus) {
+        shareStatus.textContent = 'Offline-Modus konnte in diesem Browser nicht registriert werden.';
+      } else if (message) {
+        message.textContent = 'Offline-Modus konnte in diesem Browser nicht registriert werden.';
       }
     });
   }
