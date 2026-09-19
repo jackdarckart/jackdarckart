@@ -15,7 +15,17 @@ const APP_SHELL = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await Promise.all(APP_SHELL.map(async (asset) => {
+        try {
+          await cache.add(asset);
+        } catch (error) {
+          return null;
+        }
+        return asset;
+      }));
+      return self.skipWaiting();
+    })
   );
 });
 

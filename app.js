@@ -1072,7 +1072,7 @@
   }
 
   function getNowPlayingSourceLabel() {
-    const endpoint = normalizeUrl(APP_CONFIG.nowPlaying.endpoint);
+    const endpoint = getNowPlayingEndpoint();
     if (!endpoint) {
       return 'Keine Now-Playing-Quelle konfiguriert.';
     }
@@ -1085,7 +1085,11 @@
   }
 
   function isNowPlayingConfigured() {
-    return Boolean(normalizeUrl(APP_CONFIG.nowPlaying.endpoint)) && typeof window.fetch === 'function';
+    return Boolean(getNowPlayingEndpoint()) && typeof window.fetch === 'function';
+  }
+
+  function getNowPlayingEndpoint() {
+    return normalizeUrl(APP_CONFIG.nowPlaying.endpoint);
   }
 
   function getNowPlayingAdapter() {
@@ -1238,7 +1242,7 @@
     }
 
     try {
-      const response = await window.fetch(APP_CONFIG.nowPlaying.endpoint, Object.assign({ method: 'GET', cache: 'no-store' }, APP_CONFIG.nowPlaying.requestInit || {}));
+      const response = await window.fetch(getNowPlayingEndpoint(), Object.assign({ method: 'GET', cache: 'no-store' }, APP_CONFIG.nowPlaying.requestInit || {}));
       if (!response || !response.ok) {
         throw new Error('now-playing-unavailable');
       }
@@ -1300,9 +1304,18 @@
       return;
     }
 
-    installPromptEvent.prompt();
-    if (installStatus) {
-      installStatus.textContent = 'Installationsdialog wurde geöffnet.';
+    try {
+      await installPromptEvent.prompt();
+      if (installStatus) {
+        installStatus.textContent = 'Installationsdialog wurde geöffnet.';
+      }
+    } catch (error) {
+      installPromptEvent = null;
+      updateInstallPromptVisibility();
+      if (installStatus) {
+        installStatus.textContent = 'Installationsdialog konnte nicht geöffnet werden.';
+      }
+      return;
     }
 
     if (installPromptEvent.userChoice && typeof installPromptEvent.userChoice.then === 'function') {
@@ -1495,7 +1508,7 @@
   if (window.matchMedia && typeof window.matchMedia === 'function') {
     const lightModeQuery = window.matchMedia('(prefers-color-scheme: light)');
     const handleThemeChange = () => {
-      if ((readStorage(STORAGE_KEYS.theme) || DEFAULT_THEME) === 'auto') {
+      if (getStoredThemePreference() === 'auto') {
         applyTheme('auto');
       }
     };

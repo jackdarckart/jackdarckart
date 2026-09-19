@@ -522,26 +522,30 @@ async function testNowPlayingIsNotFetchedWithoutConfiguredSource() {
 }
 
 async function testShareUsesCurrentTrackWhenMetadataIsAvailable() {
+  let fetchedUrl = '';
   const env = createEnvironment({
     appConfig: {
       nowPlaying: {
-        endpoint: 'https://example.com/now-playing'
+        endpoint: 'metadata/now-playing.json'
       }
     },
-    fetch: async () => ({
-      ok: true,
-      json: async () => ({
-        current: {
-          title: 'Mitternacht',
-          artist: 'jackdarckart'
-        },
-        history: [
-          { title: 'Mitternacht', artist: 'jackdarckart', playedAt: '2026-09-19T12:00:00.000Z' },
-          { title: 'Mitternacht', artist: 'jackdarckart', playedAt: '2026-09-19T12:00:00.000Z' },
-          { title: 'Wolkenlauf', artist: 'jackdarckart', playedAt: '2026-09-19T11:45:00.000Z' }
-        ]
-      })
-    }),
+    fetch: async (url) => {
+      fetchedUrl = url;
+      return {
+        ok: true,
+        json: async () => ({
+          current: {
+            title: 'Mitternacht',
+            artist: 'jackdarckart'
+          },
+          history: [
+            { title: 'Mitternacht', artist: 'jackdarckart', playedAt: '2026-09-19T12:00:00.000Z' },
+            { title: 'Mitternacht', artist: 'jackdarckart', playedAt: '2026-09-19T12:00:00.000Z' },
+            { title: 'Wolkenlauf', artist: 'jackdarckart', playedAt: '2026-09-19T11:45:00.000Z' }
+          ]
+        })
+      };
+    },
     share: async () => undefined
   });
 
@@ -556,6 +560,8 @@ async function testShareUsesCurrentTrackWhenMetadataIsAvailable() {
   assert.equal(env.elements['history-list'].children.length, 2, 'history should deduplicate repeated entries');
   assert.equal(env.elements['history-empty'].hidden, true, 'history fallback should be hidden once entries exist');
   assert.equal(env.navigator.mediaSession.metadata.title, 'Mitternacht', 'media session metadata should reflect real now-playing data');
+  assert.equal(fetchedUrl, 'https://stream-musik.space/metadata/now-playing.json', 'configured now-playing fetches should use the normalized endpoint');
+  assert.equal(env.elements['now-playing-source'].textContent, 'Datenquelle: stream-musik.space', 'configured now-playing sources should expose a stable label');
 }
 
 async function testThemeSelectionUpdatesDatasetAndThemeColor() {
