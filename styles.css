@@ -278,6 +278,37 @@ button{cursor:pointer}
   color:#fff;
 }
 
+.play-button[data-state="loading"],
+.sticky-play-button[data-state="loading"]{
+  border-color:rgba(34,211,238,.34);
+  background:linear-gradient(135deg,rgba(8,145,178,.88),rgba(76,29,149,.92));
+  box-shadow:0 0 0 1px rgba(34,211,238,.12),0 16px 35px rgba(8,145,178,.22);
+}
+
+.play-button[data-state="playing"],
+.sticky-play-button[data-state="playing"]{
+  border-color:rgba(52,211,153,.34);
+  background:linear-gradient(135deg,rgba(5,150,105,.92),rgba(14,116,144,.92));
+  box-shadow:0 0 0 1px rgba(52,211,153,.12),0 16px 35px rgba(5,150,105,.22);
+}
+
+.icon-button[data-state="active"]{
+  border-color:rgba(34,211,238,.28);
+  color:#e0fbff;
+}
+
+.icon-button[data-state="muted"]{
+  border-color:rgba(236,72,153,.3);
+  color:#ffe4f2;
+}
+
+.icon-button[data-state="action-needed"]{
+  border-color:rgba(251,113,133,.34);
+  background:rgba(60,10,20,.7);
+  color:#ffe0e6;
+  box-shadow:0 0 0 1px rgba(251,113,133,.08);
+}
+
 .panel{
   border:1px solid rgba(148,163,184,.18);
   border-radius:1.6rem;

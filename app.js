@@ -95,6 +95,7 @@
       buttons.forEach((button) => {
         button.textContent = 'Stream pausieren';
         button.setAttribute('aria-pressed', 'true');
+        button.dataset.state = 'playing';
       });
       return;
     }
@@ -102,11 +103,13 @@
     buttons.forEach((button) => {
       button.textContent = currentState === 'loading' ? 'Verbindung läuft …' : 'Stream starten';
       button.setAttribute('aria-pressed', 'false');
+      button.dataset.state = currentState === 'loading' ? 'loading' : 'ready';
     });
   }
 
   function updateRetryButton() {
     retryButton.hidden = currentState !== 'error' && currentState !== 'blocked';
+    retryButton.dataset.state = retryButton.hidden ? 'hidden' : 'action-needed';
   }
 
   function updateNetworkStatus() {
@@ -211,6 +214,7 @@
     muteButton.textContent = muted ? 'Ton an' : 'Stumm';
     muteButton.setAttribute('aria-pressed', String(muted));
     muteButton.setAttribute('aria-label', muted ? 'Ton wieder einschalten' : 'Ton stummschalten');
+    muteButton.dataset.state = muted ? 'muted' : 'active';
   }
 
   function updateVolume(value) {
