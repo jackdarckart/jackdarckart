@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html" aria-current="page" class="is-current">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html" aria-current="page" class="is-current">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -66,12 +66,12 @@
     <li aria-current="page">Kontakt & Feedback</li>
   </ol>
 </nav>
-      <span class="eyebrow">Songwünsche, Feedback, Fehler, Sicherheit</span>
-      <h1>Kontaktwege ohne Drittanbieterformular und ohne versteckte Datensammlung.</h1>
-      <p>Diese Seite bereitet ausschließlich lokale Mailto- oder GitHub-Issue-Links vor. Sie eignet sich für Songwünsche, allgemeines Feedback, technische Fehler oder Sicherheitsmeldungen und erklärt gleichzeitig, wann welche Angabe hilfreich ist.</p>
+      <span class="eyebrow">Kontaktzentrale</span>
+      <h1>Songwünsche, Feedback und technische Meldungen in einem klaren Hub.</h1>
+      <p>Alle Aktionen bleiben lokal vorbereitet: Mailto oder GitHub-Issue. Nichts wird ohne deinen finalen Klick übertragen.</p>
     </div>
   </section>
-  <section class="section">
+  <section class="section" data-reveal>
     <div class="wrap contact-grid">
       <div class="panel contact-card">
         <span class="eyebrow">Songwunsch &amp; Feedback</span>
@@ -96,10 +96,15 @@
         <p class="note" id="feedback-email-hint">Wenn keine Mailadresse in der Konfiguration hinterlegt ist, bleibt GitHub Issues der verfügbare Fallback.</p>
       </div>
 
-      <div class="panel content-panel">
-        <span class="eyebrow">Plattform-Links &amp; Hinweise</span>
-        <h2>Nur verifizierte Ziele und klare nächste Schritte.</h2>
-        <p>Zusätzliche Ziele wie laut.fm, Direktstream oder GitHub Issues stammen aus der statischen Konfiguration. Ohne bewusst gesetzte Links wird hier nichts erfunden.</p>
+      <div class="panel editorial-module">
+        <span class="eyebrow">Technische Meldungen</span>
+        <h2>Was bei Fehlerreports besonders hilft</h2>
+        <div class="flow-steps">
+          <article class="flow-step"><strong>Kontext</strong><p>Gerät, Browser, Seite und Uhrzeit notieren.</p></article>
+          <article class="flow-step"><strong>Status</strong><p>Sichtbare Meldung oder Screenshot kurz beschreiben.</p></article>
+          <article class="flow-step"><strong>Reproduktion</strong><p>Kurze Schrittfolge für nachvollziehbare Prüfung.</p></article>
+        </div>
+        <p class="section-gap-top">Zusätzliche Ziele wie laut.fm, Direktstream oder GitHub Issues stammen aus der statischen Konfiguration und werden nicht frei erfunden.</p>
         <div class="content-list single-column" id="platform-links" aria-live="polite"></div>
         <details class="inline-details section-gap-top">
           <summary>Wann sollte ich GitHub Issues statt E-Mail nutzen?</summary>

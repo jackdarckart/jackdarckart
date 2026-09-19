@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html" aria-current="page" class="is-current">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html" aria-current="page" class="is-current">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -66,24 +66,24 @@
     <li aria-current="page">News</li>
   </ol>
 </nav>
-      <span class="eyebrow">Sender- &amp; Website-Hinweise</span>
-      <h1>News für veröffentlichte Änderungen, Hinweise und Wartungsinformationen.</h1>
-      <p>News ergänzen die Website um redaktionelle Kurzmeldungen: neue Bereiche, geänderte Abläufe, technische Hinweise oder veröffentlichte Inhalte. Die Rubrik ersetzt weder Live-Metadaten noch den Sendeplan und bleibt absichtlich leer, solange es nichts Verifiziertes zu melden gibt.</p>
+      <span class="eyebrow">Redaktioneller Feed</span>
+      <h1>News mit Datumsmarken, Kontext und klarer Kategorisierung.</h1>
+      <p>Diese Seite sammelt veröffentlichte Hinweise zu Sender, Website und Funktionen. Ohne bestätigte Meldungen bleibt ein bewusst gestalteter Leerzustand statt eines scheinbar unvollständigen Feeds.</p>
     </div>
   </section>
-  <section class="section">
+  <section class="section" data-reveal>
     <div class="wrap content-columns">
-      <article class="panel content-panel">
+      <article class="panel content-panel timeline-strip">
         <h2>Aktuelle News</h2>
         <div class="content-list single-column" id="news-list" aria-live="polite"></div>
       </article>
-      <article class="panel content-panel">
+      <article class="panel editorial-module">
         <h2>Pflegehinweise für Meldungen</h2>
-        <ul class="support-list">
-          <li>Nur kurze, nachvollziehbare Mitteilungen veröffentlichen.</li>
-          <li>Wenn ein Termin betroffen ist, zusätzlich prüfen, ob er eher in Events oder Sendeplan gehört.</li>
-          <li>Wartungs- oder Funktionshinweise sollten auf <a href="./hilfe.html">hilfe.html</a> vertieft werden.</li>
-        </ul>
+        <div class="feed-list">
+          <article class="feed-item"><time>Kategorie · Technik</time><p>Kurze Hinweise zu neuen Funktionen oder geänderten Abläufen.</p></article>
+          <article class="feed-item"><time>Kategorie · Redaktion</time><p>Veröffentlichte Inhalte, bestätigte Hinweise, keine Spekulationen.</p></article>
+          <article class="feed-item"><time>Weiterleitung</time><p>Termine in Events/Sendeplan, Fehlerdetails in Hilfe/Kontakt vertiefen.</p></article>
+        </div>
         <div class="actions section-actions">
           <a class="button primary" href="./hilfe.html">Hilfe &amp; FAQ</a>
           <a class="button secondary" href="./kontakt.html">Hinweis senden</a>

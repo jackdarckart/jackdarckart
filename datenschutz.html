@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html" aria-current="page" class="is-current">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html" aria-current="page" class="is-current">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -67,11 +67,16 @@
   </ol>
 </nav>
       <span class="eyebrow">Transparenz statt Tracking</span>
-      <h1>Datenschutz- und Sicherheitsinformationen für statisches Hosting und Browser-Komfortfunktionen.</h1>
-      <p>Diese Seite beschreibt sachlich, wie stream-musik.space technisch funktioniert. Sie ist keine Rechtsberatung, sondern eine verständliche Übersicht darüber, welche Daten lokal bleiben, welche externen Verbindungen entstehen können und welche Sicherheitsmaßnahmen direkt im Projekt sichtbar sind.</p>
+      <h1>Datenschutz und Sicherheit klar gegliedert: lokal im Browser vs. externe Stream-Verbindungen.</h1>
+      <p>Diese Übersicht trennt bewusst zwischen lokalen Komfortdaten und externen Verbindungen. So bleibt nachvollziehbar, was auf dem Gerät bleibt und was beim Hören technisch nach außen geht.</p>
+      <nav class="h-scroll section-gap-top" aria-label="Inhaltsnavigation Datenschutz">
+        <a href="#lokal"><strong>Lokal</strong><p>Theme, Favoriten, Lautstärke.</p></a>
+        <a href="#extern"><strong>Extern</strong><p>Stream und verifizierte Links.</p></a>
+        <a href="#schutz"><strong>Schutz</strong><p>CSP, SW und Grenzen.</p></a>
+      </nav>
     </div>
   </section>
-  <section class="section">
+  <section class="section" data-reveal>
     <div class="wrap cards info-cards section-gap-bottom">
       <article class="panel card"><h3>Statisches Hosting</h3><p>Die Website besteht aus statischen HTML-, CSS-, JS-, Manifest- und Service-Worker-Dateien. Es gibt kein eingebautes Tracking-Backend und keine externe Frontend-Bibliothek.</p></article>
       <article class="panel card"><h3>Lokale Daten</h3><p>Theme, Lautstärke, Mute-Status und Favoriten können lokal im Browser gespeichert werden. Diese Informationen dienen nur der Bedienung auf deinem Gerät.</p></article>
@@ -79,7 +84,7 @@
       <article class="panel card"><h3>Service Worker</h3><p>Der Service Worker cached nur statische Seiten und Assets. Der Live-Audiostream wird nicht in den App-Cache aufgenommen.</p></article>
     </div>
     <div class="wrap content-columns">
-      <article class="panel content-panel">
+      <article class="panel content-panel" id="lokal">
         <h2>Welche Daten lokal bleiben</h2>
         <ul class="support-list">
           <li>Theme-Präferenz (Auto, Hell, Dunkel)</li>
@@ -89,7 +94,7 @@
         </ul>
         <p>Diese Informationen werden nicht automatisch an Dritte übertragen.</p>
       </article>
-      <article class="panel content-panel">
+      <article class="panel content-panel" id="extern">
         <h2>Welche Verbindungen nach außen möglich sind</h2>
         <ul class="support-list">
           <li>Audio-Streaming über den offiziellen laut.fm-Stream</li>
@@ -100,7 +105,7 @@
       </article>
     </div>
   </section>
-  <section class="section section-muted">
+  <section class="section section-muted" id="schutz" data-reveal>
     <div class="wrap content-columns">
       <article class="panel content-panel">
         <h2>Fehlende Tracker und bewusste Beschränkungen</h2>

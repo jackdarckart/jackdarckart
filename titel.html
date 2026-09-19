@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html" aria-current="page" class="is-current">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html" aria-current="page" class="is-current">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -66,19 +66,20 @@
     <li aria-current="page">Aktueller Titel</li>
   </ol>
 </nav>
-      <span class="eyebrow">Now Playing &amp; Verlauf</span>
-      <h1>Aktueller Titel, zuletzt gespielte Tracks und lokale Favoriten.</h1>
-      <p>Diese Seite bündelt alle Titelinformationen, die stream-musik.space seriös darstellen kann. Wenn keine Now-Playing-Quelle gepflegt ist oder die Quelle gerade nichts Verlässliches liefert, bleibt der Leerzustand bewusst ehrlich und erklärt, was später hier erscheinen kann.</p>
+      <span class="eyebrow">Now-Playing-Bühne</span>
+      <h1>Aktueller Titel im Fokus – Historie und Favoriten in einer ruhigen Timeline.</h1>
+      <p>Die Titelansicht zeigt nur belastbare Metadaten. Wenn keine Quelle verfügbar ist, bleibt der Zustand bewusst atmosphärisch und ehrlich: keine erfundenen Tracks, aber klare nächste Schritte.</p>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" data-reveal>
     <div class="wrap content-columns title-layout">
-      <article class="panel content-panel">
+      <article class="panel content-panel hero-led">
         <div class="subpanel-head">
           <h2>Now Playing</h2>
           <span class="subpanel-label">ehrlicher Fallback statt Fantasiedaten</span>
         </div>
+        <div class="signal-lines" aria-hidden="true"></div>
         <p class="now-playing-track" id="now-playing-track">Titelinformationen derzeit nicht verfügbar</p>
         <p class="now-playing-artist" id="now-playing-artist">Live-Metadaten bleiben deaktiviert, bis eine echte Quelle konfiguriert ist.</p>
         <p class="status-line"><span class="meta-label">Senderstatus</span><span id="station-status">Bereit für manuellen Start</span></p>
@@ -91,22 +92,34 @@
         <p class="note" id="favorite-status" aria-live="polite">Favoriten werden nur lokal im Browser gespeichert, sobald verlässliche Titeldaten verfügbar sind.</p>
         <p class="share-status note" id="share-status" aria-live="polite">Beim Teilen bleibt die Darstellung datenschutzfreundlich: Es werden nur Seite oder Direktstream verlinkt.</p>
       </article>
-      <article class="panel content-panel">
-        <span class="eyebrow">Orientierung</span>
-        <h2>Warum ein Leerzustand hier sinnvoll ist.</h2>
-        <p>Die Titelansicht ist nur dann wertvoll, wenn sie echte Daten zeigt. Deshalb erklärt diese Seite offen, wenn gerade keine Titelquelle gepflegt oder erreichbar ist. So entsteht kein Widerspruch zwischen Audio-Wiedergabe und Metadatenanzeige.</p>
-        <ul class="support-list">
-          <li>Die Audio-Wiedergabe selbst kann trotzdem auf <a href="./live.html#player">live.html</a> funktionieren.</li>
-          <li>Historie und Favoriten erscheinen erst mit gültigen Titeldaten.</li>
-          <li>Teilen bleibt auch ohne Now-Playing-Quelle verfügbar.</li>
-        </ul>
+      <article class="panel editorial-module">
+        <span class="eyebrow">Titelkontext</span>
+        <h2>Was diese Bühne ist – und was nicht.</h2>
+        <div class="versus-grid">
+          <div>
+            <h3>Diese Seite ist</h3>
+            <ul class="inline-list">
+              <li>eine transparente Anzeige für echte Titelmetadaten</li>
+              <li>ein lokaler Favoritenbereich ohne Account</li>
+              <li>eine Timeline für zuletzt gespielte Tracks</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Diese Seite ist nicht</h3>
+            <ul class="inline-list">
+              <li>kein Ersatz für fehlende Datenquellen</li>
+              <li>kein Generator für erfundene Titel</li>
+              <li>kein versteckter Tracking-Feed</li>
+            </ul>
+          </div>
+        </div>
       </article>
     </div>
   </section>
 
-  <section class="section section-muted">
+  <section class="section section-muted" data-reveal>
     <div class="wrap content-columns">
-      <article class="panel content-panel">
+      <article class="panel content-panel timeline-strip">
         <div class="subpanel-head">
           <h2>Zuletzt gespielt</h2>
           <span class="subpanel-label">gleiche Quelle wie Now Playing</span>
@@ -125,7 +138,7 @@
           </div>
         </details>
       </article>
-      <article class="panel content-panel">
+      <article class="panel content-panel editorial-note">
         <div class="subpanel-head">
           <h2>Lokale Favoriten</h2>
           <button class="button secondary" id="favorites-clear" type="button">Liste leeren</button>
@@ -137,7 +150,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" data-reveal>
     <div class="wrap actions section-actions">
       <a class="button primary" href="./live.html#player">Zum Live-Player</a>
       <a class="button secondary" href="./hilfe.html">Mehr zu Now Playing &amp; Historie</a>

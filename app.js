@@ -2203,6 +2203,43 @@
     installPromptShell.hidden = !installPromptEvent;
   }
 
+  function initScrollReveal() {
+    if (!document || typeof document.querySelectorAll !== 'function') {
+      return;
+    }
+
+    const revealNodes = Array.from(document.querySelectorAll('[data-reveal]'));
+    if (!revealNodes.length) {
+      return;
+    }
+
+    const reducedMotion = prefersReducedMotion();
+    if (document.documentElement && document.documentElement.dataset) {
+      document.documentElement.dataset.reducedMotion = reducedMotion ? 'true' : 'false';
+    }
+
+    if (typeof window === 'undefined' || reducedMotion || !('IntersectionObserver' in window) || typeof window.IntersectionObserver !== 'function') {
+      revealNodes.forEach((node) => node.classList && node.classList.add('is-visible'));
+      return;
+    }
+
+    revealNodes.forEach((node) => node.classList && node.classList.add('reveal-managed'));
+
+    const observer = new window.IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry || !entry.isIntersecting) {
+          return;
+        }
+        if (entry.target && entry.target.classList) {
+          entry.target.classList.add('is-visible');
+        }
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.15 });
+
+    revealNodes.forEach((node) => observer.observe(node));
+  }
+
   async function handleInstallClick() {
     if (!installPromptEvent) {
       return;
@@ -2254,6 +2291,10 @@
     year.textContent = String(new Date().getFullYear());
   }
 
+  if (document.documentElement && document.documentElement.dataset) {
+    document.documentElement.dataset.js = 'true';
+  }
+
   renderStaticSections();
   loadFavorites();
   updateVolume(getStoredVolume(), { persist: false });
@@ -2272,6 +2313,7 @@
   );
   setupMediaSession();
   bindNavigation();
+  initScrollReveal();
   setBackToTopVisibility();
   registerServiceWorker();
   refreshNowPlaying();

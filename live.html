@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -66,13 +66,13 @@
     <li aria-current="page">Live hören</li>
   </ol>
 </nav>
-      <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Vollständige Hörseite</span>
-      <h1>Live hören mit großem Player, Diagnose und direkten Fallbacks.</h1>
-      <p>Diese Seite bündelt den vollständigen Browser-Player für stream-musik.space. Hier findest du dieselbe Wiedergabelogik wie bisher – inklusive Retry-Verhalten, Offline-Hinweisen, Lautstärke, Sleep-Timer, Tastaturkürzeln, Now-Playing-Fallback, PWA-Hinweisen und direkten Wegen zum offiziellen Stream.</p>
+      <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Listening Console</span>
+      <h1>Die immersive Zentrale für Wiedergabe, Signalstatus und Steuerung.</h1>
+      <p>Hier liegt die stärkste Funktion der Website: ein großer Live-Player mit Diagnose-Dashboard, Fallback-Wegen und lokalen Session-Tools. Alles bleibt transparent, ohne Autoplay und ohne erfundene Metadaten.</p>
     </div>
   </section>
 
-  <section class="section player-page-section" id="player">
+  <section class="section player-page-section" id="player" data-reveal>
     <div class="wrap live-layout">
       <aside class="panel player-card player-card-wide" aria-labelledby="player-title">
         <div class="player-head">
@@ -88,7 +88,7 @@
           <span id="status-text">Bereit zum Start</span>
         </div>
 
-        <p class="note" id="message">Die Wiedergabe startet erst nach deiner Aktion. Hier siehst du danach verständlich, ob der Browser noch freigeben muss, der Stream gerade verbindet, puffert, erneut versucht oder bereits live abgespielt wird.</p>
+        <p class="note" id="message">Die Wiedergabe startet erst nach deiner Aktion. Danach zeigt die Console klar, ob der Browser freigibt, ob der Stream lädt, puffert oder stabil live läuft.</p>
 
         <div class="offline-notice" id="offline-notice" hidden role="status" aria-live="polite">
           <p id="offline-notice-text">Offline-Hinweise erscheinen hier.</p>
@@ -100,7 +100,7 @@
             <h3 id="now-playing-heading">Now Playing</h3>
             <span class="subpanel-label">Konfigurierbare Datenquelle</span>
           </div>
-          <p class="note compact-note">Dieser Bereich zeigt – wenn konfiguriert – den aktuell gemeldeten Titel. Ohne gepflegte Metadaten bleibt der Stream vollständig nutzbar. Mehr Verlauf und Favoriten liegen separat auf <a href="./titel.html">titel.html</a>.</p>
+          <p class="note compact-note">Dieser Bereich zeigt bei konfigurierter Quelle den aktuellen Titel. Ohne Quelle bleibt die Wiedergabe voll nutzbar; Verlauf und Favoriten liegen auf <a href="./titel.html">titel.html</a>.</p>
           <p class="now-playing-track" id="now-playing-track">Titelinformationen derzeit nicht verfügbar</p>
           <p class="now-playing-artist" id="now-playing-artist">Live-Metadaten bleiben deaktiviert, bis eine echte Quelle konfiguriert ist.</p>
           <p class="status-line"><span class="meta-label">Senderstatus</span><span id="station-status">Bereit für manuellen Start</span></p>
@@ -208,25 +208,30 @@
       </aside>
 
       <div class="live-side-column">
-        <section class="panel content-panel">
-          <span class="eyebrow">Direktzugänge</span>
-          <h2>Wenn der Browser bremst, bleiben klare Alternativen.</h2>
-          <p>Die Live-Seite nennt bewusst mehrere Hörwege, damit du bei Browserblockaden oder Netzschwankungen nicht im Unklaren bleibst.</p>
-          <ul class="support-list">
-            <li><strong>Retry im Player:</strong> Für kurze Ladeprobleme und nach Netzwechseln.</li>
-            <li><strong>Direktstream:</strong> Die nackte Stream-URL für andere Tabs oder externe Player.</li>
-            <li><strong>laut.fm-Fallback:</strong> Die offizielle Senderseite mit eigener Oberfläche.</li>
-            <li><strong>FAQ &amp; Kontakt:</strong> Für nachvollziehbare Hilfeschritte und technische Rückmeldungen.</li>
-          </ul>
-        </section>
-        <section class="panel content-panel">
-          <span class="eyebrow">Was diese Seite bewusst nicht tut</span>
-          <h2>Kein Autoplay, kein Audiocache, keine Fantasiedaten.</h2>
-          <p>Die Website startet nie ungefragt Ton, cached niemals den Live-Stream im Service Worker und zeigt nur Metadaten an, wenn wirklich eine passende Quelle konfiguriert ist.</p>
-          <div class="actions section-actions">
-            <a class="button primary" href="./titel.html">Zu Titeln &amp; Verlauf</a>
-            <a class="button secondary" href="./datenschutz.html">Datenschutz &amp; Sicherheit</a>
+        <section class="panel editorial-module" data-reveal>
+          <span class="eyebrow">Wenn etwas nicht funktioniert</span>
+          <h2>Schneller Leitfaden für Blockierung, Buffering und Retry.</h2>
+          <div class="flow-steps">
+            <article class="flow-step"><strong>1 · Start prüfen</strong><p>Klicke sichtbar auf Start oder Retry und achte auf den Statuswechsel.</p></article>
+            <article class="flow-step"><strong>2 · Netzwerk prüfen</strong><p>Bei Offline/Wechsel kurz warten, danach Retry erneut auslösen.</p></article>
+            <article class="flow-step"><strong>3 · Fallback nutzen</strong><p>Direktstream oder laut.fm öffnen, falls Browser blockiert.</p></article>
           </div>
+          <p class="note section-gap-top">Autoplay ist in vielen Browsern eingeschränkt. Deshalb ist die erste Nutzeraktion bewusst Pflicht und kein Fehler.</p>
+        </section>
+        <section class="panel feature-split" data-reveal>
+          <article>
+            <span class="eyebrow">Broadcast-Dashboard</span>
+            <h2>Diagnose professionell, aber verständlich.</h2>
+            <p>Die Statusboxen zeigen dir Zustände ohne Fachjargon. So lässt sich sofort erkennen, ob Verbindung, Player oder Metadaten die Ursache sind.</p>
+          </article>
+          <aside class="editorial-note">
+            <h3>Direkte Wege</h3>
+            <p>Hilfe vertiefen, Titel-Historie prüfen oder externe Hörwege nutzen.</p>
+            <div class="actions">
+              <a class="button primary" href="./hilfe.html">Hilfe öffnen</a>
+              <a class="button secondary" href="./titel.html">Titelansicht</a>
+            </div>
+          </aside>
         </section>
       </div>
     </div>

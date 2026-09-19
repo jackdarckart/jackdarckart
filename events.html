@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html" aria-current="page" class="is-current">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html" aria-current="page" class="is-current">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -66,25 +66,34 @@
     <li aria-current="page">Events & Specials</li>
   </ol>
 </nav>
-      <span class="eyebrow">Bestätigte Termine</span>
-      <h1>Events und Specials mit professionellem Leerzustand.</h1>
-      <p>Auf dieser Seite erscheinen nur bestätigte Termine, besondere Live-Slots, Specials oder externe Hinweise mit verlässlicher Beschreibung. Solange nichts final geprüft wurde, bleibt die Darstellung bewusst zurückhaltend und erklärt, wie dieser Bereich gepflegt wird.</p>
+      <span class="eyebrow">Event-Stage</span>
+      <h1>Highlights, Specials und Termin-Kapseln mit klarer redaktioneller Kuratierung.</h1>
+      <p>Events sind die Bühne für bestätigte Sonderformate. Ohne verlässliche Daten bleibt der Bereich bewusst als gepflegter Leerzustand sichtbar – nicht als kaputter Container.</p>
     </div>
   </section>
-  <section class="section">
-    <div class="wrap cards info-cards section-gap-bottom">
-      <article class="panel card"><h3>Keine Fantasietermine</h3><p>Es werden keine automatisch geschätzten Veranstaltungen angezeigt. Ein leerer Zustand ist daher ein Qualitätsmerkmal, kein Fehler.</p></article>
-      <article class="panel card"><h3>Was ein Event ausmacht</h3><p>Events sind besondere Anlässe oder einmalige Hinweise und nicht dasselbe wie ein regulärer Sendeplan-Eintrag.</p></article>
-      <article class="panel card"><h3>Pflegebar bleiben</h3><p>Alle Event-Karten sollen Titel, kurzen Kontext, optionalen Link und nur bestätigte Angaben enthalten.</p></article>
+  <section class="section" data-reveal>
+    <div class="wrap feature-split section-gap-bottom">
+      <article>
+        <h2>Kommende Highlights in Datumskapseln</h2>
+        <p>Jedes Event soll kurz, präzise und mit überprüfbarem Datum erscheinen. Diese Struktur verhindert Verwechslungen mit News oder Wochenplan.</p>
+      </article>
+      <aside class="editorial-note">
+        <h3>Kurationsregel</h3>
+        <p>Nur bestätigte Angaben veröffentlichen. Wenn Termine fehlen, wird das offen kommuniziert.</p>
+      </aside>
     </div>
     <div class="wrap content-columns">
-      <article class="panel content-panel">
+      <article class="panel content-panel timeline-strip">
         <h2>Kommende Events</h2>
         <div class="content-list single-column" id="events-list" aria-live="polite"></div>
       </article>
-      <article class="panel content-panel">
+      <article class="panel content-panel editorial-module">
         <h2>Wie dieser Bereich genutzt wird</h2>
-        <p>Sobald es bestätigte Specials gibt, erscheinen sie hier als einzelne Karten. Ohne Einträge erklärt die Seite, welche Art von Daten später sichtbar werden kann und warum noch nichts angezeigt wird.</p>
+        <div class="feed-list">
+          <article class="feed-item"><time>Format</time><p>Spezialsendungen, bestätigte Live-Slots, besondere Programmpunkte.</p></article>
+          <article class="feed-item"><time>Abgrenzung</time><p>Reguläre Reihen gehören in den Sendeplan, kurze Updates in die News.</p></article>
+          <article class="feed-item"><time>Leerer Zustand</time><p>Bedeutet: aktuell kein bestätigter Termin zur Veröffentlichung.</p></article>
+        </div>
         <div class="actions section-actions">
           <a class="button primary" href="./news.html">Zu den News</a>
           <a class="button secondary" href="./kontakt.html">Event-Hinweis melden</a>
