@@ -1007,7 +1007,9 @@ function testServiceWorkerCachesAllHtmlPages() {
   for (const file of htmlPages) {
     assert.match(swCode, new RegExp(`['"]\\./${file.replace('.', '\\.')}['"]`), `service worker should precache ${file}`);
   }
-  assert.match(swCode, /caches\.match\(request\)/, 'navigation fallback should try the requested cached page first');
+  assert.match(swCode, /const normalizedPageUrl = new URL\(url\.pathname, self\.location\.origin\)\.href;/, 'service worker should normalize navigation URLs before caching them');
+  assert.match(swCode, /cache\.put\(normalizedPageUrl, responseClone\)/, 'navigation responses should be cached under a normalized page URL');
+  assert.match(swCode, /caches\.match\(normalizedPageUrl\)/, 'offline navigation should try the normalized cached page first');
   assert.match(swCode, /OFFLINE_FALLBACK_URL/, 'service worker should keep an explicit offline fallback entry point');
 }
 

@@ -57,6 +57,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   const url = new URL(request.url);
+  const normalizedPageUrl = new URL(url.pathname, self.location.origin).href;
   if (url.origin !== self.location.origin) {
     return;
   }
@@ -72,15 +73,19 @@ self.addEventListener('fetch', (event) => {
           if (response && response.status === 200 && response.type === 'basic') {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
+              cache.put(normalizedPageUrl, responseClone);
             });
           }
           return response;
         })
         .catch(async () => {
-          const cachedPage = await caches.match(request);
+          const cachedPage = await caches.match(normalizedPageUrl);
           if (cachedPage) {
             return cachedPage;
+          }
+          const exactRequestMatch = await caches.match(request);
+          if (exactRequestMatch) {
+            return exactRequestMatch;
           }
           return caches.match(OFFLINE_FALLBACK_URL);
         })
