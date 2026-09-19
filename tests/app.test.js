@@ -1106,6 +1106,9 @@ function testIssueHelpPageAndTemplatesArePresent() {
 
   for (const file of ['bug_report.md', 'feature_request.md', 'content_request.md', 'design_ux_improvement.md', 'api_realtime_problem.md']) {
     const template = fs.readFileSync(path.join(templateDir, file), 'utf8');
+    assert.match(template, /^---[\s\S]*?name:\s+/m, `${file} should define a template name in front matter`);
+    assert.match(template, /^---[\s\S]*?description:\s+/m, `${file} should define a template description in front matter`);
+    assert.match(template, /^---[\s\S]*?title:\s+/m, `${file} should define a default title in front matter`);
     assert.match(template, /## /, `${file} should contain structured markdown sections`);
     assert.match(template, /verifiz/i, `${file} should emphasize verified information`);
   }
