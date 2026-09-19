@@ -305,7 +305,21 @@ button{cursor:pointer}
 .player-card,
 .contact-card{padding:1.35rem}
 
-.player-card{position:relative}
+.player-card{
+  position:relative;
+  overflow:hidden;
+}
+
+.player-card::before{
+  content:"";
+  position:absolute;
+  left:1.35rem;
+  right:1.35rem;
+  top:0;
+  height:1px;
+  background:linear-gradient(90deg,rgba(34,211,238,0),rgba(34,211,238,.9),rgba(139,92,246,.78),rgba(34,211,238,0));
+  opacity:.95;
+}
 
 .player-head{
   display:flex;
@@ -315,6 +329,10 @@ button{cursor:pointer}
 }
 
 .player-head h2{margin:.8rem 0 1rem}
+
+.player-head .eyebrow{
+  letter-spacing:.04em;
+}
 
 .eq{
   display:flex;
@@ -343,8 +361,10 @@ button{cursor:pointer}
   gap:.65rem;
   padding:.8rem 1rem;
   border-radius:1rem;
+  border:1px solid rgba(148,163,184,.14);
   background:rgba(2,6,23,.68);
   color:#dbeafe;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
 }
 
 .status-dot{
@@ -361,6 +381,10 @@ button{cursor:pointer}
 .status[data-state="playing"] .status-dot{background:var(--green);box-shadow:0 0 16px rgba(52,211,153,.6)}
 .status[data-state="blocked"] .status-dot{background:var(--pink);box-shadow:0 0 16px rgba(236,72,153,.6)}
 .status[data-state="error"] .status-dot{background:var(--red);box-shadow:0 0 16px rgba(251,113,133,.6)}
+.status[data-state="loading"]{border-color:rgba(34,211,238,.28)}
+.status[data-state="playing"]{border-color:rgba(52,211,153,.26)}
+.status[data-state="blocked"]{border-color:rgba(236,72,153,.28)}
+.status[data-state="error"]{border-color:rgba(251,113,133,.28)}
 
 .controls{margin-top:1.2rem}
 
@@ -378,13 +402,25 @@ button{cursor:pointer}
   padding:.9rem 1rem;
   border:1px solid rgba(148,163,184,.16);
   border-radius:1rem;
-  background:rgba(2,6,23,.45);
+  background:linear-gradient(180deg,rgba(8,15,30,.82),rgba(2,6,23,.52));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
 }
 
 .meta-label{
   display:block;
   color:var(--muted);
-  font-size:.85rem;
+  font-size:.74rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.status-meta span:last-child{
+  display:block;
+  margin-top:.3rem;
+  color:#eef6ff;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:.98rem;
 }
 
 .player-links{
@@ -408,7 +444,13 @@ input[type="range"]{
   accent-color:var(--cyan);
 }
 
-.share-status{min-height:1.6em}
+.share-status{
+  min-height:1.6em;
+  padding:.85rem 1rem;
+  border:1px dashed rgba(148,163,184,.18);
+  border-radius:1rem;
+  background:rgba(2,6,23,.3);
+}
 
 .section-title{
   max-width:45rem;
@@ -478,6 +520,22 @@ code{
   pointer-events:none;
   transform:translateY(1rem);
   transition:opacity .2s ease,transform .2s ease;
+}
+
+.sticky-player[data-state="loading"]{
+  border-color:rgba(34,211,238,.28);
+}
+
+.sticky-player[data-state="playing"]{
+  border-color:rgba(52,211,153,.28);
+}
+
+.sticky-player[data-state="blocked"]{
+  border-color:rgba(236,72,153,.3);
+}
+
+.sticky-player[data-state="error"]{
+  border-color:rgba(251,113,133,.3);
 }
 
 .sticky-player.is-visible{
