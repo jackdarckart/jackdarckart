@@ -1570,30 +1570,39 @@
     return url.pathname === '/' || /\.html$/i.test(url.pathname);
   }
 
-  function isTrustedShellResponseHtml(html) {
+  function hasPersistentShellContent(parsedDocument, sourceHtml) {
+    if (parsedDocument && typeof parsedDocument.getElementById === 'function' && parsedDocument.getElementById('content')) {
+      return true;
+    }
+
+    return /<main[^>]*\bid\s*=\s*["']content["'][^>]*>/i.test(sourceHtml);
+  }
+
+  function hasPersistentShellSiteNav(parsedDocument, sourceHtml) {
+    if (parsedDocument && typeof parsedDocument.getElementById === 'function' && parsedDocument.getElementById('site-nav')) {
+      return true;
+    }
+
+    return /<nav[^>]*\bid\s*=\s*["']site-nav["'][^>]*>/i.test(sourceHtml);
+  }
+
+  function hasPersistentShellFooterNav(parsedDocument, sourceHtml) {
+    if (parsedDocument && typeof parsedDocument.querySelector === 'function' && parsedDocument.querySelector('nav.footer-nav')) {
+      return true;
+    }
+
+    return /<nav[^>]*\bclass\s*=\s*["'][^"']*\bfooter-nav\b[^"']*["'][^>]*>/i.test(sourceHtml);
+  }
+
+  function isTrustedShellResponseHtml(html, parsedDocument) {
     if (typeof html !== 'string' || !html.trim()) {
       return false;
     }
 
-    if (typeof window.DOMParser === 'function') {
-      try {
-        const parsed = new window.DOMParser().parseFromString(html, 'text/html');
-        if (!parsed || !parsed.documentElement) {
-          return false;
-        }
-
-        const hasMain = typeof parsed.getElementById === 'function' && parsed.getElementById('content');
-        const hasAudio = typeof parsed.getElementById === 'function' && parsed.getElementById('audio');
-        const hasAppScript = typeof parsed.querySelector === 'function' && parsed.querySelector('script[src$=\"app.js\"]');
-        return Boolean(hasMain && hasAudio && hasAppScript);
-      } catch (error) {
-        return false;
-      }
-    }
-
-    return /<main[^>]+id=\"content\"/i.test(html)
-      && /<audio[^>]+id=\"audio\"/i.test(html)
-      && /<script[^>]+src=\"\.\/app\.js\"/i.test(html);
+    const parsed = parsedDocument || parsePersistentShellDocument(html);
+    return hasPersistentShellContent(parsed, html)
+      && hasPersistentShellSiteNav(parsed, html)
+      && hasPersistentShellFooterNav(parsed, html);
   }
 
   function shouldHandleInternalNavigation(link, event) {
@@ -1675,6 +1684,24 @@
     return match ? match[1] : '';
   }
 
+  function extractDocumentTitleFromSource(sourceHtml) {
+    if (typeof sourceHtml !== 'string' || !sourceHtml.trim()) {
+      return '';
+    }
+
+    const match = sourceHtml.match(/<title>([\s\S]*?)<\/title>/i);
+    return match ? match[1] : '';
+  }
+
+  function extractDocumentLanguageFromSource(sourceHtml) {
+    if (typeof sourceHtml !== 'string' || !sourceHtml.trim()) {
+      return '';
+    }
+
+    const match = sourceHtml.match(/<html[^>]*\blang\s*=\s*["']([^"']+)["']/i);
+    return match ? match[1] : '';
+  }
+
   function extractPersistentShellContentInnerHtml(parsedDocument, sourceHtml) {
     if (parsedDocument && typeof parsedDocument.getElementById === 'function') {
       const contentElement = parsedDocument.getElementById('content');
@@ -1709,7 +1736,7 @@
   }
 
   function replacePersistentShellDocument(parsedDocument, sourceHtml) {
-    if (!parsedDocument || !document || !document.body) {
+    if (!document || !document.body) {
       return false;
     }
 
@@ -1719,32 +1746,35 @@
     }
 
     const nextContentHtml = extractPersistentShellContentInnerHtml(parsedDocument, sourceHtml);
-    if (!nextContentHtml) {
+    if (!hasPersistentShellContent(parsedDocument, sourceHtml)) {
       return false;
     }
 
-    if (document.documentElement && parsedDocument.documentElement && typeof parsedDocument.documentElement.getAttribute === 'function') {
-      const nextLanguage = parsedDocument.documentElement.getAttribute('lang');
-      if (nextLanguage && typeof document.documentElement.setAttribute === 'function') {
-        document.documentElement.setAttribute('lang', nextLanguage);
-      }
+    const nextLanguage = parsedDocument && parsedDocument.documentElement && typeof parsedDocument.documentElement.getAttribute === 'function'
+      ? parsedDocument.documentElement.getAttribute('lang')
+      : extractDocumentLanguageFromSource(sourceHtml);
+    if (nextLanguage && document.documentElement && typeof document.documentElement.setAttribute === 'function') {
+      document.documentElement.setAttribute('lang', nextLanguage);
     }
 
-    if (typeof parsedDocument.title === 'string' && typeof document.title === 'string') {
-      document.title = parsedDocument.title;
+    const nextTitle = parsedDocument && typeof parsedDocument.title === 'string'
+      ? parsedDocument.title
+      : extractDocumentTitleFromSource(sourceHtml);
+    if (nextTitle && typeof document.title === 'string') {
+      document.title = nextTitle;
     }
 
     currentContent.innerHTML = nextContentHtml;
 
     const currentSiteNav = document.getElementById('site-nav');
     const nextSiteNavInnerHtml = extractPersistentShellSiteNavInnerHtml(parsedDocument, sourceHtml);
-    if (currentSiteNav && nextSiteNavInnerHtml) {
+    if (currentSiteNav && hasPersistentShellSiteNav(parsedDocument, sourceHtml)) {
       currentSiteNav.innerHTML = nextSiteNavInnerHtml;
     }
 
     const currentFooterNav = safeQuerySelector('nav.footer-nav');
     const nextFooterNavInnerHtml = extractPersistentShellFooterNavInnerHtml(parsedDocument, sourceHtml);
-    if (currentFooterNav && nextFooterNavInnerHtml) {
+    if (currentFooterNav && hasPersistentShellFooterNav(parsedDocument, sourceHtml)) {
       currentFooterNav.innerHTML = nextFooterNavInnerHtml;
     }
 
@@ -1791,12 +1821,9 @@
       }
 
       const html = await response.text();
-      if (!isTrustedShellResponseHtml(html)) {
-        throw new Error('page-untrusted');
-      }
       const parsedDocument = parsePersistentShellDocument(html);
-      if (!parsedDocument) {
-        throw new Error('page-unparsable');
+      if (!isTrustedShellResponseHtml(html, parsedDocument)) {
+        throw new Error('page-untrusted');
       }
       destroyApp({ preserveAudio: true });
 
