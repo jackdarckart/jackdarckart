@@ -1473,23 +1473,23 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
 function testStickyPlayerCssKeepsPlayerWithinViewport() {
   assert.match(
     stylesCode,
-    /\.sticky-player\s*\{[\s\S]*left:\s*max\(1rem,\s*env\(safe-area-inset-left,\s*0px\)\);[\s\S]*right:\s*max\(1rem,\s*env\(safe-area-inset-right,\s*0px\)\);[\s\S]*width:\s*min\(34rem,\s*100%\);[\s\S]*margin-inline:\s*auto;[\s\S]*transform:\s*translateY\(1rem\);/,
-    'sticky player should use inset-based positioning and vertical-only transform so it stays inside viewport bounds'
+    /:root\s*\{[\s\S]*--sticky-bottom-space:\s*clamp\(/,
+    'layout should reserve a responsive sticky-player bottom safe area via CSS variable'
   );
   assert.match(
     stylesCode,
-    /\.sticky-player\.is-visible\s*\{[\s\S]*transform:\s*translateY\(0\);/,
-    'sticky player visible state should avoid horizontal translate offsets'
+    /body\s*\{[\s\S]*padding-bottom:\s*var\(--sticky-bottom-space\);/,
+    'page body should reserve sticky-player space so controls are not clipped by viewport bottom overlays'
   );
   assert.match(
     stylesCode,
-    /@media \(max-width:\s*720px\)\s*\{[\s\S]*\.sticky-player\s*\{[\s\S]*left:\s*max\(0\.75rem,\s*env\(safe-area-inset-left,\s*0px\)\);[\s\S]*right:\s*max\(0\.75rem,\s*env\(safe-area-inset-right,\s*0px\)\);[\s\S]*width:\s*min\(30rem,\s*100%\);[\s\S]*max-width:\s*min\(30rem,\s*calc\(100% - 1\.5rem\)\);/,
-    'mobile sticky player should keep explicit viewport-safe horizontal insets'
+    /\.sticky-player\s*\{[\s\S]*--sticky-edge:\s*max\([^;]*safe-area-inset-left[^;]*safe-area-inset-right[^;]*\);[\s\S]*left:\s*var\(--sticky-edge\);[\s\S]*right:\s*var\(--sticky-edge\);[\s\S]*width:\s*min\(36rem,\s*calc\(100vw - \(var\(--sticky-edge\) \* 2\)\)\);/,
+    'sticky player should compute viewport-safe insets and width from safe-area edges to stay fully visible'
   );
   assert.match(
     stylesCode,
-    /@media \(max-width:\s*720px\)\s*\{[\s\S]*\.sticky-player-actions\s*\{[\s\S]*flex-wrap:\s*wrap;/,
-    'mobile sticky player actions should wrap to remain usable on narrow widths'
+    /@media \(max-width:\s*720px\)\s*\{[\s\S]*\.sticky-player\s*\{[\s\S]*width:\s*calc\(100vw - \(var\(--sticky-edge\) \* 2\)\);[\s\S]*max-width:\s*calc\(100vw - \(var\(--sticky-edge\) \* 2\)\);[\s\S]*\}[\s\S]*\.sticky-player-actions\s*\{[\s\S]*grid-template-columns:\s*1fr;/,
+    'mobile sticky player should use full safe viewport width and stack quick actions into one column'
   );
 }
 

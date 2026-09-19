@@ -18,13 +18,13 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 
 ## Designkonzept (aktuell)
 
-Das Frontend nutzt eine gemeinsame, dunkle Markenoberfläche für alle zwölf Seiten:
+Das Frontend nutzt eine gemeinsame, modernisierte Markenoberfläche für alle zwölf Seiten:
 
-- neonartige Gradient-Akzente, Raster-/Signalflächen und visuelle „Console“-Module ohne externe Bild- oder Font-Abhängigkeiten
-- konsistente Navigationslogik mit den Bereichen **Hören**, **Entdecken** und **Infos**
-- variierte Seitenmuster statt reiner Kartenreihen (Hero-Console, Split-Features, Timeline/Flow, Feed-Module, horizontale Scroller)
-- bewusst gestaltete Empty States mit redaktionellen Pflegehinweisen statt „leerer Container“
-- Scroll-Reveal nur defensiv und mit sofort sichtbarem Fallback bei `prefers-reduced-motion`
+- neue Glass-/Gradient-Ästhetik mit klarer Typo-Hierarchie und konsistenten Oberflächen in Dark- und Light-Theme
+- responsive Raster- und Spacing-Logik für Desktop, Tablet und Mobile mit reduzierten Umbrüchen in Navigation und Content-Modulen
+- neu integrierter Sticky-Player mit viewport-sicherer Breite, Safe-Area-Abständen und mobiler Einspalten-Aktion
+- visuell zusammenhängende Bereiche für Hero, Player, Editorial-Module, Timeline und Feed ohne zusätzliche Build- oder UI-Abhängigkeiten
+- defensive Motion-Strategie mit sofort sichtbarem Fallback bei `prefers-reduced-motion`
 
 ## Pflegehinweise für Inhalte
 
