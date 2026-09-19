@@ -77,7 +77,7 @@
         <aside class="panel player-card" id="player" aria-labelledby="player-title">
           <div class="player-head">
             <div>
-              <span class="eyebrow">Live-Player · GitHub Pages</span>
+              <span class="eyebrow">Direkter Browser-Player · Offizieller Streamzugang</span>
               <h2 id="player-title">jackdarckart Radio</h2>
             </div>
             <div class="eq" id="equalizer" aria-hidden="true">
@@ -90,19 +90,19 @@
             <span id="status-text">Bereit zum Start</span>
           </div>
 
-          <p class="note" id="message">Der Stream lädt erst nach deinem Klick. Wenn dein Browser blockiert oder die Verbindung stockt, kannst du direkt erneut versuchen.</p>
+          <p class="note" id="message">Die Wiedergabe startet erst nach deiner Aktion. Browser-Blockaden, Ladezustände und Neuversuche werden hier direkt angezeigt.</p>
 
-          <div class="status-grid" aria-label="Player-Diagnose">
+          <div class="status-grid" aria-label="Player-Status und Diagnose">
             <p class="status-meta">
-              <span class="meta-label">Verbindung</span>
+              <span class="meta-label">Netzstatus</span>
               <span id="network-status">Wird geprüft</span>
             </p>
             <p class="status-meta">
-              <span class="meta-label">Player</span>
+              <span class="meta-label">Playerstatus</span>
               <span id="player-state-label">Bereit</span>
             </p>
             <p class="status-meta">
-              <span class="meta-label">Neuversuch</span>
+              <span class="meta-label">Retry</span>
               <span id="retry-status">Manuell verfügbar</span>
             </p>
           </div>
@@ -120,11 +120,11 @@
           </label>
           <input id="volume" type="range" min="0" max="100" step="1" value="70" aria-label="Lautstärke">
 
-          <p class="share-status note" id="share-status" aria-live="polite">Aktuelle Titelinformationen findest du direkt auf laut.fm.</p>
+          <p class="share-status note" id="share-status" aria-live="polite">Titelinfos und Senderdetails laufen weiterhin direkt über laut.fm.</p>
 
           <div class="player-links">
-            <a class="button secondary" href="https://stream.laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Stream direkt öffnen</a>
-            <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Senderseite auf laut.fm</a>
+            <a class="button secondary" href="https://stream.laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Direkten Stream öffnen</a>
+            <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Offizielle Senderseite</a>
           </div>
 
           <audio id="audio" preload="none" playsinline>
@@ -256,7 +256,7 @@
   <div class="sticky-player" id="sticky-player" data-state="ready" aria-label="Schnellzugriff auf den Player">
     <div class="sticky-player-copy">
       <strong id="sticky-status-text">Bereit zum Start</strong>
-      <span id="sticky-message">Der Stream startet erst nach deinem Klick.</span>
+      <span id="sticky-message">Wiedergabe und Status laufen kontrolliert direkt im Browser.</span>
     </div>
     <div class="sticky-player-actions">
       <button class="button primary sticky-play-button" id="sticky-play" type="button" aria-pressed="false">Stream starten</button>
