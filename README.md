@@ -20,6 +20,7 @@ Die Website bleibt bewusst eine kleine, statische Landingpage ohne Build-Pipelin
 - `styles.css` – responsives Layout, Sticky-Elemente, technische Player-UI, FAQ-Design und visuelle Gestaltung
 - `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-Verhalten, Statusdiagnose, Share-Funktion und defensive Browser-APIs
 - `CNAME` – Custom Domain `stream-musik.space`
+- `tests/app.test.js` – schlanker Node-basierter Regressionstest für zentrale Player-Flows und defensive Initialisierung
 
 Die Website benötigt **keinen Build-Schritt** und wird direkt aus dem Repository-Root veröffentlicht.
 
@@ -78,6 +79,7 @@ Für diese statische Website ist keine separate `security.txt` mit verifizierter
 Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. Für Änderungen an der statischen Seite wurden daher gezielte lokale Prüfungen verwendet, zum Beispiel:
 
 - JavaScript-Syntaxprüfung mit `node --check app.js`
+- schlanker Regressionstest mit `node tests/app.test.js`
 - HTML/CSS/JS-Manuelltest über einen lokalen statischen Server
 - Wiedergabe-Flows manuell prüfen: Start, Pause, Stumm, Lautstärke, Browser-Blockierung, Retry, Pufferung und Sticky-Quick-Access
 - Mobile/Tablet/Desktop-Layout mit Fokus auf Navigation, Player-Status und FAQ-Sektionen prüfen

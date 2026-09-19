@@ -39,6 +39,7 @@
   const retryStatus = document.getElementById('retry-status');
   const stickyPlayer = document.getElementById('sticky-player');
   const stickyPlayButton = document.getElementById('sticky-play');
+  const STREAM_URL_RESOLVED = normalizeUrl(STREAM_URL);
 
   let currentState = 'ready';
   let loadTimer = 0;
@@ -47,6 +48,28 @@
   let wantsPlayback = false;
   let hasConfirmedPlayback = false;
   let lastAudibleVolume = 70;
+
+  function normalizeUrl(value) {
+    if (!value) {
+      return '';
+    }
+
+    try {
+      return new window.URL(value, window.location.href).href;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function hasStreamSource() {
+    if (!audio) {
+      return false;
+    }
+
+    const attributeValue = typeof audio.getAttribute === 'function' ? audio.getAttribute('src') : '';
+    const candidates = [attributeValue, audio.currentSrc, audio.src];
+    return candidates.some((candidate) => normalizeUrl(candidate) === STREAM_URL_RESOLVED);
+  }
 
   function readStorage(key) {
     try {
@@ -78,6 +101,10 @@
   }
 
   function updateEqualizer(isPlaying) {
+    if (!equalizer || typeof equalizer.querySelectorAll !== 'function') {
+      return;
+    }
+
     equalizer.querySelectorAll('i').forEach((bar) => {
       bar.style.animationPlayState = isPlaying ? 'running' : 'paused';
     });
@@ -103,6 +130,10 @@
   }
 
   function updateRetryButton() {
+    if (!retryButton) {
+      return;
+    }
+
     retryButton.hidden = currentState !== 'error' && currentState !== 'blocked';
     retryButton.dataset.state = retryButton.hidden ? 'hidden' : 'action-needed';
   }
@@ -165,10 +196,16 @@
 
   function setState(type, title, detail) {
     currentState = type;
-    status.dataset.state = type;
-    status.setAttribute('aria-busy', String(type === 'loading'));
-    statusText.textContent = title;
-    message.textContent = detail;
+    if (status) {
+      status.dataset.state = type;
+      status.setAttribute('aria-busy', String(type === 'loading'));
+    }
+    if (statusText) {
+      statusText.textContent = title;
+    }
+    if (message) {
+      message.textContent = detail;
+    }
     updateEqualizer(type === 'playing');
     updatePlayButton();
     updateRetryButton();
@@ -177,6 +214,10 @@
   }
 
   function updateMuteButton() {
+    if (!muteButton || !audio) {
+      return;
+    }
+
     const muted = audio.muted;
     muteButton.textContent = muted ? 'Ton an' : 'Stumm';
     muteButton.setAttribute('aria-pressed', String(muted));
@@ -185,9 +226,17 @@
   }
 
   function updateVolume(value) {
+    if (!audio) {
+      return;
+    }
+
     const normalized = Math.max(0, Math.min(100, Number.parseInt(String(value), 10) || 0));
-    volumeInput.value = String(normalized);
-    volumeText.textContent = normalized + '%';
+    if (volumeInput) {
+      volumeInput.value = String(normalized);
+    }
+    if (volumeText) {
+      volumeText.textContent = normalized + '%';
+    }
     audio.volume = normalized / 100;
 
     if (normalized > 0) {
@@ -240,12 +289,20 @@
   }
 
   function stopAudioAfterFailure() {
+    if (!audio) {
+      return;
+    }
+
     if (!audio.paused) {
       audio.pause();
     }
   }
 
   function pausePlayback() {
+    if (!audio) {
+      return;
+    }
+
     wantsPlayback = false;
     reconnectAttempts = 0;
     clearLoadTimer();
@@ -256,8 +313,15 @@
   }
 
   function ensureStreamSource(forceReload) {
-    const hasSource = audio.src === STREAM_URL;
+    if (!audio) {
+      return forceReload;
+    }
+
+    const hasSource = hasStreamSource();
     if (!hasSource) {
+      if (typeof audio.setAttribute === 'function') {
+        audio.setAttribute('src', STREAM_URL);
+      }
       audio.src = STREAM_URL;
       forceReload = true;
     }
@@ -265,6 +329,8 @@
     if (forceReload) {
       audio.load();
     }
+
+    return forceReload;
   }
 
   function scheduleLoadTimeout() {
@@ -327,6 +393,15 @@
   }
 
   async function attemptPlayback(forceReload) {
+    if (!audio) {
+      setState(
+        'error',
+        'Player nicht verfügbar.',
+        'Die Audio-Komponente konnte nicht initialisiert werden. Bitte lade die Seite neu oder nutze den Direktstream.'
+      );
+      return;
+    }
+
     wantsPlayback = true;
     clearReconnectTimer();
     setState(
@@ -341,7 +416,7 @@
         audio.pause();
       }
 
-      ensureStreamSource(forceReload);
+      forceReload = ensureStreamSource(forceReload);
       await audio.play();
     } catch (error) {
       handlePlaybackFailure(error);
@@ -349,6 +424,15 @@
   }
 
   async function togglePlayback() {
+    if (!audio) {
+      setState(
+        'error',
+        'Player nicht verfügbar.',
+        'Die Audio-Komponente fehlt auf der Seite. Bitte lade neu oder öffne den Direktstream.'
+      );
+      return;
+    }
+
     if (currentState === 'loading') {
       pausePlayback();
       setState('paused', 'Start wurde abgebrochen.', 'Tippe auf „Stream starten“, um den Streamzugang direkt neu aufzubauen.');
@@ -361,15 +445,23 @@
     }
 
     reconnectAttempts = 0;
-    await attemptPlayback(audio.getAttribute('src') !== STREAM_URL);
+    await attemptPlayback(!hasStreamSource());
   }
 
   function closeMenu() {
+    if (!menuToggle || !siteNav) {
+      return;
+    }
+
     menuToggle.setAttribute('aria-expanded', 'false');
     siteNav.classList.remove('is-open');
   }
 
   function openMenu() {
+    if (!menuToggle || !siteNav) {
+      return;
+    }
+
     menuToggle.setAttribute('aria-expanded', 'true');
     siteNav.classList.add('is-open');
   }
@@ -404,16 +496,22 @@
     try {
       if (navigator.share) {
         await navigator.share(shareData);
-        shareStatus.textContent = 'Link erfolgreich geteilt.';
+        if (shareStatus) {
+          shareStatus.textContent = 'Link erfolgreich geteilt.';
+        }
         return;
       }
 
       await copyToClipboard(window.location.href);
-      shareStatus.textContent = 'Link in die Zwischenablage kopiert.';
+      if (shareStatus) {
+        shareStatus.textContent = 'Link in die Zwischenablage kopiert.';
+      }
     } catch (error) {
-      shareStatus.textContent = error && error.name === 'AbortError'
-        ? 'Teilen wurde abgebrochen.'
-        : 'Teilen war nicht möglich. Du kannst die Adresse manuell kopieren.';
+      if (shareStatus) {
+        shareStatus.textContent = error && error.name === 'AbortError'
+          ? 'Teilen wurde abgebrochen.'
+          : 'Teilen war nicht möglich. Du kannst die Adresse manuell kopieren.';
+      }
     }
   }
 
@@ -437,17 +535,24 @@
   }
 
   function setBackToTopVisibility() {
-    backToTopButton.classList.toggle('is-visible', window.scrollY > 480);
+    if (backToTopButton) {
+      backToTopButton.classList.toggle('is-visible', window.scrollY > 480);
+    }
 
     if (!stickyPlayer) {
       return;
     }
 
-    const playerCardVisible = status.getBoundingClientRect().top < window.innerHeight && status.getBoundingClientRect().bottom > 0;
+    const statusRect = status ? status.getBoundingClientRect() : null;
+    const playerCardVisible = Boolean(statusRect) && statusRect.top < window.innerHeight && statusRect.bottom > 0;
     stickyPlayer.classList.toggle('is-visible', window.scrollY > 260 && !playerCardVisible);
   }
 
   function bindNavigation() {
+    if (!menuToggle || !siteNav) {
+      return;
+    }
+
     menuToggle.addEventListener('click', () => {
       if (siteNav.classList.contains('is-open')) {
         closeMenu();
@@ -478,126 +583,148 @@
     });
   }
 
-  year.textContent = String(new Date().getFullYear());
+  if (year) {
+    year.textContent = String(new Date().getFullYear());
+  }
 
   updateVolume(getStoredVolume());
-  audio.muted = getStoredMuted() || audio.volume === 0;
+  if (audio) {
+    audio.muted = getStoredMuted() || audio.volume === 0;
+  }
   updateMuteButton();
   setState('ready', 'Bereit zum Start', 'Die Wiedergabe startet erst nach deiner Aktion und meldet Status sowie Neuversuche direkt im Player.');
   setupMediaSession();
   bindNavigation();
   setBackToTopVisibility();
 
-  shareButton.addEventListener('click', handleShare);
-  playButton.addEventListener('click', togglePlayback);
+  if (shareButton) {
+    shareButton.addEventListener('click', handleShare);
+  }
+  if (playButton) {
+    playButton.addEventListener('click', togglePlayback);
+  }
   if (stickyPlayButton) {
     stickyPlayButton.addEventListener('click', togglePlayback);
   }
-  retryButton.addEventListener('click', () => {
-    reconnectAttempts = 0;
-    attemptPlayback(true);
-  });
-  muteButton.addEventListener('click', () => {
-    if (audio.muted && audio.volume === 0) {
-      updateVolume(lastAudibleVolume || 70);
-    }
-    audio.muted = !audio.muted;
-    updateMuteButton();
-    writeStorage(STORAGE_KEYS.muted, String(audio.muted));
-  });
-  volumeInput.addEventListener('input', () => updateVolume(volumeInput.value));
+  if (retryButton) {
+    retryButton.addEventListener('click', () => {
+      reconnectAttempts = 0;
+      attemptPlayback(true);
+    });
+  }
+  if (muteButton) {
+    muteButton.addEventListener('click', () => {
+      if (!audio) {
+        return;
+      }
 
-  audio.addEventListener('loadstart', () => {
-    if (!wantsPlayback) {
-      return;
-    }
-    setState('loading', 'Verbindung wird aufgebaut …', 'Der Livestream wird geladen, die Verbindung geprüft und der Browser-Start vorbereitet.');
-    scheduleLoadTimeout();
-  });
+      if (audio.muted && audio.volume === 0) {
+        updateVolume(lastAudibleVolume || 70);
+      }
+      audio.muted = !audio.muted;
+      updateMuteButton();
+      writeStorage(STORAGE_KEYS.muted, String(audio.muted));
+    });
+  }
+  if (volumeInput) {
+    volumeInput.addEventListener('input', () => updateVolume(volumeInput.value));
+  }
 
-  audio.addEventListener('playing', () => {
-    clearLoadTimer();
-    clearReconnectTimer();
-    reconnectAttempts = 0;
-    hasConfirmedPlayback = true;
-    wantsPlayback = true;
-    setState('playing', 'Der Livestream läuft.', 'Du hörst jetzt jackdarckart direkt über den offiziellen laut.fm-Stream im Browser.');
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.playbackState = 'playing';
-    }
-  });
+  if (audio) {
+    audio.addEventListener('loadstart', () => {
+      if (!wantsPlayback) {
+        return;
+      }
+      setState('loading', 'Verbindung wird aufgebaut …', 'Der Livestream wird geladen, die Verbindung geprüft und der Browser-Start vorbereitet.');
+      scheduleLoadTimeout();
+    });
 
-  audio.addEventListener('pause', () => {
-    clearLoadTimer();
-    clearReconnectTimer();
-    if (wantsPlayback || audio.ended || currentState === 'error' || currentState === 'blocked') {
-      return;
-    }
-    setState('paused', 'Der Stream ist pausiert.', 'Starte die Wiedergabe jederzeit erneut oder wechsle auf einen externen Hörweg.');
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.playbackState = 'paused';
-    }
-  });
-
-  audio.addEventListener('waiting', () => {
-    if (!wantsPlayback) {
-      return;
-    }
-    setState('loading', 'Stream puffert …', 'Die Verbindung wird stabilisiert. Falls nötig, folgt automatisch ein Neuversuch im Player.');
-    scheduleLoadTimeout();
-  });
-
-  audio.addEventListener('stalled', () => {
-    if (!wantsPlayback) {
-      return;
-    }
-
-    if (hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
-      reconnectAttempts += 1;
-      setState(
-        'loading',
-        'Stream verbindet sich neu …',
-        'Die Verbindung stockt. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft direkt im Player.'
-      );
+    audio.addEventListener('playing', () => {
+      clearLoadTimer();
       clearReconnectTimer();
-      reconnectTimer = window.setTimeout(() => {
-        attemptPlayback(true);
-      }, RECONNECT_DELAY_MS);
-      return;
-    }
+      reconnectAttempts = 0;
+      hasConfirmedPlayback = true;
+      wantsPlayback = true;
+      setState('playing', 'Der Livestream läuft.', 'Du hörst jetzt jackdarckart direkt über den offiziellen laut.fm-Stream im Browser.');
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing';
+      }
+    });
 
-    wantsPlayback = false;
-    stopAudioAfterFailure();
-    setState('error', 'Die Verbindung stockt.', 'Bitte tippe auf „Erneut versuchen“ oder wechsle auf den Direktstream beziehungsweise die offizielle Senderseite.');
-  });
+    audio.addEventListener('pause', () => {
+      clearLoadTimer();
+      clearReconnectTimer();
+      if (wantsPlayback || audio.ended || currentState === 'error' || currentState === 'blocked') {
+        return;
+      }
+      setState('paused', 'Der Stream ist pausiert.', 'Starte die Wiedergabe jederzeit erneut oder wechsle auf einen externen Hörweg.');
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'paused';
+      }
+    });
 
-  audio.addEventListener('error', () => {
-    clearLoadTimer();
-    clearReconnectTimer();
+    audio.addEventListener('waiting', () => {
+      if (!wantsPlayback) {
+        return;
+      }
+      setState('loading', 'Stream puffert …', 'Die Verbindung wird stabilisiert. Falls nötig, folgt automatisch ein Neuversuch im Player.');
+      scheduleLoadTimeout();
+    });
 
-    if (wantsPlayback && hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
-      reconnectAttempts += 1;
-      setState(
-        'loading',
-        'Stream verbindet sich neu …',
-        'Der Stream antwortet nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft direkt im Player.'
-      );
-      reconnectTimer = window.setTimeout(() => {
-        attemptPlayback(true);
-      }, RECONNECT_DELAY_MS);
-      return;
-    }
+    audio.addEventListener('stalled', () => {
+      if (!wantsPlayback) {
+        return;
+      }
 
-    wantsPlayback = false;
-    stopAudioAfterFailure();
-    setState('error', 'Stream momentan nicht verfügbar.', getNetworkFailureText());
-  });
+      if (hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
+        reconnectAttempts += 1;
+        setState(
+          'loading',
+          'Stream verbindet sich neu …',
+          'Die Verbindung stockt. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft direkt im Player.'
+        );
+        clearReconnectTimer();
+        reconnectTimer = window.setTimeout(() => {
+          attemptPlayback(true);
+        }, RECONNECT_DELAY_MS);
+        return;
+      }
+
+      wantsPlayback = false;
+      stopAudioAfterFailure();
+      setState('error', 'Die Verbindung stockt.', 'Bitte tippe auf „Erneut versuchen“ oder wechsle auf den Direktstream beziehungsweise die offizielle Senderseite.');
+    });
+
+    audio.addEventListener('error', () => {
+      clearLoadTimer();
+      clearReconnectTimer();
+
+      if (wantsPlayback && hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
+        reconnectAttempts += 1;
+        setState(
+          'loading',
+          'Stream verbindet sich neu …',
+          'Der Stream antwortet nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft direkt im Player.'
+        );
+        reconnectTimer = window.setTimeout(() => {
+          attemptPlayback(true);
+        }, RECONNECT_DELAY_MS);
+        return;
+      }
+
+      wantsPlayback = false;
+      stopAudioAfterFailure();
+      setState('error', 'Stream momentan nicht verfügbar.', getNetworkFailureText());
+    });
+  }
 
   window.addEventListener('scroll', setBackToTopVisibility, { passive: true });
   window.addEventListener('resize', setBackToTopVisibility);
   window.addEventListener('online', updateNetworkStatus);
   window.addEventListener('offline', updateNetworkStatus);
-  backToTopButton.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  if (backToTopButton) {
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 }());
