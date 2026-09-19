@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">stream-musik.space App-Icon</title>
+  <desc id="desc">Dunkles Neon-App-Icon mit den Buchstaben JD.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8f6bff"/>
+      <stop offset="50%" stop-color="#ff4fd8"/>
+      <stop offset="100%" stop-color="#55e6ff"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#090b16"/>
+  <rect x="36" y="36" width="440" height="440" rx="96" fill="url(#bg)" opacity="0.14"/>
+  <circle cx="388" cy="124" r="58" fill="#55e6ff" opacity="0.22" filter="url(#glow)"/>
+  <circle cx="142" cy="388" r="74" fill="#ff4fd8" opacity="0.16" filter="url(#glow)"/>
+  <path d="M168 118h54v182c0 54-30 96-92 96-23 0-48-8-68-23l25-42c12 8 28 15 41 15 26 0 40-14 40-46V118Zm119 0h67c69 0 116 36 116 102 0 44-22 76-58 92l74 82h-72l-61-70h-12v70h-54V118Zm54 49v109h15c37 0 58-20 58-55 0-35-21-54-58-54h-15Z" fill="#f6f8ff" filter="url(#glow)"/>
+</svg>
