@@ -24,7 +24,7 @@ Die Website bleibt bewusst eine kleine, statische Landingpage ohne Build-Pipelin
 - `CNAME` – Custom Domain `stream-musik.space`
 - `tests/app.test.js` – schlanker Node-basierter Regressionstest für zentrale Player-Flows und defensive Initialisierung
 - `manifest.webmanifest` – PWA-Basis für installierbare Darstellung ohne Service Worker
-- `assets/*.svg` – App-/Social-Icons als vektorbasierte Assets
+- `assets/*.svg` und `assets/icon-*.png` – App-/Social-Icons für Browser, PWA-Installationen und Social-Preview
 - `.well-known/security.txt` – standardisierter Kontaktweg für Security-Meldungen
 - `.github/workflows/validate-static-player.yml` – CI-Workflow für Syntax und Regressionstests
 

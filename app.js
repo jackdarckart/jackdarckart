@@ -401,6 +401,9 @@
       });
     } finally {
       window.clearTimeout(timeout);
+      if (requestId === nowPlayingRequestId && nowPlayingAbortController === requestAbortController) {
+        nowPlayingAbortController = null;
+      }
     }
   }
 
