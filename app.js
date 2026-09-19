@@ -230,22 +230,26 @@
       return;
     }
 
-    const normalized = Math.max(0, Math.min(100, Number.parseInt(String(value), 10) || 0));
+    const numericValue = Number.parseInt(String(value), 10);
+    const normalized = Number.isFinite(numericValue)
+      ? Math.max(0, Math.min(100, numericValue))
+      : 0;
+
     if (volumeInput) {
       volumeInput.value = String(normalized);
     }
+
     if (volumeText) {
       volumeText.textContent = normalized + '%';
     }
-    audio.volume = normalized / 100;
 
-    if (normalized > 0) {
-      lastAudibleVolume = normalized;
-    }
+    audio.volume = normalized / 100;
 
     if (normalized === 0) {
       audio.muted = true;
-    } else if (audio.muted) {
+      lastAudibleVolume = Math.max(1, lastAudibleVolume || 70);
+    } else {
+      lastAudibleVolume = normalized;
       audio.muted = false;
     }
 
@@ -607,10 +611,14 @@
     year.textContent = String(new Date().getFullYear());
   }
 
-  updateVolume(getStoredVolume());
+  const initialVolume = getStoredVolume();
+  lastAudibleVolume = initialVolume > 0 ? initialVolume : 70;
+  updateVolume(initialVolume);
+
   if (audio) {
-    audio.muted = getStoredMuted() || audio.volume === 0;
+    audio.muted = getStoredMuted();
   }
+
   updateMuteButton();
   setState('ready', 'Bereit zum Start', 'Die Wiedergabe startet erst nach deiner Aktion und meldet Status sowie Neuversuche direkt im Player.');
   setupMediaSession();
@@ -641,15 +649,28 @@
       if (audio.muted && audio.volume === 0) {
         updateVolume(lastAudibleVolume || 70);
         audio.muted = false;
+      } else if (audio.muted) {
+        updateVolume(lastAudibleVolume || 70);
       } else {
-        audio.muted = !audio.muted;
+        lastAudibleVolume = Math.max(1, Math.round(audio.volume * 100));
+        audio.muted = true;
+        audio.volume = Math.max(0, audio.volume);
       }
+
       updateMuteButton();
       writeStorage(STORAGE_KEYS.muted, String(audio.muted));
+      writeStorage(STORAGE_KEYS.volume, String(Math.round(audio.volume * 100)));
+      if (volumeText) {
+        volumeText.textContent = String(Math.round(audio.volume * 100)) + '%';
+      }
+      if (volumeInput) {
+        volumeInput.value = String(Math.round(audio.volume * 100));
+      }
     });
   }
   if (volumeInput) {
     volumeInput.addEventListener('input', () => updateVolume(volumeInput.value));
+    volumeInput.addEventListener('change', () => updateVolume(volumeInput.value));
   }
 
   if (audio) {
