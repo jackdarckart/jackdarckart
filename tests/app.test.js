@@ -746,6 +746,38 @@ async function testScheduleHandlesOvernightWraparound() {
   assert.match(highlightCards[1].children[0].textContent, /Morgenmix/, 'next entry should still be identified after an overnight live slot');
 }
 
+async function testScheduleRespectsConfiguredTimezone() {
+  const env = createEnvironment({
+    now: '2026-09-21T00:30:00Z',
+    appConfig: {
+      content: {
+        schedule: {
+          timeZone: 'UTC',
+          entries: [
+            {
+              day: 'Sonntag',
+              start: '23:00',
+              end: '01:00',
+              title: 'UTC Late Show'
+            },
+            {
+              day: 'Montag',
+              start: '02:00',
+              end: '03:00',
+              title: 'UTC Next'
+            }
+          ]
+        }
+      }
+    }
+  });
+
+  const highlightCards = env.elements['schedule-highlight'].children;
+  assert.equal(highlightCards.length, 2, 'configured timezone should still produce live and next highlights');
+  assert.match(highlightCards[0].children[0].textContent, /UTC Late Show/, 'schedule should evaluate the current show in the configured timezone');
+  assert.match(highlightCards[1].children[0].textContent, /UTC Next/, 'schedule should compute the next show in the configured timezone');
+}
+
 async function testKeyboardShortcutsRespectInteractiveTargets() {
   const env = createEnvironment({
     missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
@@ -946,6 +978,7 @@ async function main() {
   await testFavoritesCanBeAddedAndRemovedLocally();
   await testScheduleShowsLiveAndNextWhenConfigured();
   await testScheduleHandlesOvernightWraparound();
+  await testScheduleRespectsConfiguredTimezone();
   await testFeedbackUsesHonestFallbacksAndValidation();
   await testFeedbackUsesConfiguredMailtoTarget();
   console.log('app.js player tests passed');
