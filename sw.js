@@ -31,6 +31,16 @@ const STATIC_PAGE_PATHS = new Set(
     .map((asset) => new URL(asset, self.location.href).pathname)
 );
 
+function isStaticPageRequest(request, url) {
+  if (!request || !url) {
+    return false;
+  }
+
+  return request.mode === 'navigate'
+    || request.destination === 'document'
+    || STATIC_PAGE_PATHS.has(url.pathname);
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
@@ -79,7 +89,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (request.mode === 'navigate') {
+  if (isStaticPageRequest(request, url)) {
     event.respondWith(
       fetch(request)
         .then((response) => {

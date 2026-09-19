@@ -178,6 +178,43 @@ function flushMicrotasks() {
   return chain;
 }
 
+function createCacheStorage(initialEntries = {}) {
+  const entries = new Map(Object.entries(initialEntries));
+
+  function resolveKey(request) {
+    if (typeof request === 'string') {
+      return request;
+    }
+    if (request && typeof request.url === 'string') {
+      return request.url;
+    }
+    return String(request);
+  }
+
+  return {
+    async open() {
+      return {
+        async add() {},
+        async put(request, response) {
+          entries.set(resolveKey(request), response);
+        },
+        async match(request) {
+          return entries.get(resolveKey(request)) || null;
+        }
+      };
+    },
+    async match(request) {
+      return entries.get(resolveKey(request)) || null;
+    },
+    async keys() {
+      return ['stream-musik-space-v3'];
+    },
+    async delete() {
+      return true;
+    }
+  };
+}
+
 function createEnvironment(options = {}) {
   const missingIds = new Set(options.missingIds || []);
   const documentListeners = new Map();
@@ -188,6 +225,7 @@ function createEnvironment(options = {}) {
   let openedUrl = '';
   let scrollCall = null;
   let openedWindow = null;
+  const cacheStorage = createCacheStorage(options.cacheMatches || {});
   const metaThemeColor = new MockElement('meta-theme-color');
   metaThemeColor.setAttribute('content', '#070b18');
 
@@ -430,6 +468,7 @@ function createEnvironment(options = {}) {
       };
     },
     fetch: options.fetch,
+    caches: cacheStorage,
     __JACKDARCKART_CONFIG__: options.appConfig || {},
     DOMParser: class MockDOMParser {
       parseFromString(html) {
@@ -502,6 +541,7 @@ function createEnvironment(options = {}) {
     Object,
     Intl,
     AbortController,
+    caches: cacheStorage,
     setTimeout: windowObject.setTimeout,
     clearTimeout: windowObject.clearTimeout
   });
@@ -998,6 +1038,45 @@ async function testInternalNavigationAcceptsValidShellPagesWithoutDomParser() {
   assert.equal(env.elements.audio.paused, false, 'the preserved audio element should remain in its active playback state');
 }
 
+async function testInternalNavigationFallsBackToCachedPageWhenOffline() {
+  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a></nav><main id="content"><h1>Live hören</h1><p>Offline aus dem Cache.</p></main><nav class="footer-nav"><a href="./live.html" aria-current="page">Live</a></nav><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const env = createEnvironment({
+    fetch: async (url) => {
+      if (String(url).includes('api.laut.fm')) {
+        return { ok: true, json: async () => ({}) };
+      }
+      throw new Error('offline');
+    },
+    cacheMatches: {
+      'https://stream-musik.space/live.html': { ok: true, text: async () => pageHtml }
+    }
+  });
+
+  env.window.history = {
+    pushed: null,
+    replaced: null,
+    pushState(_state, _title, url) {
+      this.pushed = url;
+      env.window.location.href = url;
+    },
+    replaceState(_state, _title, url) {
+      this.replaced = url;
+      env.window.location.href = url;
+    }
+  };
+
+  await env.elements.play.dispatch('click');
+  await env.elements.audio.dispatch('playing');
+  await env.window.__JACKDARCKART_APP__.navigateWithinPersistentShell('https://stream-musik.space/live.html');
+  await flushMicrotasks();
+  await flushMicrotasks();
+
+  assert.equal(env.window.history.pushed, 'https://stream-musik.space/live.html', 'cached internal navigation should still update history inside the persistent shell');
+  assert.match(env.elements.content.innerHTML, /Offline aus dem Cache\./, 'cached page markup should be applied when the network fetch fails');
+  assert.equal(env.elements.audio.paused, false, 'cached internal navigation should keep the existing audio instance alive');
+  assert.equal(env.elements.status.dataset.state, 'playing', 'player state should stay hydrated after cached internal navigation');
+}
+
 async function testNavigateHelperUsesHistoryPushStateByDefault() {
   const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a></nav><main id="content"><h1>Live hören</h1></main><nav class="footer-nav"><a href="./live.html" aria-current="page">Live</a></nav><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
   const env = createEnvironment({
@@ -1394,10 +1473,58 @@ function testServiceWorkerCachesAllHtmlPages() {
   for (const file of htmlPages) {
     assert.match(swCode, new RegExp(`['"]${escapeRegExp('./' + file)}['"]`), `service worker should precache ${file}`);
   }
+  assert.match(swCode, /function isStaticPageRequest\(request, url\)/, 'service worker should centralize app-shell page detection');
   assert.match(swCode, /request\.mode === 'navigate'/, 'service worker should handle navigations explicitly');
+  assert.match(swCode, /STATIC_PAGE_PATHS\.has\(url\.pathname\)/, 'service worker should also recognize static page fetches beyond browser navigation mode');
   assert.match(swCode, /cache\.put\(normalizedPageUrl, responseClone\)/, 'navigation responses should be cached under a stable page key');
   assert.match(swCode, /caches\.match\(normalizedPageUrl\)/, 'offline navigation should try the normalized cached page first');
   assert.match(swCode, /OFFLINE_FALLBACK_URL/, 'service worker should keep an explicit offline fallback entry point');
+}
+
+async function testServiceWorkerServesCachedStaticPageRequestsOffline() {
+  const cacheStorage = createCacheStorage({
+    'https://stream-musik.space/live.html': { status: 200, type: 'basic', text: async () => '<main id="content">offline</main>' }
+  });
+  const listeners = new Map();
+  const selfObject = {
+    location: new URL('https://stream-musik.space/sw.js'),
+    addEventListener(type, listener) {
+      listeners.set(type, listener);
+    },
+    skipWaiting() {},
+    clients: {
+      claim() {}
+    }
+  };
+  const context = vm.createContext({
+    self: selfObject,
+    caches: cacheStorage,
+    fetch: async () => {
+      throw new Error('offline');
+    },
+    URL,
+    Promise,
+    console
+  });
+
+  vm.runInContext(swCode, context, { filename: 'sw.js' });
+
+  let responsePromise = null;
+  listeners.get('fetch')({
+    request: {
+      method: 'GET',
+      url: 'https://stream-musik.space/live.html',
+      mode: 'same-origin',
+      destination: ''
+    },
+    respondWith(promise) {
+      responsePromise = Promise.resolve(promise);
+    }
+  });
+
+  const response = await responsePromise;
+  assert.ok(response, 'service worker should answer page-like requests while offline');
+  assert.equal(await response.text(), '<main id="content">offline</main>', 'service worker should return the cached static page response when the network is unavailable');
 }
 
 function testIssueHelpPageAndTemplatesArePresent() {
@@ -1435,11 +1562,13 @@ function testIssueHelpPageAndTemplatesArePresent() {
 async function main() {
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
+  await testServiceWorkerServesCachedStaticPageRequestsOffline();
   testIssueHelpPageAndTemplatesArePresent();
   testUsesStationSpecificHttpsStreamUrl();
   testAppProvidesPersistentInternalNavigationShell();
   await testInternalNavigationPreservesAudioAcrossPages();
   await testInternalNavigationAcceptsValidShellPagesWithoutDomParser();
+  await testInternalNavigationFallsBackToCachedPageWhenOffline();
   await testNavigateHelperUsesHistoryPushStateByDefault();
   await testPopstateNavigationRewritesDocumentWithoutPushingHistory();
   await testReplaceNavigationUsesHistoryReplaceState();

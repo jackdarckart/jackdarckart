@@ -1605,6 +1605,84 @@
       && hasPersistentShellFooterNav(parsed, html);
   }
 
+  function getPersistentPageRequestUrl(url) {
+    try {
+      const requestUrl = new window.URL(url.href || url, window.location.href);
+      requestUrl.hash = '';
+      return requestUrl.href;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function getPersistentPageCacheUrl(url) {
+    try {
+      const cacheUrl = new window.URL(url.href || url, window.location.href);
+      cacheUrl.hash = '';
+      if (isInternalPageUrl(cacheUrl)) {
+        cacheUrl.search = '';
+      }
+      return cacheUrl.href;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  async function readCachedPersistentShellResponse(destination) {
+    if (!window.caches || typeof window.caches.match !== 'function') {
+      return null;
+    }
+
+    const requestUrl = getPersistentPageRequestUrl(destination);
+    const cacheUrl = getPersistentPageCacheUrl(destination);
+    const candidates = requestUrl && cacheUrl && requestUrl !== cacheUrl
+      ? [requestUrl, cacheUrl]
+      : [requestUrl || cacheUrl];
+
+    for (const candidate of candidates) {
+      if (!candidate) {
+        continue;
+      }
+
+      try {
+        const cachedResponse = await window.caches.match(candidate);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+
+    return null;
+  }
+
+  async function fetchPersistentShellResponse(destination) {
+    let response = null;
+    let networkError = null;
+
+    try {
+      response = await window.fetch(destination.href, { credentials: 'same-origin' });
+    } catch (error) {
+      networkError = error;
+    }
+
+    if (response && response.ok) {
+      return response;
+    }
+
+    const cachedResponse = await readCachedPersistentShellResponse(destination);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    if (response && !response.ok) {
+      throw new Error('page-unavailable');
+    }
+
+    throw networkError || new Error('page-unavailable');
+  }
+
   function shouldHandleInternalNavigation(link, event) {
     if (!link || !link.href || typeof window.fetch !== 'function') {
       return false;
@@ -1815,11 +1893,7 @@
     window[INTERNAL_NAVIGATION_KEY] = true;
 
     try {
-      const response = await window.fetch(destination.href, { credentials: 'same-origin' });
-      if (!response || !response.ok) {
-        throw new Error('page-unavailable');
-      }
-
+      const response = await fetchPersistentShellResponse(destination);
       const html = await response.text();
       const parsedDocument = parsePersistentShellDocument(html);
       if (!isTrustedShellResponseHtml(html, parsedDocument)) {
