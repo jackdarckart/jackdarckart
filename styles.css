@@ -1516,6 +1516,11 @@ html[data-theme="light"] .nav-cluster {
   margin-bottom: 1rem;
 }
 
+.live-side-column .live-insights-grid {
+  grid-template-columns: 1fr;
+  margin-bottom: 0;
+}
+
 .live-insights-heading {
   margin: 0 0 0.25rem;
   grid-column: 1 / -1;
