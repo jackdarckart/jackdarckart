@@ -1265,11 +1265,12 @@
   }
 
   function syncTrackActionButtons() {
+    const visibleFavoritesCount = favoritesState.filter((entry) => matchesLibraryFilter([entry.artist, entry.title, entry.meta])).length;
     if (copyTrackButton) {
       copyTrackButton.disabled = !getCurrentTrackCopyText();
     }
     if (favoritesCopyButton) {
-      favoritesCopyButton.disabled = !favoritesState.length;
+      favoritesCopyButton.disabled = visibleFavoritesCount === 0;
       favoritesCopyButton.textContent = libraryFilterInput ? 'Sichtbare Favoriten kopieren' : 'Alle Favoriten kopieren';
     }
     if (libraryFilterClearButton) {
@@ -2813,9 +2814,9 @@
       const label = new Intl.DateTimeFormat('de-DE', { weekday: 'long', timeZone }).format(timestamp);
       return Object.prototype.hasOwnProperty.call(WEEKDAY_INDEX_BY_LABEL, label.toLocaleLowerCase('de-DE'))
         ? WEEKDAY_INDEX_BY_LABEL[label.toLocaleLowerCase('de-DE')]
-        : timestamp.getDay();
+        : new Date(getDateKeyInTimeZone(timestamp, timeZone) + 'T00:00:00Z').getUTCDay();
     } catch (error) {
-      return timestamp.getDay();
+      return new Date(getDateKeyInTimeZone(timestamp, timeZone) + 'T00:00:00Z').getUTCDay();
     }
   }
 

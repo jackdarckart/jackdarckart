@@ -1569,6 +1569,7 @@ async function testLibraryFilterAndFavoritesCopyStayInSync() {
 
   assert.equal(env.elements['history-list'].children.length, 1, 'library filter should narrow the visible history list');
   assert.equal(env.elements['favorites-list'].children.length, 0, 'library filter should hide favorites that do not match');
+  assert.equal(env.elements['favorites-copy'].disabled, true, 'favorites copy should disable itself when the active filter hides all favorites');
   assert.match(env.elements['library-summary'].textContent, /Filter aktiv: 0 Favoriten · 1 Historieneinträge/, 'library summary should reflect the filtered result counts');
 
   await env.elements['favorites-copy'].dispatch('click');
