@@ -1428,7 +1428,13 @@ body::after {
   z-index: 0;
 }
 
-body > * {
+.site-header,
+main,
+.sticky-player,
+.site-footer,
+.back-to-top,
+.skip-link,
+noscript {
   position: relative;
   z-index: 1;
 }
