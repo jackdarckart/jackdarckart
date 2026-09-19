@@ -444,10 +444,10 @@
       return;
     }
 
-    await startPlayback(true);
+    await startPlayback(true, false);
   }
 
-  async function startPlayback(resetReconnectBudget) {
+  async function startPlayback(resetReconnectBudget, forceReload) {
     if (!audio) {
       setState(
         'error',
@@ -461,7 +461,7 @@
       reconnectAttempts = 0;
     }
 
-    await attemptPlayback(!hasStreamSource());
+    await attemptPlayback(forceReload === true ? true : !hasStreamSource());
   }
 
   function closeMenu() {
@@ -543,7 +543,7 @@
     });
 
     try {
-      navigator.mediaSession.setActionHandler('play', () => startPlayback(false));
+      navigator.mediaSession.setActionHandler('play', () => startPlayback(false, false));
       navigator.mediaSession.setActionHandler('pause', pausePlayback);
     } catch (error) {
       return;
