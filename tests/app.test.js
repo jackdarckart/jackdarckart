@@ -4,7 +4,22 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const appCode = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+const swCode = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 const expectedStreamUrl = 'https://jackdarckart.stream.laut.fm/jackdarckart';
+const htmlPages = [
+  'index.html',
+  'live.html',
+  'titel.html',
+  'sendeplan.html',
+  'events.html',
+  'news.html',
+  'archiv.html',
+  'ueber-uns.html',
+  'hilfe.html',
+  'kontakt.html',
+  'datenschutz.html',
+  'impressum.html'
+];
 
 class MockElement {
   constructor(id, ownerDocument) {
@@ -974,7 +989,31 @@ async function testFeedbackUsesConfiguredMailtoTarget() {
   assert.match(env.window.location.href, /^mailto:radio@example\.com\?subject=/, 'mailto flow should keep the mailbox path readable and encode only query values');
 }
 
+function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
+  for (const file of htmlPages) {
+    const html = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+    assert.match(html, /<nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">/, `${file} should include the shared main navigation`);
+    assert.match(html, /<nav class="footer-nav" aria-label="Footer-Navigation">/, `${file} should include the shared footer navigation`);
+    assert.match(html, /<meta name="description" content="[^"]+"/, `${file} should define its own meta description`);
+    assert.match(html, /<link rel="canonical" href="https:\/\/stream-musik\.space\//, `${file} should include a canonical URL`);
+    assert.match(html, /<meta property="og:image" content="https:\/\/stream-musik\.space\/assets\/social-preview\.png">/, `${file} should keep the shared social preview image`);
+    if (file !== 'index.html') {
+      assert.match(html, /<nav class="breadcrumbs" aria-label="Breadcrumb">/, `${file} should include breadcrumbs`);
+    }
+  }
+}
+
+function testServiceWorkerCachesAllHtmlPages() {
+  for (const file of htmlPages) {
+    assert.match(swCode, new RegExp(`['"]\\./${file.replace('.', '\\.')}['"]`), `service worker should precache ${file}`);
+  }
+  assert.match(swCode, /caches\.match\(request\)/, 'navigation fallback should try the requested cached page first');
+  assert.match(swCode, /OFFLINE_FALLBACK_URL/, 'service worker should keep an explicit offline fallback entry point');
+}
+
 async function main() {
+  testAllHtmlPagesExposeSharedNavigationAndMetadata();
+  testServiceWorkerCachesAllHtmlPages();
   testUsesStationSpecificHttpsStreamUrl();
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();

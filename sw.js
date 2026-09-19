@@ -1,10 +1,21 @@
 'use strict';
 
-const CACHE_NAME = 'stream-musik-space-v1';
-const INDEX_URL = new URL('./index.html', self.location.href).href;
+const CACHE_NAME = 'stream-musik-space-v2';
+const OFFLINE_FALLBACK_URL = new URL('./index.html', self.location.href).href;
 const APP_SHELL = [
   './',
   './index.html',
+  './live.html',
+  './titel.html',
+  './sendeplan.html',
+  './events.html',
+  './news.html',
+  './archiv.html',
+  './ueber-uns.html',
+  './hilfe.html',
+  './kontakt.html',
+  './datenschutz.html',
+  './impressum.html',
   './styles.css',
   './app.js',
   './manifest.webmanifest',
@@ -61,12 +72,18 @@ self.addEventListener('fetch', (event) => {
           if (response && response.status === 200 && response.type === 'basic') {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(INDEX_URL, responseClone);
+              cache.put(request, responseClone);
             });
           }
           return response;
         })
-        .catch(() => caches.match(INDEX_URL))
+        .catch(async () => {
+          const cachedPage = await caches.match(request);
+          if (cachedPage) {
+            return cachedPage;
+          }
+          return caches.match(OFFLINE_FALLBACK_URL);
+        })
     );
     return;
   }
