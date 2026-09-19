@@ -1526,7 +1526,11 @@ function testLivePageExposesEnhancedModulesAndHooks() {
     assert.match(liveHtmlCode, new RegExp(`id="${escapeRegExp(hook)}"`), `live page should expose ${hook} for the redesigned live modules`);
   }
 
-  assert.match(liveHtmlCode, /class="wrap content-columns live-insights-grid"/, 'live page should include the responsive insights grid layout');
+  assert.match(
+    liveHtmlCode,
+    /class="(?=[^"]*\bwrap\b)(?=[^"]*\bcontent-columns\b)(?=[^"]*\blive-insights-grid\b)[^"]*"/,
+    'live page should include the responsive insights grid layout'
+  );
 }
 
 function testServiceWorkerCachesAllHtmlPages() {
