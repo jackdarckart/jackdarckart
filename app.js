@@ -1569,6 +1569,32 @@
     return url.pathname === '/' || /\.html$/i.test(url.pathname);
   }
 
+  function isTrustedShellResponseHtml(html) {
+    if (typeof html !== 'string' || !html.trim()) {
+      return false;
+    }
+
+    if (typeof window.DOMParser === 'function') {
+      try {
+        const parsed = new window.DOMParser().parseFromString(html, 'text/html');
+        if (!parsed || !parsed.documentElement) {
+          return false;
+        }
+
+        const hasMain = typeof parsed.getElementById === 'function' && parsed.getElementById('content');
+        const hasAudio = typeof parsed.getElementById === 'function' && parsed.getElementById('audio');
+        const hasAppScript = typeof parsed.querySelector === 'function' && parsed.querySelector('script[src$=\"app.js\"]');
+        return Boolean(hasMain && hasAudio && hasAppScript);
+      } catch (error) {
+        return false;
+      }
+    }
+
+    return /<main[^>]+id=\"content\"/i.test(html)
+      && /<audio[^>]+id=\"audio\"/i.test(html)
+      && /<script[^>]+src=\"\.\/app\.js\"/i.test(html);
+  }
+
   function shouldHandleInternalNavigation(link, event) {
     if (!link || !link.href || typeof window.fetch !== 'function') {
       return false;
@@ -1627,6 +1653,9 @@
       }
 
       const html = await response.text();
+      if (!isTrustedShellResponseHtml(html)) {
+        throw new Error('page-untrusted');
+      }
       destroyApp({ preserveAudio: true });
 
       if (!options || !options.fromPopState) {
@@ -1642,6 +1671,8 @@
       document.close();
     } catch (error) {
       window[INTERNAL_NAVIGATION_KEY] = false;
+      window[PERSISTENT_AUDIO_KEY] = null;
+      window[PERSISTENT_STATE_KEY] = null;
       window.location.href = destination.href;
     }
   }
