@@ -2843,8 +2843,9 @@
     }
     if (filterValue === 'week') {
       const todayWeekday = getWeekdayIndexInTimeZone(new Date(), timeZone);
+      const localizedWeekday = todayWeekday === 0 ? 7 : todayWeekday;
       const allowedDateKeys = new Set();
-      for (let offset = 0; offset <= (6 - todayWeekday); offset += 1) {
+      for (let offset = 0; offset <= (7 - localizedWeekday); offset += 1) {
         allowedDateKeys.add(buildDateKeyFromCalendarParts(todayParts, offset));
       }
       return snapshot.allUpcoming.filter((entry) => allowedDateKeys.has(getDateKeyInTimeZone(entry.startsAt, timeZone)));

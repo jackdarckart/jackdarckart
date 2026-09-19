@@ -1328,6 +1328,51 @@ async function testScheduleFilterCanLimitUpcomingAgenda() {
   assert.match(env.elements['schedule-summary'].textContent, /1 kommende Einträge für morgen/i, 'schedule summary should describe the active filter result');
 }
 
+async function testScheduleWeekFilterTreatsSundayAsWeekEnd() {
+  const env = createEnvironment({
+    now: '2026-09-27T10:00:00+02:00',
+    fetch: async (url) => {
+      if (url.endsWith('/schedule')) {
+        return {
+          ok: true,
+          json: async () => ([
+            {
+              starts: '2026-09-27T19:00:00+02:00',
+              ends: '2026-09-27T21:00:00+02:00',
+              playlist: { name: 'Sunday Closing' },
+              type: 'playlist'
+            },
+            {
+              starts: '2026-09-28T08:00:00+02:00',
+              ends: '2026-09-28T09:00:00+02:00',
+              playlist: { name: 'Next Monday' },
+              type: 'playlist'
+            }
+          ])
+        };
+      }
+      if (url.endsWith('/current_song')) {
+        return { ok: true, json: async () => ({}) };
+      }
+      if (url.endsWith('/last_songs')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 0 }) };
+      }
+      if (url.endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  assert.equal(env.elements['schedule-list'].children.length, 1, 'week filter should stop at Sunday instead of including the next Monday');
+  assert.match(env.elements['schedule-list'].children[0].children[0].textContent, /Sunday Closing/, 'week filter should keep the remaining entry from the current Sunday');
+}
+
 async function testKeyboardShortcutsRespectInteractiveTargets() {
   const env = createEnvironment({
     missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
@@ -1999,6 +2044,7 @@ async function main() {
   await testSameOriginProxyConfigurationIsUsedWhenProvided();
   await testScheduleUsesOfficialApiEntriesForLiveAndNext();
   await testScheduleFilterCanLimitUpcomingAgenda();
+  await testScheduleWeekFilterTreatsSundayAsWeekEnd();
   await testEmptyStatesExplainHowSectionsAreMaintained();
   await testFeedbackUsesHonestFallbacksAndValidation();
   await testFeedbackUsesConfiguredMailtoTarget();
