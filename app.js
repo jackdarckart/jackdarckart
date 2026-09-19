@@ -55,6 +55,7 @@
   let hasConfirmedPlayback = false;
   let lastAudibleVolume = 70;
   let nowPlayingAbortController = null;
+  let nowPlayingRequestId = 0;
 
   function normalizeUrl(value) {
     if (!value) {
@@ -329,6 +330,8 @@
       nowPlayingAbortController.abort();
     }
     const requestAbortController = typeof AbortController === 'function' ? new AbortController() : null;
+    const requestId = nowPlayingRequestId + 1;
+    nowPlayingRequestId = requestId;
     nowPlayingAbortController = requestAbortController;
 
     const timeout = window.setTimeout(() => {
@@ -357,6 +360,9 @@
       const payload = await response.json();
       const normalized = normalizeNowPlayingPayload(payload);
       const now = formatNowPlayingTimestamp(new Date());
+      if (requestId !== nowPlayingRequestId || nowPlayingAbortController !== requestAbortController) {
+        return;
+      }
 
       if (!normalized) {
         updateNowPlayingView('unavailable', {
@@ -375,6 +381,9 @@
         updatedAt: 'Zuletzt aktualisiert: ' + now
       });
     } catch (error) {
+      if (requestId !== nowPlayingRequestId || nowPlayingAbortController !== requestAbortController) {
+        return;
+      }
       const now = formatNowPlayingTimestamp(new Date());
       updateNowPlayingView('error', {
         stateText: 'Nicht verfügbar',
