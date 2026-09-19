@@ -774,6 +774,7 @@ input[type="range"] {
 }
 
 input[type="text"],
+input[type="search"],
 input[type="number"],
 select,
 textarea {
@@ -786,6 +787,7 @@ textarea {
 }
 
 html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="search"],
 html[data-theme="light"] input[type="number"],
 html[data-theme="light"] select,
 html[data-theme="light"] textarea {
@@ -837,6 +839,16 @@ select[aria-invalid="true"] {
 
 .field-group > span {
   font-weight: 700;
+}
+
+.schedule-tools,
+.library-tools {
+  max-width: 28rem;
+}
+
+#library-summary,
+#schedule-summary {
+  min-height: 1.6em;
 }
 
 .shortcut-list,

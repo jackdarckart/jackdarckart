@@ -90,6 +90,7 @@
         <p class="share-status note" id="now-playing-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
         <div class="share-actions section-gap-top">
           <button class="button secondary" id="favorite-track" type="button" disabled>Zu Favoriten</button>
+          <button class="button secondary" id="copy-track" type="button" disabled>Titel kopieren</button>
           <button class="button secondary" id="share" type="button" data-share-target="page">Titelansicht teilen</button>
           <button class="button secondary" id="share-stream" type="button" data-share-target="stream">Direktstream teilen</button>
         </div>
@@ -145,8 +146,20 @@
       <article class="panel content-panel editorial-note">
         <div class="subpanel-head">
           <h2>Lokale Favoriten</h2>
+          <span class="subpanel-label">Filter, Kopie und lokale Sicherung</span>
+        </div>
+        <div class="stack-fields section-gap-top">
+          <label class="field-group" for="library-filter">
+            <span>Favoriten &amp; Historie filtern</span>
+            <input id="library-filter" type="search" inputmode="search" autocomplete="off" placeholder="z. B. Artist, Titel oder Album">
+          </label>
+        </div>
+        <div class="share-actions section-gap-top" aria-label="Favoriten-Werkzeuge">
+          <button class="button secondary" id="library-filter-clear" type="button">Filter löschen</button>
+          <button class="button secondary" id="favorites-copy" type="button">Favoriten kopieren</button>
           <button class="button secondary" id="favorites-clear" type="button">Liste leeren</button>
         </div>
+        <p class="note compact-note" id="library-summary">Bibliotheksfilter wird vorbereitet.</p>
         <ul class="favorites-list" id="favorites-list" hidden></ul>
         <p class="empty-history note" id="favorites-empty">Noch keine lokalen Favoriten gespeichert.</p>
         <p class="note compact-note">Favoriten bleiben ausschließlich im lokalen Browser-Speicher erhalten. Wenn du Browserdaten löschst oder localStorage blockiert ist, verschwindet diese Liste wieder.</p>

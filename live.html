@@ -141,6 +141,7 @@
           <button class="button icon-button" id="mute" type="button" aria-pressed="false" aria-label="Ton stummschalten">Ton an</button>
           <button class="button icon-button" id="retry" type="button" hidden>Erneut versuchen</button>
           <button class="button icon-button" id="favorite-track" type="button" data-state="ready" disabled>Zu Favoriten</button>
+          <button class="button icon-button" id="copy-track" type="button" disabled>Titel kopieren</button>
           <button class="button icon-button" id="share" type="button" data-share-target="page">Live-Seite teilen</button>
         </div>
 
@@ -194,7 +195,10 @@
             <p class="share-status note" id="favorite-status" aria-live="polite">Favoriten-Status: bereit.</p>
             <ul class="favorites-list" id="favorites-list" hidden></ul>
             <p class="note compact-note" id="favorites-empty">Noch keine lokalen Favoriten gespeichert.</p>
-            <button class="button secondary" id="favorites-clear" type="button" disabled>Favoritenliste leeren</button>
+            <div class="share-actions" aria-label="Favoriten-Werkzeuge">
+              <button class="button secondary" id="favorites-copy" type="button" disabled>Favoriten kopieren</button>
+              <button class="button secondary" id="favorites-clear" type="button" disabled>Favoritenliste leeren</button>
+            </div>
           </section>
 
           <section class="subpanel compact-panel" aria-labelledby="shortcuts-title">

@@ -10,7 +10,7 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 - interne Seitennavigation ohne vollständigen Reload: die Shell bleibt bestehen und tauscht nur `main#content`/Navigationsmarkierungen aus, damit derselbe laufende Webplayer beim Seitenwechsel erhalten bleibt
 - sichtbare Status-, Fehler-, Retry-, Puffer- und Offline-Hinweise
 - kompakte Startseite plus getrennte Inhaltsseiten für Live, Titel, Sendeplan, Events, News, Archiv, Hilfe, Issue-Hilfe, Kontakt, Datenschutz und Impressum
-- Sleep-Timer, Tastaturkürzel, Theme-Umschaltung, lokale Favoriten und Share-Funktionen
+- Sleep-Timer, Tastaturkürzel, Theme-Umschaltung, lokale Favoriten, Filter-/Kopierhilfen und Share-Funktionen
 - Live-Daten aus der offiziellen laut.fm-API für Songs, Senderprofil, Hörerzahl, Next Artists und Sendeplan
 - informative Fehler-/Leerzustände ohne erfundene Termine, Titel, Hörerzahlen oder Archivdaten
 - installierbare PWA mit Service Worker für statische App-Shell-Ressourcen
@@ -76,8 +76,8 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
-- `titel.html` – aktueller Titel, Historie, lokale Favoriten und Teilen
-- `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik
+- `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
+- `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
 - `events.html` – bestätigte Events und Specials oder professioneller Leerzustand
 - `news.html` – Sender-/Website-Neuigkeiten oder redaktioneller Leerzustand
 - `archiv.html` – Mix-/Sendungsarchiv mit ehrlichem Leerzustand für verifizierte Inhalte
