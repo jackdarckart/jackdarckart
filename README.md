@@ -9,7 +9,9 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 - direkte Browser-Wiedergabe nach echter Nutzeraktion
 - sichtbare Status-, Fehler-, Retry- und Offline-Hinweise
 - Now-Playing- und Historienbereich mit ehrlichem Fallback ohne erfundene Live-Daten
+- Sleep-Timer, dokumentierte Tastaturkürzel und lokale Favoriten ohne Backend
 - Share-Funktionen für Website und Direktstream mit nativer Browser-API plus Clipboard-Fallback
+- statischen Sendeplan sowie Songwunsch-/Feedback-Bereich via `mailto:` oder GitHub-Issue-Fallback
 - installierbare PWA mit Manifest, Service Worker und App-Shell-Caching
 - Dark/Light/Auto-Theme mit defensiver `localStorage`-Nutzung
 - statische Bereiche für Events, News, Archiv sowie Plattform-Links
@@ -17,9 +19,9 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 
 ## Struktur
 
-- `index.html` – semantische Startseite mit Meta-Tags, Direktplayer-Markup, PWA-/Now-Playing-/Historienbereichen und Inhaltssektionen
-- `styles.css` – responsives Layout, Theme-Varianten, Player-UI, Statuskarten und Inhaltsdarstellung
-- `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-Verhalten, Theme/PWA/Share-Logik, defensive Storage-Zugriffe und konfigurierbare Datenquellen
+- `index.html` – semantische Startseite mit Meta-Tags, Direktplayer-Markup, Sleep-Timer-/Favoriten-/Feedback-UI, PWA-/Now-Playing-/Historienbereichen und Inhaltssektionen
+- `styles.css` – responsives Layout, Theme-Varianten, Player-UI, Statuskarten, Formular-/Schedule-Karten und Inhaltsdarstellung
+- `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-/Sleep-Timer-Verhalten, Theme/PWA/Share-/Favoriten-Logik, defensive Storage-Zugriffe und konfigurierbare Datenquellen
 - `manifest.webmanifest` – PWA-Metadaten für Installation und Branding
 - `sw.js` – Service Worker für statische App-Ressourcen und Offline-Fallback ohne Audiostream-Caching
 - `assets/app-icon.svg` – SVG-App-Icon
@@ -98,12 +100,27 @@ Wichtig:
 
 ### Statische Inhalte pflegen
 
-Events, News, Archiv und Plattform-Links werden ebenfalls zentral in `app.js` über `APP_CONFIG.content` gepflegt.
+Events, News, Archiv, Plattform-Links und der Sendeplan werden ebenfalls zentral in `app.js` über `APP_CONFIG.content` gepflegt.
 
 Beispielstruktur:
 
 ```js
 content: {
+  schedule: {
+    timeZone: 'Europe/Berlin',
+    entries: [
+      {
+        day: 'Freitag',
+        start: '20:00',
+        end: '22:00',
+        title: 'Beispielsendung',
+        host: 'DJ Beispiel',
+        genre: 'House',
+        description: 'Nur verwenden, wenn die Angaben verifiziert sind.',
+        isPlaceholder: true
+      }
+    ]
+  },
   events: [
     {
       title: 'Beispielplatzhalter',
@@ -120,6 +137,34 @@ content: {
 ```
 
 Leere Arrays sind ausdrücklich erlaubt; die Seite zeigt dann automatisch professionelle Leerzustände mit Pflegehinweis.
+
+Für `schedule.entries` gilt:
+
+- `day`: `0` bis `6` oder Wochentag wie `Montag`, `Freitag`, `Mon`
+- `start` / `end`: `HH:MM` im 24h-Format
+- `isPlaceholder: true` kennzeichnet bewusst nur Beispiel-/Platzhalterdaten
+- der Live-/Next-Hinweis arbeitet standardmäßig mit `Europe/Berlin`
+
+### Kontakt- und Feedback-Ziele
+
+Der Songwunsch-/Feedback-Bereich nutzt ausschließlich lokale Link-Erzeugung. Ziele werden zentral unter `APP_CONFIG.content.contact` gepflegt:
+
+```js
+contact: {
+  email: 'radio@example.com',
+  issueUrl: 'https://github.com/jackdarckart/jackdarckart/issues',
+  stationUrl: 'https://laut.fm/jackdarckart'
+}
+```
+
+- Ohne `email` bleibt der E-Mail-Button deaktiviert und der UI-Hinweis verweist ehrlich auf GitHub Issues.
+- Es werden keine Formulardaten gespeichert oder an externe Formdienste gesendet.
+
+### Lokale Browser-Funktionen
+
+- **Sleep-Timer:** Optionen `aus`, `15`, `30`, `60` Minuten sowie benutzerdefiniert `1–480` Minuten. Beim manuellen Stop wird der aktive Timer zurückgesetzt.
+- **Tastaturkürzel:** `Leertaste` Play/Pause, `M` Stumm, `↑/↓` Lautstärke, `S` Teilen, `T` nach oben. Aktiv nur außerhalb von `input`, `textarea`, `select`, `button`, `a` und `contenteditable`.
+- **Favoriten:** aktuelle Titel werden ausschließlich lokal via `localStorage` gespeichert; bei blockiertem Storage bleibt die Oberfläche funktionsfähig und meldet den Fehler defensiv.
 
 ### Theme
 
@@ -159,6 +204,7 @@ Der Service Worker cached **nicht** den Live-Audiostream. Offline wird stattdess
 - klarer Player-Status für bereit, lädt, spielt, pausiert, Browser-Blockierung und Fehler
 - sichtbare Browser-/Verbindungsdiagnose und Auto-Reconnect-Hinweise nach echter Nutzeraktion
 - Lautstärke-, Mute- und Theme-Einstellungen werden defensiv aus `localStorage` gelesen
+- lokale Favoriten werden defensiv aus `localStorage` gelesen und nur im Browser des Nutzers gespeichert
 - keine unvalidierte HTML-Injektion: DOM-Updates laufen über `textContent`, Attribute und bekannte Elemente
 - Service Worker cached nur eigene statische App-Ressourcen, nicht den Livestream
 
@@ -186,6 +232,7 @@ Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. 
 - JavaScript-Syntaxprüfung mit `node --check sw.js`
 - schlanker Regressionstest mit `node tests/app.test.js`
 - HTML/CSS/JS-Manuelltest über einen lokalen statischen Server
+- manuelle Prüfung von Sleep-Timer, Tastaturkürzeln, Favoriten, Sendeplan-Status und Songwunsch-/Feedback-Aktionen
 - PWA-Prüfung über Browser-DevTools (Manifest, Service Worker, Offline-Cache)
 - Wiedergabe-Flows manuell prüfen: Start, Pause, Mute, Lautstärke, Browser-Blockierung, Retry, Pufferung und Sticky-Quick-Access
 - Offline-/Online-Wechsel manuell prüfen: Hinweisbanner, Recovery-Retry und statische Offline-Oberfläche
@@ -197,7 +244,9 @@ Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. 
 1. **Desktop (Chrome/Firefox/Safari):**
    - Seite laden
    - `Stream starten` klicken
-   - Pause, Mute, Lautstärke und Teilen testen
+   - Pause, Mute, Lautstärke, Sleep-Timer und Teilen testen
+   - Tastaturkürzel außerhalb von Formularfeldern prüfen
+   - Now-Playing-Favorit setzen/entfernen, sofern Metadaten verfügbar sind
    - Theme wechseln und Reload prüfen
    - Netzwerk kurz deaktivieren und Retry-/Offline-Verhalten prüfen
 
@@ -215,4 +264,9 @@ Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. 
 4. **Mit echter Now-Playing-Quelle:**
    - API-Endpunkt in `app.js` eintragen
    - `connect-src` in der CSP anpassen, falls externe Domain nötig ist
-   - prüfen, dass Titel, Interpret, Historie, Media Session und Share-Text korrekt aktualisiert werden
+   - prüfen, dass Titel, Interpret, Historie, Favoriten-Button, Media Session und Share-Text korrekt aktualisiert werden
+
+5. **Mit gepflegtem Sendeplan / Feedback-Zielen:**
+   - `APP_CONFIG.content.schedule.entries` mit verifizierten Daten pflegen
+   - prüfen, dass „Jetzt live“/„Als Nächstes“ in deutscher Darstellung korrekt berechnet werden
+   - optionale `contact.email` hinterlegen und E-Mail-/Issue-Flows mit validierten Eingaben testen

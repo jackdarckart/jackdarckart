@@ -4,7 +4,8 @@
   const STORAGE_KEYS = {
     volume: 'jackdarckart-volume',
     muted: 'jackdarckart-muted',
-    theme: 'jackdarckart-theme'
+    theme: 'jackdarckart-theme',
+    favorites: 'jackdarckart-favorites'
   };
   const STREAM_URL = 'https://jackdarckart.stream.laut.fm/jackdarckart';
   const LOAD_TIMEOUT_MS = 10000;
@@ -23,6 +24,7 @@
   const DATE_TIME_FORMATTER = typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function'
     ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' })
     : null;
+  const WEEKDAY_LABELS = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
   const audio = document.getElementById('audio');
   const playButton = document.getElementById('play');
@@ -59,16 +61,37 @@
   const installPromptShell = document.getElementById('install-prompt');
   const installButton = document.getElementById('install-app');
   const installStatus = document.getElementById('install-status');
+  const sleepTimerSelect = document.getElementById('sleep-timer-select');
+  const sleepCustomWrap = document.getElementById('sleep-custom-wrap');
+  const sleepCustomMinutes = document.getElementById('sleep-custom-minutes');
+  const sleepApplyButton = document.getElementById('sleep-apply');
+  const sleepCancelButton = document.getElementById('sleep-cancel');
+  const sleepRemaining = document.getElementById('sleep-remaining');
   const nowPlayingTitle = document.getElementById('now-playing-track');
   const nowPlayingArtist = document.getElementById('now-playing-artist');
   const nowPlayingSource = document.getElementById('now-playing-source');
   const stationStatus = document.getElementById('station-status');
+  const favoriteTrackButton = document.getElementById('favorite-track');
+  const favoriteStatus = document.getElementById('favorite-status');
+  const favoritesList = document.getElementById('favorites-list');
+  const favoritesEmpty = document.getElementById('favorites-empty');
+  const favoritesClearButton = document.getElementById('favorites-clear');
   const historyList = document.getElementById('history-list');
   const historyEmpty = document.getElementById('history-empty');
+  const scheduleHighlight = document.getElementById('schedule-highlight');
+  const scheduleList = document.getElementById('schedule-list');
   const eventsList = document.getElementById('events-list');
   const newsList = document.getElementById('news-list');
   const archiveList = document.getElementById('archive-list');
   const platformLinks = document.getElementById('platform-links');
+  const feedbackKind = document.getElementById('feedback-kind');
+  const feedbackName = document.getElementById('feedback-name');
+  const feedbackSubject = document.getElementById('feedback-subject');
+  const feedbackMessage = document.getElementById('feedback-message');
+  const feedbackEmailButton = document.getElementById('feedback-email');
+  const feedbackIssueButton = document.getElementById('feedback-issue');
+  const feedbackStatus = document.getElementById('feedback-status');
+  const feedbackEmailHint = document.getElementById('feedback-email-hint');
   const STREAM_URL_RESOLVED = normalizeUrl(STREAM_URL);
   const themeColorMeta = safeQuerySelector('meta[name="theme-color"]');
 
@@ -89,6 +112,10 @@
     current: null,
     history: []
   };
+  let favoritesState = [];
+  let sleepTimerId = 0;
+  let sleepEndAt = 0;
+  let lastPauseReason = '';
 
   function createAppConfig(overrides) {
     const directStreamUrl = normalizeUrl(STREAM_URL) || STREAM_URL;
@@ -121,6 +148,10 @@
             description: 'Datenschutzfreundlicher Weg für Feedback, Fehler und Wünsche'
           }
         ],
+        schedule: {
+          timeZone: 'Europe/Berlin',
+          entries: []
+        },
         contact: {
           email: '',
           issueUrl: 'https://github.com/jackdarckart/jackdarckart/issues',
@@ -139,6 +170,14 @@
         platformLinks: Array.isArray(overrides.content && overrides.content.platformLinks)
           ? overrides.content.platformLinks
           : defaultConfig.content.platformLinks,
+        schedule: {
+          timeZone: overrides.content && overrides.content.schedule && typeof overrides.content.schedule.timeZone === 'string'
+            ? overrides.content.schedule.timeZone
+            : defaultConfig.content.schedule.timeZone,
+          entries: Array.isArray(overrides.content && overrides.content.schedule && overrides.content.schedule.entries)
+            ? overrides.content.schedule.entries
+            : defaultConfig.content.schedule.entries
+        },
         contact: Object.assign({}, defaultConfig.content.contact, overrides.content && overrides.content.contact)
       }
     };
@@ -250,6 +289,35 @@
     }
 
     return DATE_TIME_FORMATTER.format(date);
+  }
+
+  function prefersReducedMotion() {
+    return Boolean(
+      window.matchMedia
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+  }
+
+  function readJsonStorage(key) {
+    const value = readStorage(key);
+    if (!value) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeJsonStorage(key, value) {
+    try {
+      return writeStorage(key, JSON.stringify(value));
+    } catch (error) {
+      return false;
+    }
   }
 
   function updateEqualizer(isPlaying) {
@@ -568,6 +636,137 @@
     }
   }
 
+  function updateSleepCustomVisibility() {
+    setHidden(sleepCustomWrap, !sleepTimerSelect || sleepTimerSelect.value !== 'custom');
+  }
+
+  function formatDuration(ms) {
+    const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (hours > 0) {
+      return String(hours) + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    }
+
+    return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+  }
+
+  function updateSleepTimerStatus(text) {
+    if (!sleepRemaining) {
+      return;
+    }
+
+    if (text) {
+      sleepRemaining.textContent = text;
+      return;
+    }
+
+    if (!sleepEndAt) {
+      sleepRemaining.textContent = 'Kein Sleep-Timer aktiv.';
+      return;
+    }
+
+    sleepRemaining.textContent = 'Sleep-Timer aktiv · verbleibend ' + formatDuration(sleepEndAt - Date.now());
+  }
+
+  function clearSleepTimer(text) {
+    if (sleepTimerId) {
+      window.clearTimeout(sleepTimerId);
+      sleepTimerId = 0;
+    }
+
+    sleepEndAt = 0;
+    if (sleepTimerSelect) {
+      sleepTimerSelect.value = 'off';
+    }
+    updateSleepCustomVisibility();
+    updateSleepTimerStatus(text || 'Kein Sleep-Timer aktiv.');
+  }
+
+  function tickSleepTimer() {
+    if (!sleepEndAt) {
+      return;
+    }
+
+    const remaining = sleepEndAt - Date.now();
+    if (remaining <= 0) {
+      clearSleepTimer('Sleep-Timer beendet die Wiedergabe.');
+      pausePlayback('sleep-timer');
+      if (audio && audio.paused) {
+        setState('paused', 'Sleep-Timer beendet die Wiedergabe.', 'Der aktive Sleep-Timer ist abgelaufen. Du kannst den Stream jederzeit wieder manuell starten.');
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.playbackState = 'paused';
+        }
+      }
+      return;
+    }
+
+    updateSleepTimerStatus();
+    sleepTimerId = window.setTimeout(tickSleepTimer, Math.min(1000, remaining));
+  }
+
+  function getSelectedSleepDurationMinutes() {
+    if (!sleepTimerSelect) {
+      return 0;
+    }
+
+    if (sleepTimerSelect.value === 'custom') {
+      const customValue = Number.parseInt(sleepCustomMinutes && sleepCustomMinutes.value ? sleepCustomMinutes.value : '', 10);
+      if (!Number.isFinite(customValue) || customValue < 1 || customValue > 480) {
+        updateSleepTimerStatus('Bitte wähle für den Sleep-Timer 1 bis 480 Minuten.');
+        if (sleepCustomMinutes) {
+          sleepCustomMinutes.focus();
+        }
+        return -1;
+      }
+
+      return customValue;
+    }
+
+    return Number.parseInt(sleepTimerSelect.value || '0', 10) || 0;
+  }
+
+  function applySleepTimer() {
+    const minutes = getSelectedSleepDurationMinutes();
+    if (minutes < 0) {
+      return;
+    }
+
+    if (!minutes) {
+      clearSleepTimer('Kein Sleep-Timer aktiv.');
+      return;
+    }
+
+    if (sleepTimerId) {
+      window.clearTimeout(sleepTimerId);
+      sleepTimerId = 0;
+    }
+
+    sleepEndAt = Date.now() + (minutes * 60 * 1000);
+    updateSleepTimerStatus();
+    tickSleepTimer();
+  }
+
+  function getFavoriteStorageEntries() {
+    const stored = readJsonStorage(STORAGE_KEYS.favorites);
+    if (!Array.isArray(stored)) {
+      return [];
+    }
+
+    return stored
+      .filter((entry) => entry && typeof entry === 'object')
+      .map((entry) => ({
+        key: typeof entry.key === 'string' ? entry.key : '',
+        title: typeof entry.title === 'string' ? entry.title : '',
+        artist: typeof entry.artist === 'string' ? entry.artist : '',
+        meta: typeof entry.meta === 'string' ? entry.meta : '',
+        savedAt: typeof entry.savedAt === 'string' ? entry.savedAt : ''
+      }))
+      .filter((entry) => entry.key && (entry.title || entry.artist));
+  }
+
   function getPlaybackPreparationText(forceReload) {
     const isOffline = typeof navigator.onLine === 'boolean' && !navigator.onLine;
 
@@ -598,15 +797,19 @@
     }
   }
 
-  function pausePlayback() {
+  function pausePlayback(reason) {
     if (!audio) {
       return;
     }
 
+    lastPauseReason = reason || 'manual';
     wantsPlayback = false;
     reconnectAttempts = 0;
     clearLoadTimer();
     clearReconnectTimer();
+    if (lastPauseReason !== 'sleep-timer' && sleepEndAt) {
+      clearSleepTimer('Sleep-Timer zurückgesetzt.');
+    }
     if (!audio.paused) {
       audio.pause();
     }
@@ -715,6 +918,7 @@
     }
 
     wantsPlayback = true;
+    lastPauseReason = '';
     showRecoveryRetry = false;
     clearReconnectTimer();
     setState(
@@ -887,6 +1091,116 @@
     await shareTarget(target);
   }
 
+  function setFieldValidity(field, isValid) {
+    if (!field) {
+      return;
+    }
+
+    field.setAttribute('aria-invalid', String(!isValid));
+  }
+
+  function validateFeedbackFields() {
+    const subject = feedbackSubject ? feedbackSubject.value.trim() : '';
+    const messageValue = feedbackMessage ? feedbackMessage.value.trim() : '';
+    const name = feedbackName ? feedbackName.value.trim() : '';
+    const invalidField = !subject
+      ? feedbackSubject
+      : (!messageValue || messageValue.length < 5)
+        ? feedbackMessage
+        : (name.length > 80 ? feedbackName : null);
+
+    setFieldValidity(feedbackSubject, Boolean(subject));
+    setFieldValidity(feedbackMessage, Boolean(messageValue) && messageValue.length >= 5);
+    setFieldValidity(feedbackName, name.length <= 80);
+
+    if (invalidField) {
+      invalidField.focus();
+      setText(feedbackStatus, 'Bitte ergänze mindestens einen Betreff und eine Nachricht mit mindestens 5 Zeichen.');
+      return null;
+    }
+
+    return {
+      kind: feedbackKind ? feedbackKind.value : 'feedback',
+      name,
+      subject,
+      message: messageValue
+    };
+  }
+
+  function buildFeedbackTitle(data) {
+    return (data.kind === 'song' ? 'Songwunsch: ' : 'Feedback: ') + data.subject;
+  }
+
+  function buildFeedbackBody(data) {
+    const lines = [
+      data.kind === 'song' ? 'Art: Songwunsch' : 'Art: Feedback',
+      data.name ? 'Name: ' + data.name : 'Name: anonym',
+      '',
+      data.message,
+      '',
+      'Gesendet über stream-musik.space'
+    ];
+
+    const currentTrack = getCurrentTrackLabel();
+    if (currentTrack) {
+      lines.push('Aktuell angezeigt: ' + currentTrack);
+    }
+
+    return lines.join('\n');
+  }
+
+  function openUrl(url, options) {
+    if (!url) {
+      return;
+    }
+
+    if (options && options.newTab && typeof window.open === 'function') {
+      window.open(url, '_blank', 'noopener');
+      return;
+    }
+
+    window.location.href = url;
+  }
+
+  function handleFeedbackAction(target) {
+    const data = validateFeedbackFields();
+    if (!data) {
+      return;
+    }
+
+    const title = buildFeedbackTitle(data);
+    const body = buildFeedbackBody(data);
+    const contactConfig = APP_CONFIG.content.contact || {};
+    const email = String(contactConfig.email || '').trim();
+    const issueUrl = normalizeUrl(contactConfig.issueUrl);
+
+    if (target === 'email') {
+      if (!email) {
+        setText(feedbackStatus, 'Aktuell ist keine Mailadresse hinterlegt. Nutze bitte den GitHub-Issue-Fallback.');
+        return;
+      }
+
+      const mailtoUrl = 'mailto:' + encodeURIComponent(email)
+        + '?subject=' + encodeURIComponent(title)
+        + '&body=' + encodeURIComponent(body);
+      setText(feedbackStatus, 'E-Mail wird lokal in deinem Mailprogramm vorbereitet.');
+      openUrl(mailtoUrl);
+      return;
+    }
+
+    if (!issueUrl) {
+      setText(feedbackStatus, 'Der GitHub-Issue-Fallback ist derzeit nicht konfiguriert.');
+      return;
+    }
+
+    const separator = issueUrl.indexOf('?') === -1 ? '?' : '&';
+    const issueTarget = issueUrl + separator
+      + 'title=' + encodeURIComponent(title)
+      + '&body=' + encodeURIComponent(body);
+    setText(feedbackStatus, 'GitHub-Issue wird mit deinen lokalen Eingaben vorbereitet.');
+    openUrl(issueTarget, { newTab: true });
+  }
+
   function updateMediaSessionMetadata() {
     if (!('mediaSession' in navigator) || !('MediaMetadata' in window)) {
       return;
@@ -912,6 +1226,72 @@
       navigator.mediaSession.setActionHandler('pause', pausePlayback);
     } catch (error) {
       return;
+    }
+  }
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  }
+
+  function isEditableTarget(target) {
+    if (!target || typeof target !== 'object') {
+      return false;
+    }
+
+    const tagName = typeof target.tagName === 'string' ? target.tagName.toUpperCase() : '';
+    return tagName === 'INPUT'
+      || tagName === 'TEXTAREA'
+      || tagName === 'SELECT'
+      || tagName === 'BUTTON'
+      || tagName === 'A'
+      || Boolean(target.isContentEditable);
+  }
+
+  function handleKeyboardShortcuts(event) {
+    if (!event || event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || isEditableTarget(event.target)) {
+      return;
+    }
+
+    switch (event.key) {
+      case ' ':
+      case 'Spacebar':
+        event.preventDefault();
+        togglePlayback();
+        break;
+      case 'm':
+      case 'M':
+        event.preventDefault();
+        if (audio) {
+          if (audio.muted && audio.volume === 0) {
+            updateVolume(lastAudibleVolume || 70);
+            audio.muted = false;
+          } else {
+            audio.muted = !audio.muted;
+          }
+          updateMuteButton();
+          writeStorage(STORAGE_KEYS.muted, String(audio.muted));
+        }
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        updateVolume((Number.parseInt(volumeInput && volumeInput.value ? volumeInput.value : '0', 10) || 0) + 5);
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        updateVolume((Number.parseInt(volumeInput && volumeInput.value ? volumeInput.value : '0', 10) || 0) - 5);
+        break;
+      case 's':
+      case 'S':
+        event.preventDefault();
+        shareTarget('website');
+        break;
+      case 't':
+      case 'T':
+        event.preventDefault();
+        scrollToTop();
+        break;
+      default:
+        break;
     }
   }
 
@@ -1043,7 +1423,384 @@
     });
   }
 
+  function normalizeFavoriteTrack(track) {
+    if (!track || typeof track !== 'object') {
+      return null;
+    }
+
+    const normalized = {
+      title: String(track.title || '').trim(),
+      artist: String(track.artist || '').trim(),
+      meta: String(track.meta || '').trim()
+    };
+    normalized.key = [normalized.artist, normalized.title, normalized.meta]
+      .map((value) => value.toLowerCase())
+      .join('|');
+
+    return normalized.key && (normalized.title || normalized.artist) ? normalized : null;
+  }
+
+  function isFavoriteTrack(track) {
+    const normalized = normalizeFavoriteTrack(track);
+    return Boolean(normalized) && favoritesState.some((entry) => entry.key === normalized.key);
+  }
+
+  function syncFavoriteButton() {
+    if (!favoriteTrackButton) {
+      return;
+    }
+
+    const hasTrack = Boolean(normalizeFavoriteTrack(nowPlayingState.current));
+    const active = hasTrack && isFavoriteTrack(nowPlayingState.current);
+    favoriteTrackButton.disabled = !hasTrack;
+    favoriteTrackButton.textContent = active ? 'Favorit entfernen' : 'Zu Favoriten';
+    favoriteTrackButton.dataset.state = active ? 'active' : 'ready';
+  }
+
+  function renderFavorites() {
+    if (!favoritesList || !favoritesEmpty) {
+      return;
+    }
+
+    clearElement(favoritesList);
+
+    if (!favoritesState.length) {
+      favoritesList.hidden = true;
+      favoritesEmpty.hidden = false;
+      favoritesEmpty.textContent = 'Noch keine lokalen Favoriten gespeichert.';
+      if (favoritesClearButton) {
+        favoritesClearButton.disabled = true;
+      }
+      syncFavoriteButton();
+      return;
+    }
+
+    favoritesList.hidden = false;
+    favoritesEmpty.hidden = true;
+    if (favoritesClearButton) {
+      favoritesClearButton.disabled = false;
+    }
+
+    favoritesState.forEach((entry) => {
+      const item = document.createElement('li');
+      item.className = 'favorite-item';
+
+      const copy = document.createElement('div');
+      copy.className = 'favorite-copy';
+      copy.appendChild(createDetailBlock('p', 'history-track', [entry.artist, entry.title].filter(Boolean).join(' – ') || 'Ohne Titelangabe'));
+      copy.appendChild(createDetailBlock('p', 'history-meta', entry.meta || (entry.savedAt ? 'Gespeichert am ' + formatDateTime(entry.savedAt) : 'Lokal gespeichert')));
+      item.appendChild(copy);
+
+      const removeButton = document.createElement('button');
+      removeButton.className = 'button secondary';
+      removeButton.type = 'button';
+      removeButton.textContent = 'Entfernen';
+      removeButton.addEventListener('click', () => {
+        favoritesState = favoritesState.filter((favorite) => favorite.key !== entry.key);
+        if (!writeJsonStorage(STORAGE_KEYS.favorites, favoritesState)) {
+          setText(favoriteStatus, 'Favorit konnte nicht lokal aktualisiert werden.');
+        } else {
+          setText(favoriteStatus, 'Favorit entfernt.');
+        }
+        renderFavorites();
+      });
+      item.appendChild(removeButton);
+      favoritesList.appendChild(item);
+    });
+
+    syncFavoriteButton();
+  }
+
+  function loadFavorites() {
+    favoritesState = getFavoriteStorageEntries();
+    renderFavorites();
+  }
+
+  function toggleCurrentFavorite() {
+    const currentTrack = normalizeFavoriteTrack(nowPlayingState.current);
+    if (!currentTrack) {
+      setText(favoriteStatus, 'Für Favoriten werden erst verlässliche Now-Playing-Daten benötigt.');
+      syncFavoriteButton();
+      return;
+    }
+
+    if (favoritesState.some((entry) => entry.key === currentTrack.key)) {
+      favoritesState = favoritesState.filter((entry) => entry.key !== currentTrack.key);
+      if (!writeJsonStorage(STORAGE_KEYS.favorites, favoritesState)) {
+        setText(favoriteStatus, 'Favorit konnte nicht lokal entfernt werden.');
+      } else {
+        setText(favoriteStatus, 'Favorit entfernt.');
+      }
+      renderFavorites();
+      return;
+    }
+
+    favoritesState = [
+      {
+        key: currentTrack.key,
+        title: currentTrack.title,
+        artist: currentTrack.artist,
+        meta: currentTrack.meta,
+        savedAt: new Date().toISOString()
+      }
+    ].concat(favoritesState).slice(0, 50);
+
+    if (!writeJsonStorage(STORAGE_KEYS.favorites, favoritesState)) {
+      favoritesState = getFavoriteStorageEntries();
+      setText(favoriteStatus, 'Favorit konnte nicht lokal gespeichert werden.');
+    } else {
+      setText(favoriteStatus, 'Favorit lokal gespeichert.');
+    }
+    renderFavorites();
+  }
+
+  function clearFavorites() {
+    favoritesState = [];
+    if (!writeJsonStorage(STORAGE_KEYS.favorites, favoritesState)) {
+      setText(favoriteStatus, 'Favoriten konnten nicht geleert werden.');
+      favoritesState = getFavoriteStorageEntries();
+    } else {
+      setText(favoriteStatus, 'Lokale Favoritenliste geleert.');
+    }
+    renderFavorites();
+  }
+
+  function normalizeWeekday(value) {
+    if (Number.isInteger(value) && value >= 0 && value <= 6) {
+      return value;
+    }
+
+    const normalized = String(value || '').trim().toLowerCase();
+    const weekdayMap = {
+      so: 0,
+      sonntag: 0,
+      sunday: 0,
+      mo: 1,
+      montag: 1,
+      monday: 1,
+      di: 2,
+      dienstag: 2,
+      tuesday: 2,
+      mi: 3,
+      mittwoch: 3,
+      wednesday: 3,
+      do: 4,
+      donnerstag: 4,
+      thursday: 4,
+      fr: 5,
+      freitag: 5,
+      friday: 5,
+      sa: 6,
+      samstag: 6,
+      saturday: 6
+    };
+
+    return Object.prototype.hasOwnProperty.call(weekdayMap, normalized) ? weekdayMap[normalized] : -1;
+  }
+
+  function parseScheduleTime(value) {
+    const match = String(value || '').trim().match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+    if (!match) {
+      return null;
+    }
+
+    return {
+      hours: Number.parseInt(match[1], 10),
+      minutes: Number.parseInt(match[2], 10)
+    };
+  }
+
+  function getTimeZoneParts(date, timeZone) {
+    if (!(typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function')) {
+      return null;
+    }
+
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone,
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23'
+    });
+    const parts = formatter.formatToParts(date);
+    const values = {};
+    parts.forEach((part) => {
+      if (part.type !== 'literal') {
+        values[part.type] = part.value;
+      }
+    });
+
+    const weekdayMap = {
+      Sun: 0,
+      Mon: 1,
+      Tue: 2,
+      Wed: 3,
+      Thu: 4,
+      Fri: 5,
+      Sat: 6
+    };
+
+    return {
+      weekday: Object.prototype.hasOwnProperty.call(weekdayMap, values.weekday) ? weekdayMap[values.weekday] : -1,
+      hours: Number.parseInt(values.hour || '0', 10),
+      minutes: Number.parseInt(values.minute || '0', 10)
+    };
+  }
+
+  function formatScheduleMeta(entry, label, timeZone) {
+    const timeLabel = entry.start + '–' + entry.end + ' Uhr';
+    const detailParts = [label, WEEKDAY_LABELS[entry.day] + ' · ' + timeLabel];
+
+    if (entry.host) {
+      detailParts.push(entry.host);
+    }
+    if (entry.genre) {
+      detailParts.push(entry.genre);
+    }
+    if (timeZone) {
+      detailParts.push(timeZone);
+    }
+
+    return detailParts.join(' · ');
+  }
+
+  function getScheduleEntries() {
+    const scheduleConfig = APP_CONFIG.content.schedule || {};
+    return (Array.isArray(scheduleConfig.entries) ? scheduleConfig.entries : [])
+      .map((entry) => {
+        const day = normalizeWeekday(entry && entry.day);
+        const start = parseScheduleTime(entry && entry.start);
+        const end = parseScheduleTime(entry && entry.end);
+        if (day < 0 || !start || !end) {
+          return null;
+        }
+
+        const startMinutes = start.hours * 60 + start.minutes;
+        let endMinutes = end.hours * 60 + end.minutes;
+        if (endMinutes <= startMinutes) {
+          endMinutes += 1440;
+        }
+
+        return {
+          day,
+          start: entry.start,
+          end: entry.end,
+          startMinutes,
+          endMinutes,
+          title: String(entry.title || '').trim() || 'Sendung',
+          host: String(entry.host || '').trim(),
+          genre: String(entry.genre || '').trim(),
+          description: String(entry.description || '').trim(),
+          linkLabel: String(entry.linkLabel || '').trim(),
+          url: normalizeUrl(entry.url),
+          isPlaceholder: Boolean(entry.isPlaceholder)
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => (a.day * 1440 + a.startMinutes) - (b.day * 1440 + b.startMinutes));
+  }
+
+  function buildScheduleSnapshot() {
+    const entries = getScheduleEntries();
+    const timeZone = APP_CONFIG.content.schedule && APP_CONFIG.content.schedule.timeZone
+      ? APP_CONFIG.content.schedule.timeZone
+      : 'Europe/Berlin';
+
+    if (!entries.length) {
+      return { entries, current: null, next: null, upcoming: [], timeZone };
+    }
+
+    const parts = getTimeZoneParts(new Date(), timeZone);
+    if (!parts || parts.weekday < 0) {
+      return { entries, current: null, next: null, upcoming: entries.slice(0, 6), timeZone };
+    }
+
+    const currentMinutesOfWeek = (parts.weekday * 1440) + (parts.hours * 60) + parts.minutes;
+    const weekMinutes = 7 * 1440;
+    const occurrenceEntries = [];
+    let current = null;
+
+    entries.forEach((entry) => {
+      const baseStart = (entry.day * 1440) + entry.startMinutes;
+      const baseEnd = (entry.day * 1440) + entry.endMinutes;
+      const candidates = [0, weekMinutes].map((offset) => ({
+        entry,
+        start: baseStart + offset,
+        end: baseEnd + offset
+      }));
+
+      candidates.forEach((candidate) => {
+        if (candidate.start <= currentMinutesOfWeek && candidate.end > currentMinutesOfWeek) {
+          current = candidate.entry;
+        }
+        if (candidate.end > currentMinutesOfWeek - weekMinutes) {
+          occurrenceEntries.push(candidate);
+        }
+      });
+    });
+
+    const upcoming = occurrenceEntries
+      .filter((candidate) => candidate.end > currentMinutesOfWeek)
+      .sort((a, b) => a.start - b.start)
+      .slice(0, 6)
+      .map((candidate) => candidate.entry);
+
+    const next = upcoming.find((entry) => entry !== current) || null;
+
+    return {
+      entries,
+      current,
+      next,
+      upcoming: upcoming.length ? upcoming : entries.slice(0, 6),
+      timeZone
+    };
+  }
+
+  function renderSchedule() {
+    const snapshot = buildScheduleSnapshot();
+    const highlightItems = [];
+
+    if (snapshot.current) {
+      highlightItems.push({
+        title: snapshot.current.title,
+        meta: formatScheduleMeta(snapshot.current, 'Jetzt live', snapshot.timeZone),
+        description: snapshot.current.description || (snapshot.current.isPlaceholder ? 'Beispiel-/Platzhalterdaten klar gekennzeichnet.' : 'Aktuell laufende Sendung aus der statischen Konfiguration.')
+      });
+    }
+
+    if (snapshot.next) {
+      highlightItems.push({
+        title: snapshot.next.title,
+        meta: formatScheduleMeta(snapshot.next, 'Als Nächstes', snapshot.timeZone),
+        description: snapshot.next.description || 'Nächster statisch gepflegter Programmpunkt.'
+      });
+    }
+
+    renderCollection(scheduleHighlight, highlightItems, {
+      itemTag: 'article',
+      itemClassName: 'content-card-item',
+      headingTag: 'h3',
+      emptyText: 'Noch kein Sendeplan hinterlegt.',
+      hintText: 'Pflege bestätigte Termine in APP_CONFIG.content.schedule.entries. Ohne Einträge bleibt dieser Bereich bewusst leer.'
+    });
+
+    renderCollection(scheduleList, snapshot.upcoming.map((entry) => ({
+      title: entry.title + (entry.isPlaceholder ? ' (Beispiel)' : ''),
+      meta: formatScheduleMeta(entry, 'Geplant', snapshot.timeZone),
+      description: entry.description || (entry.isPlaceholder ? 'Klar gekennzeichneter Beispielplatzhalter.' : 'Statischer Programmeintrag ohne zusätzliche Tracking- oder Fremddaten.'),
+      url: entry.url,
+      linkLabel: entry.linkLabel || 'Mehr dazu'
+    })), {
+      itemTag: 'article',
+      itemClassName: 'content-card-item',
+      headingTag: 'h3',
+      emptyText: 'Derzeit sind keine kommenden Sendungen eingetragen.',
+      hintText: 'Lege bestätigte Wochentage und Start-/Endzeiten in der statischen Schedule-Konfiguration fest.'
+    });
+  }
+
   function renderStaticSections() {
+    renderSchedule();
     renderCollection(eventsList, APP_CONFIG.content.events, {
       itemTag: 'article',
       itemClassName: 'content-card-item',
@@ -1230,6 +1987,7 @@
       current: null,
       history: []
     };
+    syncFavoriteButton();
     updateMediaSessionMetadata();
     updateStationStatus();
   }
@@ -1252,6 +2010,7 @@
     }
 
     renderHistory(history, 'Die Datenquelle meldet derzeit noch keine Historie.');
+    syncFavoriteButton();
     updateMediaSessionMetadata();
     updateStationStatus();
   }
@@ -1364,16 +2123,33 @@
     updateInstallPromptVisibility();
   }
 
+  function updateFeedbackAvailability() {
+    const contactConfig = APP_CONFIG.content.contact || {};
+    const hasEmail = Boolean(String(contactConfig.email || '').trim());
+    if (feedbackEmailButton) {
+      feedbackEmailButton.disabled = !hasEmail;
+    }
+    if (feedbackEmailHint) {
+      feedbackEmailHint.textContent = hasEmail
+        ? 'Die E-Mail wird nur lokal mit deinen Eingaben vorbereitet; gesendet wird erst in deinem Mailprogramm.'
+        : 'Aktuell ist keine Mailadresse hinterlegt. Nutze bitte den GitHub-Issue-Fallback oder die Senderseite.';
+    }
+  }
+
   if (year) {
     year.textContent = String(new Date().getFullYear());
   }
 
   renderStaticSections();
+  loadFavorites();
   updateVolume(getStoredVolume(), { persist: false });
   if (audio) {
     audio.muted = getStoredMuted() || audio.volume === 0;
   }
   updateMuteButton();
+  updateSleepCustomVisibility();
+  updateSleepTimerStatus('Kein Sleep-Timer aktiv.');
+  updateFeedbackAvailability();
   applyTheme(getStoredThemePreference());
   setState('ready', 'Bereit zum Start', 'Die Wiedergabe startet erst nach deiner Aktion und meldet Status sowie Neuversuche direkt im Player.');
   renderNowPlayingFallback(
@@ -1444,6 +2220,32 @@
   if (installButton) {
     installButton.addEventListener('click', handleInstallClick);
   }
+  if (sleepTimerSelect) {
+    sleepTimerSelect.addEventListener('change', () => {
+      updateSleepCustomVisibility();
+      if (sleepTimerSelect.value === 'off' && !sleepEndAt) {
+        updateSleepTimerStatus('Kein Sleep-Timer aktiv.');
+      }
+    });
+  }
+  if (sleepApplyButton) {
+    sleepApplyButton.addEventListener('click', applySleepTimer);
+  }
+  if (sleepCancelButton) {
+    sleepCancelButton.addEventListener('click', () => clearSleepTimer('Kein Sleep-Timer aktiv.'));
+  }
+  if (favoriteTrackButton) {
+    favoriteTrackButton.addEventListener('click', toggleCurrentFavorite);
+  }
+  if (favoritesClearButton) {
+    favoritesClearButton.addEventListener('click', clearFavorites);
+  }
+  if (feedbackEmailButton) {
+    feedbackEmailButton.addEventListener('click', () => handleFeedbackAction('email'));
+  }
+  if (feedbackIssueButton) {
+    feedbackIssueButton.addEventListener('click', () => handleFeedbackAction('issue'));
+  }
 
   if (audio) {
     audio.addEventListener('loadstart', () => {
@@ -1460,6 +2262,7 @@
       reconnectAttempts = 0;
       hasConfirmedPlayback = true;
       wantsPlayback = true;
+      lastPauseReason = '';
       sawOffline = false;
       showRecoveryRetry = false;
       lastSuccessfulStartAt = new Date().toISOString();
@@ -1475,7 +2278,12 @@
       if (wantsPlayback || audio.ended || currentState === 'error' || currentState === 'blocked') {
         return;
       }
-      setState('paused', 'Der Stream ist pausiert.', 'Starte die Wiedergabe jederzeit erneut oder wechsle auf einen externen Hörweg.');
+      if (lastPauseReason === 'sleep-timer') {
+        setState('paused', 'Sleep-Timer beendet die Wiedergabe.', 'Der aktive Sleep-Timer ist abgelaufen. Du kannst den Stream jederzeit wieder manuell starten.');
+      } else {
+        setState('paused', 'Der Stream ist pausiert.', 'Starte die Wiedergabe jederzeit erneut oder wechsle auf einen externen Hörweg.');
+      }
+      lastPauseReason = '';
       if ('mediaSession' in navigator) {
         navigator.mediaSession.playbackState = 'paused';
       }
@@ -1585,9 +2393,8 @@
       installStatus.textContent = 'Die App wurde installiert oder zum Homescreen hinzugefügt.';
     }
   });
+  document.addEventListener('keydown', handleKeyboardShortcuts);
   if (backToTopButton) {
-    backToTopButton.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    backToTopButton.addEventListener('click', scrollToTop);
   }
 }());

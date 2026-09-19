@@ -55,6 +55,7 @@
       <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
         <a href="#player">Player</a>
         <a href="#listen">Hören</a>
+        <a href="#schedule">Sendeplan</a>
         <a href="#updates">Events & News</a>
         <a href="#archive">Archiv</a>
         <a href="#faq">FAQ</a>
@@ -125,6 +126,10 @@
             <p class="now-playing-artist" id="now-playing-artist">Live-Metadaten bleiben deaktiviert, bis eine echte Quelle konfiguriert ist.</p>
             <p class="status-line"><span class="meta-label">Senderstatus</span><span id="station-status">Bereit für manuellen Start</span></p>
             <p class="share-status note" id="now-playing-source" aria-live="polite">Keine Now-Playing-Quelle konfiguriert.</p>
+            <div class="share-actions" aria-label="Titelaktionen">
+              <button class="button secondary" id="favorite-track" type="button" disabled>Zu Favoriten</button>
+            </div>
+            <p class="note" id="favorite-status" aria-live="polite">Favoriten werden nur lokal im Browser gespeichert, sobald verlässliche Titeldaten verfügbar sind.</p>
           </section>
 
           <div class="status-grid" aria-label="Player-Status und Diagnose">
@@ -191,7 +196,60 @@
               <button class="button secondary" id="install-app" type="button">App installieren</button>
               <p class="note" id="install-status" aria-live="polite">Installationshinweise werden nur angezeigt, wenn dein Browser sie unterstützt.</p>
             </section>
+
+            <section class="subpanel compact-panel" aria-labelledby="sleep-title">
+              <div class="subpanel-head compact-head">
+                <h3 id="sleep-title">Sleep-Timer</h3>
+                <span class="subpanel-label">lokal im Browser</span>
+              </div>
+              <div class="stack-fields">
+                <label class="field-group" for="sleep-timer-select">
+                  <span>Dauer</span>
+                  <select id="sleep-timer-select" aria-label="Sleep-Timer-Dauer">
+                    <option value="off">Aus</option>
+                    <option value="15">15 Minuten</option>
+                    <option value="30">30 Minuten</option>
+                    <option value="60">60 Minuten</option>
+                    <option value="custom">Benutzerdefiniert</option>
+                  </select>
+                </label>
+                <label class="field-group" id="sleep-custom-wrap" for="sleep-custom-minutes" hidden>
+                  <span>Benutzerdefinierte Minuten</span>
+                  <input id="sleep-custom-minutes" type="number" min="1" max="480" step="1" value="45" inputmode="numeric" aria-describedby="sleep-remaining">
+                </label>
+              </div>
+              <div class="share-actions" aria-label="Sleep-Timer-Aktionen">
+                <button class="button secondary" id="sleep-apply" type="button">Timer setzen</button>
+                <button class="button secondary" id="sleep-cancel" type="button">Timer aus</button>
+              </div>
+              <p class="share-status note" id="sleep-remaining" aria-live="polite">Kein Sleep-Timer aktiv.</p>
+            </section>
+
+            <section class="subpanel compact-panel" aria-labelledby="shortcuts-title">
+              <div class="subpanel-head compact-head">
+                <h3 id="shortcuts-title">Tastaturkürzel</h3>
+                <span class="subpanel-label">nur außerhalb von Eingabefeldern</span>
+              </div>
+              <ul class="shortcut-list">
+                <li><kbd>Leertaste</kbd><span>Play / Pause</span></li>
+                <li><kbd>M</kbd><span>Stumm schalten</span></li>
+                <li><kbd>↑</kbd><span>Lautstärke erhöhen</span></li>
+                <li><kbd>↓</kbd><span>Lautstärke senken</span></li>
+                <li><kbd>S</kbd><span>Website teilen</span></li>
+                <li><kbd>T</kbd><span>Nach oben springen</span></li>
+              </ul>
+              <p class="note">Die Kürzel bleiben in Formularen, Links, Buttons und editierbaren Bereichen bewusst inaktiv.</p>
+            </section>
           </div>
+
+          <section class="subpanel favorites-panel" aria-labelledby="favorites-title">
+            <div class="subpanel-head">
+              <h3 id="favorites-title">Lokale Favoriten</h3>
+              <button class="button secondary" id="favorites-clear" type="button">Liste leeren</button>
+            </div>
+            <ul class="favorites-list" id="favorites-list" hidden></ul>
+            <p class="empty-history note" id="favorites-empty">Noch keine lokalen Favoriten gespeichert.</p>
+          </section>
 
           <p class="theme-hint note" id="theme-hint" aria-live="polite">Automatisch aktiv (dunkel)</p>
 
@@ -263,6 +321,26 @@
           <article class="panel card">
             <h3>Fakten statt Fantasie</h3>
             <p>Aktuelle Titel, Historie, Events und News erscheinen nur aus verifizierter Konfiguration oder klaren Leerzuständen — nicht aus erfundenen Live-Daten.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="schedule">
+      <div class="wrap">
+        <div class="section-title">
+          <span class="eyebrow">Sendeplan</span>
+          <h2>Statisch pflegbarer Programmplan mit ehrlichem Live-/Next-Hinweis.</h2>
+          <p>Der Sendeplan wird bewusst aus einer statischen Konfiguration gepflegt. Ohne bestätigte Einträge erscheint ein transparenter Leerzustand statt erfundener Sendungsdaten.</p>
+        </div>
+        <div class="content-columns">
+          <article class="panel content-panel">
+            <h3>Jetzt live / Als Nächstes</h3>
+            <div class="content-list single-column" id="schedule-highlight" aria-live="polite"></div>
+          </article>
+          <article class="panel content-panel">
+            <h3>Kommende Sendungen</h3>
+            <div class="content-list" id="schedule-list" aria-live="polite"></div>
           </article>
         </div>
       </div>
@@ -354,14 +432,37 @@
     <section class="section" id="contact">
       <div class="wrap contact-grid">
         <div class="panel contact-card">
-          <span class="eyebrow">Kontakt & Feedback</span>
-          <h2>Direkt, datenschutzfreundlich und ohne Formular-Backend.</h2>
-          <p>Für Feedback, Fehlerberichte oder Songwünsche werden keine Formulardaten an Drittanbieter gesendet. Nutze bevorzugt GitHub Issues oder die offizielle Senderseite; bei Bedarf kann später zusätzlich eine Mailadresse in der statischen Konfiguration ergänzt werden.</p>
+          <span class="eyebrow">Songwunsch & Feedback</span>
+          <h2>Direkt, datenschutzfreundlich und ohne Drittanbieterformular.</h2>
+          <p>Dieser Bereich erstellt nur lokale Mailto-/GitHub-Issue-Links im Browser. Es werden keine Eingaben gespeichert oder an externe Formdienste übertragen.</p>
+          <div class="feedback-grid" aria-label="Songwunsch oder Feedback">
+            <label class="field-group" for="feedback-kind">
+              <span>Anliegen</span>
+              <select id="feedback-kind">
+                <option value="song">Songwunsch</option>
+                <option value="feedback">Feedback</option>
+              </select>
+            </label>
+            <label class="field-group" for="feedback-name">
+              <span>Name (optional)</span>
+              <input id="feedback-name" type="text" maxlength="80" autocomplete="name">
+            </label>
+            <label class="field-group field-group-wide" for="feedback-subject">
+              <span>Titel oder Betreff</span>
+              <input id="feedback-subject" type="text" maxlength="120" aria-describedby="feedback-status">
+            </label>
+            <label class="field-group field-group-wide" for="feedback-message">
+              <span>Nachricht</span>
+              <textarea id="feedback-message" rows="5" maxlength="1200" aria-describedby="feedback-status"></textarea>
+            </label>
+          </div>
           <div class="actions">
-            <a class="button primary" href="https://github.com/jackdarckart/jackdarckart/issues" target="_blank" rel="noopener noreferrer">Feedback über GitHub Issues</a>
+            <button class="button primary" id="feedback-email" type="button">Per E-Mail öffnen</button>
+            <button class="button secondary" id="feedback-issue" type="button">GitHub-Issue vorbereiten</button>
             <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Senderseite auf laut.fm</a>
           </div>
-          <p class="note">Songwunsch-Hinweis: Aktuell gibt es kein externes Webformular. Wünsche oder Hinweise sollten deshalb bewusst über die vorhandenen Kontaktwege gesendet werden.</p>
+          <p class="share-status note" id="feedback-status" aria-live="polite">Du kannst einen Songwunsch oder Feedback lokal als E-Mail oder GitHub-Issue vorbereiten.</p>
+          <p class="note" id="feedback-email-hint">Wenn keine Mailadresse in der Konfiguration hinterlegt ist, bleibt GitHub Issues der verfügbare Fallback.</p>
         </div>
 
         <div class="panel content-panel">
