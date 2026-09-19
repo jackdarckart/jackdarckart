@@ -205,6 +205,9 @@ function createEnvironment(options = {}) {
       if (selector === 'meta[name="theme-color"]') {
         return metaThemeColor;
       }
+      if (selector === 'nav.footer-nav') {
+        return elements['footer-nav'] || null;
+      }
       return null;
     },
     addEventListener(type, listener) {
@@ -226,6 +229,7 @@ function createEnvironment(options = {}) {
 
   const elements = {};
   const ids = [
+    'content',
     'audio',
     'play',
     'mute',
@@ -309,7 +313,8 @@ function createEnvironment(options = {}) {
     'feedback-email',
     'feedback-issue',
     'feedback-status',
-    'feedback-email-hint'
+    'feedback-email-hint',
+    'footer-nav'
   ];
 
   for (const id of ids) {
@@ -858,8 +863,13 @@ function testAppProvidesPersistentInternalNavigationShell() {
   );
   assert.match(
     appCode,
+    /currentContent\.innerHTML = nextContentHtml;/,
+    'internal navigation should swap only the content area so the persistent shell can keep long-lived media elements alive'
+  );
+  assert.doesNotMatch(
+    appCode,
     /document\.body\.innerHTML = nextBodyHtml;/,
-    'internal navigation should replace the persistent shell body in-place instead of rewriting the whole document'
+    'internal navigation must not replace the whole document body because that destroys the active audio pipeline'
   );
   assert.match(
     appCode,
@@ -874,7 +884,7 @@ function testAppProvidesPersistentInternalNavigationShell() {
 }
 
 async function testInternalNavigationPreservesAudioAcrossPages() {
-  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><main id="content"><h1>Live hören</h1></main><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a></nav><main id="content"><h1>Live hören</h1></main><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
   const env = createEnvironment({
     fetch: async (url) => {
       if (String(url).endsWith('.html')) {
@@ -924,7 +934,13 @@ async function testInternalNavigationPreservesAudioAcrossPages() {
   await flushMicrotasks();
   await flushMicrotasks();
 
-  assert.match(env.document.body.innerHTML, /<main id="content"><h1>Live hören<\/h1><\/main>/, 'same-origin page clicks should swap the current shell body without forcing a full browser navigation');
+  assert.match(env.elements.content.innerHTML, /<h1>Live hören<\/h1>/, 'same-origin page clicks should swap the current content area without forcing a full browser navigation');
+  assert.doesNotMatch(
+    String(env.document.body.innerHTML || ''),
+    /<main id="content"><h1>Live hören<\/h1><\/main>/,
+    'internal navigation should keep the existing shell document instead of replacing the body'
+  );
+  assert.match(env.elements['site-nav'].innerHTML, /aria-current="page"/, 'site navigation should be refreshed from the destination page so active links stay accurate');
   assert.equal(env.window.history.pushed, 'https://stream-musik.space/live.html', 'internal navigation should push the requested HTML page into history');
   assert.ok(env.window.__JACKDARCKART_PERSISTENT_AUDIO__ == null, 'persistent audio handoff should be consumed again after the shell finishes re-initializing');
   assert.equal(env.elements.audio.paused, false, 'the original audio element instance should still be playing after internal navigation');
@@ -968,7 +984,7 @@ async function testNavigateHelperUsesHistoryPushStateByDefault() {
   await flushMicrotasks();
   await flushMicrotasks();
 
-  assert.match(env.document.body.innerHTML, /<main id="content"><h1>Live hören<\/h1><\/main>/, 'default helper navigation should replace the shell content in place');
+  assert.match(env.elements.content.innerHTML, /<h1>Live hören<\/h1>/, 'default helper navigation should replace the shell content in place');
   assert.equal(env.window.history.pushed, 'https://stream-musik.space/live.html', 'default helper navigation should push a new history entry');
   assert.equal(env.window.history.replaced, null, 'default helper navigation should not replace history unless requested');
 }
@@ -1011,7 +1027,7 @@ async function testPopstateNavigationRewritesDocumentWithoutPushingHistory() {
   await flushMicrotasks();
   await flushMicrotasks();
 
-  assert.match(env.document.body.innerHTML, /<main id="content"><h1>Live hören<\/h1><\/main>/, 'popstate navigation should also refresh the current shell content in place');
+  assert.match(env.elements.content.innerHTML, /<h1>Live hören<\/h1>/, 'popstate navigation should also refresh the current shell content in place');
   assert.equal(env.window.history.pushed, null, 'popstate handling should not push a new history entry');
   assert.equal(env.window.history.replaced, null, 'popstate handling should not replace the browser-managed history entry');
 }
@@ -1053,7 +1069,7 @@ async function testReplaceNavigationUsesHistoryReplaceState() {
   await flushMicrotasks();
   await flushMicrotasks();
 
-  assert.match(env.document.body.innerHTML, /<main id="content"><h1>Titel<\/h1><\/main>/, 'replace-mode navigation should refresh the shell content in place');
+  assert.match(env.elements.content.innerHTML, /<h1>Titel<\/h1>/, 'replace-mode navigation should refresh the shell content in place');
   assert.equal(env.window.history.pushed, null, 'replace-mode navigation should not push a new history entry');
   assert.equal(env.window.history.replaced, 'https://stream-musik.space/titel.html', 'replace-mode navigation should update the current history entry');
 }
