@@ -1951,7 +1951,7 @@
 
     try {
       const url = new window.URL(endpoint);
-      return 'Datenquelle: ' + url.host + url.pathname + ' · Aktualisierung ' + formatNowPlayingIntervalLabel() + '.';
+      return 'Datenquelle: ' + url.host + url.pathname + url.search + ' · Aktualisierung ' + formatNowPlayingIntervalLabel() + '.';
     } catch (error) {
       return 'Datenquelle konfiguriert · Aktualisierung ' + formatNowPlayingIntervalLabel() + '.';
     }
