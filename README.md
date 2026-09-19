@@ -7,7 +7,7 @@ Statische, mehrseitige GitHub-Pages-Website für das Webradio **jackdarckart** a
 Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipeline und ohne externe Frontend-Abhängigkeiten. Sie ergänzt den offiziellen laut.fm-Stream um:
 
 - direkte Browser-Wiedergabe nach echter Nutzeraktion
-- interne Seitennavigation ohne vollständigen Reload, damit der laufende Webplayer beim Wechsel zwischen Bereichen erhalten bleibt
+- interne Seitennavigation ohne vollständigen Reload: die Shell bleibt bestehen und tauscht nur `main#content`/Navigationsmarkierungen aus, damit derselbe laufende Webplayer beim Seitenwechsel erhalten bleibt
 - sichtbare Status-, Fehler-, Retry-, Puffer- und Offline-Hinweise
 - kompakte Startseite plus getrennte Inhaltsseiten für Live, Titel, Sendeplan, Events, News, Archiv, Hilfe, Issue-Hilfe, Kontakt, Datenschutz und Impressum
 - Sleep-Timer, Tastaturkürzel, Theme-Umschaltung, lokale Favoriten und Share-Funktionen

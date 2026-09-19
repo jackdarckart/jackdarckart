@@ -1645,15 +1645,81 @@
     }
   }
 
-  function replacePersistentShellDocument(parsedDocument) {
+  function escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function extractElementInnerHtmlFromSource(sourceHtml, tagName, attributeName, attributeValue) {
+    if (typeof sourceHtml !== 'string' || !sourceHtml.trim()) {
+      return '';
+    }
+
+    const safeTagName = escapeRegExp(tagName);
+    const attributeSegment = attributeName && attributeValue
+      ? '\\b' + escapeRegExp(attributeName) + '\\s*=\\s*["\']' + escapeRegExp(attributeValue) + '["\']'
+      : '';
+    const pattern = new RegExp(
+      '<' + safeTagName + '(?=[^>]*' + attributeSegment + ')[^>]*>([\\s\\S]*?)<\\/' + safeTagName + '>',
+      'i'
+    );
+    const match = sourceHtml.match(pattern);
+    return match ? match[1] : '';
+  }
+
+  function extractFooterNavInnerHtmlFromSource(sourceHtml) {
+    if (typeof sourceHtml !== 'string' || !sourceHtml.trim()) {
+      return '';
+    }
+
+    const match = sourceHtml.match(/<nav[^>]*class=["'][^"']*\bfooter-nav\b[^"']*["'][^>]*>([\s\S]*?)<\/nav>/i);
+    return match ? match[1] : '';
+  }
+
+  function extractPersistentShellContentInnerHtml(parsedDocument, sourceHtml) {
+    if (parsedDocument && typeof parsedDocument.getElementById === 'function') {
+      const contentElement = parsedDocument.getElementById('content');
+      if (contentElement && typeof contentElement.innerHTML === 'string') {
+        return contentElement.innerHTML;
+      }
+    }
+
+    return extractElementInnerHtmlFromSource(sourceHtml, 'main', 'id', 'content');
+  }
+
+  function extractPersistentShellSiteNavInnerHtml(parsedDocument, sourceHtml) {
+    if (parsedDocument && typeof parsedDocument.getElementById === 'function') {
+      const siteNavElement = parsedDocument.getElementById('site-nav');
+      if (siteNavElement && typeof siteNavElement.innerHTML === 'string') {
+        return siteNavElement.innerHTML;
+      }
+    }
+
+    return extractElementInnerHtmlFromSource(sourceHtml, 'nav', 'id', 'site-nav');
+  }
+
+  function extractPersistentShellFooterNavInnerHtml(parsedDocument, sourceHtml) {
+    if (parsedDocument && typeof parsedDocument.querySelector === 'function') {
+      const footerNavElement = parsedDocument.querySelector('nav.footer-nav');
+      if (footerNavElement && typeof footerNavElement.innerHTML === 'string') {
+        return footerNavElement.innerHTML;
+      }
+    }
+
+    return extractFooterNavInnerHtmlFromSource(sourceHtml);
+  }
+
+  function replacePersistentShellDocument(parsedDocument, sourceHtml) {
     if (!parsedDocument || !document || !document.body) {
       return false;
     }
 
-    const nextBodyHtml = parsedDocument.body && typeof parsedDocument.body.innerHTML === 'string'
-      ? parsedDocument.body.innerHTML
-      : '';
-    if (!nextBodyHtml) {
+    const currentContent = document.getElementById('content');
+    if (!currentContent) {
+      return false;
+    }
+
+    const nextContentHtml = extractPersistentShellContentInnerHtml(parsedDocument, sourceHtml);
+    if (!nextContentHtml) {
       return false;
     }
 
@@ -1668,7 +1734,20 @@
       document.title = parsedDocument.title;
     }
 
-    document.body.innerHTML = nextBodyHtml;
+    currentContent.innerHTML = nextContentHtml;
+
+    const currentSiteNav = document.getElementById('site-nav');
+    const nextSiteNavInnerHtml = extractPersistentShellSiteNavInnerHtml(parsedDocument, sourceHtml);
+    if (currentSiteNav && nextSiteNavInnerHtml) {
+      currentSiteNav.innerHTML = nextSiteNavInnerHtml;
+    }
+
+    const currentFooterNav = safeQuerySelector('nav.footer-nav');
+    const nextFooterNavInnerHtml = extractPersistentShellFooterNavInnerHtml(parsedDocument, sourceHtml);
+    if (currentFooterNav && nextFooterNavInnerHtml) {
+      currentFooterNav.innerHTML = nextFooterNavInnerHtml;
+    }
+
     return true;
   }
 
@@ -1729,7 +1808,7 @@
         }
       }
 
-      if (!replacePersistentShellDocument(parsedDocument)) {
+      if (!replacePersistentShellDocument(parsedDocument, html)) {
         throw new Error('page-replace-failed');
       }
       finalizePersistentNavigation(destination);
