@@ -5,6 +5,7 @@
     volume: 'jackdarckart-volume',
     muted: 'jackdarckart-muted'
   };
+  const STREAM_URL = 'https://stream.laut.fm/jackdarckart';
   const LOAD_TIMEOUT_MS = 8000;
   const RECONNECT_DELAY_MS = 1200;
   const MAX_AUTO_RECONNECTS = 1;
@@ -25,7 +26,6 @@
   const siteNav = document.getElementById('site-nav');
   const backToTopButton = document.getElementById('back-to-top');
   const year = document.getElementById('year');
-  const streamUrl = audio.getAttribute('data-stream-url') || '';
 
   let currentState = 'ready';
   let loadTimer = 0;
@@ -154,9 +154,9 @@
   }
 
   function ensureStreamSource(forceReload) {
-    const hasSource = audio.getAttribute('src') === streamUrl;
+    const hasSource = audio.getAttribute('src') === STREAM_URL;
     if (!hasSource) {
-      audio.setAttribute('src', streamUrl);
+      audio.setAttribute('src', STREAM_URL);
       forceReload = true;
     }
 
@@ -220,11 +220,6 @@
   }
 
   async function attemptPlayback(forceReload) {
-    if (!streamUrl) {
-      setState('error', 'Stream-URL fehlt.', 'Die verifizierte laut.fm-Adresse ist nicht verfügbar.');
-      return;
-    }
-
     wantsPlayback = true;
     clearReconnectTimer();
     setState(
@@ -259,7 +254,7 @@
     }
 
     reconnectAttempts = 0;
-    await attemptPlayback(audio.getAttribute('src') !== streamUrl);
+    await attemptPlayback(audio.getAttribute('src') !== STREAM_URL);
   }
 
   function closeMenu() {
