@@ -1509,9 +1509,12 @@
       return;
     }
 
-    const statusRect = status ? status.getBoundingClientRect() : null;
-    const playerCardVisible = Boolean(statusRect) && statusRect.top < window.innerHeight && statusRect.bottom > 0;
-    stickyPlayer.classList.toggle('is-visible', window.scrollY > 260 && !playerCardVisible);
+    const stickyAnchor = playButton || status;
+    const stickyAnchorRect = stickyAnchor && typeof stickyAnchor.getBoundingClientRect === 'function'
+      ? stickyAnchor.getBoundingClientRect()
+      : null;
+    const stickyAnchorVisible = Boolean(stickyAnchorRect) && stickyAnchorRect.top < window.innerHeight && stickyAnchorRect.bottom > 0;
+    stickyPlayer.classList.toggle('is-visible', window.scrollY > 260 && !stickyAnchorVisible);
   }
 
   function bindNavigation() {
