@@ -32,6 +32,7 @@
   let reconnectTimer = 0;
   let reconnectAttempts = 0;
   let wantsPlayback = false;
+  let hasConfirmedPlayback = false;
   let lastAudibleVolume = 70;
 
   function readStorage(key) {
@@ -172,7 +173,7 @@
         return;
       }
 
-      if (reconnectAttempts < MAX_AUTO_RECONNECTS) {
+      if (hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
         reconnectAttempts += 1;
         setState(
           'loading',
@@ -199,6 +200,11 @@
   function handlePlaybackFailure(error) {
     clearLoadTimer();
     clearReconnectTimer();
+
+    if (error && error.name === 'AbortError' && !wantsPlayback) {
+      return;
+    }
+
     wantsPlayback = false;
 
     if (error && error.name === 'NotAllowedError') {
@@ -402,6 +408,7 @@
     clearLoadTimer();
     clearReconnectTimer();
     reconnectAttempts = 0;
+    hasConfirmedPlayback = true;
     wantsPlayback = true;
     setState('playing', 'Der Livestream läuft.', 'Du hörst jetzt jackdarckart.');
     if ('mediaSession' in navigator) {
@@ -434,7 +441,7 @@
       return;
     }
 
-    if (reconnectAttempts < MAX_AUTO_RECONNECTS) {
+    if (hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
       reconnectAttempts += 1;
       setState('loading', 'Stream verbindet sich neu …', 'Die Verbindung stockt. Ein neuer Versuch läuft.');
       clearReconnectTimer();
@@ -453,7 +460,7 @@
     clearLoadTimer();
     clearReconnectTimer();
 
-    if (wantsPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
+    if (wantsPlayback && hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
       reconnectAttempts += 1;
       setState('loading', 'Stream verbindet sich neu …', 'Der Stream antwortet nicht. Ein weiterer Versuch läuft.');
       reconnectTimer = window.setTimeout(() => {
