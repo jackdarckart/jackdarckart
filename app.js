@@ -461,7 +461,7 @@
       reconnectAttempts = 0;
     }
 
-    await attemptPlayback(forceReload === true ? true : !hasStreamSource());
+    await attemptPlayback(typeof forceReload === 'boolean' ? forceReload : !hasStreamSource());
   }
 
   function closeMenu() {
