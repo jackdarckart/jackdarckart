@@ -6,16 +6,18 @@ Statische GitHub-Pages-Website für das Webradio **jackdarckart** auf laut.fm.
 
 Die Website bleibt bewusst eine kleine, statische Landingpage ohne Build-Pipeline und ohne externe Frontend-Abhängigkeiten. Sie bündelt den offiziellen laut.fm-Stream in einem browserfreundlichen Direktplayer und ergänzt ihn um:
 
+- direkte Browser-Wiedergabe nach echter Nutzeraktion
 - klarere Status-, Fehler- und Retry-Hinweise
 - Sticky-Quick-Access zum Player beim Scrollen
 - Share-/Link-Kopier-Funktion per nativer Browser-API mit Fallback
+- sichtbare Diagnose- und Fallback-Wege für Browser- und Verbindungsprobleme
 - reale FAQ-, Kontakt-, Sicherheits- und Datenschutzhinweise
 - kontraststarkes, responsives Layout für Mobile, Tablet und Desktop
 
 ## Struktur
 
-- `index.html` – semantische Startseite mit Meta-Tags, Player-Markup und Inhaltssektionen
-- `styles.css` – responsives Layout, Sticky-Elemente, FAQ-Design und visuelle Gestaltung
+- `index.html` – semantische Startseite mit Meta-Tags, Direktplayer-Markup, Diagnoseflächen und Inhaltssektionen
+- `styles.css` – responsives Layout, Sticky-Elemente, technische Player-UI, FAQ-Design und visuelle Gestaltung
 - `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-Verhalten, Statusdiagnose, Share-Funktion und defensive Browser-APIs
 - `CNAME` – Custom Domain `stream-musik.space`
 
