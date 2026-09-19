@@ -16,6 +16,7 @@ const htmlPages = [
   'archiv.html',
   'ueber-uns.html',
   'hilfe.html',
+  'issue-hilfe.html',
   'kontakt.html',
   'datenschutz.html',
   'impressum.html'
@@ -1066,6 +1067,8 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
     assert.match(html, /<meta property="og:image" content="https:\/\/stream-musik\.space\/assets\/social-preview\.png">/, `${file} should keep the shared social preview image`);
     assert.ok(siteNavMatch, `${file} should expose a parsable main navigation section`);
     assert.ok(footerNavMatch, `${file} should expose a parsable footer navigation section`);
+    assert.match(siteNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the main navigation`);
+    assert.match(footerNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the footer navigation`);
     assert.equal((siteNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the main navigation`);
     assert.equal((footerNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the footer navigation`);
     assert.match(siteNavMatch[1], new RegExp(`<a href="${escapeRegExp(expectedHref)}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the main navigation`);
@@ -1086,9 +1089,42 @@ function testServiceWorkerCachesAllHtmlPages() {
   assert.match(swCode, /OFFLINE_FALLBACK_URL/, 'service worker should keep an explicit offline fallback entry point');
 }
 
+function testIssueHelpPageAndTemplatesArePresent() {
+  const issueHelpHtml = fs.readFileSync(path.join(__dirname, '..', 'issue-hilfe.html'), 'utf8');
+  const readme = fs.readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
+  const templateDir = path.join(__dirname, '..', '.github', 'ISSUE_TEMPLATE');
+  const templateConfig = fs.readFileSync(path.join(templateDir, 'config.yml'), 'utf8');
+
+  assert.match(issueHelpHtml, /<link rel="canonical" href="https:\/\/stream-musik\.space\/issue-hilfe\.html">/, 'issue help page should define its canonical URL');
+  assert.match(issueHelpHtml, /issues\/new\?template=bug_report\.md/, 'issue help page should link to the bug template');
+  assert.match(issueHelpHtml, /issues\/new\?template=feature_request\.md/, 'issue help page should link to the feature template');
+  assert.match(issueHelpHtml, /issues\/new\?template=content_request\.md/, 'issue help page should link to the content template');
+  assert.match(issueHelpHtml, /issues\/new\?template=design_ux_improvement\.md/, 'issue help page should link to the design and UX template');
+  assert.match(issueHelpHtml, /issues\/new\?template=api_realtime_problem\.md/, 'issue help page should link to the API template');
+  assert.match(issueHelpHtml, /\.\/issue-hilfe\.html" aria-current="page" class="is-current"/, 'issue help page should mark its own navigation link as current');
+  for (const hook of ['live-data-status', 'live-data-updated', 'live-data-source', 'live-data-refresh']) {
+    assert.match(issueHelpHtml, new RegExp(`id=\"${escapeRegExp(hook)}\"`), `issue help page should keep the shared app.js hook ${hook}`);
+  }
+  assert.match(readme, /Mitwirken über GitHub Issues/, 'README should document the GitHub issue workflow');
+
+  assert.match(templateConfig, /blank_issues_enabled:\s*false/, 'issue template config should disable blank issues');
+  assert.match(templateConfig, /name:\s*GitHub-Issue-Hilfe auf stream-musik\.space/, 'issue template config should link to the website issue help');
+  assert.match(templateConfig, /url:\s*https:\/\/stream-musik\.space\/issue-hilfe\.html/, 'issue template config should point to the issue help page');
+
+  for (const file of ['bug_report.md', 'feature_request.md', 'content_request.md', 'design_ux_improvement.md', 'api_realtime_problem.md']) {
+    const template = fs.readFileSync(path.join(templateDir, file), 'utf8');
+    assert.match(template, /^---[\s\S]*?name:\s+/m, `${file} should define a template name in front matter`);
+    assert.match(template, /^---[\s\S]*?description:\s+/m, `${file} should define a template description in front matter`);
+    assert.match(template, /^---[\s\S]*?title:\s+/m, `${file} should define a default title in front matter`);
+    assert.match(template, /## /, `${file} should contain structured markdown sections`);
+    assert.match(template, /verifiz/i, `${file} should emphasize verified information`);
+  }
+}
+
 async function main() {
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
+  testIssueHelpPageAndTemplatesArePresent();
   testUsesStationSpecificHttpsStreamUrl();
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();
