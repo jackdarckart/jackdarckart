@@ -1289,6 +1289,12 @@ async function testScheduleFilterCanLimitUpcomingAgenda() {
               ends: '2026-09-22T03:00:00+02:00',
               playlist: { name: 'Dienstag Set' },
               type: 'playlist'
+            },
+            {
+              starts: '2026-09-28T02:00:00+02:00',
+              ends: '2026-09-28T03:00:00+02:00',
+              playlist: { name: 'Nächste Woche' },
+              type: 'playlist'
             }
           ])
         };
@@ -1310,6 +1316,9 @@ async function testScheduleFilterCanLimitUpcomingAgenda() {
   });
 
   await flushMicrotasks();
+
+  assert.equal(env.elements['schedule-list'].children.length, 2, 'default week filter should exclude entries from the next calendar week');
+  assert.match(env.elements['schedule-summary'].textContent, /2 kommende Einträge für diese Woche/i, 'schedule summary should describe the current-week result set');
 
   env.elements['schedule-filter'].value = 'tomorrow';
   await env.elements['schedule-filter'].dispatch('change');

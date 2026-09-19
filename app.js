@@ -28,6 +28,7 @@
     ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' })
     : null;
   const WEEKDAY_LABELS = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+  const WEEKDAY_INDEX_BY_LABEL = Object.fromEntries(WEEKDAY_LABELS.map((label, index) => [label.toLocaleLowerCase('de-DE'), index]));
   const APP_INSTANCE_KEY = '__JACKDARCKART_APP__';
   const PERSISTENT_AUDIO_KEY = '__JACKDARCKART_PERSISTENT_AUDIO__';
   const PERSISTENT_STATE_KEY = '__JACKDARCKART_PERSISTENT_STATE__';
@@ -1269,6 +1270,7 @@
     }
     if (favoritesCopyButton) {
       favoritesCopyButton.disabled = !favoritesState.length;
+      favoritesCopyButton.textContent = libraryFilterInput ? 'Sichtbare Favoriten kopieren' : 'Alle Favoriten kopieren';
     }
     if (libraryFilterClearButton) {
       libraryFilterClearButton.disabled = !libraryFilterValue;
@@ -1378,8 +1380,8 @@
       await copyToClipboard(exportText);
       if (favoriteStatus) {
         favoriteStatus.textContent = libraryFilterValue
-          ? 'Gefilterte Favoritenliste in die Zwischenablage kopiert.'
-          : 'Favoritenliste in die Zwischenablage kopiert.';
+          ? 'Sichtbare Favoritenliste in die Zwischenablage kopiert.'
+          : (libraryFilterInput ? 'Sichtbare Favoritenliste in die Zwischenablage kopiert.' : 'Komplette Favoritenliste in die Zwischenablage kopiert.');
       }
     } catch (error) {
       if (favoriteStatus) {
@@ -2772,6 +2774,22 @@
     }
   }
 
+  function getWeekdayIndexInTimeZone(value, timeZone) {
+    const timestamp = value ? new Date(value) : null;
+    if (!timestamp || Number.isNaN(timestamp.getTime())) {
+      return new Date().getDay();
+    }
+
+    try {
+      const label = new Intl.DateTimeFormat('de-DE', { weekday: 'long', timeZone }).format(timestamp);
+      return Object.prototype.hasOwnProperty.call(WEEKDAY_INDEX_BY_LABEL, label.toLocaleLowerCase('de-DE'))
+        ? WEEKDAY_INDEX_BY_LABEL[label.toLocaleLowerCase('de-DE')]
+        : timestamp.getDay();
+    } catch (error) {
+      return timestamp.getDay();
+    }
+  }
+
   function getScheduleFilterValue() {
     if (!scheduleFilterSelect) {
       return 'all';
@@ -2794,7 +2812,12 @@
       return snapshot.allUpcoming.filter((entry) => getDateKeyInTimeZone(entry.startsAt, timeZone) === tomorrowKey);
     }
     if (filterValue === 'week') {
-      return snapshot.allUpcoming.filter((entry) => Date.parse(entry.startsAt) < Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const todayWeekday = getWeekdayIndexInTimeZone(new Date(), timeZone);
+      const allowedDateKeys = new Set();
+      for (let offset = 0; offset <= (6 - todayWeekday); offset += 1) {
+        allowedDateKeys.add(getDateKeyInTimeZone(Date.now() + offset * 24 * 60 * 60 * 1000, timeZone));
+      }
+      return snapshot.allUpcoming.filter((entry) => allowedDateKeys.has(getDateKeyInTimeZone(entry.startsAt, timeZone)));
     }
     return snapshot.allUpcoming;
   }
@@ -2842,8 +2865,8 @@
       entries,
       current,
       next,
-      allUpcoming: allUpcoming.length ? allUpcoming : entries.slice(0, 24),
-      upcoming: allUpcoming.length ? allUpcoming.slice(0, 8) : entries.slice(0, 8),
+      allUpcoming,
+      upcoming: allUpcoming.slice(0, 8),
       timeZone
     };
   }
