@@ -1074,7 +1074,9 @@
   function getNowPlayingSourceLabel() {
     const endpoint = getNowPlayingEndpoint();
     if (!endpoint) {
-      return 'Keine Now-Playing-Quelle konfiguriert.';
+      return hasExternalNowPlayingEndpoint()
+        ? 'Externe Now-Playing-Quelle erfordert same-origin oder eine bewusst angepasste CSP.'
+        : 'Keine Now-Playing-Quelle konfiguriert.';
     }
 
     try {
@@ -1088,8 +1090,30 @@
     return Boolean(getNowPlayingEndpoint()) && typeof window.fetch === 'function';
   }
 
+  function hasExternalNowPlayingEndpoint() {
+    const rawEndpoint = normalizeUrl(APP_CONFIG.nowPlaying.endpoint);
+    if (!rawEndpoint) {
+      return false;
+    }
+
+    try {
+      return new window.URL(rawEndpoint).origin !== window.location.origin;
+    } catch (error) {
+      return false;
+    }
+  }
+
   function getNowPlayingEndpoint() {
-    return normalizeUrl(APP_CONFIG.nowPlaying.endpoint);
+    const endpoint = normalizeUrl(APP_CONFIG.nowPlaying.endpoint);
+    if (!endpoint) {
+      return '';
+    }
+
+    try {
+      return new window.URL(endpoint).origin === window.location.origin ? endpoint : '';
+    } catch (error) {
+      return '';
+    }
   }
 
   function getNowPlayingAdapter() {
@@ -1235,8 +1259,10 @@
   async function refreshNowPlaying() {
     if (!isNowPlayingConfigured()) {
       renderNowPlayingFallback(
-        'Live-Metadaten bleiben deaktiviert, bis in der Konfiguration eine echte Quelle hinterlegt ist.',
-        'Keine Now-Playing-Quelle konfiguriert.'
+        hasExternalNowPlayingEndpoint()
+          ? 'Die konfigurierte Now-Playing-Quelle liegt außerhalb der eigenen Origin und bleibt ohne bewusste CSP-Anpassung deaktiviert.'
+          : 'Live-Metadaten bleiben deaktiviert, bis in der Konfiguration eine echte Quelle hinterlegt ist.',
+        getNowPlayingSourceLabel()
       );
       return;
     }

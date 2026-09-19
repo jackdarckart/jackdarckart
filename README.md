@@ -70,7 +70,7 @@ nowPlaying: {
 }
 ```
 
-Erst wenn `endpoint` mit einer echten Quelle gefüllt wird, startet Polling. Der enthaltene Adapter `generic-json` versucht gängige JSON-Felder wie `current`, `track`, `song`, `history`, `recent` oder `lastPlayed` defensiv auszulesen.
+Erst wenn `endpoint` mit einer echten **same-origin**-Quelle gefüllt wird, startet Polling. Der enthaltene Adapter `generic-json` versucht gängige JSON-Felder wie `current`, `track`, `song`, `history`, `recent` oder `lastPlayed` defensiv auszulesen.
 
 Beispiel für eine echte Override-Konfiguration:
 
@@ -92,7 +92,8 @@ window.__JACKDARCKART_CONFIG__ = {
 Wichtig:
 
 - Keine erfundenen oder unzuverlässigen Endpunkte verwenden.
-- Wenn eine **externe** API genutzt wird, muss die Meta-CSP in `index.html` unter `connect-src` passend ergänzt werden.
+- Ohne bewusste Anpassungen der Meta-CSP akzeptiert die App nur **same-origin**-Now-Playing-Quellen.
+- Wenn dennoch eine **externe** API genutzt werden soll, muss die Meta-CSP in `index.html` unter `connect-src` passend ergänzt und die same-origin-Prüfung in `app.js` bewusst erweitert werden.
 - Liefert die Quelle keine gültigen Titel-/Historieninformationen, zeigt die Oberfläche bewusst den Fallback `Titelinformationen derzeit nicht verfügbar`.
 
 ### Statische Inhalte pflegen
@@ -149,7 +150,7 @@ Der Service Worker cached **nicht** den Live-Audiostream. Offline wird stattdess
 ## Sicherheitsmaßnahmen
 
 - restriktive Meta-Content-Security-Policy in `index.html`
-- keine Inline-Skripte außer gehashter JSON-LD-Strukturdaten
+- keine ausführbaren Inline-Skripte; einziges Inline-Script-Element ist JSON-LD für strukturierte Daten
 - keine externen Bibliotheken, keine Tracker, keine Analytics
 - externe Ressourcen standardmäßig auf die Website selbst und den laut.fm-Stream begrenzt
 - `referrer`-Policy über Meta-Tag gesetzt

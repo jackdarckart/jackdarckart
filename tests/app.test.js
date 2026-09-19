@@ -278,6 +278,7 @@ function createEnvironment(options = {}) {
   const locationUrl = new URL('https://stream-musik.space/');
   const location = {
     href: locationUrl.href,
+    origin: locationUrl.origin,
     protocol: locationUrl.protocol,
     hostname: locationUrl.hostname
   };
@@ -589,6 +590,26 @@ async function testOfflineRecoveryShowsDedicatedRetryAction() {
   assert.equal(env.elements['offline-retry'].hidden, false, 'retry action should become visible once the connection returns');
 }
 
+async function testExternalNowPlayingEndpointStaysDisabledByDefaultCsp() {
+  let fetchCalls = 0;
+  const env = createEnvironment({
+    appConfig: {
+      nowPlaying: {
+        endpoint: 'https://example.com/now-playing.json'
+      }
+    },
+    fetch: async () => {
+      fetchCalls += 1;
+      return { ok: true, json: async () => ({}) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  assert.equal(fetchCalls, 0, 'external now-playing endpoints should stay disabled until CSP and code are explicitly widened');
+  assert.match(env.elements['now-playing-source'].textContent, /same-origin|CSP/, 'the UI should explain why the configured endpoint stays inactive');
+}
+
 function testUsesStationSpecificHttpsStreamUrl() {
   assert.match(
     appCode,
@@ -607,6 +628,7 @@ async function main() {
   await testShareUsesCurrentTrackWhenMetadataIsAvailable();
   await testThemeSelectionUpdatesDatasetAndThemeColor();
   await testOfflineRecoveryShowsDedicatedRetryAction();
+  await testExternalNowPlayingEndpointStaysDisabledByDefaultCsp();
   console.log('app.js player tests passed');
 }
 
