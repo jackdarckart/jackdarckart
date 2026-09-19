@@ -884,7 +884,7 @@ function testAppProvidesPersistentInternalNavigationShell() {
 }
 
 async function testInternalNavigationPreservesAudioAcrossPages() {
-  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a></nav><main id="content"><h1>Live hören</h1></main><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a></nav><main id="content"><h1>Live hören</h1></main><nav class="footer-nav"><a href="./live.html" aria-current="page">Live</a></nav><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
   const env = createEnvironment({
     fetch: async (url) => {
       if (String(url).endsWith('.html')) {
@@ -947,8 +947,59 @@ async function testInternalNavigationPreservesAudioAcrossPages() {
   assert.equal(env.elements.status.dataset.state, 'playing', 'the player UI should rehydrate the active playback state after internal navigation');
 }
 
+async function testInternalNavigationAcceptsValidShellPagesWithoutDomParser() {
+  const pageHtml = '<!doctype html><html lang="de"><head><title>Live hören | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a></nav><main id="content"><h1>Live hören</h1><p>Stream bleibt aktiv.</p></main><nav class="footer-nav"><a href="./live.html" aria-current="page">Live</a></nav><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const env = createEnvironment({
+    fetch: async (url) => {
+      if (String(url).endsWith('.html')) {
+        return { ok: true, text: async () => pageHtml };
+      }
+      if (String(url).endsWith('/current_song')) {
+        return { ok: true, json: async () => ({ title: 'Mitternacht', artist: { name: 'jackdarckart' } }) };
+      }
+      if (String(url).endsWith('/last_songs') || String(url).endsWith('/schedule') || String(url).endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (String(url).endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 1 }) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  env.window.DOMParser = undefined;
+  env.window.history = {
+    pushed: null,
+    replaced: null,
+    pushState(_state, _title, url) {
+      this.pushed = url;
+      env.window.location.href = url;
+    },
+    replaceState(_state, _title, url) {
+      this.replaced = url;
+      env.window.location.href = url;
+    }
+  };
+
+  const originalAudio = env.elements.audio;
+  await env.elements.play.dispatch('click');
+  await env.elements.audio.dispatch('playing');
+
+  await env.window.__JACKDARCKART_APP__.navigateWithinPersistentShell('https://stream-musik.space/live.html');
+  await flushMicrotasks();
+  await flushMicrotasks();
+
+  assert.equal(env.window.history.pushed, 'https://stream-musik.space/live.html', 'valid shell pages should stay on persistent-shell navigation even when DOMParser is unavailable');
+  assert.equal(env.document.documentElement.getAttribute('lang'), 'de', 'source-based shell parsing should preserve the destination document language');
+  assert.match(env.elements.content.innerHTML, /Stream bleibt aktiv\./, 'source-based shell parsing should still replace the content fragment');
+  assert.match(env.elements['site-nav'].innerHTML, /aria-current="page"/, 'source-based shell parsing should still refresh the site navigation fragment');
+  assert.match(env.elements['footer-nav'].innerHTML, /aria-current="page"/, 'source-based shell parsing should still refresh the footer navigation fragment');
+  assert.equal(env.elements.audio, originalAudio, 'persistent-shell navigation should keep reusing the same audio element instance');
+  assert.equal(env.elements.audio.paused, false, 'the preserved audio element should remain in its active playback state');
+}
+
 async function testNavigateHelperUsesHistoryPushStateByDefault() {
-  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><main id="content"><h1>Live hören</h1></main><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a></nav><main id="content"><h1>Live hören</h1></main><nav class="footer-nav"><a href="./live.html" aria-current="page">Live</a></nav><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
   const env = createEnvironment({
     fetch: async (url) => {
       if (String(url).endsWith('.html')) {
@@ -990,7 +1041,7 @@ async function testNavigateHelperUsesHistoryPushStateByDefault() {
 }
 
 async function testPopstateNavigationRewritesDocumentWithoutPushingHistory() {
-  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><main id="content"><h1>Live hören</h1></main><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./live.html" aria-current="page" class="is-current">Live hören</a></nav><main id="content"><h1>Live hören</h1></main><nav class="footer-nav"><a href="./live.html" aria-current="page">Live</a></nav><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
   const env = createEnvironment({
     fetch: async (url) => {
       if (String(url).endsWith('.html')) {
@@ -1033,7 +1084,7 @@ async function testPopstateNavigationRewritesDocumentWithoutPushingHistory() {
 }
 
 async function testReplaceNavigationUsesHistoryReplaceState() {
-  const pageHtml = '<!doctype html><html><head><title>Titel | stream-musik.space</title></head><body><main id="content"><h1>Titel</h1></main><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const pageHtml = '<!doctype html><html><head><title>Titel | stream-musik.space</title></head><body><nav id="site-nav"><a href="./index.html">Start</a><a href="./titel.html" aria-current="page" class="is-current">Titel</a></nav><main id="content"><h1>Titel</h1></main><nav class="footer-nav"><a href="./titel.html" aria-current="page">Titel</a></nav><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
   const env = createEnvironment({
     fetch: async (url) => {
       if (String(url).endsWith('.html')) {
@@ -1388,6 +1439,7 @@ async function main() {
   testUsesStationSpecificHttpsStreamUrl();
   testAppProvidesPersistentInternalNavigationShell();
   await testInternalNavigationPreservesAudioAcrossPages();
+  await testInternalNavigationAcceptsValidShellPagesWithoutDomParser();
   await testNavigateHelperUsesHistoryPushStateByDefault();
   await testPopstateNavigationRewritesDocumentWithoutPushingHistory();
   await testReplaceNavigationUsesHistoryReplaceState();
