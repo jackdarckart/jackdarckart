@@ -86,7 +86,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `issue-hilfe.html` – ausführliche GitHub-Issue-Hilfe mit Checklisten, Qualitätsregeln und deutschsprachigen Vorlagen
 - `kontakt.html` – Songwünsche, Feedback, technische Fehler und Sicherheitsmeldungen
 - `datenschutz.html` – sachliche Datenschutz- und Sicherheitsinformationen
-- `impressum.html` – deutlich markierte Impressum-Vorlage mit Platzhaltern
+- `impressum.html` – Impressum mit Anbieterkennzeichnung, Kontakt und Verantwortlichkeit
 
 ## Technische Struktur
 

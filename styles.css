@@ -1109,31 +1109,18 @@ code {
 
 .sticky-player {
   position: fixed;
-  left: max(1rem, env(safe-area-inset-left, 0px));
-  right: max(1rem, env(safe-area-inset-right, 0px));
-  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-  width: min(34rem, 100%);
-  max-width: min(34rem, calc(100% - 2rem));
-  margin-inline: auto;
   z-index: 18;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.7rem;
-  padding: 0.8rem 0.9rem;
   border: 1px solid rgba(148, 163, 184, 0.24);
-  border-radius: 1.4rem;
-  background: rgba(4, 9, 17, 0.92);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
   opacity: 0;
   pointer-events: none;
   transform: translateY(1rem);
   transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-html[data-theme="light"] .sticky-player {
-  background: rgba(255, 255, 255, 0.94);
 }
 
 .sticky-player[data-state="loading"] { border-color: rgba(77, 220, 255, 0.28); }
@@ -1546,6 +1533,10 @@ html[data-theme="light"] .nav-cluster {
 @media (max-width: 1120px) {
   .live-layout {
     grid-template-columns: 1fr;
+  }
+
+  .live-side-column {
+    order: -1;
   }
 }
 
