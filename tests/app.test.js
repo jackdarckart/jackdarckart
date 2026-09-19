@@ -304,6 +304,19 @@ function createEnvironment(options = {}) {
   }
 
   const localStorageState = new Map();
+  const RealDate = Date;
+  const fixedNow = options.now ? new RealDate(options.now).getTime() : null;
+  const MockDate = fixedNow === null
+    ? RealDate
+    : class MockDate extends RealDate {
+        constructor(...args) {
+          super(...(args.length ? args : [fixedNow]));
+        }
+
+        static now() {
+          return fixedNow;
+        }
+      };
   const locationUrl = new URL('https://stream-musik.space/');
   const location = {
     href: locationUrl.href,
@@ -399,7 +412,7 @@ function createEnvironment(options = {}) {
     Math,
     Number,
     String,
-    Date,
+    Date: MockDate,
     Promise,
     Error,
     Boolean,
@@ -695,6 +708,38 @@ function toTimeString(totalMinutes) {
   return String(Math.floor(normalized / 60)).padStart(2, '0') + ':' + String(normalized % 60).padStart(2, '0');
 }
 
+async function testScheduleHandlesOvernightWraparound() {
+  const env = createEnvironment({
+    now: '2026-09-21T00:30:00+02:00',
+    appConfig: {
+      content: {
+        schedule: {
+          timeZone: 'Europe/Berlin',
+          entries: [
+            {
+              day: 'Sonntag',
+              start: '23:00',
+              end: '01:00',
+              title: 'Late Night'
+            },
+            {
+              day: 'Montag',
+              start: '02:00',
+              end: '03:00',
+              title: 'Morgenmix'
+            }
+          ]
+        }
+      }
+    }
+  });
+
+  const highlightCards = env.elements['schedule-highlight'].children;
+  assert.equal(highlightCards.length, 2, 'overnight entries should still yield live and next highlight cards');
+  assert.match(highlightCards[0].children[0].textContent, /Late Night/, 'overnight entry should be detected as currently live after midnight');
+  assert.match(highlightCards[1].children[0].textContent, /Morgenmix/, 'next entry should still be identified after an overnight live slot');
+}
+
 async function testKeyboardShortcutsRespectInteractiveTargets() {
   const env = createEnvironment({
     missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year'],
@@ -865,6 +910,7 @@ async function main() {
   await testSleepTimerResetsOnManualStop();
   await testFavoritesCanBeAddedAndRemovedLocally();
   await testScheduleShowsLiveAndNextWhenConfigured();
+  await testScheduleHandlesOvernightWraparound();
   await testFeedbackUsesHonestFallbacksAndValidation();
   console.log('app.js player tests passed');
 }

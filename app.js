@@ -1155,7 +1155,7 @@
     }
 
     if (options && options.newTab && typeof window.open === 'function') {
-      window.open(url, '_blank', 'noopener');
+      window.open(url, '_blank', 'noopener,noreferrer');
       return;
     }
 
@@ -1718,7 +1718,7 @@
     const currentMinutesOfWeek = (parts.weekday * 1440) + (parts.hours * 60) + parts.minutes;
     const weekMinutes = 7 * 1440;
     const occurrenceEntries = [];
-    let current = null;
+    let currentOccurrence = null;
 
     entries.forEach((entry) => {
       const baseStart = (entry.day * 1440) + entry.startMinutes;
@@ -1731,7 +1731,7 @@
 
       candidates.forEach((candidate) => {
         if (candidate.start <= currentMinutesOfWeek && candidate.end > currentMinutesOfWeek) {
-          current = candidate.entry;
+          currentOccurrence = candidate;
         }
         if (candidate.end > currentMinutesOfWeek - weekMinutes) {
           occurrenceEntries.push(candidate);
@@ -1739,19 +1739,38 @@
       });
     });
 
-    const upcoming = occurrenceEntries
+    const seenUpcomingEntries = new Set();
+    const upcomingOccurrences = occurrenceEntries
       .filter((candidate) => candidate.end > currentMinutesOfWeek)
       .sort((a, b) => a.start - b.start)
-      .slice(0, 6)
-      .map((candidate) => candidate.entry);
+      .filter((candidate) => {
+        const key = [
+          candidate.entry.day,
+          candidate.entry.start,
+          candidate.entry.end,
+          candidate.entry.title,
+          candidate.entry.host,
+          candidate.entry.genre
+        ].join('|');
 
-    const next = upcoming.find((entry) => entry !== current) || null;
+        if (seenUpcomingEntries.has(key)) {
+          return false;
+        }
+
+        seenUpcomingEntries.add(key);
+        return true;
+      })
+      .slice(0, 6);
+
+    const nextOccurrence = upcomingOccurrences.find((candidate) => !currentOccurrence
+      || candidate.start !== currentOccurrence.start
+      || candidate.entry !== currentOccurrence.entry) || null;
 
     return {
       entries,
-      current,
-      next,
-      upcoming: upcoming.length ? upcoming : entries.slice(0, 6),
+      current: currentOccurrence ? currentOccurrence.entry : null,
+      next: nextOccurrence ? nextOccurrence.entry : null,
+      upcoming: upcomingOccurrences.length ? upcomingOccurrences.map((candidate) => candidate.entry) : entries.slice(0, 6),
       timeZone
     };
   }
