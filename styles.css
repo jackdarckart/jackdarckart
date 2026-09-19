@@ -44,11 +44,11 @@ body {
   color: var(--text);
   font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   background:
+    repeating-linear-gradient(90deg, rgba(118, 143, 180, 0.04) 0 1px, transparent 1px 72px),
     radial-gradient(circle at top left, rgba(114, 92, 255, 0.24), transparent 25%),
     radial-gradient(circle at top right, rgba(77, 220, 255, 0.18), transparent 23%),
     linear-gradient(180deg, #040a12 0%, #0b1320 48%, #09161f 100%);
   overflow-x: hidden;
-  position: relative;
 }
 
 html[data-theme="light"] body {
@@ -66,7 +66,7 @@ body::before {
   background:
     linear-gradient(120deg, rgba(139, 92, 246, 0.06), transparent 38%, rgba(77, 220, 255, 0.06)),
     radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.04), transparent 44%);
-  z-index: 0;
+  z-index: -1;
 }
 
 html[data-theme="light"] body::before {
@@ -1417,30 +1417,6 @@ html[data-theme="light"] .nav-cluster {
   .page-hero-section {
     padding-top: 5rem;
   }
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(90deg, rgba(118, 143, 180, 0.05) 0 1px, transparent 1px 72px),
-    linear-gradient(180deg, rgba(77, 220, 255, 0.08), transparent 22%, transparent 78%, rgba(139, 92, 246, 0.08));
-  -webkit-mask-image: radial-gradient(circle at 50% 12%, black, transparent 72%);
-  mask-image: radial-gradient(circle at 50% 12%, black, transparent 72%);
-  z-index: 0;
-}
-
-.site-header,
-main,
-.sticky-player,
-.site-footer,
-.back-to-top,
-.skip-link,
-noscript {
-  position: relative;
-  z-index: 1;
 }
 
 .logo {
