@@ -8,7 +8,7 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 
 - direkte Browser-Wiedergabe nach echter Nutzeraktion
 - sichtbare Status-, Fehler-, Retry-, Puffer- und Offline-Hinweise
-- kompakte Startseite plus getrennte Inhaltsseiten für Live, Titel, Sendeplan, Events, News, Archiv, Hilfe, Kontakt, Datenschutz und Impressum
+- kompakte Startseite plus getrennte Inhaltsseiten für Live, Titel, Sendeplan, Events, News, Archiv, Hilfe, Issue-Hilfe, Kontakt, Datenschutz und Impressum
 - Sleep-Timer, Tastaturkürzel, Theme-Umschaltung, lokale Favoriten und Share-Funktionen
 - Live-Daten aus der offiziellen laut.fm-API für Songs, Senderprofil, Hörerzahl, Next Artists und Sendeplan
 - informative Fehler-/Leerzustände ohne erfundene Termine, Titel, Hörerzahlen oder Archivdaten
@@ -34,6 +34,43 @@ Damit keine erfundenen Inhalte erscheinen:
 - Kontakt- und Impressumsangaben erst nach Verifikation ergänzen
 - optionale Plattform-Links nur nach Prüfung in `APP_CONFIG.content.platformLinks` setzen
 
+## Mitwirken über GitHub Issues
+
+Dieses Projekt nutzt **GitHub Issues als zentrale Stelle** für Fehlerberichte, Feature-Wünsche, Inhaltskorrekturen, Design-/UX-Ideen und API-/Echtzeitdaten-Probleme. Die Website verweist deshalb sichtbar auf `issue-hilfe.html` und auf die Repository-Issues unter:
+
+- `https://github.com/jackdarckart/jackdarckart/issues`
+- `https://github.com/jackdarckart/jackdarckart/issues/new/choose`
+
+### Erwartete Angaben in einem guten Issue
+
+Ein hochwertiges Issue enthält nach Möglichkeit:
+
+- einen präzisen Titel
+- Ziel und Relevanz
+- aktuellen Zustand und gewünschten Zustand
+- reproduzierbare Schritte oder klaren Kontext
+- Umgebung (Gerät, Browser, Betriebssystem, Uhrzeit, betroffene Seite)
+- echte Screenshots, Logs oder API-Hinweise
+- verifizierte Datenquellen statt Vermutungen
+
+### Was ausdrücklich nicht in Issues stehen soll
+
+- erfundene Songs, Events, Sendungen oder Social-Profile
+- unbestätigte Daten als angebliche Echtzeit-Fakten
+- Platzhalter wie „später ergänzen“ oder rein vage Beschreibungen
+
+### Repository-Vorlagen
+
+Unter `.github/ISSUE_TEMPLATE/` liegen deutschsprachige Vorlagen für:
+
+- `bug_report.md`
+- `feature_request.md`
+- `content_request.md`
+- `design_ux_improvement.md`
+- `api_realtime_problem.md`
+
+Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durchsuchen und anschließend den passenden Typ wählen.
+
 ## Seitenstruktur
 
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
@@ -45,6 +82,7 @@ Damit keine erfundenen Inhalte erscheinen:
 - `archiv.html` – Mix-/Sendungsarchiv mit ehrlichem Leerzustand für verifizierte Inhalte
 - `ueber-uns.html` – Einordnung von jackdarckart und stream-musik.space
 - `hilfe.html` – umfangreiche Hilfe/FAQ zu Wiedergabe, PWA, Datenverbrauch, Theme und Tastatursteuerung
+- `issue-hilfe.html` – ausführliche GitHub-Issue-Hilfe mit Checklisten, Qualitätsregeln und deutschsprachigen Vorlagen
 - `kontakt.html` – Songwünsche, Feedback, technische Fehler und Sicherheitsmeldungen
 - `datenschutz.html` – sachliche Datenschutz- und Sicherheitsinformationen
 - `impressum.html` – deutlich markierte Impressum-Vorlage mit Platzhaltern

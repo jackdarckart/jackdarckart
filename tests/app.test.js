@@ -16,6 +16,7 @@ const htmlPages = [
   'archiv.html',
   'ueber-uns.html',
   'hilfe.html',
+  'issue-hilfe.html',
   'kontakt.html',
   'datenschutz.html',
   'impressum.html'
@@ -1086,9 +1087,31 @@ function testServiceWorkerCachesAllHtmlPages() {
   assert.match(swCode, /OFFLINE_FALLBACK_URL/, 'service worker should keep an explicit offline fallback entry point');
 }
 
+function testIssueHelpPageAndTemplatesArePresent() {
+  const issueHelpHtml = fs.readFileSync(path.join(__dirname, '..', 'issue-hilfe.html'), 'utf8');
+  const readme = fs.readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
+  const templateDir = path.join(__dirname, '..', '.github', 'ISSUE_TEMPLATE');
+
+  assert.match(issueHelpHtml, /GitHub Issues &amp; Feedback/, 'issue help page should expose a dedicated GitHub Issues section');
+  assert.match(issueHelpHtml, /Bugreport/, 'issue help page should describe bug reports');
+  assert.match(issueHelpHtml, /Feature Request/, 'issue help page should describe feature requests');
+  assert.match(issueHelpHtml, /Inhaltsanfrage \/ Datenpflege/, 'issue help page should describe content and data maintenance issues');
+  assert.match(issueHelpHtml, /Design-\/UX-Verbesserung/, 'issue help page should describe design and UX issues');
+  assert.match(issueHelpHtml, /API-\/Echtzeitdaten-Problem/, 'issue help page should describe API and realtime data issues');
+  assert.match(issueHelpHtml, /keine erfundenen Songs, Sendungen, Events oder Social-Profile/i, 'issue help page should forbid invented content');
+  assert.match(readme, /Mitwirken über GitHub Issues/, 'README should document the GitHub issue workflow');
+
+  for (const file of ['bug_report.md', 'feature_request.md', 'content_request.md', 'design_ux_improvement.md', 'api_realtime_problem.md']) {
+    const template = fs.readFileSync(path.join(templateDir, file), 'utf8');
+    assert.match(template, /## /, `${file} should contain structured markdown sections`);
+    assert.match(template, /verifiz/i, `${file} should emphasize verified information`);
+  }
+}
+
 async function main() {
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
+  testIssueHelpPageAndTemplatesArePresent();
   testUsesStationSpecificHttpsStreamUrl();
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();

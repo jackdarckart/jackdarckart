@@ -53,7 +53,7 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html" aria-current="page" class="is-current">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./issue-hilfe.html">Issue-Hilfe</a><a href="./kontakt.html" aria-current="page" class="is-current">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
@@ -68,7 +68,7 @@
 </nav>
       <span class="eyebrow">Kontaktzentrale</span>
       <h1>Songwünsche, Feedback und technische Meldungen in einem klaren Hub.</h1>
-      <p>Alle Aktionen bleiben lokal vorbereitet: Mailto oder GitHub-Issue. Nichts wird ohne deinen finalen Klick übertragen.</p>
+      <p>Alle Aktionen bleiben lokal vorbereitet: Mailto oder GitHub-Issue. Nichts wird ohne deinen finalen Klick übertragen. Für ausführliche Reports gibt es zusätzlich eine eigene <a href="./issue-hilfe.html">Issue-Hilfe</a> mit vollständigen Vorlagen.</p>
     </div>
   </section>
   <section class="section" data-reveal>
@@ -78,8 +78,8 @@
         <h2>Direkt, nachvollziehbar und datenschutzfreundlich.</h2>
         <p>Deine Eingaben werden nicht automatisch gespeichert, nicht im Hintergrund versendet und nicht an eingebettete Drittdienste weitergereicht. Erst dein Klick auf E-Mail oder GitHub Issues löst eine lokale Aktion im Browser aus.</p>
         <div class="cards info-cards contact-notes">
-          <article class="panel card"><h3>Hilfreiche Angaben</h3><p>Ein klarer Betreff, eine kurze Beschreibung und bei technischen Fehlern idealerweise Browser, Gerät und sichtbarer Status helfen am meisten.</p></article>
-          <article class="panel card"><h3>Sicherheitsmeldungen</h3><p>Für potenzielle Sicherheitsprobleme sind Zeitpunkt, betroffener Bereich, beobachtetes Verhalten und – wenn relevant – externer Link oder Streamweg hilfreich.</p></article>
+          <article class="panel card"><h3>Hilfreiche Angaben</h3><p>Ein gutes Issue enthält Titel, Ziel, aktuellen Zustand, gewünschten Zustand, Schritte, Umgebung, Relevanz und – wenn möglich – Screenshots oder Logs.</p></article>
+          <article class="panel card"><h3>Verifizierte Inhalte</h3><p>Bitte nur echte, belegbare Inhalte melden. Keine erfundenen Songs, Events, Social-Profile oder unbestätigten Echtzeitdaten als Tatsachen einreichen.</p></article>
         </div>
         <div class="feedback-grid" aria-label="Songwunsch oder Feedback">
           <label class="field-group" for="feedback-kind"><span>Anliegen</span><select id="feedback-kind"><option value="song">Songwunsch</option><option value="feedback">Feedback</option></select></label>
@@ -90,6 +90,7 @@
         <div class="actions">
           <button class="button primary" id="feedback-email" type="button">Per E-Mail öffnen</button>
           <button class="button secondary" id="feedback-issue" type="button">GitHub-Issue vorbereiten</button>
+          <a class="button secondary" href="./issue-hilfe.html">Issue-Hilfe lesen</a>
           <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Senderseite auf laut.fm</a>
         </div>
         <p class="share-status note" id="feedback-status" aria-live="polite">Du kannst einen Songwunsch oder Feedback lokal als E-Mail oder GitHub-Issue vorbereiten.</p>
@@ -100,9 +101,19 @@
         <span class="eyebrow">Technische Meldungen</span>
         <h2>Was bei Fehlerreports besonders hilft</h2>
         <div class="flow-steps">
-          <article class="flow-step"><strong>Kontext</strong><p>Gerät, Browser, Seite und Uhrzeit notieren.</p></article>
-          <article class="flow-step"><strong>Status</strong><p>Sichtbare Meldung oder Screenshot kurz beschreiben.</p></article>
-          <article class="flow-step"><strong>Reproduktion</strong><p>Kurze Schrittfolge für nachvollziehbare Prüfung.</p></article>
+          <article class="flow-step"><strong>Kontext</strong><p>Gerät, Browser, Seite, Uhrzeit und betroffenen Bereich notieren.</p></article>
+          <article class="flow-step"><strong>Status</strong><p>Sichtbare Meldung, aktueller Zustand und gewünschter Zustand sauber trennen.</p></article>
+          <article class="flow-step"><strong>Reproduktion</strong><p>Kurze Schrittfolge, Relevanz und echte Belege wie Screenshot oder Log ergänzen.</p></article>
+        </div>
+        <div class="subpanel issue-inline-guide section-gap-top">
+          <h3>Was ein gutes Issue enthalten soll</h3>
+          <ul class="issue-checklist issue-checklist-compact">
+            <li>präziser Titel statt Sammelbegriff</li>
+            <li>Ziel, aktueller Zustand und gewünschter Zustand</li>
+            <li>Schritte, Umgebung, Relevanz und Datenquelle</li>
+            <li>keine Platzhalter und keine frei erfundenen Inhalte</li>
+          </ul>
+          <a class="content-link" href="./issue-hilfe.html">Vollständige Issue-Hilfe öffnen</a>
         </div>
         <p class="section-gap-top">Zusätzliche Ziele wie laut.fm, Direktstream oder GitHub Issues stammen aus der statischen Konfiguration und werden nicht frei erfunden.</p>
         <div class="content-list single-column" id="platform-links" aria-live="polite"></div>
@@ -141,7 +152,7 @@
       <p class="footer-status">Technischer Status: statische, installierbare Browser-Oberfläche mit lokalem Komfortspeicher, sichtbarer Stream-Diagnose, PWA-Unterstützung und bewusst optionalen Inhaltsdaten.</p>
     </div>
     <nav class="footer-nav" aria-label="Footer-Navigation">
-      <a href="./index.html">Start</a><a href="./live.html">Live</a><a href="./titel.html">Titel</a><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html" aria-current="page" class="is-current">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a><a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">laut.fm</a>
+      <a href="./index.html">Start</a><a href="./live.html">Live</a><a href="./titel.html">Titel</a><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./issue-hilfe.html">Issue-Hilfe</a><a href="./kontakt.html" aria-current="page" class="is-current">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a><a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">laut.fm</a>
     </nav>
   </div>
 </footer>

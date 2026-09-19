@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub-Issue-Hilfe auf stream-musik.space
+    url: https://stream-musik.space/issue-hilfe.html
+    about: Ausführliche deutschsprachige Anleitung mit Checkliste, Beispielen und Projektregeln für echte, verifizierte Issues.
+  - name: Vorhandene Issues durchsuchen
+    url: https://github.com/jackdarckart/jackdarckart/issues?q=is%3Aissue%20is%3Aopen
+    about: Prüfe zuerst, ob dein Thema bereits offen ist oder ergänzt werden kann.

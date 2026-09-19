@@ -1010,6 +1010,59 @@ html[data-theme="light"] .empty-state {
   margin-top: 1rem;
 }
 
+.issue-checklist {
+  display: grid;
+  gap: 0.55rem;
+  padding-left: 1.15rem;
+}
+
+.issue-checklist-compact {
+  margin: 1rem 0 0;
+}
+
+.issue-checklist li {
+  color: var(--muted);
+}
+
+.issue-type-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.issue-check-cards {
+  margin-bottom: 1.2rem;
+}
+
+.comparison-grid {
+  align-items: start;
+}
+
+.template-snippet {
+  overflow-x: auto;
+  margin: 1rem 0 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, 0.58);
+  color: var(--text);
+}
+
+html[data-theme="light"] .template-snippet {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.template-snippet code {
+  white-space: pre;
+}
+
+.issue-inline-guide h3 {
+  margin: 0;
+}
+
+.issue-hero-actions {
+  margin-top: 1.2rem;
+}
+
 .support-list.compact-list {
   gap: 0.5rem;
 }
