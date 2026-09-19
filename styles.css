@@ -355,9 +355,12 @@ button{cursor:pointer}
 .status[data-state="paused"] .status-dot{background:var(--yellow)}
 .status[data-state="loading"] .status-dot{background:var(--cyan);box-shadow:0 0 16px rgba(34,211,238,.6)}
 .status[data-state="playing"] .status-dot{background:var(--green);box-shadow:0 0 16px rgba(52,211,153,.6)}
+.status[data-state="blocked"] .status-dot{background:var(--pink);box-shadow:0 0 16px rgba(236,72,153,.6)}
 .status[data-state="error"] .status-dot{background:var(--red);box-shadow:0 0 16px rgba(251,113,133,.6)}
 
 .controls{margin-top:1.2rem}
+
+.controls [hidden]{display:none}
 
 .volume-control{
   margin-top:1.2rem;

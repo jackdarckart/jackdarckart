@@ -6,7 +6,7 @@ Statische GitHub-Pages-Website für das Webradio **jackdarckart** auf laut.fm.
 
 - `index.html` – semantische Startseite mit Meta-Tags und Player-Markup
 - `styles.css` – responsives Layout und visuelles Design
-- `app.js` – Navigation, Player-Logik, Share-Funktion und defensive Browser-APIs
+- `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-Verhalten, Share-Funktion und defensive Browser-APIs
 - `CNAME` – Custom Domain `stream-musik.space`
 
 Die Website benötigt **keinen Build-Schritt** und wird direkt aus dem Repository-Root veröffentlicht.
@@ -40,6 +40,7 @@ Die Custom Domain bleibt über `CNAME` auf `stream-musik.space` gesetzt.
 - `referrer`-Policy über Meta-Tag gesetzt
 - externe Links mit `target="_blank"` sowie `rel="noopener noreferrer"`
 - keine automatische Audiowiedergabe beim Laden
+- klarer Player-Status für bereit, lädt, spielt, pausiert, Browser-Blockierung und Fehler
 - Lautstärke- und Mute-Einstellungen werden defensiv aus `localStorage` gelesen
 - keine unvalidierte HTML-Injektion: DOM-Updates laufen über `textContent`, Attribute und bekannte Elemente
 
@@ -48,6 +49,7 @@ Die Custom Domain bleibt über `CNAME` auf `stream-musik.space` gesetzt.
 - GitHub Pages für statische Dateien erlaubt keine frei konfigurierbaren HTTP-Response-Header. Deshalb wird die CSP nur als **Meta-CSP** gesetzt. Das ist besser als keine CSP, aber schwächer als echte Server-Header.
 - HSTS, `X-Frame-Options`, `Permissions-Policy` und ähnliche Header lassen sich über GitHub Pages bzw. eine Custom Domain nur eingeschränkt oder gar nicht direkt aus diesem Repository steuern.
 - Der Audiostream kommt von `https://stream.laut.fm/jackdarckart`. Wenn laut.fm nicht erreichbar ist, kann die Website nur auf die offizielle laut.fm-Seite verweisen.
+- Bei restriktiven Browser-Richtlinien (vor allem mobil/Safari) muss der Start weiter direkt über die sichtbare Nutzeraktion **Stream starten** oder **Erneut versuchen** erfolgen.
 - Es wird bewusst **kein Service Worker** eingesetzt, um veraltete Caches und unnötige Offline-Komplexität zu vermeiden.
 - Es werden bewusst keine angeblich aktuellen Titel- oder Sendeplandaten angezeigt, solange keine verlässlich eingebundene Quelle vorhanden ist.
 
@@ -64,3 +66,4 @@ Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. 
 
 - JavaScript-Syntaxprüfung mit `node --check app.js`
 - HTML/CSS/JS-Manuelltest über einen lokalen statischen Server
+- Wiedergabe-Flows manuell prüfen: Start, Pause, Stumm, Lautstärke, Browser-Blockierung und Retry
