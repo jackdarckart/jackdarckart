@@ -1523,7 +1523,11 @@ function testLivePageExposesEnhancedModulesAndHooks() {
     'station-profile-image-wrap',
     'station-profile-image-fallback'
   ]) {
-    assert.match(liveHtmlCode, new RegExp(`id="${escapeRegExp(hook)}"`), `live page should expose ${hook} for the redesigned live modules`);
+    assert.match(
+      liveHtmlCode,
+      new RegExp(`id\\s*=\\s*["']${escapeRegExp(hook)}["']`),
+      `live page should expose ${hook} for the redesigned live modules`
+    );
   }
 
   assert.match(
