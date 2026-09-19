@@ -57,7 +57,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   const url = new URL(request.url);
-  const normalizedPageUrl = new URL(url.pathname, self.location.origin).href;
+  const normalizedPageUrl = new URL(url.pathname + url.search, self.location.origin).href;
   if (url.origin !== self.location.origin) {
     return;
   }
