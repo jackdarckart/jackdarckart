@@ -444,6 +444,19 @@
       return;
     }
 
+    await startPlayback();
+  }
+
+  async function startPlayback() {
+    if (!audio) {
+      setState(
+        'error',
+        'Player nicht verfügbar.',
+        'Die Audio-Komponente fehlt auf der Seite. Bitte lade neu oder öffne den Direktstream.'
+      );
+      return;
+    }
+
     reconnectAttempts = 0;
     await attemptPlayback(!hasStreamSource());
   }
@@ -527,7 +540,7 @@
     });
 
     try {
-      navigator.mediaSession.setActionHandler('play', togglePlayback);
+      navigator.mediaSession.setActionHandler('play', startPlayback);
       navigator.mediaSession.setActionHandler('pause', pausePlayback);
     } catch (error) {
       return;
