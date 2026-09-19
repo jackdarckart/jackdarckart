@@ -1099,6 +1099,9 @@ function testIssueHelpPageAndTemplatesArePresent() {
   assert.match(issueHelpHtml, /issues\/new\?template=design_ux_improvement\.md/, 'issue help page should link to the design and UX template');
   assert.match(issueHelpHtml, /issues\/new\?template=api_realtime_problem\.md/, 'issue help page should link to the API template');
   assert.match(issueHelpHtml, /\.\/issue-hilfe\.html" aria-current="page" class="is-current"/, 'issue help page should mark its own navigation link as current');
+  for (const hook of ['live-data-status', 'live-data-updated', 'live-data-source', 'live-data-refresh']) {
+    assert.match(issueHelpHtml, new RegExp(`id=\"${escapeRegExp(hook)}\"`), `issue help page should keep the shared app.js hook ${hook}`);
+  }
   assert.match(readme, /Mitwirken über GitHub Issues/, 'README should document the GitHub issue workflow');
 
   for (const file of ['bug_report.md', 'feature_request.md', 'content_request.md', 'design_ux_improvement.md', 'api_realtime_problem.md']) {
