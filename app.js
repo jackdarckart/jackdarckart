@@ -113,6 +113,9 @@
 
     const isOffline = typeof navigator.onLine === 'boolean' && !navigator.onLine;
     networkStatus.textContent = isOffline ? 'Browser meldet offline' : 'Browser meldet online';
+    if (networkStatus.parentElement) {
+      networkStatus.parentElement.dataset.state = isOffline ? 'offline' : 'online';
+    }
   }
 
   function getRetryStatusText() {
@@ -136,10 +139,22 @@
   function syncStatusMirrors() {
     if (playerStateLabel) {
       playerStateLabel.textContent = STATE_LABELS[currentState] || STATE_LABELS.ready;
+      if (playerStateLabel.parentElement) {
+        playerStateLabel.parentElement.dataset.state = currentState;
+      }
     }
 
     if (retryStatus) {
       retryStatus.textContent = getRetryStatusText();
+      if (retryStatus.parentElement) {
+        if (currentState === 'error' || currentState === 'blocked') {
+          retryStatus.parentElement.dataset.state = 'action-needed';
+        } else if (currentState === 'loading' || reconnectAttempts > 0) {
+          retryStatus.parentElement.dataset.state = 'active';
+        } else {
+          retryStatus.parentElement.dataset.state = 'manual';
+        }
+      }
     }
 
     if (stickyStatusText) {
