@@ -2221,20 +2221,26 @@
       removeButton.className = 'button secondary';
       removeButton.type = 'button';
       removeButton.textContent = 'Entfernen';
-      removeButton.addEventListener('click', () => {
-        favoritesState = favoritesState.filter((favorite) => favorite.key !== entry.key);
-        if (!writeJsonStorage(STORAGE_KEYS.favorites, favoritesState)) {
-          setText(favoriteStatus, 'Favorit konnte nicht lokal aktualisiert werden.');
-        } else {
-          setText(favoriteStatus, 'Favorit entfernt.');
-        }
-        renderFavorites();
-      });
+      removeButton.dataset.favoriteKey = entry.key;
       item.appendChild(removeButton);
       favoritesList.appendChild(item);
     });
 
     syncFavoriteButton();
+  }
+
+  function removeFavoriteByKey(favoriteKey) {
+    if (!favoriteKey) {
+      return;
+    }
+
+    favoritesState = favoritesState.filter((favorite) => favorite.key !== favoriteKey);
+    if (!writeJsonStorage(STORAGE_KEYS.favorites, favoritesState)) {
+      setText(favoriteStatus, 'Favorit konnte nicht lokal aktualisiert werden.');
+    } else {
+      setText(favoriteStatus, 'Favorit entfernt.');
+    }
+    renderFavorites();
   }
 
   function loadFavorites() {
@@ -3365,6 +3371,17 @@
   if (favoritesClearButton) {
     bindManagedEvent(favoritesClearButton, 'click', clearFavorites);
   }
+  if (favoritesList) {
+    bindManagedEvent(favoritesList, 'click', (event) => {
+      const favoriteKey = event && event.target && event.target.dataset
+        ? event.target.dataset.favoriteKey
+        : '';
+      if (!favoriteKey) {
+        return;
+      }
+      removeFavoriteByKey(favoriteKey);
+    });
+  }
   if (feedbackEmailButton) {
     bindManagedEvent(feedbackEmailButton, 'click', () => handleFeedbackAction('email'));
   }
@@ -3515,6 +3532,9 @@
     }
   });
   bindManagedEvent(window, 'pagehide', () => {
+    if (window[INTERNAL_NAVIGATION_KEY]) {
+      return;
+    }
     destroyApp();
   });
   bindManagedEvent(document, 'keydown', handleKeyboardShortcuts);

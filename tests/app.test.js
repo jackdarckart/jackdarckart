@@ -837,6 +837,67 @@ function testAppProvidesPersistentInternalNavigationShell() {
   );
 }
 
+async function testInternalNavigationPreservesAudioAcrossPages() {
+  const pageHtml = '<!doctype html><html><head><title>Live hören | stream-musik.space</title></head><body><main id="content"><h1>Live hören</h1></main><audio id="audio" hidden></audio><script src="./app.js" defer></script></body></html>';
+  const env = createEnvironment({
+    fetch: async (url) => {
+      if (String(url).endsWith('.html')) {
+        return { ok: true, text: async () => pageHtml };
+      }
+      if (String(url).endsWith('/current_song')) {
+        return { ok: true, json: async () => ({ title: 'Mitternacht', artist: { name: 'jackdarckart' } }) };
+      }
+      if (String(url).endsWith('/last_songs') || String(url).endsWith('/schedule') || String(url).endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (String(url).endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 1 }) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  env.window.history = {
+    pushed: null,
+    replaced: null,
+    pushState(_state, _title, url) {
+      this.pushed = url;
+    },
+    replaceState(_state, _title, url) {
+      this.replaced = url;
+    }
+  };
+  env.document.openCalled = false;
+  env.document.open = () => {
+    env.document.openCalled = true;
+  };
+  env.document.write = () => {};
+  env.document.close = () => {};
+
+  await env.elements.play.dispatch('click');
+  await env.elements.audio.dispatch('playing');
+
+  const link = env.document.createElement('a');
+  link.tagName = 'A';
+  link.href = 'https://stream-musik.space/live.html';
+
+  await env.document.dispatch('click', {
+    target: link,
+    button: 0,
+    defaultPrevented: false,
+    preventDefault() {
+      this.defaultPrevented = true;
+    }
+  });
+  await flushMicrotasks();
+  await flushMicrotasks();
+
+  assert.equal(env.document.openCalled, true, 'same-origin page clicks should rewrite the current document instead of forcing a full browser navigation');
+  assert.equal(env.window.history.pushed, 'https://stream-musik.space/live.html', 'internal navigation should push the requested HTML page into history');
+  assert.equal(env.window.__JACKDARCKART_PERSISTENT_AUDIO__, env.elements.audio, 'internal navigation should preserve the original audio element instance');
+  assert.equal(env.window.__JACKDARCKART_PERSISTENT_STATE__.currentState, 'playing', 'persistent navigation should hand off the active playback state to the rewritten page');
+}
+
 async function testScheduleUsesOfficialApiEntriesForLiveAndNext() {
   const env = createEnvironment({
     now: '2026-09-21T00:30:00+02:00',
@@ -1150,6 +1211,7 @@ async function main() {
   testIssueHelpPageAndTemplatesArePresent();
   testUsesStationSpecificHttpsStreamUrl();
   testAppProvidesPersistentInternalNavigationShell();
+  await testInternalNavigationPreservesAudioAcrossPages();
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();
