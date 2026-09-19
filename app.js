@@ -225,11 +225,12 @@
     muteButton.dataset.state = muted ? 'muted' : 'active';
   }
 
-  function updateVolume(value) {
+  function updateVolume(value, options) {
     if (!audio) {
       return;
     }
 
+    const shouldPersist = !options || options.persist !== false;
     const normalized = Math.max(0, Math.min(100, Number.parseInt(String(value), 10) || 0));
     if (volumeInput) {
       volumeInput.value = String(normalized);
@@ -250,8 +251,10 @@
     }
 
     updateMuteButton();
-    writeStorage(STORAGE_KEYS.volume, String(normalized));
-    writeStorage(STORAGE_KEYS.muted, String(audio.muted));
+    if (shouldPersist) {
+      writeStorage(STORAGE_KEYS.volume, String(normalized));
+      writeStorage(STORAGE_KEYS.muted, String(audio.muted));
+    }
   }
 
   function clearLoadTimer() {
@@ -607,7 +610,7 @@
     year.textContent = String(new Date().getFullYear());
   }
 
-  updateVolume(getStoredVolume());
+  updateVolume(getStoredVolume(), { persist: false });
   if (audio) {
     audio.muted = getStoredMuted() || audio.volume === 0;
   }
@@ -649,7 +652,9 @@
     });
   }
   if (volumeInput) {
-    volumeInput.addEventListener('input', () => updateVolume(volumeInput.value));
+    const syncVolumeFromInput = () => updateVolume(volumeInput.value);
+    volumeInput.addEventListener('input', syncVolumeFromInput);
+    volumeInput.addEventListener('change', syncVolumeFromInput);
   }
 
   if (audio) {
