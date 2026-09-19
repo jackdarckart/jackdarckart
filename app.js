@@ -1596,6 +1596,9 @@
     }
 
     const currentUrl = new window.URL(window.location.href);
+    if (destination.pathname === currentUrl.pathname && destination.search === currentUrl.search && destination.hash === currentUrl.hash) {
+      return false;
+    }
     if (destination.pathname === currentUrl.pathname && destination.search === currentUrl.search && destination.hash && destination.hash !== currentUrl.hash) {
       return false;
     }
@@ -3535,7 +3538,10 @@
       installStatus.textContent = 'Die App wurde installiert oder zum Homescreen hinzugefügt.';
     }
   });
-  bindManagedEvent(window, 'pagehide', () => {
+  bindManagedEvent(window, 'pagehide', (event) => {
+    if (event && event.persisted) {
+      return;
+    }
     if (window[INTERNAL_NAVIGATION_KEY]) {
       return;
     }
