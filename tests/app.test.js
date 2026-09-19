@@ -169,7 +169,7 @@ class MockAudioElement extends MockElement {
 
 function flushMicrotasks() {
   let chain = Promise.resolve();
-  for (let index = 0; index < 6; index += 1) {
+  for (let index = 0; index < 20; index += 1) {
     chain = chain.then(() => Promise.resolve());
   }
   return chain;
@@ -660,6 +660,7 @@ async function testOfficialLautFmApiIsUsedForLiveMetadata() {
   });
 
   await flushMicrotasks();
+  await flushMicrotasks();
   await env.elements.share.dispatch('click');
 
   const shareCall = env.getShareCall();
@@ -708,12 +709,100 @@ async function testApiFailuresShowHonestFallbackState() {
   });
 
   await flushMicrotasks();
+  await flushMicrotasks();
 
   assert.equal(env.elements['now-playing-track'].textContent, 'Titelinformationen derzeit nicht verfügbar');
   assert.match(env.elements['now-playing-artist'].textContent, /offiziellen Songdaten konnten gerade nicht geladen werden/i);
   assert.match(env.elements['live-data-status'].textContent, /nicht vollständig erreichbar/i);
   assert.match(env.elements['live-data-source'].textContent, /Same-Origin-Proxy/i, 'failure state should mention the optional real proxy path');
   assert.equal(env.elements['live-data-refresh'].disabled, false, 'manual refresh should remain available after an API failure');
+}
+
+async function testPreviousHistoryStaysVisibleAfterRefreshFailure() {
+  let shouldFail = false;
+  const env = createEnvironment({
+    fetch: async (url) => {
+      if (shouldFail) {
+        throw new Error('network down');
+      }
+      if (url.endsWith('/current_song')) {
+        return {
+          ok: true,
+          json: async () => ({
+            title: 'Mitternacht',
+            artist: { name: 'jackdarckart' }
+          })
+        };
+      }
+      if (url.endsWith('/last_songs')) {
+        return {
+          ok: true,
+          json: async () => ([
+            { title: 'Mitternacht', artist: { name: 'jackdarckart' }, started_at: '2026-09-19T12:00:00.000Z' },
+            { title: 'Wolkenlauf', artist: { name: 'jackdarckart' }, started_at: '2026-09-19T11:45:00.000Z' }
+          ])
+        };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 2 }) };
+      }
+      if (url.endsWith('/next_artists') || url.endsWith('/schedule')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  await flushMicrotasks();
+  await flushMicrotasks();
+  assert.equal(env.elements['history-list'].children.length, 2, 'successful initial load should render history entries');
+
+  shouldFail = true;
+  await env.elements['live-data-refresh'].dispatch('click');
+  await flushMicrotasks();
+  await flushMicrotasks();
+
+  assert.equal(env.elements['history-list'].children.length, 2, 'last successful history should stay visible after a later refresh failure');
+  assert.equal(env.elements['now-playing-track'].textContent, 'Titelinformationen derzeit nicht verfügbar', 'failed refresh should still clear the current-song headline');
+  assert.match(env.elements['history-source'].textContent, /Letzter erfolgreicher Abruf/i, 'history state should explain that the visible data is from the last successful refresh');
+}
+
+async function testCurrentSongSurvivesAuxiliaryMetadataFailure() {
+  const env = createEnvironment({
+    fetch: async (url) => {
+      if (url.endsWith('/current_song')) {
+        return {
+          ok: true,
+          json: async () => ({
+            title: 'Mitternacht',
+            artist: { name: 'jackdarckart' }
+          })
+        };
+      }
+      if (url.endsWith('/last_songs')) {
+        return {
+          ok: true,
+          json: async () => ([{ title: 'Wolkenlauf', artist: { name: 'jackdarckart' }, started_at: '2026-09-19T11:45:00.000Z' }])
+        };
+      }
+      if (url.endsWith('/listeners')) {
+        throw new Error('listeners unavailable');
+      }
+      if (url.endsWith('/next_artists')) {
+        throw new Error('next artists unavailable');
+      }
+      if (url.endsWith('/schedule')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
+  });
+
+  await flushMicrotasks();
+
+  assert.equal(env.elements['now-playing-track'].textContent, 'Mitternacht', 'verified current-song data should remain visible even if auxiliary metadata fails');
+  assert.match(env.elements['now-playing-source'].textContent, /Zusatzhinweis/i, 'now-playing UI should disclose partial auxiliary endpoint failures');
+  assert.match(env.elements['live-data-status'].textContent, /nicht vollständig erreichbar/i, 'global live-data summary should reflect the degraded auxiliary state');
 }
 
 function testUsesStationSpecificHttpsStreamUrl() {
@@ -1009,6 +1098,8 @@ async function main() {
   await testThemeSelectionUpdatesDatasetAndThemeColor();
   await testOfflineRecoveryShowsDedicatedRetryAction();
   await testApiFailuresShowHonestFallbackState();
+  await testPreviousHistoryStaysVisibleAfterRefreshFailure();
+  await testCurrentSongSurvivesAuxiliaryMetadataFailure();
   await testKeyboardShortcutsRespectInteractiveTargets();
   await testSleepTimerResetsOnManualStop();
   await testFavoritesCanBeAddedAndRemovedLocally();
