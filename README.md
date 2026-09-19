@@ -14,6 +14,25 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 - installierbare PWA mit Service Worker für statische App-Shell-Ressourcen
 - GitHub-Pages-kompatible relative Links, restriktive CSP und barrierearme Navigation
 
+## Designkonzept (aktuell)
+
+Das Frontend nutzt eine gemeinsame, dunkle Markenoberfläche für alle zwölf Seiten:
+
+- neonartige Gradient-Akzente, Raster-/Signalflächen und visuelle „Console“-Module ohne externe Bild- oder Font-Abhängigkeiten
+- konsistente Navigationslogik mit den Bereichen **Hören**, **Entdecken** und **Infos**
+- variierte Seitenmuster statt reiner Kartenreihen (Hero-Console, Split-Features, Timeline/Flow, Feed-Module, horizontale Scroller)
+- bewusst gestaltete Empty States mit redaktionellen Pflegehinweisen statt „leerer Container“
+- Scroll-Reveal nur defensiv und mit sofort sichtbarem Fallback bei `prefers-reduced-motion`
+
+## Pflegehinweise für Inhalte
+
+Damit keine erfundenen Inhalte erscheinen:
+
+- bestätigte Daten in `APP_CONFIG.content.schedule/events/news/archive` pflegen
+- bei fehlenden Daten lieber die vorhandenen erklärenden Empty States beibehalten
+- Kontakt- und Impressumsangaben erst nach Verifikation ergänzen
+- optionale Plattform-Links nur nach Prüfung in `APP_CONFIG.content.platformLinks` setzen
+
 ## Seitenstruktur
 
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
@@ -102,11 +121,11 @@ node tests/app.test.js
 
 Sinnvolle manuelle Prüfungen:
 
-1. Navigation, aktive Seitenmarkierung und Mobile-Menü auf mehreren Seiten prüfen
-2. Live-Player auf `live.html` starten, pausieren, stummschalten, Retry testen
+1. Navigation, aktive Seitenmarkierung und Mobile-Drawer auf mehreren Seiten prüfen
+2. Live-Player auf `live.html` starten, pausieren, stummschalten, Retry + Offline-Hinweise testen
 3. Theme wechseln und Seitenreload auf anderer Unterseite prüfen
-4. Sticky-Quick-Access und relative Links zu Unterseiten kontrollieren
-5. PWA/Service Worker in Browser-DevTools prüfen
+4. Sticky-Quick-Access, Scroll-Reveal und Reduced-Motion-Fallback prüfen
+5. PWA/Service Worker in Browser-DevTools prüfen (kein Stream-Caching)
 
 ## PWA / Offline
 

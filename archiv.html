@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html" aria-current="page" class="is-current">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html" aria-current="page" class="is-current">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -66,23 +66,27 @@
     <li aria-current="page">Archiv</li>
   </ol>
 </nav>
-      <span class="eyebrow">Mixes, Mitschnitte, Referenzen</span>
-      <h1>Archiv für verifizierte Mixes, Sendungen und externe Referenzlinks.</h1>
-      <p>Das Archiv soll nur belastbare Inhalte zeigen. Deshalb bleibt es professionell leer, solange keine bestätigten Mitschnitte, Mixe oder Referenzveröffentlichungen hinterlegt sind. Gleichzeitig erklärt die Seite, welche Arten von Inhalten hier später gut aufgehoben sind.</p>
+      <span class="eyebrow">Archiv-Layer</span>
+      <h1>Mixes, Mitschnitte und Referenzen mit Genre-Optik und klaren Herkunftshinweisen.</h1>
+      <p>Das Archiv zeigt nur verifizierte Inhalte. Solange nichts veröffentlicht ist, erklärt dieser Bereich transparent, welche Art von Material später erscheint und wie es gepflegt wird.</p>
     </div>
   </section>
-  <section class="section">
-    <div class="wrap cards info-cards section-gap-bottom">
-      <article class="panel card"><h3>Mögliche Kategorien</h3><p>Zum Beispiel Mixe, Mitschnitte, Session-Links, Genre-Sammlungen oder verifizierte Referenzveröffentlichungen.</p></article>
-      <article class="panel card"><h3>Genre-Hinweise</h3><p>Genre oder Format sollten im Beschreibungstext klar benannt werden, damit Archivkarten ohne zusätzliche Filter verständlich bleiben.</p></article>
-      <article class="panel card"><h3>Quellen prüfen</h3><p>Bevor etwas veröffentlicht wird, sollten Titel, Bezug zum Sender und externe Ziel-URL nachvollziehbar verifiziert sein.</p></article>
+  <section class="section" data-reveal>
+    <div class="wrap editorial-module section-gap-bottom">
+      <h2>Archiv-Filteroptik (redaktionell)</h2>
+      <div class="h-scroll" aria-label="Archiv-Kategorien">
+        <span><strong>Mixes</strong><p>Kuratiert, mit Quelle.</p></span>
+        <span><strong>Sessions</strong><p>Mitschnitte mit Zeitbezug.</p></span>
+        <span><strong>Genre-Layer</strong><p>Klare Stilhinweise.</p></span>
+        <span><strong>Referenzen</strong><p>Externe Veröffentlichungen.</p></span>
+      </div>
     </div>
     <div class="wrap content-columns">
-      <article class="panel content-panel">
+      <article class="panel content-panel timeline-strip">
         <h2>Archiv-Inhalte</h2>
         <div class="content-list single-column" id="archive-list" aria-live="polite"></div>
       </article>
-      <article class="panel content-panel">
+      <article class="panel content-panel editorial-note">
         <h2>Was bis dahin sinnvoll bleibt</h2>
         <p>Auch wenn noch keine Archivkarten sichtbar sind, bleibt die Seite nützlich: Sie dokumentiert offen, dass hier nicht spekuliert wird, und gibt eine klare Struktur für zukünftige verifizierte Inhalte vor.</p>
         <div class="actions section-actions">

@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html" aria-current="page" class="is-current">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html" aria-current="page" class="is-current">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -66,20 +66,25 @@
     <li aria-current="page">Sendeplan</li>
   </ol>
 </nav>
-      <span class="eyebrow">Programmstruktur</span>
-      <h1>Sendeplan mit „Jetzt live“, „Als Nächstes“ und klaren Zeitzonenhinweisen.</h1>
-      <p>Der Sendeplan wird weiterhin statisch gepflegt. Das macht ihn GitHub-Pages-kompatibel, nachvollziehbar und datensparsam. Gleichzeitig kann die Oberfläche automatisch erklären, wenn gerade kein bestätigter Programmeintrag hinterlegt ist.</p>
+      <span class="eyebrow">Wochentimeline</span>
+      <h1>Sendeplan mit Zeitachsen-Gefühl, Heute-Fokus und transparenten Live-Markern.</h1>
+      <p>Die Planung bleibt statisch und nachvollziehbar. Dadurch wirkt jeder Programmpunkt bewusst gesetzt, und leere Zustände können ehrlich erklären, was für die Pflege noch fehlt.</p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="wrap cards info-cards section-gap-bottom">
-      <article class="panel card"><h3>Was hier erscheint</h3><p>Bestätigte Sendungsfenster mit Wochentag, Start, Ende und Titel. Optional ergänzen Host, Genre, Beschreibung und Link mehr Kontext.</p></article>
-      <article class="panel card"><h3>Zeitzone</h3><p>Live- und Next-Hinweise werden anhand der konfigurierten Zeitzone berechnet. Standardmäßig ist dafür Europe/Berlin vorgesehen.</p></article>
-      <article class="panel card"><h3>Warum leer sinnvoll ist</h3><p>Ohne valide Termine darf die Website keinen laufenden Programmpunkt erfinden. Stattdessen erklärt sie den Pflegezustand offen.</p></article>
+  <section class="section" data-reveal>
+    <div class="wrap feature-split section-gap-bottom">
+      <article>
+        <h2>Programmfenster mit klarer Priorität</h2>
+        <p>„Jetzt live“ und „Als Nächstes“ werden aus Tageszeit, Wochentag und Zeitzone abgeleitet. Damit bleibt der aktuelle Kontext auf Smartphone und Desktop sofort verständlich.</p>
+      </article>
+      <aside class="editorial-note">
+        <h3>Zeitzonenhinweis</h3>
+        <p>Standardmäßig rechnet die Seite in Europe/Berlin. Bei Änderungen sollte der Pflegehinweis in der Konfiguration angepasst werden.</p>
+      </aside>
     </div>
     <div class="wrap content-columns">
-      <article class="panel content-panel">
+      <article class="panel content-panel timeline-strip">
         <h2>Jetzt live / Als Nächstes</h2>
         <p>Dieser Bereich hebt nur dann echte Treffer hervor, wenn Datum, Uhrzeit, Wochentag und Zeitzone zusammenpassen.</p>
         <div class="content-list single-column" id="schedule-highlight" aria-live="polite"></div>
@@ -92,7 +97,7 @@
     </div>
   </section>
 
-  <section class="section section-muted">
+  <section class="section section-muted" data-reveal>
     <div class="wrap content-columns">
       <article class="panel content-panel">
         <h2>Pflegehinweise</h2>

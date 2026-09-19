@@ -53,12 +53,12 @@
       <span></span>
     </button>
     <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
-      <div class="nav-cluster"><span class="nav-cluster-label">Stream</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Inhalte</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Service</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html" aria-current="page" class="is-current">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
+      <div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html" aria-current="page" class="is-current">Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div>
     </nav>
   </div>
 </header>
   <main id="content">
-  <section class="section page-hero-section">
+  <section class="section page-hero-section" data-reveal>
     <div class="wrap page-hero-copy">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
   <ol>
@@ -66,16 +66,26 @@
     <li aria-current="page">Hilfe & FAQ</li>
   </ol>
 </nav>
-      <span class="eyebrow">Antworten &amp; Problemlösung</span>
-      <h1>Hilfe für Wiedergabe, Browserblockaden, PWA, Datenverbrauch und Komfortfunktionen.</h1>
-      <p>Diese Hilfeseite übernimmt die bisherigen FAQ-Inhalte und erweitert sie um klare Hinweise zu Mehrseiten-Struktur, Installation, Tastatursteuerung, Favoriten, Theme und Datenschutz. Sie soll konkrete Fragen lösen – ohne Backend, ohne Drittanbieterformulare und ohne leere Worthülsen.</p>
+      <span class="eyebrow">Support Hub</span>
+      <h1>Schnellhilfe für Start, Blockierung, Buffering, Offline und Komfortfunktionen.</h1>
+      <p>Die Hilfeseite priorisiert typische Probleme im Höralltag und führt mit einem klaren 1–2–3-Ablauf durch die Diagnose. Antworten bleiben konkret, ohne unnötige Technikblöcke.</p>
     </div>
   </section>
-  <section class="section">
-    <div class="wrap cards info-cards section-gap-bottom">
-      <article class="panel card"><h3>Bei Wiedergabeproblemen</h3><p>Prüfe Netzwerk, Browserfreigabe und nutze den Retry-Button oder wechsle zum Direktstream.</p></article>
-      <article class="panel card"><h3>Bei fehlenden Titeldaten</h3><p>Now Playing und Historie hängen von einer bewussten Metadatenquelle ab und können unabhängig vom Audio leer bleiben.</p></article>
-      <article class="panel card"><h3>Bei Fragen zur App</h3><p>PWA, Theme, Tastaturkürzel, Sleep-Timer und Favoriten funktionieren lokal im Browser und werden hier einzeln erklärt.</p></article>
+  <section class="section" data-reveal>
+    <div class="wrap editorial-module section-gap-bottom">
+      <h2>Schnelldiagnose</h2>
+      <div class="flow-steps">
+        <article class="flow-step"><strong>1 · Starten</strong><p>Auf live.html per Klick starten oder Retry auslösen.</p></article>
+        <article class="flow-step"><strong>2 · Prüfen</strong><p>Statusfeld lesen: blockiert, puffert, offline oder Fehler.</p></article>
+        <article class="flow-step"><strong>3 · Wechseln</strong><p>Direktstream/laut.fm nutzen oder Problem melden.</p></article>
+      </div>
+    </div>
+    <div class="wrap h-scroll section-gap-bottom" aria-label="Hilfe-Kategorien">
+      <span><strong>Start &amp; Blockierung</strong><p>Autoplay-Freigaben und Browser-Aktionen.</p></span>
+      <span><strong>Buffering &amp; Offline</strong><p>Retry, Netzwechsel und externe Fallbacks.</p></span>
+      <span><strong>Now Playing</strong><p>Metadatenquelle, Verlauf, Favoriten.</p></span>
+      <span><strong>PWA &amp; Theme</strong><p>Installation, Darstellung, lokale Speicherung.</p></span>
+      <span><strong>Timer &amp; Shortcuts</strong><p>Langzeithören komfortabel steuern.</p></span>
     </div>
     <div class="faq-list wrap">
       <details class="panel faq-item" open><summary>Der Stream startet nicht. Was kann ich sofort tun?</summary><p>Öffne zuerst <a href="./live.html#player">die Live-Seite</a>, klicke auf <strong>Stream starten</strong> oder <strong>Erneut versuchen</strong> und achte darauf, ob der Status eher auf <em>Blockiert</em>, <em>Puffern</em> oder <em>Fehler</em> steht. Wenn dein Browser den Start nicht freigibt, helfen oft ein erneuter Klick, ein anderer Browser oder der Wechsel zum Direktstream beziehungsweise zur offiziellen laut.fm-Seite.</p></details>
