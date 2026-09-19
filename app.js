@@ -39,11 +39,6 @@
   const retryStatus = document.getElementById('retry-status');
   const stickyPlayer = document.getElementById('sticky-player');
   const stickyPlayButton = document.getElementById('sticky-play');
-  const stickyStatusText = document.getElementById('sticky-status-text');
-  const stickyMessage = document.getElementById('sticky-message');
-  const stickyNetworkState = document.getElementById('sticky-network-state');
-  const stickyPlayerState = document.getElementById('sticky-player-state');
-  const stickyRetryState = document.getElementById('sticky-retry-state');
 
   let currentState = 'ready';
   let loadTimer = 0;
@@ -122,10 +117,6 @@
     if (networkStatus.parentElement) {
       networkStatus.parentElement.dataset.state = isOffline ? 'offline' : 'online';
     }
-    if (stickyNetworkState) {
-      stickyNetworkState.textContent = isOffline ? 'Netz offline' : 'Netz online';
-      stickyNetworkState.dataset.state = isOffline ? 'offline' : 'online';
-    }
   }
 
   function getRetryStatusText() {
@@ -164,30 +155,6 @@
         } else {
           retryStatus.parentElement.dataset.state = 'manual';
         }
-      }
-    }
-
-    if (stickyStatusText) {
-      stickyStatusText.textContent = statusText.textContent;
-    }
-
-    if (stickyMessage) {
-      stickyMessage.textContent = message.textContent;
-    }
-
-    if (stickyPlayerState) {
-      stickyPlayerState.textContent = STATE_LABELS[currentState] || STATE_LABELS.ready;
-      stickyPlayerState.dataset.state = currentState;
-    }
-
-    if (stickyRetryState) {
-      stickyRetryState.textContent = getRetryStatusText();
-      if (currentState === 'error' || currentState === 'blocked') {
-        stickyRetryState.dataset.state = 'action-needed';
-      } else if (currentState === 'loading' || reconnectAttempts > 0) {
-        stickyRetryState.dataset.state = 'active';
-      } else {
-        stickyRetryState.dataset.state = 'manual';
       }
     }
 
@@ -289,9 +256,9 @@
   }
 
   function ensureStreamSource(forceReload) {
-    const hasSource = audio.getAttribute('src') === STREAM_URL;
+    const hasSource = audio.src === STREAM_URL;
     if (!hasSource) {
-      audio.setAttribute('src', STREAM_URL);
+      audio.src = STREAM_URL;
       forceReload = true;
     }
 
