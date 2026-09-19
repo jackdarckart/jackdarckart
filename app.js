@@ -5,7 +5,7 @@
     volume: 'jackdarckart-volume',
     muted: 'jackdarckart-muted'
   };
-  const STREAM_URL = 'https://stream.laut.fm/jackdarckart';
+  const STREAM_URL = 'https://jackdarckart.stream.laut.fm/jackdarckart';
   const LOAD_TIMEOUT_MS = 10000;
   const RECONNECT_DELAY_MS = 1500;
   const MAX_AUTO_RECONNECTS = 2;

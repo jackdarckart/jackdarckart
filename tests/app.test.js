@@ -4,6 +4,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const appCode = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+const expectedStreamUrl = 'https://jackdarckart.stream.laut.fm/jackdarckart';
 
 class MockElement {
   constructor(id, ownerDocument) {
@@ -350,7 +351,7 @@ async function testMissingOptionalElementsDoNotCrashInitialization() {
   await elements.play.dispatch('click');
 
   assert.equal(elements.audio.playCount, 1, 'playback should still be attempted when optional UI fragments are absent');
-  assert.equal(elements.audio.src, 'https://stream.laut.fm/jackdarckart', 'the stream URL should still be assigned');
+  assert.equal(elements.audio.src, expectedStreamUrl, 'the stream URL should still be assigned');
 }
 
 async function testMissingAudioElementShowsGuardedErrorState() {
@@ -388,7 +389,16 @@ async function testMuteButtonRestoresAudiblePlaybackFromZeroVolume() {
   assert.equal(elements['volume-text'].textContent, '70%', 'restoring audio should refresh the visible volume label');
 }
 
+function testUsesStationSpecificHttpsStreamUrl() {
+  assert.match(
+    appCode,
+    /const STREAM_URL = 'https:\/\/jackdarckart\.stream\.laut\.fm\/jackdarckart';/,
+    'player code should target the station-specific laut.fm HTTPS stream URL'
+  );
+}
+
 async function main() {
+  testUsesStationSpecificHttpsStreamUrl();
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();
