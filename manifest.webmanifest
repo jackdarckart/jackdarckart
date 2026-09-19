@@ -1,0 +1,32 @@
+{
+  "name": "jackdarckart Radio-Web-App",
+  "short_name": "jackdarckart",
+  "description": "Installierbare, datenschutzfreundliche Radio-Web-App für den offiziellen jackdarckart laut.fm-Stream.",
+  "lang": "de-DE",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070b18",
+  "theme_color": "#070b18",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    {
+      "src": "./assets/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

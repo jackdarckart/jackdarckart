@@ -1,27 +1,30 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-theme="dark" data-theme-preference="auto">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>jackdarckart — Direkter Browser-Player | stream-musik.space</title>
-  <meta name="description" content="Direkter Browser-Player für den offiziellen jackdarckart laut.fm-Stream: kontrollierter Start, sichtbare Statusmeldungen, Retry-Hinweise und externe Fallback-Wege.">
+  <title>jackdarckart — Radio-Web-App & Browser-Player | stream-musik.space</title>
+  <meta name="description" content="Installierbare, datenschutzfreundliche Radio-Web-App für den offiziellen jackdarckart laut.fm-Stream mit Direktplayer, Now-Playing-Fallback, Retry-Status, Offline-Hinweisen und statischen Inhaltssektionen.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm; manifest-src 'self'; upgrade-insecure-requests">
+  <meta name="color-scheme" content="dark light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'sha256-ecY/ETBWpZGKLlCEIcQZExf7GvhY0Od36vsPD935rKI='; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
   <meta property="og:site_name" content="stream-musik.space">
-  <meta property="og:title" content="jackdarckart — Direkter Browser-Player">
-  <meta property="og:description" content="Direkter Browser-Zugang zum offiziellen jackdarckart laut.fm-Stream mit sichtbaren Statusmeldungen, Retry-Hinweisen und externen Fallback-Wegen.">
+  <meta property="og:title" content="jackdarckart — Radio-Web-App & Browser-Player">
+  <meta property="og:description" content="Installierbare, datenschutzfreundliche Radio-Web-App für den offiziellen jackdarckart laut.fm-Stream mit Direktplayer, Retry-Status und ehrlichen Inhaltszuständen.">
   <meta property="og:url" content="https://stream-musik.space/">
   <meta property="og:image" content="https://stream-musik.space/assets/social-preview.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="jackdarckart — Direkter Browser-Player">
-  <meta name="twitter:description" content="Direkter Browser-Zugang zum offiziellen jackdarckart laut.fm-Stream mit sichtbaren Statusmeldungen, Retry-Hinweisen und externen Fallback-Wegen.">
+  <meta name="twitter:title" content="jackdarckart — Radio-Web-App & Browser-Player">
+  <meta name="twitter:description" content="Installierbare, datenschutzfreundliche Radio-Web-App für den offiziellen jackdarckart laut.fm-Stream mit Direktplayer, Retry-Status und ehrlichen Inhaltszuständen.">
   <meta name="twitter:image" content="https://stream-musik.space/assets/social-preview.png">
   <meta name="theme-color" content="#070b18">
+  <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
+  <script type="application/ld+json" id="structured-data">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"stream-musik.space","url":"https://stream-musik.space/","inLanguage":"de-DE","description":"Installierbare, datenschutzfreundliche Radio-Web-App für den offiziellen jackdarckart laut.fm-Stream."},{"@type":"RadioStation","name":"jackdarckart","url":"https://stream-musik.space/","sameAs":["https://laut.fm/jackdarckart"],"broadcastDisplayName":"jackdarckart","description":"Browserfreundliche, statische Web-App für den offiziellen laut.fm-Stream von jackdarckart."}]}</script>
 </head>
 <body>
   <a class="skip-link" href="#content">Zum Inhalt springen</a>
@@ -31,9 +34,19 @@
         <span class="logo" aria-hidden="true">JD</span>
         <span>
           <span class="brand-title">jackdarckart</span>
-          <span class="brand-subtitle">Direkter Browser-Player auf laut.fm-Basis</span>
+          <span class="brand-subtitle">Installierbare Radio-Web-App auf laut.fm-Basis</span>
         </span>
       </a>
+      <div class="nav-tools">
+        <label class="theme-switch" for="theme-select">
+          <span>Theme</span>
+          <select id="theme-select" aria-label="Farbschema wählen">
+            <option value="auto">Auto</option>
+            <option value="dark">Dunkel</option>
+            <option value="light">Hell</option>
+          </select>
+        </label>
+      </div>
       <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Navigation öffnen">
         <span></span>
         <span></span>
@@ -42,7 +55,8 @@
       <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation">
         <a href="#player">Player</a>
         <a href="#listen">Hören</a>
-        <a href="#about">Über den Sender</a>
+        <a href="#updates">Events & News</a>
+        <a href="#archive">Archiv</a>
         <a href="#faq">FAQ</a>
         <a href="#security">Sicherheit</a>
         <a href="#contact">Kontakt</a>
@@ -54,10 +68,10 @@
     <section class="hero section" id="start">
       <div class="wrap hero-grid">
         <div class="hero-copy">
-          <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Offizieller laut.fm-Stream · Direkt im Browser</span>
-          <h1>jackdarckart.<br><span class="gradient">Direkter Streamzugang mit klarer Kontrolle.</span></h1>
+          <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Offizieller laut.fm-Stream · Direkt im Browser · installierbar</span>
+          <h1>jackdarckart.<br><span class="gradient">Mehr Radio-Web-App, gleicher kontrollierter Direktstream.</span></h1>
           <p>
-            stream-musik.space bündelt den offiziellen Stream von <strong>jackdarckart</strong> in einer schlanken Browser-Oberfläche: Start erst nach deiner Aktion, sichtbare Status- und Fehlerhinweise, Retry bei Problemen und direkte Fallback-Wege ohne Tracker oder unnötige Frontend-Abhängigkeiten.
+            stream-musik.space erweitert den offiziellen Stream von <strong>jackdarckart</strong> um eine installierbare, datenschutzfreundliche Browser-Oberfläche: Start erst nach deiner Aktion, sichtbare Status- und Offline-Hinweise, konfigurierbare Now-Playing-Struktur, ehrliche Fallbacks und statische Inhaltsbereiche ohne Tracker oder unnötige Frontend-Abhängigkeiten.
           </p>
           <div class="actions">
             <a class="button primary" href="#player">Jetzt streamen</a>
@@ -65,16 +79,16 @@
           </div>
           <div class="mini-grid" aria-label="Vorteile">
             <article class="panel card">
-              <h2>Direkter Browser-Player</h2>
-              <p>Der Livestream startet direkt auf der Seite und wird erst nach echter Nutzeraktion geladen.</p>
+              <h2>Now Playing mit ehrlichem Fallback</h2>
+              <p>Metadaten werden nur abgefragt, wenn eine verlässliche Quelle konfiguriert ist. Ohne Quelle bleibt die Anzeige transparent statt spekulativ.</p>
             </article>
             <article class="panel card">
-              <h2>Status &amp; Retry sichtbar</h2>
-              <p>Blockaden, Ladezustände, Fehler und Neuversuche bleiben im Player klar nachvollziehbar.</p>
+              <h2>Status, Retry &amp; Offline sichtbar</h2>
+              <p>Browser-Blockaden, Ladezustände, Fehler, Neuversuche und Netzwechsel bleiben im Player klar nachvollziehbar.</p>
             </article>
             <article class="panel card">
-              <h2>Schlanke statische Oberfläche</h2>
-              <p>Keine Analytics, keine Fremdbibliotheken und nur die nötigen Verbindungen rund um den Stream.</p>
+              <h2>PWA ohne Tracking</h2>
+              <p>Die App kann installiert werden, cached nur statische Ressourcen und lässt den Live-Audiostream bewusst ungecached.</p>
             </article>
           </div>
         </div>
@@ -97,6 +111,22 @@
 
           <p class="note" id="message">Die Wiedergabe startet erst nach deiner Aktion. Browser-Blockaden, Ladezustände und Neuversuche werden hier direkt angezeigt.</p>
 
+          <div class="offline-notice" id="offline-notice" hidden role="status" aria-live="polite">
+            <p id="offline-notice-text">Offline-Hinweise erscheinen hier.</p>
+            <button class="button secondary" id="offline-retry" type="button" hidden>Nach Netzwerk-Rückkehr erneut versuchen</button>
+          </div>
+
+          <section class="subpanel" aria-labelledby="now-playing-heading">
+            <div class="subpanel-head">
+              <h3 id="now-playing-heading">Now Playing</h3>
+              <span class="subpanel-label">Konfigurierbare Datenquelle</span>
+            </div>
+            <p class="now-playing-track" id="now-playing-track">Titelinformationen derzeit nicht verfügbar</p>
+            <p class="now-playing-artist" id="now-playing-artist">Live-Metadaten bleiben deaktiviert, bis eine echte Quelle konfiguriert ist.</p>
+            <p class="status-line"><span class="meta-label">Senderstatus</span><span id="station-status">Bereit für manuellen Start</span></p>
+            <p class="share-status note" id="now-playing-source" aria-live="polite">Keine Now-Playing-Quelle konfiguriert.</p>
+          </section>
+
           <div class="status-grid" aria-label="Player-Status und Diagnose">
             <p class="status-meta">
               <span class="meta-label">Netzstatus</span>
@@ -107,8 +137,24 @@
               <span id="player-state-label">Bereit</span>
             </p>
             <p class="status-meta">
-              <span class="meta-label">Retry</span>
+              <span class="meta-label">Verbindungsqualität</span>
+              <span id="connection-quality">Bereit bei Bedarf</span>
+            </p>
+            <p class="status-meta">
+              <span class="meta-label">Retry-Status</span>
               <span id="retry-status">Manuell verfügbar</span>
+            </p>
+            <p class="status-meta">
+              <span class="meta-label">Retry-Zähler</span>
+              <span id="retry-counter">0 / 2</span>
+            </p>
+            <p class="status-meta">
+              <span class="meta-label">Letzter Start</span>
+              <span id="last-started">Noch kein Start</span>
+            </p>
+            <p class="status-meta status-meta-wide">
+              <span class="meta-label">Letzter Fehler</span>
+              <span id="last-error">Noch kein Fehler registriert</span>
             </p>
           </div>
 
@@ -116,7 +162,7 @@
             <button class="button play-button" id="play" type="button" aria-pressed="false">Stream starten</button>
             <button class="button icon-button" id="mute" type="button" aria-pressed="false" aria-label="Ton stummschalten">Ton an</button>
             <button class="button icon-button" id="retry" type="button" hidden>Erneut versuchen</button>
-            <button class="button icon-button" id="share" type="button">Teilen</button>
+            <button class="button icon-button" id="share" type="button" data-share-target="page">Jetzt teilen</button>
           </div>
 
           <label class="volume-control" for="volume">
@@ -125,12 +171,43 @@
           </label>
           <input id="volume" type="range" min="0" max="100" step="1" value="70" aria-label="Lautstärke">
 
-          <p class="share-status note" id="share-status" aria-live="polite">Titelinfos und Senderdetails laufen weiterhin direkt über laut.fm.</p>
+          <div class="utility-grid">
+            <section class="subpanel compact-panel" aria-labelledby="share-panel-title">
+              <div class="subpanel-head compact-head">
+                <h3 id="share-panel-title">Teilen ohne Tracking</h3>
+              </div>
+              <div class="share-actions" aria-label="Teilen und Links kopieren">
+                <button class="button secondary" id="share-website" type="button" data-share-target="website">Website teilen</button>
+                <button class="button secondary" id="share-stream" type="button" data-share-target="stream">Aktuellen Stream teilen</button>
+              </div>
+              <p class="share-status note" id="share-status" aria-live="polite">Bei verfügbaren Now-Playing-Daten wird der Share-Text automatisch um Titel und Interpret ergänzt.</p>
+            </section>
+
+            <section class="subpanel compact-panel install-panel" id="install-prompt" hidden aria-labelledby="install-title">
+              <div class="subpanel-head compact-head">
+                <h3 id="install-title">Installieren</h3>
+                <span class="subpanel-label">PWA-Hinweis</span>
+              </div>
+              <button class="button secondary" id="install-app" type="button">App installieren</button>
+              <p class="note" id="install-status" aria-live="polite">Installationshinweise werden nur angezeigt, wenn dein Browser sie unterstützt.</p>
+            </section>
+          </div>
+
+          <p class="theme-hint note" id="theme-hint" aria-live="polite">Automatisch aktiv (dunkel)</p>
 
           <div class="player-links">
             <a class="button secondary" href="https://jackdarckart.stream.laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Direkten Stream öffnen</a>
             <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Offizielle Senderseite</a>
           </div>
+
+          <section class="subpanel history-panel" aria-labelledby="history-title">
+            <div class="subpanel-head">
+              <h3 id="history-title">Zuletzt gespielt</h3>
+              <span class="subpanel-label">deutsche Zeitstempel</span>
+            </div>
+            <ol class="history-list" id="history-list" hidden></ol>
+            <p class="empty-history note" id="history-empty">Noch keine Historie verfügbar. Sobald eine verlässliche Quelle eingerichtet ist, erscheinen hier zuletzt gespielte Titel.</p>
+          </section>
 
           <audio id="audio" preload="none" playsinline>
             Dein Browser unterstützt Audio nicht.
@@ -143,8 +220,8 @@
       <div class="wrap">
         <div class="section-title">
           <span class="eyebrow">Jetzt hören</span>
-          <h2>Ein technischer Hörweg mit direktem Browser-Start und klaren Ausweichpfaden.</h2>
-          <p>Die Oberfläche konzentriert sich auf einen nachvollziehbaren Streamzugang: direkte Wiedergabe im Browser, sichtbare Zustände im Player und externe Fallback-Wege über Stream-URL oder laut.fm.</p>
+          <h2>Ein nachvollziehbarer Hörweg mit Direktstart, Statusdiagnose und Offline-Hinweisen.</h2>
+          <p>Die Oberfläche konzentriert sich weiterhin auf kontrollierte Wiedergabe im Browser, sichtbare Zustände im Player und externe Fallback-Wege über Stream-URL oder laut.fm — ergänzt um Installierbarkeit und statische Zusatzbereiche.</p>
         </div>
         <div class="cards">
           <article class="panel card">
@@ -153,7 +230,7 @@
           </article>
           <article class="panel card">
             <h3>2. Status lesen</h3>
-            <p>Der Player meldet Ladephase, Blockaden, Pufferung, Neuversuche und den aktuellen Wiedergabestatus sichtbar im Interface.</p>
+            <p>Der Player meldet Ladephase, Blockaden, Retry-Zähler, Offline-Situationen und den aktuellen Wiedergabestatus direkt im Interface.</p>
           </article>
           <article class="panel card">
             <h3>3. Hörweg wechseln</h3>
@@ -172,7 +249,7 @@
         <div class="section-title">
           <span class="eyebrow">Über den Sender</span>
           <h2>Eine fokussierte Web-Oberfläche rund um den bestehenden laut.fm-Stream.</h2>
-          <p>Diese Website ergänzt die Senderpräsenz von jackdarckart um einen direkten Browser-Player, sichtbare Diagnose- und Retry-Logik sowie eine reduzierte Oberfläche ohne zusätzliche Dienste oder unbelegte Metadaten.</p>
+          <p>Diese Website ergänzt die Senderpräsenz von jackdarckart um einen direkten Browser-Player, sichtbare Diagnose- und Retry-Logik, Theme-Steuerung, Installierbarkeit und statische Inhaltsblöcke — ohne zusätzliche Dienste oder erfundene Live-Daten.</p>
         </div>
         <div class="cards">
           <article class="panel card">
@@ -181,13 +258,44 @@
           </article>
           <article class="panel card">
             <h3>Klare Bedienoberfläche</h3>
-            <p>Tastaturbedienung, kontrastreiche UI, Sticky-Schnellzugriff und <code>prefers-reduced-motion</code> halten die Oberfläche lesbar und kontrollierbar.</p>
+            <p>Tastaturbedienung, sichtbare Fokuszustände, Sticky-Schnellzugriff und <code>prefers-reduced-motion</code> halten die Oberfläche lesbar und kontrollierbar.</p>
           </article>
           <article class="panel card">
-            <h3>Fakten statt Platzhalter</h3>
-            <p>Es werden bewusst keine Sendungs-, Titel- oder Zeitplandaten eingeblendet, solange dafür keine verlässliche Quelle direkt angebunden ist.</p>
+            <h3>Fakten statt Fantasie</h3>
+            <p>Aktuelle Titel, Historie, Events und News erscheinen nur aus verifizierter Konfiguration oder klaren Leerzuständen — nicht aus erfundenen Live-Daten.</p>
           </article>
         </div>
+      </div>
+    </section>
+
+    <section class="section section-muted" id="updates">
+      <div class="wrap">
+        <div class="section-title">
+          <span class="eyebrow">Events & News</span>
+          <h2>Statische, leicht pflegbare Inhaltsbereiche für kommende Inhalte.</h2>
+          <p>Kommende Live-Events und redaktionelle Updates bleiben bewusst statisch konfigurierbar. Ohne gepflegte Einträge erscheinen ehrliche, professionell gestaltete Leerzustände.</p>
+        </div>
+        <div class="content-columns">
+          <article class="panel content-panel">
+            <h3>Kommende Live-Events</h3>
+            <div class="content-list" id="events-list" aria-live="polite"></div>
+          </article>
+          <article class="panel content-panel">
+            <h3>News</h3>
+            <div class="content-list" id="news-list" aria-live="polite"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="archive">
+      <div class="wrap">
+        <div class="section-title">
+          <span class="eyebrow">Mix- & Sendungsarchiv</span>
+          <h2>Ein Platz für archivierte Mixes, Mitschnitte und Referenzen.</h2>
+          <p>Auch das Archiv bleibt statisch editierbar. So kann die Seite Inhalte präsentieren, ohne automatische Drittanbieter-Feeds oder Tracking nachzuladen.</p>
+        </div>
+        <div class="content-list single-column" id="archive-list" aria-live="polite"></div>
       </div>
     </section>
 
@@ -195,8 +303,8 @@
       <div class="wrap">
         <div class="section-title">
           <span class="eyebrow">FAQ</span>
-          <h2>Wichtige Antworten zum Browser-Player.</h2>
-          <p>Die häufigsten Fragen drehen sich um Nutzeraktion statt Autoplay, sichtbare Blockaden, externe Hörwege und den reduzierten technischen Aufbau der Seite.</p>
+          <h2>Wichtige Antworten zur Radio-Web-App.</h2>
+          <p>Die häufigsten Fragen drehen sich um Nutzeraktion statt Autoplay, sichtbare Blockaden, Offline-Fallbacks, PWA-Installierbarkeit und den bewusst reduzierten technischen Aufbau.</p>
         </div>
         <div class="faq-list">
           <details class="panel faq-item">
@@ -204,16 +312,16 @@
             <p>Autoplay bleibt bewusst deaktiviert. Viele Browser blockieren Livestreams ohne echte Nutzeraktion, deshalb startet der Player erst nach einem Klick auf einen sichtbaren Bedienknopf.</p>
           </details>
           <details class="panel faq-item">
-            <summary>Was bedeutet „Browser blockiert die Wiedergabe“?</summary>
-            <p>Das ist meist eine Schutzfunktion deines Browsers oder Geräts. Tippe erneut auf <strong>Stream starten</strong> oder <strong>Erneut versuchen</strong>; alternativ kannst du die offizielle laut.fm-Seite öffnen.</p>
+            <summary>Warum zeigt Now Playing manchmal keine Titelinfos?</summary>
+            <p>Die Website fragt Titelinformationen nur ab, wenn eine echte Datenquelle konfiguriert ist. Ohne Quelle oder bei Fehlern bleibt die Anzeige transparent auf „Titelinformationen derzeit nicht verfügbar“ stehen.</p>
           </details>
           <details class="panel faq-item">
-            <summary>Werden aktuelle Titel oder Sendepläne angezeigt?</summary>
-            <p>Nein. Die Seite zeigt absichtlich keine Now-Playing- oder Programmdaten an, solange dafür keine belastbare Quelle direkt an diese statische Oberfläche angebunden ist.</p>
+            <summary>Wird der Live-Stream offline gespeichert?</summary>
+            <p>Nein. Der Service Worker cached nur statische App-Dateien. Der Live-Audiostream bleibt absichtlich ungecached, damit keine veraltete oder unvollständige Stream-Wiedergabe vorgetäuscht wird.</p>
           </details>
           <details class="panel faq-item">
-            <summary>Kann ich den Stream direkt teilen?</summary>
-            <p>Ja. Der Teilen-Button nutzt die Browserfreigabe, wenn vorhanden, und fällt sonst sicher auf das Kopieren des Seitenlinks als externen Stream-Einstieg zurück.</p>
+            <summary>Kann ich die Seite auf dem Homescreen installieren?</summary>
+            <p>Ja, sofern dein Browser `beforeinstallprompt` oder eine vergleichbare Installationsfunktion anbietet. Der Installationshinweis wird deshalb nur eingeblendet, wenn er auf deinem Gerät wirklich verfügbar ist.</p>
           </details>
         </div>
       </div>
@@ -224,35 +332,43 @@
         <div class="section-title">
           <span class="eyebrow">Sicherheit & Datenschutz</span>
           <h2>Wenig Angriffsfläche, klare Grenzen.</h2>
-          <p>Die Seite bleibt bewusst klein: statische Dateien, defensive DOM-Updates, restriktive Meta-CSP und nur die technisch notwendigen externen Ziele rund um laut.fm.</p>
+          <p>Die Seite bleibt bewusst klein: statische Dateien, defensive DOM-Updates, restriktive Meta-CSP, PWA-Caching nur für App-Ressourcen und nur die technisch notwendigen externen Ziele rund um laut.fm.</p>
         </div>
         <div class="cards">
           <article class="panel card">
             <h3>Keine Tracker</h3>
-            <p>Es werden keine Analytics-, Werbe- oder Profiling-Skripte nachgeladen. Externe Anfragen beschränken sich auf Streamzugang, Direktlink und offizielle Senderwege.</p>
+            <p>Es werden keine Analytics-, Werbe- oder Profiling-Skripte nachgeladen. Externe Anfragen beschränken sich standardmäßig auf Streamzugang, Direktlink und offizielle Senderwege.</p>
           </article>
           <article class="panel card">
             <h3>Keine HTML-Injektion</h3>
-            <p>Player-Updates laufen über bekannte Elemente, Attribute und <code>textContent</code> statt über unsichere HTML-Einfügungen in die Oberfläche.</p>
+            <p>Dynamische Player-, Historien- und Inhalts-Updates laufen über bekannte Elemente, Attribute und <code>textContent</code> statt über unsichere HTML-Einfügungen.</p>
           </article>
           <article class="panel card">
-            <h3>Pages-kompatibel</h3>
-            <p>GitHub Pages erlaubt hier nur Meta-CSP statt eigener Response-Header. Die Oberfläche bleibt innerhalb dieser Grenze bewusst statisch und defensiv.</p>
+            <h3>Pages-kompatible PWA</h3>
+            <p>Manifest, Service Worker und JSON-LD bleiben GitHub-Pages-kompatibel. Die CSP wurde nur dort erweitert, wo es für Service Worker und strukturierte Daten technisch nötig ist.</p>
           </article>
         </div>
       </div>
     </section>
 
     <section class="section" id="contact">
-      <div class="wrap">
+      <div class="wrap contact-grid">
         <div class="panel contact-card">
-          <span class="eyebrow">Kontakt & Links</span>
-          <h2>Direkt zu jackdarckart</h2>
-          <p>Weitere Senderinformationen, externe Hörwege und Senderdetails findest du auf der offiziellen laut.fm-Seite. Probleme und Sicherheitsmeldungen laufen über das GitHub-Repository.</p>
+          <span class="eyebrow">Kontakt & Feedback</span>
+          <h2>Direkt, datenschutzfreundlich und ohne Formular-Backend.</h2>
+          <p>Für Feedback, Fehlerberichte oder Songwünsche werden keine Formulardaten an Drittanbieter gesendet. Nutze bevorzugt GitHub Issues oder die offizielle Senderseite; bei Bedarf kann später zusätzlich eine Mailadresse in der statischen Konfiguration ergänzt werden.</p>
           <div class="actions">
-            <a class="button primary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">laut.fm/jackdarckart</a>
-            <a class="button secondary" href="https://github.com/jackdarckart/jackdarckart/issues" target="_blank" rel="noopener noreferrer">Problem über GitHub melden</a>
+            <a class="button primary" href="https://github.com/jackdarckart/jackdarckart/issues" target="_blank" rel="noopener noreferrer">Feedback über GitHub Issues</a>
+            <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Senderseite auf laut.fm</a>
           </div>
+          <p class="note">Songwunsch-Hinweis: Aktuell gibt es kein externes Webformular. Wünsche oder Hinweise sollten deshalb bewusst über die vorhandenen Kontaktwege gesendet werden.</p>
+        </div>
+
+        <div class="panel content-panel">
+          <span class="eyebrow">Plattform-Links</span>
+          <h2>Nur verifizierte Ziele.</h2>
+          <p>Diese Liste verwendet ausschließlich tatsächlich gesetzte Links aus der statischen Konfiguration. Zusätzliche Social-Profile erscheinen erst, wenn sie bewusst hinterlegt wurden.</p>
+          <div class="content-list single-column" id="platform-links" aria-live="polite"></div>
         </div>
       </div>
     </section>
@@ -268,13 +384,13 @@
   <footer class="site-footer">
     <div class="wrap footer-shell">
       <span>© <span id="year"></span> jackdarckart · stream-musik.space</span>
-      <span>Statische Browser-Oberfläche für den offiziellen laut.fm-Stream</span>
+      <span>Statische, installierbare Browser-Oberfläche für den offiziellen laut.fm-Stream</span>
     </div>
   </footer>
 
   <button class="back-to-top" id="back-to-top" type="button" aria-label="Nach oben">↑</button>
   <noscript>
-    <p class="noscript-banner">Für den Browser-Player wird JavaScript benötigt. Du kannst den Stream jederzeit direkt über laut.fm öffnen.</p>
+    <p class="noscript-banner">Für Player, Theme-Umschaltung, Offline-Hinweise und PWA-Funktionen wird JavaScript benötigt. Den Stream kannst du jederzeit direkt über laut.fm öffnen.</p>
   </noscript>
 
   <script src="./app.js" defer></script>
