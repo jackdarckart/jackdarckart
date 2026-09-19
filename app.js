@@ -2800,6 +2800,14 @@
     return new Date(Date.UTC(parts.year, parts.month - 1, parts.day + dayOffset)).toISOString().slice(0, 10);
   }
 
+  function getWeekdayIndexFromCalendarParts(parts) {
+    if (!parts) {
+      return new Date().getDay();
+    }
+
+    return new Date(Date.UTC(parts.year, parts.month - 1, parts.day, 12)).getUTCDay();
+  }
+
   function getDateKeyInTimeZone(value, timeZone) {
     return buildDateKeyFromCalendarParts(getCalendarPartsInTimeZone(value, timeZone), 0);
   }
@@ -2810,13 +2818,15 @@
       return new Date().getDay();
     }
 
+    const calendarParts = getCalendarPartsInTimeZone(timestamp, timeZone);
+
     try {
       const label = new Intl.DateTimeFormat('de-DE', { weekday: 'long', timeZone }).format(timestamp);
       return Object.prototype.hasOwnProperty.call(WEEKDAY_INDEX_BY_LABEL, label.toLocaleLowerCase('de-DE'))
         ? WEEKDAY_INDEX_BY_LABEL[label.toLocaleLowerCase('de-DE')]
-        : new Date(getDateKeyInTimeZone(timestamp, timeZone) + 'T00:00:00Z').getUTCDay();
+        : getWeekdayIndexFromCalendarParts(calendarParts);
     } catch (error) {
-      return new Date(getDateKeyInTimeZone(timestamp, timeZone) + 'T00:00:00Z').getUTCDay();
+      return getWeekdayIndexFromCalendarParts(calendarParts);
     }
   }
 
