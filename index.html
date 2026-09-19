@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>stream-musik.space · Webradio, Beats &amp; Live-Vibes rund um die Uhr</title>
+  <meta name="description" content="Die moderne Landingpage von stream-musik.space mit integriertem Webradio-Player für laut.fm/jackdarckart, Live-Infos, Programm-Highlights und Social Links.">
+  <meta name="theme-color" content="#090314">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="stream-musik.space · Live-Webradio erleben">
+  <meta property="og:description" content="Jetzt live einschalten: moderne Webradio-Startseite mit integriertem Player für laut.fm/jackdarckart.">
+  <meta property="og:url" content="https://stream-musik.space/">
+  <meta property="og:site_name" content="stream-musik.space">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="stream-musik.space · Live-Webradio erleben">
+  <meta name="twitter:description" content="Höre den Stream von laut.fm/jackdarckart direkt auf stream-musik.space.">
+  <style>
+    :root{
+      color-scheme:dark;
+      --bg:#090314;
+      --bg-soft:#120924;
+      --panel:rgb(18 17 40 / 0.65);
+      --panel-strong:rgb(10 12 28 / 0.82);
+      --line:rgb(255 255 255 / 0.12);
+      --text:#f7f6ff;
+      --muted:#b9b8d8;
+      --accent:#7b5cff;
+      --accent-2:#1de5ff;
+      --accent-3:#ff4fd8;
+      --success:#54f59f;
+      --shadow:0 24px 80px rgb(0 0 0 / 0.35);
+      --radius:24px;
+      --radius-sm:18px;
+      --content-width:min(1180px, calc(100vw - 2rem));
+      --header-height:5rem;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, rgb(123 92 255 / 0.18), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgb(29 229 255 / 0.14), transparent 26%),
+        radial-gradient(circle at 50% 100%, rgb(255 79 216 / 0.12), transparent 28%),
+        linear-gradient(180deg, #04020b 0%, #090314 40%, #080511 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      inset:auto;
+      width:34rem;
+      height:34rem;
+      border-radius:50%;
+      filter:blur(70px);
+      pointer-events:none;
+      opacity:.25;
+      z-index:-1;
+      animation:float 16s ease-in-out infinite;
+    }
+
+    body::before{
+      top:-10rem;
+      left:-10rem;
+      background:linear-gradient(135deg, var(--accent), transparent 70%);
+    }
+
+    body::after{
+      right:-12rem;
+      bottom:-12rem;
+      background:linear-gradient(135deg, var(--accent-2), transparent 70%);
+      animation-delay:-6s;
+    }
+
+    a{color:inherit}
+    img{max-width:100%}
+    button,input{font:inherit}
+    :focus-visible{
+      outline:3px solid rgb(29 229 255 / 0.9);
+      outline-offset:4px;
+    }
+
+    .skip-link{
+      position:absolute;
+      left:1rem;
+      top:-3rem;
+      padding:.8rem 1rem;
+      border-radius:999px;
+      background:#fff;
+      color:#050816;
+      z-index:1000;
+      transition:top .2s ease;
+      text-decoration:none;
+      font-weight:700;
+    }
+    .skip-link:focus{top:1rem}
+
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:100;
+      backdrop-filter:blur(22px);
+      background:rgb(5 6 16 / 0.62);
+      border-bottom:1px solid rgb(255 255 255 / 0.08);
+    }
+
+    .header-inner,
+    .hero,
+    .section,
+    .footer-inner{
+      width:var(--content-width);
+      margin:0 auto;
+    }
+
+    .header-inner{
+      min-height:var(--header-height);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:.9rem;
+      text-decoration:none;
+    }
+
+    .brand-mark{
+      width:2.75rem;
+      height:2.75rem;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      letter-spacing:.08em;
+      background:
+        linear-gradient(135deg, rgb(123 92 255 / 0.95), rgb(29 229 255 / 0.9));
+      box-shadow:0 0 30px rgb(123 92 255 / 0.38);
+    }
+
+    .brand-copy strong{
+      display:block;
+      font-size:1rem;
+      letter-spacing:.04em;
+    }
+
+    .brand-copy span{
+      display:block;
+      color:var(--muted);
+      font-size:.76rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap:1rem;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .nav a{
+      text-decoration:none;
+      color:var(--muted);
+      font-size:.95rem;
+      transition:color .2s ease, transform .2s ease;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible{
+      color:var(--text);
+      transform:translateY(-1px);
+    }
+
+    .nav .nav-cta{
+      padding:.75rem 1rem;
+      border:1px solid rgb(255 255 255 / 0.12);
+      border-radius:999px;
+      background:rgb(255 255 255 / 0.04);
+      color:var(--text);
+    }
+
+    .hero-shell{
+      position:relative;
+      overflow:hidden;
+      padding:3.25rem 0 1.5rem;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap:1.5rem;
+      align-items:stretch;
+    }
+
+    .hero-copy,
+    .player-panel,
+    .card,
+    .social-panel,
+    .footer-panel{
+      position:relative;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(22px);
+    }
+
+    .hero-copy{
+      padding:clamp(1.8rem, 4vw, 3.25rem);
+      overflow:hidden;
+      isolation:isolate;
+    }
+
+    .hero-copy::before{
+      content:"";
+      position:absolute;
+      inset:auto -4rem -4rem auto;
+      width:18rem;
+      height:18rem;
+      border-radius:50%;
+      background:radial-gradient(circle, rgb(29 229 255 / 0.24), transparent 65%);
+      z-index:-1;
+    }
+
+    .eyebrow,
+    .live-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:.55rem;
+      padding:.45rem .85rem;
+      border-radius:999px;
+      border:1px solid rgb(255 255 255 / 0.1);
+      background:rgb(255 255 255 / 0.05);
+      color:#dcf8ff;
+      font-size:.8rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .live-dot{
+      width:.6rem;
+      height:.6rem;
+      border-radius:50%;
+      background:var(--success);
+      box-shadow:0 0 18px var(--success);
+      animation:pulse 1.4s infinite;
+    }
+
+    h1{
+      margin:1.1rem 0 1rem;
+      font-size:clamp(2.6rem, 7vw, 5.8rem);
+      line-height:.95;
+      letter-spacing:-.04em;
+    }
+
+    .hero-gradient{
+      background:linear-gradient(115deg, #ffffff 10%, #b0a8ff 38%, #6ef1ff 72%, #ff98ef 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .hero-copy p{
+      max-width:42rem;
+      color:var(--muted);
+      font-size:1.05rem;
+      line-height:1.75;
+      margin:0 0 1.4rem;
+    }
+
+    .hero-actions,
+    .hero-highlights,
+    .player-actions,
+    .player-meta,
+    .social-links,
+    .footer-links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.9rem;
+    }
+
+    .button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.65rem;
+      min-height:3.35rem;
+      padding:.9rem 1.2rem;
+      border-radius:999px;
+      border:1px solid transparent;
+      text-decoration:none;
+      font-weight:700;
+      transition:transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .button:hover,
+    .button:focus-visible{
+      transform:translateY(-2px);
+    }
+
+    .button-primary{
+      color:#08101e;
+      background:linear-gradient(135deg, #6ef1ff, #a684ff 65%, #ff8ce8);
+      box-shadow:0 18px 40px rgb(123 92 255 / 0.28);
+    }
+
+    .button-secondary{
+      color:var(--text);
+      border-color:rgb(255 255 255 / 0.12);
+      background:rgb(255 255 255 / 0.05);
+    }
+
+    .hero-highlights{
+      margin-top:1.5rem;
+    }
+
+    .hero-highlights span{
+      padding:.7rem 1rem;
+      border-radius:999px;
+      background:rgb(255 255 255 / 0.05);
+      border:1px solid rgb(255 255 255 / 0.08);
+      color:#d6d5ef;
+      font-size:.92rem;
+    }
+
+    .player-panel{
+      padding:1.5rem;
+      display:flex;
+      flex-direction:column;
+      gap:1.2rem;
+      justify-content:space-between;
+      background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.02)),
+        linear-gradient(145deg, rgb(123 92 255 / 0.22), rgb(29 229 255 / 0.1) 55%, rgb(255 79 216 / 0.14));
+    }
+
+    .player-top{
+      display:flex;
+      justify-content:space-between;
+      gap:1rem;
+      align-items:flex-start;
+    }
+
+    .player-top h2,
+    .section h2,
+    .social-panel h2{
+      margin:0;
+      font-size:clamp(1.6rem, 3vw, 2.4rem);
+      letter-spacing:-.03em;
+    }
+
+    .player-top p,
+    .section-intro,
+    .social-panel p,
+    .footer-panel p{
+      margin:.55rem 0 0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .player-surface{
+      padding:1.25rem;
+      border-radius:calc(var(--radius) - 8px);
+      background:var(--panel-strong);
+      border:1px solid rgb(255 255 255 / 0.08);
+    }
+
+    .now-playing{
+      margin-bottom:1rem;
+    }
+
+    .label{
+      display:block;
+      color:#bdf6ff;
+      font-size:.78rem;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:.45rem;
+    }
+
+    .track-title{
+      margin:0;
+      font-size:1.2rem;
+      font-weight:800;
+    }
+
+    .track-artist{
+      margin:.25rem 0 0;
+      color:var(--muted);
+      font-size:.98rem;
+    }
+
+    .player-controls{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:1rem;
+      align-items:center;
+      margin-bottom:1rem;
+    }
+
+    .play-toggle{
+      width:4.15rem;
+      height:4.15rem;
+      border:0;
+      border-radius:50%;
+      color:#060916;
+      background:linear-gradient(135deg, #6ef1ff, #a684ff 65%, #ff8ce8);
+      cursor:pointer;
+      box-shadow:0 16px 36px rgb(123 92 255 / 0.35);
+      font-size:1.25rem;
+      font-weight:900;
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+
+    .play-toggle:hover,
+    .play-toggle:focus-visible{
+      transform:scale(1.03);
+      box-shadow:0 22px 44px rgb(123 92 255 / 0.42);
+    }
+
+    .visualizer{
+      display:flex;
+      align-items:flex-end;
+      gap:.35rem;
+      min-height:4.15rem;
+      padding:0 0 .2rem;
+    }
+
+    .visualizer span{
+      width:.45rem;
+      height:1rem;
+      border-radius:999px;
+      background:linear-gradient(180deg, #78f6ff, #7f64ff 60%, #ff71e4);
+      box-shadow:0 0 18px rgb(29 229 255 / 0.26);
+      transform-origin:center bottom;
+      animation:equalizer 1.2s ease-in-out infinite paused;
+    }
+
+    .visualizer span:nth-child(2){animation-delay:-.9s}
+    .visualizer span:nth-child(3){animation-delay:-.45s}
+    .visualizer span:nth-child(4){animation-delay:-.2s}
+    .visualizer span:nth-child(5){animation-delay:-.75s}
+    .visualizer span:nth-child(6){animation-delay:-.55s}
+    .visualizer span:nth-child(7){animation-delay:-.35s}
+
+    .visualizer.is-playing span{
+      animation-play-state:running;
+    }
+
+    .volume-row{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:.85rem;
+      align-items:center;
+      color:var(--muted);
+    }
+
+    .volume-row strong{
+      color:var(--text);
+      font-size:.95rem;
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color:#7fefff;
+      cursor:pointer;
+    }
+
+    .status-line{
+      min-height:1.5rem;
+      margin-top:.9rem;
+      color:#cceff6;
+      font-size:.92rem;
+    }
+
+    .player-actions{
+      margin-top:1rem;
+    }
+
+    .section{
+      padding:1.4rem 0 0;
+    }
+
+    .section-card{
+      padding:clamp(1.6rem, 3vw, 2.4rem);
+    }
+
+    .section-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:1rem;
+      margin-top:1.35rem;
+    }
+
+    .card{
+      padding:1.35rem;
+      min-height:100%;
+    }
+
+    .card-icon{
+      width:3rem;
+      height:3rem;
+      display:grid;
+      place-items:center;
+      border-radius:16px;
+      font-size:1.35rem;
+      background:linear-gradient(135deg, rgb(123 92 255 / 0.2), rgb(29 229 255 / 0.14));
+      border:1px solid rgb(255 255 255 / 0.1);
+      margin-bottom:1rem;
+    }
+
+    .card h3{
+      margin:.1rem 0 .65rem;
+      font-size:1.12rem;
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .schedule{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:1rem;
+      margin-top:1.35rem;
+    }
+
+    .schedule-item{
+      padding:1.25rem;
+      border-radius:var(--radius-sm);
+      border:1px solid rgb(255 255 255 / 0.08);
+      background:rgb(255 255 255 / 0.04);
+    }
+
+    .schedule-item strong{
+      display:block;
+      margin-bottom:.5rem;
+      font-size:1.08rem;
+    }
+
+    .schedule-item span{
+      display:inline-block;
+      margin-bottom:.65rem;
+      padding:.4rem .75rem;
+      border-radius:999px;
+      background:rgb(29 229 255 / 0.1);
+      color:#c8f8ff;
+      font-size:.78rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .social-panel,
+    .footer-panel{
+      padding:clamp(1.6rem, 3vw, 2.4rem);
+    }
+
+    .social-layout{
+      display:grid;
+      grid-template-columns:minmax(0, 1.1fr) minmax(280px, .9fr);
+      gap:1rem;
+      align-items:stretch;
+    }
+
+    .social-links a{
+      min-height:3.15rem;
+      padding:.85rem 1rem;
+      border-radius:16px;
+      border:1px solid rgb(255 255 255 / 0.1);
+      background:rgb(255 255 255 / 0.05);
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    .social-links a:hover,
+    .social-links a:focus-visible{
+      background:rgb(255 255 255 / 0.09);
+    }
+
+    .social-metrics{
+      display:grid;
+      gap:.8rem;
+    }
+
+    .metric{
+      padding:1rem 1.1rem;
+      border-radius:18px;
+      background:rgb(255 255 255 / 0.05);
+      border:1px solid rgb(255 255 255 / 0.08);
+    }
+
+    .metric strong{
+      display:block;
+      font-size:1.35rem;
+      margin-bottom:.2rem;
+    }
+
+    footer{
+      padding:1.2rem 0 2rem;
+    }
+
+    .footer-inner{
+      margin-top:1.2rem;
+    }
+
+    .footer-panel{
+      display:flex;
+      justify-content:space-between;
+      gap:1rem;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .footer-panel p{
+      margin:0;
+    }
+
+    .footer-links a{
+      color:var(--muted);
+      text-decoration:none;
+    }
+
+    .footer-links a:hover,
+    .footer-links a:focus-visible{
+      color:var(--text);
+    }
+
+    @keyframes pulse{
+      0%,100%{transform:scale(.9);opacity:.85}
+      50%{transform:scale(1.08);opacity:1}
+    }
+
+    @keyframes float{
+      0%,100%{transform:translate3d(0,0,0)}
+      50%{transform:translate3d(2rem, 2rem, 0)}
+    }
+
+    @keyframes equalizer{
+      0%,100%{transform:scaleY(.4)}
+      30%{transform:scaleY(1)}
+      60%{transform:scaleY(.55)}
+    }
+
+    @media (max-width: 980px){
+      .hero,
+      .social-layout,
+      .section-grid,
+      .schedule{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 720px){
+      .header-inner{
+        padding:.85rem 0;
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .nav{
+        justify-content:flex-start;
+      }
+
+      .hero-shell{
+        padding-top:2rem;
+      }
+
+      .player-controls,
+      .volume-row{
+        grid-template-columns:1fr;
+      }
+
+      .player-top,
+      .footer-panel{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Direkt zum Inhalt springen</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="stream-musik.space Startseite">
+        <span class="brand-mark" aria-hidden="true">SM</span>
+        <span class="brand-copy">
+          <strong>stream-musik.space</strong>
+          <span>Live Radio Experience</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Hauptnavigation">
+        <a href="#top">Home</a>
+        <a href="#player">Player</a>
+        <a href="#programm">Programm</a>
+        <a href="#kontakt">Kontakt</a>
+        <a class="nav-cta" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">laut.fm öffnen</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero-shell" id="top" aria-labelledby="hero-title">
+      <div class="hero">
+        <article class="hero-copy">
+          <span class="eyebrow"><span class="live-dot" aria-hidden="true"></span>Webradio · 24/7 Live</span>
+          <h1 id="hero-title">Dein Soundtrack zwischen <span class="hero-gradient">Bass, Beats &amp; Broadcast</span>.</h1>
+          <p>
+            Willkommen bei <strong>stream-musik.space</strong> – dem digitalen Zuhause für den
+            Stream <strong>laut.fm/jackdarckart</strong>. Hier trifft modernes Webdesign auf ein
+            direkt integriertes Radio-Erlebnis: live hören, neue Tracks entdecken und jederzeit in
+            die Atmosphäre eines kreativen Online-Senders eintauchen.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#player">Jetzt Player starten</a>
+            <a class="button button-secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Jetzt live hören auf laut.fm</a>
+          </div>
+          <div class="hero-highlights" aria-label="Senderhighlights">
+            <span>Neon-Design mit Glassmorphism</span>
+            <span>Direkter Stream von laut.fm</span>
+            <span>Now Playing &amp; Live-Feeling</span>
+          </div>
+        </article>
+
+        <aside class="player-panel" id="player" aria-labelledby="player-heading">
+          <div class="player-top">
+            <div>
+              <span class="live-pill"><span class="live-dot" aria-hidden="true"></span>On Air</span>
+              <h2 id="player-heading">Webradio-Player</h2>
+              <p>Starte den Stream direkt hier oder öffne den Sender mit einem Klick auf laut.fm.</p>
+            </div>
+          </div>
+
+          <div class="player-surface">
+            <div class="now-playing" aria-live="polite">
+              <span class="label">Aktuell läuft</span>
+              <p class="track-title" id="track-title">laut.fm/jackdarckart</p>
+              <p class="track-artist" id="track-artist">Bereit für den nächsten Track</p>
+            </div>
+
+            <div class="player-controls">
+              <button class="play-toggle" id="play-toggle" type="button" aria-label="Livestream abspielen" aria-pressed="false">▶</button>
+              <div class="visualizer" id="visualizer" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+
+            <div class="volume-row">
+              <strong>Lautstärke</strong>
+              <input id="volume-control" type="range" min="0" max="100" value="75" aria-label="Lautstärke regeln">
+              <span id="volume-value">75%</span>
+            </div>
+
+            <p class="status-line" id="status-line" role="status">Bereit. Klicke auf Play, um den Livestream zu starten.</p>
+
+            <div class="player-actions">
+              <a class="button button-primary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Jetzt live hören auf laut.fm</a>
+              <a class="button button-secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Senderprofil ansehen</a>
+            </div>
+
+            <audio id="radio-audio" preload="none" crossorigin="anonymous">
+              <source src="https://stream.laut.fm/jackdarckart" type="audio/mpeg">
+            </audio>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="about-heading">
+      <div class="hero-copy section-card">
+        <span class="eyebrow">Über den Sender</span>
+        <h2 id="about-heading">stream-musik.space bringt modernes Webradio auf den Punkt</h2>
+        <p class="section-intro">
+          Die Startseite ist als digitale Bühne für den Stream gedacht: klar, lebendig und jederzeit
+          auf Live-Musik fokussiert. Besucherinnen und Besucher erhalten sofort Zugang zum laufenden
+          Programm, zu den klanglichen Schwerpunkten und zu einer visuellen Atmosphäre, die perfekt zu
+          einem kreativen Radiosender mit Nachtmodus, Neon-Look und Club-Ästhetik passt.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="programm" aria-labelledby="programm-heading">
+      <div class="hero-copy section-card">
+        <span class="eyebrow">Programm &amp; Features</span>
+        <h2 id="programm-heading">Mehr als nur Play drücken</h2>
+        <p class="section-intro">
+          Das Konzept dieser Landingpage setzt auf Information, Stimmung und direkte Interaktion. Die
+          folgenden Bereiche zeigen beispielhaft, wie das On-Air-Erlebnis rund um Genres, Specials und
+          Community-Momente präsentiert werden kann.
+        </p>
+
+        <div class="section-grid">
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🎧</div>
+            <h3>Genre-Highlights</h3>
+            <p>Elektronische Energie, melodische Nachtfahrten, entspannte Chill-Vibes und ausgewählte Tracks für digitale Klangreisen – perfekt für lange Sessions.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">📡</div>
+            <h3>Live-Feeling</h3>
+            <p>Direkter Zugriff auf den Stream von laut.fm/jackdarckart mit moderner Oberfläche, Equalizer-Visualisierung und schnell erreichbarem Laut.fm-Link.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">✨</div>
+            <h3>Atmosphäre</h3>
+            <p>Dunkles Theme, leuchtende Farbverläufe und Glassmorphism-Panels sorgen für eine zeitgemäße Optik, die Musik nicht nur hörbar, sondern spürbar macht.</p>
+          </article>
+        </div>
+
+        <div class="schedule" aria-label="Beispielhafte Programmhöhepunkte">
+          <article class="schedule-item">
+            <span>Prime Time</span>
+            <strong>Neon Drive</strong>
+            <p>Illustratives Format für energiegeladene Abendstunden mit tanzbaren Grooves, Synth-Layern und urbanem Puls.</p>
+          </article>
+          <article class="schedule-item">
+            <span>Late Night</span>
+            <strong>Afterglow Sessions</strong>
+            <p>Sanftere Klanglandschaften für ruhige Momente – mit Atmosphäre, Details und Tracks, die im Kopf nachhallen.</p>
+          </article>
+          <article class="schedule-item">
+            <span>Weekend</span>
+            <strong>Community Picks</strong>
+            <p>Platz für Hörerwünsche, Lieblingssongs und spezielle Themenstrecken – ideal für Ausbau mit echten Sendeformaten.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="kontakt" aria-labelledby="kontakt-heading">
+      <div class="social-layout">
+        <div class="social-panel">
+          <span class="eyebrow">Social &amp; Kontakt</span>
+          <h2 id="kontakt-heading">Bleib mit dem Sender verbunden</h2>
+          <p>
+            Folge stream-musik.space auf deinen Kanälen, teile den Stream mit Freundinnen und Freunden
+            und baue rund um den Sender eine eigene Community auf. Die Links sind als Platzhalter
+            vorbereitet und können später direkt durch echte Profile ersetzt werden.
+          </p>
+          <div class="social-links">
+            <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">laut.fm</a>
+            <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://x.com/" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+            <a href="mailto:info@stream-musik.space">E-Mail</a>
+          </div>
+        </div>
+
+        <aside class="social-panel" aria-label="Community Call-to-Action">
+          <span class="eyebrow">Call to Action</span>
+          <h2>Mach den Stream zu deinem täglichen Ritual</h2>
+          <p>Ob im Homeoffice, nachts unterwegs oder beim Chillen – ein Klick genügt, um live dabei zu sein.</p>
+          <div class="social-metrics">
+            <div class="metric">
+              <strong>24/7</strong>
+              <span>Streaming-Bereitschaft für jederzeitiges Einschalten</span>
+            </div>
+            <div class="metric">
+              <strong>Live Now</strong>
+              <span>Songanzeige wird regelmäßig über die laut.fm-API aktualisiert</span>
+            </div>
+            <div class="metric">
+              <strong>Mobile First</strong>
+              <span>Optimiert für Smartphone, Tablet und Desktop</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-panel">
+        <p>&copy; <span id="year"></span> stream-musik.space · Moderne Landingpage für den Webradio-Stream von laut.fm/jackdarckart.</p>
+        <div class="footer-links" aria-label="Rechtliche Links">
+          <a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Sender auf laut.fm</a>
+          <a href="#top">Nach oben</a>
+          <a href="#">Impressum</a>
+          <a href="#">Datenschutz</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const audio = document.querySelector('#radio-audio');
+    const playToggle = document.querySelector('#play-toggle');
+    const volumeControl = document.querySelector('#volume-control');
+    const volumeValue = document.querySelector('#volume-value');
+    const statusLine = document.querySelector('#status-line');
+    const visualizer = document.querySelector('#visualizer');
+    const trackTitle = document.querySelector('#track-title');
+    const trackArtist = document.querySelector('#track-artist');
+    const year = document.querySelector('#year');
+
+    const stationApiCandidates = [
+      'https://api.laut.fm/station/jackdarckart/current_song',
+      'https://api.laut.fm/station/jackdarckart'
+    ];
+
+    year.textContent = new Date().getFullYear();
+    audio.volume = Number(volumeControl.value) / 100;
+
+    function setPlayerState(isPlaying) {
+      playToggle.textContent = isPlaying ? '❚❚' : '▶';
+      playToggle.setAttribute('aria-pressed', String(isPlaying));
+      playToggle.setAttribute('aria-label', isPlaying ? 'Livestream pausieren' : 'Livestream abspielen');
+      visualizer.classList.toggle('is-playing', isPlaying);
+      statusLine.textContent = isPlaying
+        ? 'Live verbunden – der Stream läuft jetzt.'
+        : 'Stream pausiert. Drücke Play, um weiterzuhören.';
+    }
+
+    async function togglePlayback() {
+      try {
+        if (audio.paused) {
+          await audio.play();
+        } else {
+          audio.pause();
+        }
+      } catch (error) {
+        setPlayerState(false);
+        statusLine.textContent = 'Der Stream konnte nicht gestartet werden. Bitte öffne alternativ laut.fm direkt.';
+      }
+    }
+
+    function updateVolume() {
+      const value = Number(volumeControl.value);
+      audio.volume = value / 100;
+      volumeValue.textContent = value + '%';
+    }
+
+    function normalizeSongData(payload) {
+      const source = payload && payload.current_song ? payload.current_song : payload;
+      if (!source) {
+        return null;
+      }
+
+      const title = source.title || source.name || source.song || null;
+      const artist = source.artist && (source.artist.name || source.artist) || source.interpret || source.album_artist || null;
+
+      if (!title && !artist) {
+        return null;
+      }
+
+      return {
+        title: title || 'Live auf jackdarckart',
+        artist: artist || 'Direkt aus dem Stream'
+      };
+    }
+
+    async function fetchNowPlaying() {
+      for (const url of stationApiCandidates) {
+        try {
+          const response = await fetch(url, { headers: { Accept: 'application/json' } });
+          if (!response.ok) {
+            continue;
+          }
+
+          const data = await response.json();
+          const song = normalizeSongData(data);
+
+          if (song) {
+            trackTitle.textContent = song.title;
+            trackArtist.textContent = song.artist;
+            return;
+          }
+        } catch (error) {
+          continue;
+        }
+      }
+
+      trackTitle.textContent = 'laut.fm/jackdarckart';
+      trackArtist.textContent = 'Aktuelle Titeldaten sind momentan nicht verfügbar.';
+    }
+
+    playToggle.addEventListener('click', togglePlayback);
+    volumeControl.addEventListener('input', updateVolume);
+
+    audio.addEventListener('play', () => setPlayerState(true));
+    audio.addEventListener('pause', () => setPlayerState(false));
+    audio.addEventListener('waiting', () => {
+      statusLine.textContent = 'Verbindung wird aufgebaut …';
+    });
+    audio.addEventListener('error', () => {
+      setPlayerState(false);
+      statusLine.textContent = 'Der Livestream ist aktuell nicht erreichbar. Bitte versuche es gleich erneut.';
+    });
+
+    fetchNowPlaying();
+    window.setInterval(fetchNowPlaying, 30000);
+  </script>
+</body>
+</html>
