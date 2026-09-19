@@ -814,6 +814,29 @@ function testUsesStationSpecificHttpsStreamUrl() {
   );
 }
 
+function testAppProvidesPersistentInternalNavigationShell() {
+  assert.match(
+    appCode,
+    /const PERSISTENT_AUDIO_KEY = '__JACKDARCKART_PERSISTENT_AUDIO__';/,
+    'app.js should keep a dedicated persistent-audio handoff key for internal page transitions'
+  );
+  assert.match(
+    appCode,
+    /const audio = resolveAudioElement\(\);/,
+    'app.js should reattach an existing audio element instead of always constructing a fresh page-local player'
+  );
+  assert.match(
+    appCode,
+    /document\.open\(\);\s+document\.write\(html\);\s+document\.close\(\);/,
+    'internal navigation should replace the page document in-place so the player shell can survive page changes'
+  );
+  assert.match(
+    appCode,
+    /bindManagedEvent\(window, 'popstate',/,
+    'persistent navigation should also handle browser back-forward transitions'
+  );
+}
+
 async function testScheduleUsesOfficialApiEntriesForLiveAndNext() {
   const env = createEnvironment({
     now: '2026-09-21T00:30:00+02:00',
@@ -1126,6 +1149,7 @@ async function main() {
   testServiceWorkerCachesAllHtmlPages();
   testIssueHelpPageAndTemplatesArePresent();
   testUsesStationSpecificHttpsStreamUrl();
+  testAppProvidesPersistentInternalNavigationShell();
   await testReusesExistingSourceWithoutForcedReload();
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();

@@ -7,6 +7,7 @@ Statische, mehrseitige GitHub-Pages-Website für das Webradio **jackdarckart** a
 Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipeline und ohne externe Frontend-Abhängigkeiten. Sie ergänzt den offiziellen laut.fm-Stream um:
 
 - direkte Browser-Wiedergabe nach echter Nutzeraktion
+- interne Seitennavigation ohne vollständigen Reload, damit der laufende Webplayer beim Wechsel zwischen Bereichen erhalten bleibt
 - sichtbare Status-, Fehler-, Retry-, Puffer- und Offline-Hinweise
 - kompakte Startseite plus getrennte Inhaltsseiten für Live, Titel, Sendeplan, Events, News, Archiv, Hilfe, Issue-Hilfe, Kontakt, Datenschutz und Impressum
 - Sleep-Timer, Tastaturkürzel, Theme-Umschaltung, lokale Favoriten und Share-Funktionen
@@ -199,7 +200,7 @@ node tests/app.test.js
 
 Sinnvolle manuelle Prüfungen:
 
-1. Navigation, aktive Seitenmarkierung und Mobile-Drawer auf mehreren Seiten prüfen
+1. Navigation, aktive Seitenmarkierung, Mobile-Drawer und laufende Wiedergabe beim Wechsel zwischen mehreren Seiten prüfen
 2. `index.html`, `live.html`, `titel.html` und `sendeplan.html` mit erreichbarer laut.fm-API prüfen: Song, Historie, Sendeplan, Senderdaten, Listener und Next Artists
 3. API-Fehlerfall simulieren: Browser offline oder Proxy deaktivieren und auf ehrliche Fehlerzustände mit letztem erfolgreichen Abruf achten
 4. Live-Player auf `live.html` starten, pausieren, stummschalten, Retry + Offline-Hinweise testen
