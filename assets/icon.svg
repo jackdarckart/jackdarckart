@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">jackdarckart App-Icon</title>
+  <desc id="desc">Abstraktes JD-Monogramm auf dunklem Verlaufshintergrund.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#4ddcff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="#050b15"/>
+  <rect x="36" y="36" width="440" height="440" rx="96" fill="url(#bg)"/>
+  <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="188" font-family="Inter, Arial, sans-serif" font-weight="800" letter-spacing="6">JD</text>
+</svg>

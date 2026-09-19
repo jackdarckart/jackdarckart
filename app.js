@@ -6,6 +6,8 @@
     muted: 'jackdarckart-muted'
   };
   const STREAM_URL = 'https://jackdarckart.stream.laut.fm/jackdarckart';
+  const NOW_PLAYING_URL = 'https://api.laut.fm/station/jackdarckart/current_song';
+  const NOW_PLAYING_TIMEOUT_MS = 4000;
   const LOAD_TIMEOUT_MS = 10000;
   const RECONNECT_DELAY_MS = 1500;
   const MAX_AUTO_RECONNECTS = 2;
@@ -39,6 +41,10 @@
   const retryStatus = document.getElementById('retry-status');
   const stickyPlayer = document.getElementById('sticky-player');
   const stickyPlayButton = document.getElementById('sticky-play');
+  const nowPlayingState = document.getElementById('now-playing-state');
+  const nowPlayingTitle = document.getElementById('now-playing-title');
+  const nowPlayingArtist = document.getElementById('now-playing-artist');
+  const nowPlayingUpdatedAt = document.getElementById('now-playing-updated-at');
   const STREAM_URL_RESOLVED = normalizeUrl(STREAM_URL);
 
   let currentState = 'ready';
@@ -48,6 +54,8 @@
   let wantsPlayback = false;
   let hasConfirmedPlayback = false;
   let lastAudibleVolume = 70;
+  let nowPlayingAbortController = null;
+  let nowPlayingRequestId = 0;
 
   function normalizeUrl(value) {
     if (!value) {
@@ -225,11 +233,12 @@
     muteButton.dataset.state = muted ? 'muted' : 'active';
   }
 
-  function updateVolume(value) {
+  function updateVolume(value, options) {
     if (!audio) {
       return;
     }
 
+    const shouldPersist = !options || options.persist !== false;
     const normalized = Math.max(0, Math.min(100, Number.parseInt(String(value), 10) || 0));
     if (volumeInput) {
       volumeInput.value = String(normalized);
@@ -250,8 +259,152 @@
     }
 
     updateMuteButton();
-    writeStorage(STORAGE_KEYS.volume, String(normalized));
-    writeStorage(STORAGE_KEYS.muted, String(audio.muted));
+    if (shouldPersist) {
+      writeStorage(STORAGE_KEYS.volume, String(normalized));
+      writeStorage(STORAGE_KEYS.muted, String(audio.muted));
+    }
+  }
+
+  function updateNowPlayingView(state, info) {
+    if (nowPlayingState) {
+      nowPlayingState.textContent = info && info.stateText ? info.stateText : 'Nicht verfügbar';
+    }
+    if (nowPlayingTitle) {
+      nowPlayingTitle.textContent = info && info.title ? info.title : 'Keine verlässlichen Live-Metadaten verfügbar';
+    }
+    if (nowPlayingArtist) {
+      nowPlayingArtist.textContent = info && info.artist ? info.artist : 'Live-Quelle aktuell nicht nutzbar';
+    }
+    if (nowPlayingUpdatedAt) {
+      nowPlayingUpdatedAt.textContent = info && info.updatedAt ? info.updatedAt : 'Letzte Prüfung: –';
+    }
+    if (nowPlayingState && nowPlayingState.parentElement) {
+      nowPlayingState.parentElement.dataset.state = state;
+    }
+  }
+
+  function formatNowPlayingTimestamp(date) {
+    try {
+      if (typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function') {
+        return new Intl.DateTimeFormat('de-DE', {
+          dateStyle: 'short',
+          timeStyle: 'medium'
+        }).format(date);
+      }
+    } catch (error) {
+      return date.toISOString();
+    }
+
+    return typeof date.toLocaleString === 'function' ? date.toLocaleString('de-DE') : date.toISOString();
+  }
+
+  function getNowPlayingFallbackMessage(error) {
+    if (error && error.name === 'AbortError') {
+      return 'Zeitüberschreitung bei der Live-Abfrage';
+    }
+
+    return 'Live-Abfrage derzeit nicht erreichbar';
+  }
+
+  function normalizeNowPlayingPayload(payload) {
+    if (!payload || typeof payload !== 'object') {
+      return null;
+    }
+
+    const title = typeof payload.title === 'string' ? payload.title.trim() : '';
+    const artist = payload.artist && typeof payload.artist.name === 'string'
+      ? payload.artist.name.trim()
+      : '';
+
+    if (!title || !artist) {
+      return null;
+    }
+
+    return { title, artist };
+  }
+
+  async function fetchNowPlaying() {
+    if (typeof window.fetch !== 'function') {
+      updateNowPlayingView('unavailable', {
+        stateText: 'Nicht verfügbar',
+        title: 'Keine verlässlichen Live-Metadaten verfügbar',
+        artist: 'Dieser Browser unterstützt die nötige Abfrage nicht',
+        updatedAt: 'Letzte Prüfung: ' + formatNowPlayingTimestamp(new Date())
+      });
+      return;
+    }
+
+    if (nowPlayingAbortController) {
+      nowPlayingAbortController.abort();
+    }
+    const requestAbortController = typeof AbortController === 'function' ? new AbortController() : null;
+    const requestId = nowPlayingRequestId + 1;
+    nowPlayingRequestId = requestId;
+    nowPlayingAbortController = requestAbortController;
+
+    const timeout = window.setTimeout(() => {
+      if (requestAbortController) {
+        requestAbortController.abort();
+      }
+    }, NOW_PLAYING_TIMEOUT_MS);
+
+    updateNowPlayingView('loading', {
+      stateText: 'Wird geladen …',
+      title: 'Livedaten werden abgefragt',
+      artist: 'Quelle: api.laut.fm (current_song)',
+      updatedAt: 'Letzte Prüfung: läuft …'
+    });
+
+    try {
+      const response = await window.fetch(NOW_PLAYING_URL, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        signal: requestAbortController ? requestAbortController.signal : undefined
+      });
+      if (!response.ok) {
+        throw new Error('http-' + response.status);
+      }
+
+      const payload = await response.json();
+      const normalized = normalizeNowPlayingPayload(payload);
+      const now = formatNowPlayingTimestamp(new Date());
+      if (requestId !== nowPlayingRequestId || nowPlayingAbortController !== requestAbortController) {
+        return;
+      }
+
+      if (!normalized) {
+        updateNowPlayingView('unavailable', {
+          stateText: 'Nicht verfügbar',
+          title: 'Live-Quelle liefert aktuell keine belastbaren Titelinfos',
+          artist: 'Player bleibt ohne Metadaten voll nutzbar',
+          updatedAt: 'Letzte Prüfung: ' + now
+        });
+        return;
+      }
+
+      updateNowPlayingView('available', {
+        stateText: 'Live-Daten aktiv',
+        title: normalized.title,
+        artist: normalized.artist,
+        updatedAt: 'Zuletzt aktualisiert: ' + now
+      });
+    } catch (error) {
+      if (requestId !== nowPlayingRequestId || nowPlayingAbortController !== requestAbortController) {
+        return;
+      }
+      const now = formatNowPlayingTimestamp(new Date());
+      updateNowPlayingView('error', {
+        stateText: 'Nicht verfügbar',
+        title: 'Keine verlässlichen Live-Metadaten verfügbar',
+        artist: getNowPlayingFallbackMessage(error) + ' (CORS/Netzwerk möglich)',
+        updatedAt: 'Letzte Prüfung: ' + now
+      });
+    } finally {
+      window.clearTimeout(timeout);
+      if (requestId === nowPlayingRequestId && nowPlayingAbortController === requestAbortController) {
+        nowPlayingAbortController = null;
+      }
+    }
   }
 
   function clearLoadTimer() {
@@ -607,11 +760,21 @@
     year.textContent = String(new Date().getFullYear());
   }
 
-  updateVolume(getStoredVolume());
+  updateVolume(getStoredVolume(), { persist: false });
   if (audio) {
     audio.muted = getStoredMuted() || audio.volume === 0;
   }
+  if (audio && audio.volume > 0) {
+    lastAudibleVolume = Math.max(1, Math.round(audio.volume * 100));
+  }
   updateMuteButton();
+  updateNowPlayingView('unavailable', {
+    stateText: 'Nicht verfügbar',
+    title: 'Keine verlässlichen Live-Metadaten verfügbar',
+    artist: 'Player funktioniert auch ohne diese Zusatzdaten',
+    updatedAt: 'Letzte Prüfung: –'
+  });
+  fetchNowPlaying();
   setState('ready', 'Bereit zum Start', 'Die Wiedergabe startet erst nach deiner Aktion und meldet Status sowie Neuversuche direkt im Player.');
   setupMediaSession();
   bindNavigation();
@@ -650,6 +813,7 @@
   }
   if (volumeInput) {
     volumeInput.addEventListener('input', () => updateVolume(volumeInput.value));
+    volumeInput.addEventListener('change', () => updateVolume(volumeInput.value));
   }
 
   if (audio) {

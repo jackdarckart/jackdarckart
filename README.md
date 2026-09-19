@@ -9,9 +9,11 @@ Die Website bleibt bewusst eine kleine, statische Landingpage ohne Build-Pipelin
 - direkte Browser-Wiedergabe nach echter Nutzeraktion
 - klarere Status-, Fehler- und Retry-Hinweise
 - Sticky-Quick-Access zum Player beim Scrollen
+- Now-Playing-Fläche mit dokumentierter laut.fm-Quelle (`api.laut.fm/.../current_song`) und ehrlichem „nicht verfügbar“-Fallback
 - Share-/Link-Kopier-Funktion per nativer Browser-API mit Fallback
 - sichtbare Diagnose- und Fallback-Wege für Browser- und Verbindungsprobleme
 - reale FAQ-, Kontakt-, Sicherheits- und Datenschutzhinweise
+- Impressum-Vorlage, security.txt und PWA-Basis ohne Build-Schritt
 - kontraststarkes, responsives Layout für Mobile, Tablet und Desktop
 
 ## Struktur
@@ -21,6 +23,10 @@ Die Website bleibt bewusst eine kleine, statische Landingpage ohne Build-Pipelin
 - `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-Verhalten, Statusdiagnose, Share-Funktion und defensive Browser-APIs
 - `CNAME` – Custom Domain `stream-musik.space`
 - `tests/app.test.js` – schlanker Node-basierter Regressionstest für zentrale Player-Flows und defensive Initialisierung
+- `manifest.webmanifest` – PWA-Basis für installierbare Darstellung ohne Service Worker
+- `assets/*.svg` und `assets/icon-*.png` – App-/Social-Icons für Browser, PWA-Installationen und Social-Preview
+- `.well-known/security.txt` – standardisierter Kontaktweg für Security-Meldungen
+- `.github/workflows/validate-static-player.yml` – CI-Workflow für Syntax und Regressionstests
 
 Die Website benötigt **keinen Build-Schritt** und wird direkt aus dem Repository-Root veröffentlicht.
 
@@ -49,7 +55,7 @@ Die Custom Domain bleibt über `CNAME` auf `stream-musik.space` gesetzt.
 
 - restriktive Meta-Content-Security-Policy in `index.html`
 - keine Inline-Skripte, keine externen Bibliotheken, keine Tracker
-- externe Ressourcen auf die Website selbst und den laut.fm-Stream begrenzt
+- externe Ressourcen auf die Website selbst, den laut.fm-Stream und die dokumentierte Live-Metadatenquelle (`api.laut.fm`) begrenzt
 - `referrer`-Policy über Meta-Tag gesetzt
 - externe Links mit `target="_blank"` sowie `rel="noopener noreferrer"`
 - keine automatische Audiowiedergabe beim Laden
@@ -65,14 +71,14 @@ Die Custom Domain bleibt über `CNAME` auf `stream-musik.space` gesetzt.
 - Der Audiostream kommt von `https://jackdarckart.stream.laut.fm/jackdarckart`. Wenn laut.fm nicht erreichbar ist, kann die Website nur auf die offizielle laut.fm-Seite verweisen.
 - Bei restriktiven Browser-Richtlinien (vor allem mobil/Safari) muss der Start weiter direkt über die sichtbare Nutzeraktion **Stream starten** oder **Erneut versuchen** erfolgen.
 - Es wird bewusst **kein Service Worker** eingesetzt, um veraltete Caches und unnötige Offline-Komplexität zu vermeiden.
-- Es werden bewusst keine angeblich aktuellen Titel- oder Sendeplandaten angezeigt, solange keine verlässlich eingebundene Quelle vorhanden ist.
+- Die Now-Playing-Anzeige nutzt nur die dokumentierte Quelle `https://api.laut.fm/station/jackdarckart/current_song`; bei CORS-/Netzwerkproblemen wird bewusst ein transparenter „nicht verfügbar“-Fallback angezeigt.
 
 ## Sicherheitsmeldungen
 
-Für diese statische Website ist keine separate `security.txt` mit verifizierter Kontaktadresse hinterlegt. Bitte melde Sicherheitsprobleme über die vorhandenen Wege im Repository, zum Beispiel über:
+Sicherheitsmeldungen sind über `/.well-known/security.txt` dokumentiert. Verifizierte Kontaktwege:
 
 - GitHub Issues: <https://github.com/jackdarckart/jackdarckart/issues>
-- Pull Requests gegen `main`
+- GitHub Security Advisories: <https://github.com/jackdarckart/jackdarckart/security/advisories/new>
 
 ## Prüfungen
 
@@ -80,6 +86,7 @@ Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. 
 
 - JavaScript-Syntaxprüfung mit `node --check app.js`
 - schlanker Regressionstest mit `node tests/app.test.js`
+- CI-Workflow mit denselben Befehlen in GitHub Actions (`Validate static player`)
 - HTML/CSS/JS-Manuelltest über einen lokalen statischen Server
 - Wiedergabe-Flows manuell prüfen: Start, Pause, Stumm, Lautstärke, Browser-Blockierung, Retry, Pufferung und Sticky-Quick-Access
 - Mobile/Tablet/Desktop-Layout mit Fokus auf Navigation, Player-Status und FAQ-Sektionen prüfen
