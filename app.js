@@ -1518,7 +1518,7 @@
       return;
     }
 
-    menuToggle.addEventListener('click', () => {
+    bindManagedEvent(menuToggle, 'click', () => {
       if (siteNav.classList.contains('is-open')) {
         closeMenu();
       } else {
@@ -1527,7 +1527,7 @@
     });
 
     siteNav.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', closeMenu);
+      bindManagedEvent(link, 'click', closeMenu);
     });
 
     bindManagedEvent(document, 'click', (event) => {
@@ -3285,36 +3285,36 @@
   refreshAllLiveData();
 
   if (shareButton) {
-    shareButton.addEventListener('click', handleShare);
+    bindManagedEvent(shareButton, 'click', handleShare);
   }
   if (shareWebsiteButton) {
-    shareWebsiteButton.addEventListener('click', handleShare);
+    bindManagedEvent(shareWebsiteButton, 'click', handleShare);
   }
   if (shareStreamButton) {
-    shareStreamButton.addEventListener('click', handleShare);
+    bindManagedEvent(shareStreamButton, 'click', handleShare);
   }
   if (playButton) {
-    playButton.addEventListener('click', togglePlayback);
+    bindManagedEvent(playButton, 'click', togglePlayback);
   }
   if (stickyPlayButton) {
-    stickyPlayButton.addEventListener('click', togglePlayback);
+    bindManagedEvent(stickyPlayButton, 'click', togglePlayback);
   }
   if (retryButton) {
-    retryButton.addEventListener('click', () => {
+    bindManagedEvent(retryButton, 'click', () => {
       reconnectAttempts = 0;
       showRecoveryRetry = false;
       attemptPlayback(true);
     });
   }
   if (offlineRetryButton) {
-    offlineRetryButton.addEventListener('click', () => {
+    bindManagedEvent(offlineRetryButton, 'click', () => {
       reconnectAttempts = 0;
       showRecoveryRetry = false;
       attemptPlayback(true);
     });
   }
   if (muteButton) {
-    muteButton.addEventListener('click', () => {
+    bindManagedEvent(muteButton, 'click', () => {
       if (!audio) {
         return;
       }
@@ -3330,20 +3330,20 @@
     });
   }
   if (volumeInput) {
-    volumeInput.addEventListener('input', () => updateVolume(volumeInput.value));
-    volumeInput.addEventListener('change', () => updateVolume(volumeInput.value));
+    bindManagedEvent(volumeInput, 'input', () => updateVolume(volumeInput.value));
+    bindManagedEvent(volumeInput, 'change', () => updateVolume(volumeInput.value));
   }
   if (themeSelect) {
-    themeSelect.addEventListener('change', () => {
+    bindManagedEvent(themeSelect, 'change', () => {
       applyTheme(themeSelect.value || DEFAULT_THEME);
       writeStorage(STORAGE_KEYS.theme, themeSelect.value || DEFAULT_THEME);
     });
   }
   if (installButton) {
-    installButton.addEventListener('click', handleInstallClick);
+    bindManagedEvent(installButton, 'click', handleInstallClick);
   }
   if (sleepTimerSelect) {
-    sleepTimerSelect.addEventListener('change', () => {
+    bindManagedEvent(sleepTimerSelect, 'change', () => {
       updateSleepCustomVisibility();
       if (sleepTimerSelect.value === 'off' && !sleepEndAt) {
         updateSleepTimerStatus('Kein Sleep-Timer aktiv.');
@@ -3351,25 +3351,25 @@
     });
   }
   if (sleepApplyButton) {
-    sleepApplyButton.addEventListener('click', applySleepTimer);
+    bindManagedEvent(sleepApplyButton, 'click', applySleepTimer);
   }
   if (sleepCancelButton) {
-    sleepCancelButton.addEventListener('click', () => clearSleepTimer('Kein Sleep-Timer aktiv.'));
+    bindManagedEvent(sleepCancelButton, 'click', () => clearSleepTimer('Kein Sleep-Timer aktiv.'));
   }
   if (favoriteTrackButton) {
-    favoriteTrackButton.addEventListener('click', toggleCurrentFavorite);
+    bindManagedEvent(favoriteTrackButton, 'click', toggleCurrentFavorite);
   }
   if (liveDataRefreshButton) {
-    liveDataRefreshButton.addEventListener('click', refreshAllLiveData);
+    bindManagedEvent(liveDataRefreshButton, 'click', refreshAllLiveData);
   }
   if (favoritesClearButton) {
-    favoritesClearButton.addEventListener('click', clearFavorites);
+    bindManagedEvent(favoritesClearButton, 'click', clearFavorites);
   }
   if (feedbackEmailButton) {
-    feedbackEmailButton.addEventListener('click', () => handleFeedbackAction('email'));
+    bindManagedEvent(feedbackEmailButton, 'click', () => handleFeedbackAction('email'));
   }
   if (feedbackIssueButton) {
-    feedbackIssueButton.addEventListener('click', () => handleFeedbackAction('issue'));
+    bindManagedEvent(feedbackIssueButton, 'click', () => handleFeedbackAction('issue'));
   }
 
   if (audio) {
@@ -3519,6 +3519,6 @@
   });
   bindManagedEvent(document, 'keydown', handleKeyboardShortcuts);
   if (backToTopButton) {
-    backToTopButton.addEventListener('click', scrollToTop);
+    bindManagedEvent(backToTopButton, 'click', scrollToTop);
   }
 }());
