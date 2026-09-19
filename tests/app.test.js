@@ -22,6 +22,10 @@ const htmlPages = [
 ];
 const pageHrefByFile = Object.fromEntries(htmlPages.map((file) => [file, './' + file]));
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 class MockElement {
   constructor(id, ownerDocument) {
     this.id = id;
@@ -1005,8 +1009,8 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
     assert.ok(footerNavMatch, `${file} should expose a parsable footer navigation section`);
     assert.equal((siteNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the main navigation`);
     assert.equal((footerNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the footer navigation`);
-    assert.match(siteNavMatch[1], new RegExp(`<a href="${expectedHref.replace('.', '\\.')}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the main navigation`);
-    assert.match(footerNavMatch[1], new RegExp(`<a href="${expectedHref.replace('.', '\\.')}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the footer navigation`);
+    assert.match(siteNavMatch[1], new RegExp(`<a href="${escapeRegExp(expectedHref)}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the main navigation`);
+    assert.match(footerNavMatch[1], new RegExp(`<a href="${escapeRegExp(expectedHref)}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the footer navigation`);
     if (file !== 'index.html') {
       assert.match(html, /<nav class="breadcrumbs" aria-label="Breadcrumb">/, `${file} should include breadcrumbs`);
     }
@@ -1015,7 +1019,7 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
 
 function testServiceWorkerCachesAllHtmlPages() {
   for (const file of htmlPages) {
-    assert.match(swCode, new RegExp(`['"]\\./${file.replace('.', '\\.')}['"]`), `service worker should precache ${file}`);
+    assert.match(swCode, new RegExp(`['"]${escapeRegExp('./' + file)}['"]`), `service worker should precache ${file}`);
   }
   assert.match(swCode, /request\.mode === 'navigate'/, 'service worker should handle navigations explicitly');
   assert.match(swCode, /cache\.put\(normalizedPageUrl, responseClone\)/, 'navigation responses should be cached under a stable page key');

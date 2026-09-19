@@ -24,6 +24,11 @@ const APP_SHELL = [
   './assets/app-icon.svg',
   './assets/social-preview.png'
 ];
+const STATIC_PAGE_PATHS = new Set(
+  APP_SHELL
+    .filter((asset) => asset === './' || asset.endsWith('.html'))
+    .map((asset) => new URL(asset, self.location.href).pathname)
+);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -66,7 +71,8 @@ self.addEventListener('fetch', (event) => {
   const relativePath = url.pathname.startsWith(scopePath)
     ? url.pathname.slice(scopePath.length)
     : url.pathname.replace(/^\/+/, '');
-  const normalizedPageUrl = new URL(relativePath || './', scopeUrl).href;
+  const useQuerylessKey = STATIC_PAGE_PATHS.has(url.pathname);
+  const normalizedPageUrl = new URL((relativePath || './') + (useQuerylessKey ? '' : url.search), scopeUrl).href;
 
   if (request.destination === 'audio') {
     return;
