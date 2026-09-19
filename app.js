@@ -6,9 +6,17 @@
     muted: 'jackdarckart-muted'
   };
   const STREAM_URL = 'https://stream.laut.fm/jackdarckart';
-  const LOAD_TIMEOUT_MS = 8000;
-  const RECONNECT_DELAY_MS = 1200;
-  const MAX_AUTO_RECONNECTS = 1;
+  const LOAD_TIMEOUT_MS = 10000;
+  const RECONNECT_DELAY_MS = 1500;
+  const MAX_AUTO_RECONNECTS = 2;
+  const STATE_LABELS = {
+    ready: 'Bereit',
+    loading: 'Lädt',
+    playing: 'Spielt',
+    paused: 'Pausiert',
+    blocked: 'Blockiert',
+    error: 'Fehler'
+  };
 
   const audio = document.getElementById('audio');
   const playButton = document.getElementById('play');
@@ -26,6 +34,13 @@
   const siteNav = document.getElementById('site-nav');
   const backToTopButton = document.getElementById('back-to-top');
   const year = document.getElementById('year');
+  const networkStatus = document.getElementById('network-status');
+  const playerStateLabel = document.getElementById('player-state-label');
+  const retryStatus = document.getElementById('retry-status');
+  const stickyPlayer = document.getElementById('sticky-player');
+  const stickyPlayButton = document.getElementById('sticky-play');
+  const stickyStatusText = document.getElementById('sticky-status-text');
+  const stickyMessage = document.getElementById('sticky-message');
 
   let currentState = 'ready';
   let loadTimer = 0;
@@ -71,18 +86,73 @@
   }
 
   function updatePlayButton() {
+    const buttons = [playButton, stickyPlayButton].filter(Boolean);
+
     if (currentState === 'playing') {
-      playButton.textContent = 'Stream pausieren';
-      playButton.setAttribute('aria-pressed', 'true');
+      buttons.forEach((button) => {
+        button.textContent = 'Stream pausieren';
+        button.setAttribute('aria-pressed', 'true');
+      });
       return;
     }
 
-    playButton.textContent = currentState === 'loading' ? 'Verbindung läuft …' : 'Stream starten';
-    playButton.setAttribute('aria-pressed', 'false');
+    buttons.forEach((button) => {
+      button.textContent = currentState === 'loading' ? 'Verbindung läuft …' : 'Stream starten';
+      button.setAttribute('aria-pressed', 'false');
+    });
   }
 
   function updateRetryButton() {
     retryButton.hidden = currentState !== 'error' && currentState !== 'blocked';
+  }
+
+  function updateNetworkStatus() {
+    if (!networkStatus) {
+      return;
+    }
+
+    const isOffline = typeof navigator.onLine === 'boolean' && !navigator.onLine;
+    networkStatus.textContent = isOffline ? 'Browser meldet offline' : 'Browser meldet online';
+  }
+
+  function getRetryStatusText() {
+    if (currentState === 'loading') {
+      return reconnectAttempts > 0
+        ? 'Automatik ' + reconnectAttempts + '/' + MAX_AUTO_RECONNECTS
+        : 'Start wird überwacht';
+    }
+
+    if (currentState === 'playing') {
+      return MAX_AUTO_RECONNECTS > 0 ? 'Auto-Reconnect aktiv' : 'Nur manuell';
+    }
+
+    if (currentState === 'error' || currentState === 'blocked') {
+      return 'Bitte manuell erneut versuchen';
+    }
+
+    return 'Manuell verfügbar';
+  }
+
+  function syncStatusMirrors() {
+    if (playerStateLabel) {
+      playerStateLabel.textContent = STATE_LABELS[currentState] || STATE_LABELS.ready;
+    }
+
+    if (retryStatus) {
+      retryStatus.textContent = getRetryStatusText();
+    }
+
+    if (stickyStatusText) {
+      stickyStatusText.textContent = statusText.textContent;
+    }
+
+    if (stickyMessage) {
+      stickyMessage.textContent = message.textContent;
+    }
+
+    if (stickyPlayer) {
+      stickyPlayer.dataset.state = currentState;
+    }
   }
 
   function setState(type, title, detail) {
@@ -94,6 +164,8 @@
     updateEqualizer(type === 'playing');
     updatePlayButton();
     updateRetryButton();
+    updateNetworkStatus();
+    syncStatusMirrors();
   }
 
   function updateMuteButton() {
@@ -138,6 +210,26 @@
     }
   }
 
+  function getPlaybackPreparationText(forceReload) {
+    const isOffline = typeof navigator.onLine === 'boolean' && !navigator.onLine;
+
+    if (isOffline) {
+      return 'Dein Browser meldet gerade keine Verbindung. Sobald du wieder online bist, kannst du direkt erneut starten.';
+    }
+
+    return forceReload
+      ? 'Die Verbindung zum Livestream wird neu aufgebaut.'
+      : 'Der Livestream wird mit deiner Aktion gestartet.';
+  }
+
+  function getNetworkFailureText() {
+    if (typeof navigator.onLine === 'boolean' && !navigator.onLine) {
+      return 'Dein Browser meldet aktuell Offline. Bitte prüfe die Verbindung und tippe dann erneut auf den Stream.';
+    }
+
+    return 'Bitte versuche es erneut oder öffne den Stream direkt auf laut.fm.';
+  }
+
   function stopAudioAfterFailure() {
     if (!audio.paused) {
       audio.pause();
@@ -178,7 +270,7 @@
         setState(
           'loading',
           'Verbindung wird erneut aufgebaut …',
-          'Der Stream antwortet noch nicht. Ein weiterer Versuch startet jetzt.'
+          'Der Stream antwortet noch nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' startet jetzt.'
         );
         clearReconnectTimer();
         reconnectTimer = window.setTimeout(() => {
@@ -192,7 +284,7 @@
       setState(
         'error',
         'Der Stream startet gerade nicht.',
-        'Bitte tippe auf „Erneut versuchen“ oder öffne den Stream direkt auf laut.fm.'
+        getNetworkFailureText()
       );
     }, LOAD_TIMEOUT_MS);
   }
@@ -212,7 +304,7 @@
       setState(
         'blocked',
         'Browser blockiert die Wiedergabe.',
-        'Bitte tippe erneut auf „Stream starten“ oder „Erneut versuchen“.'
+        'Bitte tippe erneut auf „Stream starten“ oder „Erneut versuchen“. Erst danach darf der Browser den Livestream freigeben.'
       );
       return;
     }
@@ -221,7 +313,7 @@
     setState(
       'error',
       'Wiedergabe konnte nicht starten.',
-      'Bitte versuche es erneut oder öffne den Stream direkt auf laut.fm.'
+      getNetworkFailureText()
     );
   }
 
@@ -231,7 +323,7 @@
     setState(
       'loading',
       forceReload ? 'Verbindung wird aufgebaut …' : 'Wiedergabe wird vorbereitet …',
-      'Der Livestream wird mit deiner Aktion gestartet.'
+      getPlaybackPreparationText(forceReload)
     );
     scheduleLoadTimeout();
 
@@ -337,6 +429,13 @@
 
   function setBackToTopVisibility() {
     backToTopButton.classList.toggle('is-visible', window.scrollY > 480);
+
+    if (!stickyPlayer) {
+      return;
+    }
+
+    const playerCardVisible = status.getBoundingClientRect().top < window.innerHeight && status.getBoundingClientRect().bottom > 0;
+    stickyPlayer.classList.toggle('is-visible', window.scrollY > 260 && !playerCardVisible);
   }
 
   function bindNavigation() {
@@ -382,6 +481,9 @@
 
   shareButton.addEventListener('click', handleShare);
   playButton.addEventListener('click', togglePlayback);
+  if (stickyPlayButton) {
+    stickyPlayButton.addEventListener('click', togglePlayback);
+  }
   retryButton.addEventListener('click', () => {
     reconnectAttempts = 0;
     attemptPlayback(true);
@@ -400,7 +502,7 @@
     if (!wantsPlayback) {
       return;
     }
-    setState('loading', 'Verbindung wird aufgebaut …', 'Der Livestream wird geladen.');
+    setState('loading', 'Verbindung wird aufgebaut …', 'Der Livestream wird geladen und die Verbindung geprüft.');
     scheduleLoadTimeout();
   });
 
@@ -410,7 +512,7 @@
     reconnectAttempts = 0;
     hasConfirmedPlayback = true;
     wantsPlayback = true;
-    setState('playing', 'Der Livestream läuft.', 'Du hörst jetzt jackdarckart.');
+    setState('playing', 'Der Livestream läuft.', 'Du hörst jetzt jackdarckart über den offiziellen laut.fm-Stream.');
     if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'playing';
     }
@@ -432,7 +534,7 @@
     if (!wantsPlayback) {
       return;
     }
-    setState('loading', 'Stream puffert …', 'Die Verbindung wird stabilisiert.');
+    setState('loading', 'Stream puffert …', 'Die Verbindung wird stabilisiert. Wenn nötig, folgt automatisch ein Neuversuch.');
     scheduleLoadTimeout();
   });
 
@@ -443,7 +545,11 @@
 
     if (hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
       reconnectAttempts += 1;
-      setState('loading', 'Stream verbindet sich neu …', 'Die Verbindung stockt. Ein neuer Versuch läuft.');
+      setState(
+        'loading',
+        'Stream verbindet sich neu …',
+        'Die Verbindung stockt. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft.'
+      );
       clearReconnectTimer();
       reconnectTimer = window.setTimeout(() => {
         attemptPlayback(true);
@@ -453,7 +559,7 @@
 
     wantsPlayback = false;
     stopAudioAfterFailure();
-    setState('error', 'Die Verbindung stockt.', 'Bitte tippe auf „Erneut versuchen“.');
+    setState('error', 'Die Verbindung stockt.', 'Bitte tippe auf „Erneut versuchen“ oder öffne den Stream direkt auf laut.fm.');
   });
 
   audio.addEventListener('error', () => {
@@ -462,7 +568,11 @@
 
     if (wantsPlayback && hasConfirmedPlayback && reconnectAttempts < MAX_AUTO_RECONNECTS) {
       reconnectAttempts += 1;
-      setState('loading', 'Stream verbindet sich neu …', 'Der Stream antwortet nicht. Ein weiterer Versuch läuft.');
+      setState(
+        'loading',
+        'Stream verbindet sich neu …',
+        'Der Stream antwortet nicht. Automatischer Neuversuch ' + reconnectAttempts + ' von ' + MAX_AUTO_RECONNECTS + ' läuft.'
+      );
       reconnectTimer = window.setTimeout(() => {
         attemptPlayback(true);
       }, RECONNECT_DELAY_MS);
@@ -471,10 +581,13 @@
 
     wantsPlayback = false;
     stopAudioAfterFailure();
-    setState('error', 'Stream momentan nicht verfügbar.', 'Bitte prüfe deine Verbindung oder versuche es erneut.');
+    setState('error', 'Stream momentan nicht verfügbar.', getNetworkFailureText());
   });
 
   window.addEventListener('scroll', setBackToTopVisibility, { passive: true });
+  window.addEventListener('resize', setBackToTopVisibility);
+  window.addEventListener('online', updateNetworkStatus);
+  window.addEventListener('offline', updateNetworkStatus);
   backToTopButton.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });

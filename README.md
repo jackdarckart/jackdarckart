@@ -2,11 +2,21 @@
 
 Statische GitHub-Pages-Website für das Webradio **jackdarckart** auf laut.fm.
 
+## Überblick
+
+Die Website bleibt bewusst eine kleine, statische Landingpage ohne Build-Pipeline und ohne externe Frontend-Abhängigkeiten. Sie bündelt den offiziellen laut.fm-Stream in einem browserfreundlichen Direktplayer und ergänzt ihn um:
+
+- klarere Status-, Fehler- und Retry-Hinweise
+- Sticky-Quick-Access zum Player beim Scrollen
+- Share-/Link-Kopier-Funktion per nativer Browser-API mit Fallback
+- reale FAQ-, Kontakt-, Sicherheits- und Datenschutzhinweise
+- kontraststarkes, responsives Layout für Mobile, Tablet und Desktop
+
 ## Struktur
 
-- `index.html` – semantische Startseite mit Meta-Tags und Player-Markup
-- `styles.css` – responsives Layout und visuelles Design
-- `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-Verhalten, Share-Funktion und defensive Browser-APIs
+- `index.html` – semantische Startseite mit Meta-Tags, Player-Markup und Inhaltssektionen
+- `styles.css` – responsives Layout, Sticky-Elemente, FAQ-Design und visuelle Gestaltung
+- `app.js` – Navigation, Player-Logik mit Retry-/Reconnect-Verhalten, Statusdiagnose, Share-Funktion und defensive Browser-APIs
 - `CNAME` – Custom Domain `stream-musik.space`
 
 Die Website benötigt **keinen Build-Schritt** und wird direkt aus dem Repository-Root veröffentlicht.
@@ -41,6 +51,7 @@ Die Custom Domain bleibt über `CNAME` auf `stream-musik.space` gesetzt.
 - externe Links mit `target="_blank"` sowie `rel="noopener noreferrer"`
 - keine automatische Audiowiedergabe beim Laden
 - klarer Player-Status für bereit, lädt, spielt, pausiert, Browser-Blockierung und Fehler
+- sichtbare Browser-/Verbindungsdiagnose und Auto-Reconnect-Hinweise nach echter Nutzeraktion
 - Lautstärke- und Mute-Einstellungen werden defensiv aus `localStorage` gelesen
 - keine unvalidierte HTML-Injektion: DOM-Updates laufen über `textContent`, Attribute und bekannte Elemente
 
@@ -66,4 +77,25 @@ Es gibt im Repository derzeit keine installierte Test- oder Lint-Infrastruktur. 
 
 - JavaScript-Syntaxprüfung mit `node --check app.js`
 - HTML/CSS/JS-Manuelltest über einen lokalen statischen Server
-- Wiedergabe-Flows manuell prüfen: Start, Pause, Stumm, Lautstärke, Browser-Blockierung und Retry
+- Wiedergabe-Flows manuell prüfen: Start, Pause, Stumm, Lautstärke, Browser-Blockierung, Retry, Pufferung und Sticky-Quick-Access
+- Mobile/Tablet/Desktop-Layout mit Fokus auf Navigation, Player-Status und FAQ-Sektionen prüfen
+- GitHub-Pages-Verhalten mit vorhandener Custom Domain `stream-musik.space` verifizieren
+
+## Realistische Testhinweise
+
+Für die Browserprüfung bieten sich folgende Szenarien an:
+
+1. **Desktop (Chrome/Firefox/Safari):**
+   - Seite laden
+   - `Stream starten` klicken
+   - Pause, Mute, Lautstärke und Teilen testen
+   - Netzwerk kurz deaktivieren und Retry-Verhalten prüfen
+
+2. **Mobile (iPhone/Android):**
+   - Start nur per Touch auslösen
+   - Sticky-Quick-Access und Mobile-Menü prüfen
+   - Browser-Blockierung bzw. erneute Freigabe testen
+
+3. **GitHub Pages / Live-Domain:**
+   - Deployment auf `https://stream-musik.space/` öffnen
+   - Externe Links, Meta-CSP, CNAME und Direktstream-Link kontrollieren
