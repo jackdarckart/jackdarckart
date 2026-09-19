@@ -1092,13 +1092,13 @@ function testIssueHelpPageAndTemplatesArePresent() {
   const readme = fs.readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
   const templateDir = path.join(__dirname, '..', '.github', 'ISSUE_TEMPLATE');
 
-  assert.match(issueHelpHtml, /GitHub Issues &amp; Feedback/, 'issue help page should expose a dedicated GitHub Issues section');
-  assert.match(issueHelpHtml, /Bugreport/, 'issue help page should describe bug reports');
-  assert.match(issueHelpHtml, /Feature Request/, 'issue help page should describe feature requests');
-  assert.match(issueHelpHtml, /Inhaltsanfrage \/ Datenpflege/, 'issue help page should describe content and data maintenance issues');
-  assert.match(issueHelpHtml, /Design-\/UX-Verbesserung/, 'issue help page should describe design and UX issues');
-  assert.match(issueHelpHtml, /API-\/Echtzeitdaten-Problem/, 'issue help page should describe API and realtime data issues');
-  assert.match(issueHelpHtml, /keine erfundenen Songs, Sendungen, Events oder Social-Profile/i, 'issue help page should forbid invented content');
+  assert.match(issueHelpHtml, /<link rel="canonical" href="https:\/\/stream-musik\.space\/issue-hilfe\.html">/, 'issue help page should define its canonical URL');
+  assert.match(issueHelpHtml, /issues\/new\?template=bug_report\.md/, 'issue help page should link to the bug template');
+  assert.match(issueHelpHtml, /issues\/new\?template=feature_request\.md/, 'issue help page should link to the feature template');
+  assert.match(issueHelpHtml, /issues\/new\?template=content_request\.md/, 'issue help page should link to the content template');
+  assert.match(issueHelpHtml, /issues\/new\?template=design_ux_improvement\.md/, 'issue help page should link to the design and UX template');
+  assert.match(issueHelpHtml, /issues\/new\?template=api_realtime_problem\.md/, 'issue help page should link to the API template');
+  assert.match(issueHelpHtml, /\.\/issue-hilfe\.html" aria-current="page" class="is-current"/, 'issue help page should mark its own navigation link as current');
   assert.match(readme, /Mitwirken über GitHub Issues/, 'README should document the GitHub issue workflow');
 
   for (const file of ['bug_report.md', 'feature_request.md', 'content_request.md', 'design_ux_improvement.md', 'api_realtime_problem.md']) {
