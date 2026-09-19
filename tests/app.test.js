@@ -5,6 +5,7 @@ const vm = require('node:vm');
 
 const appCode = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
 const swCode = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+const stylesCode = fs.readFileSync(path.join(__dirname, '..', 'styles.css'), 'utf8');
 const expectedStreamUrl = 'https://jackdarckart.stream.laut.fm/jackdarckart';
 const htmlPages = [
   'index.html',
@@ -1469,6 +1470,29 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
   }
 }
 
+function testStickyPlayerCssKeepsPlayerWithinViewport() {
+  assert.match(
+    stylesCode,
+    /\.sticky-player\s*\{[\s\S]*left:\s*max\(1rem,\s*env\(safe-area-inset-left,\s*0px\)\);[\s\S]*right:\s*max\(1rem,\s*env\(safe-area-inset-right,\s*0px\)\);[\s\S]*width:\s*min\(34rem,\s*100%\);[\s\S]*margin-inline:\s*auto;[\s\S]*transform:\s*translateY\(1rem\);/,
+    'sticky player should use inset-based positioning and vertical-only transform so it stays inside viewport bounds'
+  );
+  assert.match(
+    stylesCode,
+    /\.sticky-player\.is-visible\s*\{[\s\S]*transform:\s*translateY\(0\);/,
+    'sticky player visible state should avoid horizontal translate offsets'
+  );
+  assert.match(
+    stylesCode,
+    /@media \(max-width:\s*720px\)\s*\{[\s\S]*\.sticky-player\s*\{[\s\S]*left:\s*max\(0\.75rem,\s*env\(safe-area-inset-left,\s*0px\)\);[\s\S]*right:\s*max\(0\.75rem,\s*env\(safe-area-inset-right,\s*0px\)\);[\s\S]*width:\s*min\(30rem,\s*100%\);[\s\S]*max-width:\s*min\(30rem,\s*calc\(100% - 1\.5rem\)\);/,
+    'mobile sticky player should keep explicit viewport-safe horizontal insets'
+  );
+  assert.match(
+    stylesCode,
+    /@media \(max-width:\s*720px\)\s*\{[\s\S]*\.sticky-player-actions\s*\{[\s\S]*flex-wrap:\s*wrap;/,
+    'mobile sticky player actions should wrap to remain usable on narrow widths'
+  );
+}
+
 function testServiceWorkerCachesAllHtmlPages() {
   for (const file of htmlPages) {
     assert.match(swCode, new RegExp(`['"]${escapeRegExp('./' + file)}['"]`), `service worker should precache ${file}`);
@@ -1701,6 +1725,7 @@ function testIssueHelpPageAndTemplatesArePresent() {
 }
 
 async function main() {
+  testStickyPlayerCssKeepsPlayerWithinViewport();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();
