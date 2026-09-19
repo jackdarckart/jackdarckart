@@ -757,13 +757,12 @@ select[aria-invalid="true"] {
   gap: 0.8rem;
 }
 
-.field-group,
-.field-group span {
+.field-group {
   display: grid;
   gap: 0.45rem;
 }
 
-.field-group span {
+.field-group > span {
   font-weight: 700;
 }
 

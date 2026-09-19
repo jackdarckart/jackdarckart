@@ -1156,6 +1156,10 @@
 
     if (options && options.newTab && typeof window.open === 'function') {
       const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+      if (!openedWindow) {
+        window.location.href = url;
+        return;
+      }
       if (openedWindow && typeof openedWindow === 'object') {
         try {
           openedWindow.opener = null;
@@ -1755,7 +1759,7 @@
       .sort((a, b) => a.start - b.start)
       .slice(0, 6);
 
-    const nextOccurrence = upcomingOccurrences[0] || null;
+    const nextOccurrence = upcomingOccurrences.find((candidate) => !currentOccurrence || candidate.entry !== currentOccurrence.entry) || null;
 
     return {
       entries,
