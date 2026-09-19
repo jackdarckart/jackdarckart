@@ -1,0 +1,20 @@
+{
+  "name": "stream-musik.space",
+  "short_name": "stream-musik",
+  "description": "Premium-Webradio-Website für jackdarckart auf laut.fm mit Live-Player und GitHub-Pages-kompatibler PWA-Basis.",
+  "lang": "de-DE",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#090b16",
+  "theme_color": "#090b16",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
