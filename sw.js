@@ -41,6 +41,15 @@ function isStaticPageRequest(request, url) {
     || STATIC_PAGE_PATHS.has(url.pathname);
 }
 
+function scheduleCachePut(event, request, response) {
+  const cacheWrite = caches.open(CACHE_NAME)
+    .then((cache) => cache.put(request, response))
+    .catch(() => null);
+  if (event && typeof event.waitUntil === 'function') {
+    event.waitUntil(cacheWrite);
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
@@ -95,9 +104,7 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           if (response && response.status === 200 && response.type === 'basic') {
             const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(normalizedPageUrl, responseClone);
-            });
+            scheduleCachePut(event, normalizedPageUrl, responseClone);
           }
           return response;
         })
@@ -128,9 +135,7 @@ self.addEventListener('fetch', (event) => {
         }
 
         const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, responseClone);
-        });
+        scheduleCachePut(event, request, responseClone);
         return response;
       });
     })
