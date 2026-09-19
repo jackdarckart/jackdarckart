@@ -41,6 +41,8 @@
   const stickyPlayButton = document.getElementById('sticky-play');
   const stickyStatusText = document.getElementById('sticky-status-text');
   const stickyMessage = document.getElementById('sticky-message');
+  const stickyPlayerState = document.getElementById('sticky-player-state');
+  const stickyRetryState = document.getElementById('sticky-retry-state');
 
   let currentState = 'ready';
   let loadTimer = 0;
@@ -163,6 +165,22 @@
 
     if (stickyMessage) {
       stickyMessage.textContent = message.textContent;
+    }
+
+    if (stickyPlayerState) {
+      stickyPlayerState.textContent = STATE_LABELS[currentState] || STATE_LABELS.ready;
+      stickyPlayerState.dataset.state = currentState;
+    }
+
+    if (stickyRetryState) {
+      stickyRetryState.textContent = getRetryStatusText();
+      if (currentState === 'error' || currentState === 'blocked') {
+        stickyRetryState.dataset.state = 'action-needed';
+      } else if (currentState === 'loading' || reconnectAttempts > 0) {
+        stickyRetryState.dataset.state = 'active';
+      } else {
+        stickyRetryState.dataset.state = 'manual';
+      }
     }
 
     if (stickyPlayer) {

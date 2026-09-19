@@ -580,9 +580,52 @@ code{
   gap:.15rem;
 }
 
+.sticky-player-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  margin-top:.45rem;
+}
+
 .sticky-player-copy span{
   color:var(--muted);
   font-size:.95rem;
+}
+
+.sticky-chip{
+  display:inline-flex;
+  align-items:center;
+  min-height:1.9rem;
+  padding:.3rem .65rem;
+  border:1px solid rgba(148,163,184,.2);
+  border-radius:999px;
+  background:rgba(15,23,42,.68);
+  color:#eef6ff;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:.78rem;
+  line-height:1;
+}
+
+.sticky-chip[data-state="loading"],
+.sticky-chip[data-state="active"]{
+  border-color:rgba(34,211,238,.32);
+  color:#d9f8ff;
+}
+
+.sticky-chip[data-state="playing"]{
+  border-color:rgba(52,211,153,.32);
+  color:#dcfce7;
+}
+
+.sticky-chip[data-state="blocked"],
+.sticky-chip[data-state="action-needed"]{
+  border-color:rgba(236,72,153,.34);
+  color:#ffe4f2;
+}
+
+.sticky-chip[data-state="error"]{
+  border-color:rgba(251,113,133,.34);
+  color:#ffe0e6;
 }
 
 .sticky-player-actions{
