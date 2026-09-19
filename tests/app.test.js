@@ -1523,9 +1523,10 @@ function testLivePageExposesEnhancedModulesAndHooks() {
     'station-profile-image-wrap',
     'station-profile-image-fallback'
   ]) {
+    const escapedHook = hook.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     assert.match(
       liveHtmlCode,
-      new RegExp(`id\\s*=\\s*["']${hook}["']`),
+      new RegExp(`id\\s*=\\s*["']${escapedHook}["']`),
       `live page should expose ${hook} for the redesigned live modules`
     );
   }
