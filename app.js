@@ -7,7 +7,9 @@
     theme: 'jackdarckart-theme',
     favorites: 'jackdarckart-favorites'
   };
+  const STATION_NAME = 'jackdarckart';
   const STREAM_URL = 'https://jackdarckart.stream.laut.fm/jackdarckart';
+  const OFFICIAL_LAUT_FM_API_BASE = 'https://api.laut.fm/station/' + STATION_NAME;
   const LOAD_TIMEOUT_MS = 10000;
   const RECONNECT_DELAY_MS = 1500;
   const MAX_AUTO_RECONNECTS = 2;
@@ -84,6 +86,24 @@
   const newsList = document.getElementById('news-list');
   const archiveList = document.getElementById('archive-list');
   const platformLinks = document.getElementById('platform-links');
+  const liveDataStatus = document.getElementById('live-data-status');
+  const liveDataUpdated = document.getElementById('live-data-updated');
+  const liveDataSource = document.getElementById('live-data-source');
+  const liveDataRefreshButton = document.getElementById('live-data-refresh');
+  const historySource = document.getElementById('history-source');
+  const scheduleSource = document.getElementById('schedule-source');
+  const nowPlayingArtwork = document.getElementById('now-playing-artwork');
+  const nowPlayingArtworkWrap = document.getElementById('now-playing-artwork-wrap');
+  const nowPlayingArtworkFallback = document.getElementById('now-playing-artwork-fallback');
+  const stationProfileTitle = document.getElementById('station-profile-title');
+  const stationProfileDescription = document.getElementById('station-profile-description');
+  const stationProfileMeta = document.getElementById('station-profile-meta');
+  const stationProfileLink = document.getElementById('station-profile-link');
+  const stationProfileListeners = document.getElementById('station-profile-listeners');
+  const stationProfileNextArtists = document.getElementById('station-profile-next-artists');
+  const stationProfileImage = document.getElementById('station-profile-image');
+  const stationProfileImageWrap = document.getElementById('station-profile-image-wrap');
+  const stationProfileImageFallback = document.getElementById('station-profile-image-fallback');
   const feedbackKind = document.getElementById('feedback-kind');
   const feedbackName = document.getElementById('feedback-name');
   const feedbackSubject = document.getElementById('feedback-subject');
@@ -94,6 +114,7 @@
   const feedbackEmailHint = document.getElementById('feedback-email-hint');
   const STREAM_URL_RESOLVED = normalizeUrl(STREAM_URL);
   const themeColorMeta = safeQuerySelector('meta[name="theme-color"]');
+  const baseDocumentTitle = document && typeof document.title === 'string' ? document.title : '';
 
   let currentState = 'ready';
   let loadTimer = 0;
@@ -108,9 +129,20 @@
   let showRecoveryRetry = false;
   let installPromptEvent = null;
   let nowPlayingTimer = 0;
+  let stationInfoTimer = 0;
+  let scheduleTimer = 0;
   let nowPlayingState = {
     current: null,
     history: []
+  };
+  let stationProfileState = null;
+  let scheduleState = [];
+  let nextArtistsState = [];
+  let listenersState = null;
+  let liveDataStatusState = {
+    nowPlaying: { requestId: 0, loading: false, lastSuccessAt: '', lastError: '' },
+    station: { requestId: 0, loading: false, lastSuccessAt: '', lastError: '' },
+    schedule: { requestId: 0, loading: false, lastSuccessAt: '', lastError: '' }
   };
   let favoritesState = [];
   let sleepTimerId = 0;
@@ -121,11 +153,14 @@
     const directStreamUrl = normalizeUrl(STREAM_URL) || STREAM_URL;
     const defaultConfig = {
       theme: DEFAULT_THEME,
-      nowPlaying: {
-        endpoint: '',
-        pollIntervalMs: 60000,
-        requestInit: {},
-        adapter: 'generic-json'
+      lautFm: {
+        baseUrl: OFFICIAL_LAUT_FM_API_BASE,
+        proxyBase: '',
+        pollIntervalMs: 45000,
+        stationPollIntervalMs: 180000,
+        schedulePollIntervalMs: 180000,
+        requestTimeoutMs: 12000,
+        scheduleTimeZone: 'Europe/Berlin'
       },
       content: {
         events: [],
@@ -162,7 +197,7 @@
 
     const merged = {
       theme: typeof overrides.theme === 'string' ? overrides.theme : defaultConfig.theme,
-      nowPlaying: Object.assign({}, defaultConfig.nowPlaying, overrides.nowPlaying || {}),
+    lautFm: Object.assign({}, defaultConfig.lautFm, overrides.lautFm || {}),
       content: {
         events: Array.isArray(overrides.content && overrides.content.events) ? overrides.content.events : defaultConfig.content.events,
         news: Array.isArray(overrides.content && overrides.content.news) ? overrides.content.news : defaultConfig.content.news,
@@ -633,6 +668,20 @@
     if (nowPlayingTimer) {
       window.clearTimeout(nowPlayingTimer);
       nowPlayingTimer = 0;
+    }
+  }
+
+  function clearStationInfoTimer() {
+    if (stationInfoTimer) {
+      window.clearTimeout(stationInfoTimer);
+      stationInfoTimer = 0;
+    }
+  }
+
+  function clearScheduleTimer() {
+    if (scheduleTimer) {
+      window.clearTimeout(scheduleTimer);
+      scheduleTimer = 0;
     }
   }
 
@@ -1221,7 +1270,10 @@
     navigator.mediaSession.metadata = new window.MediaMetadata({
       title: currentTrack && currentTrack.title ? currentTrack.title : 'jackdarckart Radio',
       artist: currentTrack && currentTrack.artist ? currentTrack.artist : 'laut.fm',
-      album: 'stream-musik.space'
+      album: currentTrack && currentTrack.album ? currentTrack.album : 'stream-musik.space',
+      artwork: currentTrack && currentTrack.artworkUrl
+        ? [{ src: currentTrack.artworkUrl, sizes: '512x512', type: 'image/jpeg' }]
+        : []
     });
   }
 
@@ -1493,6 +1545,243 @@
     });
   }
 
+  function getLautFmPollIntervalMs() {
+    return Math.max(15000, Number.parseInt(String(APP_CONFIG.lautFm.pollIntervalMs), 10) || 45000);
+  }
+
+  function getStationPollIntervalMs() {
+    return Math.max(getLautFmPollIntervalMs(), Number.parseInt(String(APP_CONFIG.lautFm.stationPollIntervalMs), 10) || 180000);
+  }
+
+  function getSchedulePollIntervalMs() {
+    return Math.max(getLautFmPollIntervalMs(), Number.parseInt(String(APP_CONFIG.lautFm.schedulePollIntervalMs), 10) || 180000);
+  }
+
+  function getLautFmTimeoutMs() {
+    return Math.max(3000, Number.parseInt(String(APP_CONFIG.lautFm.requestTimeoutMs), 10) || 12000);
+  }
+
+  function normalizeHttpsUrl(value) {
+    const normalized = normalizeUrl(value);
+    if (!normalized) {
+      return '';
+    }
+
+    try {
+      const parsed = new window.URL(normalized);
+      return parsed.protocol === 'https:' ? parsed.href : '';
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function normalizeOptionalText(value) {
+    return typeof value === 'string' ? value.trim() : '';
+  }
+
+  function readFirstText(values) {
+    for (let index = 0; index < values.length; index += 1) {
+      const value = normalizeOptionalText(values[index]);
+      if (value) {
+        return value;
+      }
+    }
+    return '';
+  }
+
+  function normalizeArtistName(source) {
+    if (source && typeof source === 'object') {
+      return readFirstText([source.name, source.display_name, source.title]);
+    }
+    return normalizeOptionalText(source);
+  }
+
+  function normalizeArtworkUrl(source) {
+    if (!source) {
+      return '';
+    }
+
+    if (typeof source === 'string') {
+      return normalizeHttpsUrl(source);
+    }
+
+    if (Array.isArray(source)) {
+      for (let index = 0; index < source.length; index += 1) {
+        const normalized = normalizeArtworkUrl(source[index]);
+        if (normalized) {
+          return normalized;
+        }
+      }
+      return '';
+    }
+
+    if (typeof source === 'object') {
+      const candidates = [
+        source.art,
+        source.cover,
+        source.image,
+        source.logo,
+        source.url,
+        source.large,
+        source.medium,
+        source.small,
+        source['300x300'],
+        source['180x180'],
+        source['120x120'],
+        source['100x100'],
+        source['50x50']
+      ];
+      if (Array.isArray(source.images)) {
+        candidates.push(source.images);
+      }
+      for (let index = 0; index < candidates.length; index += 1) {
+        const normalized = normalizeArtworkUrl(candidates[index]);
+        if (normalized) {
+          return normalized;
+        }
+      }
+    }
+
+    return '';
+  }
+
+  function normalizeIsoTimestamp(value) {
+    const text = normalizeOptionalText(value);
+    if (!text) {
+      return '';
+    }
+    return Number.isNaN(Date.parse(text)) ? '' : text;
+  }
+
+  function normalizeTrack(source) {
+    if (!source || typeof source !== 'object') {
+      return null;
+    }
+
+    const title = readFirstText([source.title, source.name]);
+    const artist = normalizeArtistName(source.artist || source.interpret || source.creator || source.dj);
+    const album = readFirstText([source.album, source.release]);
+    const artworkUrl = normalizeArtworkUrl(source.art || source.cover || source.image || source.artwork);
+    const startedAt = normalizeIsoTimestamp(source.started_at || source.startedAt || source.start);
+    const endsAt = normalizeIsoTimestamp(source.ends_at || source.endsAt || source.end);
+
+    if (!title && !artist) {
+      return null;
+    }
+
+    return {
+      title,
+      artist,
+      album,
+      artworkUrl,
+      startedAt,
+      endsAt
+    };
+  }
+
+  function normalizeStationProfile(source) {
+    if (!source || typeof source !== 'object') {
+      return null;
+    }
+
+    const name = readFirstText([source.display_name, source.name]);
+    const description = readFirstText([source.description, source.tagline, source.claim]);
+    const genres = Array.isArray(source.genres)
+      ? source.genres.map((entry) => normalizeOptionalText(entry && entry.name ? entry.name : entry)).filter(Boolean)
+      : [];
+    const imageUrl = normalizeArtworkUrl(source.images || source.image || source.logo);
+    const pageUrl = normalizeHttpsUrl(source.page_url || source.website || source.url);
+    const streamUrl = normalizeHttpsUrl(source.stream_url);
+
+    if (!name && !description && !genres.length && !pageUrl) {
+      return null;
+    }
+
+    return {
+      name,
+      description,
+      genres,
+      imageUrl,
+      pageUrl,
+      streamUrl
+    };
+  }
+
+  function normalizeListenersCount(source) {
+    const raw = source && typeof source === 'object' ? source.listeners : source;
+    const parsed = typeof raw === 'number' ? raw : Number.parseInt(String(raw || ''), 10);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+  }
+
+  function normalizeNextArtists(source) {
+    const input = Array.isArray(source) ? source : [];
+    const seen = new Set();
+    const result = [];
+
+    input.forEach((entry) => {
+      const name = entry && typeof entry === 'object'
+        ? readFirstText([entry.name, entry.display_name, entry.artist])
+        : normalizeOptionalText(entry);
+      const key = name.toLowerCase();
+      if (!name || seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      result.push(name);
+    });
+
+    return result.slice(0, 8);
+  }
+
+  function normalizeScheduleEntries(source) {
+    return (Array.isArray(source) ? source : [])
+      .map((entry) => {
+        if (!entry || typeof entry !== 'object') {
+          return null;
+        }
+
+        const startsAt = normalizeIsoTimestamp(entry.starts || entry.start || entry.started_at);
+        const endsAt = normalizeIsoTimestamp(entry.ends || entry.end || entry.ends_at);
+        const title = readFirstText([
+          entry.title,
+          entry.name,
+          entry.playlist && entry.playlist.name,
+          entry.show && entry.show.name
+        ]) || 'Programmpunkt';
+        const description = readFirstText([
+          entry.description,
+          entry.playlist && entry.playlist.description
+        ]);
+        const type = readFirstText([entry.type, entry.kind]);
+        const host = readFirstText([
+          entry.host,
+          entry.dj,
+          entry.playlist && entry.playlist.user && entry.playlist.user.name
+        ]);
+        const linkUrl = normalizeHttpsUrl(
+          entry.page_url
+          || (entry.playlist && (entry.playlist.page_url || entry.playlist.url))
+          || entry.url
+        );
+
+        if (!startsAt || !endsAt) {
+          return null;
+        }
+
+        return {
+          title,
+          description,
+          type,
+          host,
+          startsAt,
+          endsAt,
+          url: linkUrl
+        };
+      })
+      .filter(Boolean)
+      .sort((left, right) => Date.parse(left.startsAt) - Date.parse(right.startsAt));
+  }
+
   function normalizeFavoriteTrack(track) {
     if (!track || typeof track !== 'object') {
       return null;
@@ -1501,7 +1790,7 @@
     const normalized = {
       title: String(track.title || '').trim(),
       artist: String(track.artist || '').trim(),
-      meta: String(track.meta || '').trim()
+      meta: String(track.album || track.meta || '').trim()
     };
     normalized.key = [normalized.artist, normalized.title, normalized.meta]
       .map((value) => value.toLowerCase())
@@ -1635,209 +1924,95 @@
     renderFavorites();
   }
 
-  function normalizeWeekday(value) {
-    if (Number.isInteger(value) && value >= 0 && value <= 6) {
-      return value;
+  function formatDateTimeInTimeZone(value, timeZone) {
+    const timestamp = value ? new Date(value) : null;
+    if (!timestamp || Number.isNaN(timestamp.getTime())) {
+      return '';
     }
 
-    const normalized = String(value || '').trim().toLowerCase();
-    const weekdayMap = {
-      so: 0,
-      sonntag: 0,
-      sunday: 0,
-      mo: 1,
-      montag: 1,
-      monday: 1,
-      di: 2,
-      dienstag: 2,
-      tuesday: 2,
-      mi: 3,
-      mittwoch: 3,
-      wednesday: 3,
-      do: 4,
-      donnerstag: 4,
-      thursday: 4,
-      fr: 5,
-      freitag: 5,
-      friday: 5,
-      sa: 6,
-      samstag: 6,
-      saturday: 6
-    };
-
-    return Object.prototype.hasOwnProperty.call(weekdayMap, normalized) ? weekdayMap[normalized] : -1;
-  }
-
-  function parseScheduleTime(value) {
-    const match = String(value || '').trim().match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
-    if (!match) {
-      return null;
-    }
-
-    return {
-      hours: Number.parseInt(match[1], 10),
-      minutes: Number.parseInt(match[2], 10)
-    };
-  }
-
-  function getTimeZoneParts(date, timeZone) {
     if (!(typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function')) {
-      return null;
+      return DATE_TIME_FORMATTER ? DATE_TIME_FORMATTER.format(timestamp) : timestamp.toISOString();
     }
 
-    const formatter = new Intl.DateTimeFormat('en-GB', {
-      timeZone,
-      weekday: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      hourCycle: 'h23'
-    });
-    const parts = formatter.formatToParts(date);
-    const values = {};
-    parts.forEach((part) => {
-      if (part.type !== 'literal') {
-        values[part.type] = part.value;
+    try {
+      return new Intl.DateTimeFormat('de-DE', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone
+      }).format(timestamp);
+    } catch (error) {
+      return DATE_TIME_FORMATTER ? DATE_TIME_FORMATTER.format(timestamp) : timestamp.toISOString();
+    }
+  }
+
+  function getScheduleTimeZone() {
+    return normalizeOptionalText(APP_CONFIG.lautFm.scheduleTimeZone)
+      || ((typeof Intl !== 'undefined' && Intl.DateTimeFormat && Intl.DateTimeFormat().resolvedOptions)
+        ? Intl.DateTimeFormat().resolvedOptions().timeZone
+        : '')
+      || 'Europe/Berlin';
+  }
+
+  function buildScheduleSnapshot() {
+    const entries = Array.isArray(scheduleState) ? scheduleState : [];
+    const timeZone = getScheduleTimeZone();
+    const now = Date.now();
+    let current = null;
+    let next = null;
+
+    const upcoming = entries
+      .filter((entry) => Date.parse(entry.endsAt) >= now)
+      .slice(0, 8);
+
+    entries.forEach((entry) => {
+      const startsAt = Date.parse(entry.startsAt);
+      const endsAt = Date.parse(entry.endsAt);
+      if (!current && startsAt <= now && endsAt > now) {
+        current = entry;
+      }
+      if (!next && startsAt > now) {
+        next = entry;
       }
     });
 
-    const weekdayMap = {
-      Sun: 0,
-      Mon: 1,
-      Tue: 2,
-      Wed: 3,
-      Thu: 4,
-      Fri: 5,
-      Sat: 6
-    };
-
     return {
-      weekday: Object.prototype.hasOwnProperty.call(weekdayMap, values.weekday) ? weekdayMap[values.weekday] : -1,
-      hours: Number.parseInt(values.hour || '0', 10),
-      minutes: Number.parseInt(values.minute || '0', 10)
+      entries,
+      current,
+      next,
+      upcoming: upcoming.length ? upcoming : entries.slice(0, 8),
+      timeZone
     };
   }
 
   function formatScheduleMeta(entry, label, timeZone) {
-    const timeLabel = entry.start + '–' + entry.end + ' Uhr';
-    const detailParts = [label, WEEKDAY_LABELS[entry.day] + ' · ' + timeLabel];
+    const detailParts = [
+      label,
+      formatDateTimeInTimeZone(entry.startsAt, timeZone) + ' – ' + formatDateTimeInTimeZone(entry.endsAt, timeZone)
+    ];
 
+    if (entry.type) {
+      detailParts.push(entry.type);
+    }
     if (entry.host) {
       detailParts.push(entry.host);
     }
-    if (entry.genre) {
-      detailParts.push(entry.genre);
-    }
-    if (timeZone) {
-      detailParts.push(timeZone);
-    }
+    detailParts.push(timeZone);
 
     return detailParts.join(' · ');
-  }
-
-  function getScheduleEntries() {
-    const scheduleConfig = APP_CONFIG.content.schedule || {};
-    return (Array.isArray(scheduleConfig.entries) ? scheduleConfig.entries : [])
-      .map((entry) => {
-        const day = normalizeWeekday(entry && entry.day);
-        const start = parseScheduleTime(entry && entry.start);
-        const end = parseScheduleTime(entry && entry.end);
-        if (day < 0 || !start || !end) {
-          return null;
-        }
-
-        const startMinutes = start.hours * 60 + start.minutes;
-        let endMinutes = end.hours * 60 + end.minutes;
-        if (endMinutes <= startMinutes) {
-          endMinutes += 1440;
-        }
-
-        return {
-          day,
-          start: entry.start,
-          end: entry.end,
-          startMinutes,
-          endMinutes,
-          title: String(entry.title || '').trim() || 'Sendung',
-          host: String(entry.host || '').trim(),
-          genre: String(entry.genre || '').trim(),
-          description: String(entry.description || '').trim(),
-          linkLabel: String(entry.linkLabel || '').trim(),
-          url: normalizeUrl(entry.url),
-          isPlaceholder: Boolean(entry.isPlaceholder)
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => (a.day * 1440 + a.startMinutes) - (b.day * 1440 + b.startMinutes));
-  }
-
-  function buildScheduleSnapshot() {
-    const entries = getScheduleEntries();
-    const timeZone = APP_CONFIG.content.schedule && APP_CONFIG.content.schedule.timeZone
-      ? APP_CONFIG.content.schedule.timeZone
-      : 'Europe/Berlin';
-
-    if (!entries.length) {
-      return { entries, current: null, next: null, upcoming: [], timeZone };
-    }
-
-    const parts = getTimeZoneParts(new Date(), timeZone);
-    if (!parts || parts.weekday < 0) {
-      return { entries, current: null, next: null, upcoming: entries.slice(0, 6), timeZone };
-    }
-
-    const currentMinutesOfWeek = (parts.weekday * 1440) + (parts.hours * 60) + parts.minutes;
-    const weekMinutes = 7 * 1440;
-    let currentOccurrence = null;
-
-    const upcomingOccurrences = entries.map((entry) => {
-      const baseStart = (entry.day * 1440) + entry.startMinutes;
-      const baseEnd = (entry.day * 1440) + entry.endMinutes;
-      const isCurrentOccurrence = (
-        (currentMinutesOfWeek >= baseStart && currentMinutesOfWeek < baseEnd)
-        || (currentMinutesOfWeek + weekMinutes >= baseStart && currentMinutesOfWeek + weekMinutes < baseEnd)
-      );
-
-      if (isCurrentOccurrence) {
-        currentOccurrence = {
-          entry,
-          start: currentMinutesOfWeek >= baseStart ? baseStart : baseStart - weekMinutes,
-          end: currentMinutesOfWeek >= baseStart ? baseEnd : baseEnd - weekMinutes
-        };
-      }
-
-      let nextStart = baseStart;
-      while (nextStart <= currentMinutesOfWeek) {
-        nextStart += weekMinutes;
-      }
-
-      return {
-        entry,
-        start: nextStart
-      };
-    })
-      .sort((a, b) => a.start - b.start)
-      .slice(0, 6);
-
-    const nextOccurrence = upcomingOccurrences.find((candidate) => !currentOccurrence || candidate.entry !== currentOccurrence.entry) || null;
-
-    return {
-      entries,
-      current: currentOccurrence ? currentOccurrence.entry : null,
-      next: nextOccurrence ? nextOccurrence.entry : null,
-      upcoming: upcomingOccurrences.length ? upcomingOccurrences.map((candidate) => candidate.entry) : entries.slice(0, 6),
-      timeZone
-    };
   }
 
   function renderSchedule() {
     const snapshot = buildScheduleSnapshot();
     const highlightItems = [];
+    const scheduleStatus = liveDataStatusState.schedule;
 
     if (snapshot.current) {
       highlightItems.push({
         title: snapshot.current.title,
         meta: formatScheduleMeta(snapshot.current, 'Jetzt live', snapshot.timeZone),
-        description: snapshot.current.description || (snapshot.current.isPlaceholder ? 'Beispiel-/Platzhalterdaten klar gekennzeichnet.' : 'Aktuell laufende Sendung aus der statischen Konfiguration.')
+        description: snapshot.current.description || 'Aktuell laufender Programmeintrag aus der offiziellen laut.fm-API.',
+        url: snapshot.current.url,
+        linkLabel: snapshot.current.url ? 'Auf laut.fm ansehen' : ''
       });
     }
 
@@ -1845,7 +2020,9 @@
       highlightItems.push({
         title: snapshot.next.title,
         meta: formatScheduleMeta(snapshot.next, 'Als Nächstes', snapshot.timeZone),
-        description: snapshot.next.description || 'Nächster statisch gepflegter Programmpunkt.'
+        description: snapshot.next.description || 'Nächster bestätigter Programmeintrag aus der offiziellen laut.fm-API.',
+        url: snapshot.next.url,
+        linkLabel: snapshot.next.url ? 'Auf laut.fm ansehen' : ''
       });
     }
 
@@ -1853,36 +2030,45 @@
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyTitle: snapshot.entries.length ? 'Derzeit kein eindeutiger Live-/Next-Treffer.' : 'Noch kein Sendeplan hinterlegt.',
-      emptyText: snapshot.entries.length
-        ? 'Die vorhandenen Einträge ergeben im Moment keinen verlässlichen Treffer für „Jetzt live“ oder „Als Nächstes“.'
-        : 'Ohne bestätigte Termine zeigt die Website absichtlich keinen erfundenen Programmstatus an.',
-      hintText: snapshot.entries.length
-        ? 'Prüfe Wochentag, Start- und Endzeit, Zeitzone und mögliche Übernacht-Slots.'
-        : 'Pflege bestätigte Termine in APP_CONFIG.content.schedule.entries. Zeiten werden in ' + snapshot.timeZone + ' interpretiert.',
-      emptyItems: snapshot.entries.length
-        ? ['Übernacht-Sendungen sind erlaubt, wenn die Endzeit numerisch vor der Startzeit liegt.', 'Fehlende oder unlesbare Zeiten verhindern einen Live-/Next-Hinweis.']
-        : ['Benötigt werden mindestens day, start, end und title.', 'Optional helfen host, genre, description, url und linkLabel für mehr Kontext.']
+      emptyTitle: scheduleStatus.lastError ? 'Sendeplan konnte momentan nicht geladen werden.' : 'Derzeit kein aktueller oder kommender API-Eintrag.',
+      emptyText: scheduleStatus.lastError
+        ? 'Die offizielle laut.fm-API hat aktuell keine lesbaren Sendeplandaten geliefert oder der Abruf wurde blockiert.'
+        : 'Für diesen Moment liefert die API keinen eindeutigen „Jetzt live“- oder „Als Nächstes“-Treffer.',
+      hintText: scheduleStatus.lastSuccessAt
+        ? 'Letzter erfolgreicher Sendeplan-Abruf: ' + formatDateTime(scheduleStatus.lastSuccessAt) + ' · Zeitzone: ' + snapshot.timeZone + '.'
+        : 'Quelle: offizielle laut.fm-API · Zeitzone: ' + snapshot.timeZone + '.',
+      emptyItems: [
+        'Nutze „Jetzt aktualisieren“, um die offiziellen API-Daten erneut abzurufen.',
+        'Ohne API-Treffer werden bewusst keine Beispielsendungen im Frontend angezeigt.'
+      ]
     });
 
     renderCollection(scheduleList, snapshot.upcoming.map((entry) => ({
-      title: entry.title + (entry.isPlaceholder ? ' (Beispiel)' : ''),
+      title: entry.title,
       meta: formatScheduleMeta(entry, 'Geplant', snapshot.timeZone),
-      description: entry.description || (entry.isPlaceholder ? 'Klar gekennzeichneter Beispielplatzhalter.' : 'Statischer Programmeintrag ohne zusätzliche Tracking- oder Fremddaten.'),
+      description: entry.description || 'Kommender Programmeintrag aus der offiziellen laut.fm-API.',
       url: entry.url,
-      linkLabel: entry.linkLabel || 'Mehr dazu'
+      linkLabel: entry.url ? 'Auf laut.fm ansehen' : ''
     })), {
       itemTag: 'article',
       itemClassName: 'content-card-item',
       headingTag: 'h3',
-      emptyTitle: 'Derzeit sind keine kommenden Sendungen eingetragen.',
-      emptyText: 'Dieser Bereich zeigt erst dann Karten, wenn bestätigte Programmeinträge statisch gepflegt wurden.',
-      hintText: 'Lege bestätigte Wochentage sowie Start- und Endzeiten in APP_CONFIG.content.schedule.entries fest.',
+      emptyTitle: scheduleStatus.lastError ? 'Kommende Sendungen konnten momentan nicht geladen werden.' : 'Die API liefert derzeit keine kommenden Sendungen.',
+      emptyText: scheduleStatus.lastError
+        ? 'Aktuell ist kein verlässlicher API-Abruf für den Wochenplan möglich.'
+        : 'Das bedeutet nicht automatisch, dass der Stream offline ist – nur, dass die API momentan keine kommenden Programmeinträge bereitstellt.',
+      hintText: 'Quelle: offizielle laut.fm-API · Zeitzone: ' + snapshot.timeZone + '.',
       emptyItems: [
-        'Zeiten werden in der konfigurierten Zeitzone ausgewertet.',
-        'Fehlende Einträge bedeuten nicht, dass der Stream offline ist – nur, dass kein Plan hinterlegt wurde.'
+        'Es werden ausschließlich bestätigte API-Einträge dargestellt.',
+        'Bei API-Problemen bleibt dieser Bereich ehrlich leer statt Beispielinhalte zu zeigen.'
       ]
     });
+
+    if (scheduleSource) {
+      scheduleSource.textContent = scheduleStatus.lastError
+        ? 'Sendeplan-API-Status: Fehler · Letzter erfolgreicher Abruf ' + (scheduleStatus.lastSuccessAt ? formatDateTime(scheduleStatus.lastSuccessAt) : 'noch nicht erfolgt') + ' · Zeitzone ' + snapshot.timeZone + '.'
+        : 'Sendeplan-API-Status: ' + (scheduleStatus.loading ? 'Aktualisierung läuft' : 'bereit') + ' · Letzter erfolgreicher Abruf ' + (scheduleStatus.lastSuccessAt ? formatDateTime(scheduleStatus.lastSuccessAt) : 'steht noch aus') + ' · Zeitzone ' + snapshot.timeZone + '.';
+    }
   }
 
   function renderStaticSections() {
@@ -1934,109 +2120,199 @@
   }
 
   function formatNowPlayingIntervalLabel() {
-    const interval = Math.max(15000, Number.parseInt(String(APP_CONFIG.nowPlaying.pollIntervalMs), 10) || 60000);
+    const interval = getLautFmPollIntervalMs();
     const seconds = Math.round(interval / 1000);
     return seconds >= 60 && seconds % 60 === 0
       ? 'ca. alle ' + String(seconds / 60) + ' min'
       : 'ca. alle ' + String(seconds) + ' s';
   }
 
-  function getNowPlayingSourceLabel() {
-    const endpoint = getNowPlayingEndpoint();
-    if (!endpoint) {
-      return hasExternalNowPlayingEndpoint()
-        ? 'Externe Now-Playing-Quelle erkannt, aber ohne same-origin-Freigabe bzw. bewusste CSP-Anpassung deaktiviert.'
-        : 'Keine Now-Playing-Quelle konfiguriert. Für Titelinfos und Historie kann eine same-origin-Quelle gepflegt werden; der Stream funktioniert trotzdem.';
+  function getLautFmBaseUrl() {
+    const proxyBase = normalizeUrl(APP_CONFIG.lautFm.proxyBase);
+    if (!proxyBase) {
+      return normalizeUrl(APP_CONFIG.lautFm.baseUrl) || OFFICIAL_LAUT_FM_API_BASE;
     }
 
     try {
-      const url = new window.URL(endpoint);
-      return 'Datenquelle: ' + url.host + url.pathname + url.search + ' · Aktualisierung ' + formatNowPlayingIntervalLabel() + '.';
+      const proxyUrl = new window.URL(proxyBase);
+      return proxyUrl.origin === window.location.origin ? proxyUrl.href.replace(/\/+$/, '') : (normalizeUrl(APP_CONFIG.lautFm.baseUrl) || OFFICIAL_LAUT_FM_API_BASE);
     } catch (error) {
-      return 'Datenquelle konfiguriert · Aktualisierung ' + formatNowPlayingIntervalLabel() + '.';
+      return normalizeUrl(APP_CONFIG.lautFm.baseUrl) || OFFICIAL_LAUT_FM_API_BASE;
     }
   }
 
-  function isNowPlayingConfigured() {
-    return Boolean(getNowPlayingEndpoint()) && typeof window.fetch === 'function';
-  }
-
-  function hasExternalNowPlayingEndpoint() {
-    const rawEndpoint = normalizeUrl(APP_CONFIG.nowPlaying.endpoint);
-    if (!rawEndpoint) {
+  function isUsingSameOriginProxy() {
+    const proxyBase = normalizeUrl(APP_CONFIG.lautFm.proxyBase);
+    if (!proxyBase) {
       return false;
     }
 
     try {
-      return new window.URL(rawEndpoint).origin !== window.location.origin;
+      return new window.URL(proxyBase).origin === window.location.origin;
     } catch (error) {
       return false;
     }
   }
 
-  function getNowPlayingEndpoint() {
-    const endpoint = normalizeUrl(APP_CONFIG.nowPlaying.endpoint);
-    if (!endpoint) {
-      return '';
-    }
-
-    try {
-      return new window.URL(endpoint).origin === window.location.origin ? endpoint : '';
-    } catch (error) {
-      return '';
-    }
+  function buildLautFmEndpoint(section) {
+    const baseUrl = getLautFmBaseUrl().replace(/\/+$/, '');
+    return section ? baseUrl + '/' + section : baseUrl;
   }
 
-  function getNowPlayingAdapter() {
-    const adapters = {
-      'generic-json': {
-        parse(payload) {
-          const currentSource = payload && typeof payload === 'object'
-            ? (payload.current || payload.nowPlaying || payload.track || payload.song || payload)
-            : {};
-          const historySource = payload && typeof payload === 'object'
-            ? (payload.history || payload.recent || payload.lastPlayed || payload.tracks || [])
-            : [];
-          const current = normalizeTrack(currentSource);
-          const history = Array.isArray(historySource)
-            ? historySource.map(normalizeTrack).filter((entry) => entry.title || entry.artist)
-            : [];
+  function getLiveDataSourceText() {
+    const proxyText = isUsingSameOriginProxy()
+      ? 'offizielle laut.fm-API via konfigurierbaren Same-Origin-Proxy'
+      : 'offizielle laut.fm-API direkt im Browser';
+    return 'Quelle: ' + proxyText + ' · Station ' + STATION_NAME + ' · Song-Aktualisierung ' + formatNowPlayingIntervalLabel() + '.';
+  }
 
-          return {
-            current: current.title || current.artist ? current : null,
-            history
-          };
-        }
+  function getLastSuccessfulLiveDataAt() {
+    return [
+      liveDataStatusState.nowPlaying.lastSuccessAt,
+      liveDataStatusState.station.lastSuccessAt,
+      liveDataStatusState.schedule.lastSuccessAt
+    ].filter(Boolean).sort().reverse()[0] || '';
+  }
+
+  function buildApiErrorLabel(error) {
+    if (!error) {
+      return 'Unbekannter API-Fehler';
+    }
+    if (error.name === 'AbortError') {
+      return 'API-Timeout';
+    }
+    if (error && typeof error.message === 'string' && error.message.indexOf('http-') === 0) {
+      return 'API-Antwort ' + error.message.slice(5);
+    }
+    if (error && typeof error.message === 'string' && error.message) {
+      return error.message;
+    }
+    return 'Technischer API-Fehler';
+  }
+
+  function setLiveDataButtonBusy(isBusy) {
+    if (!liveDataRefreshButton) {
+      return;
+    }
+    liveDataRefreshButton.disabled = Boolean(isBusy);
+    liveDataRefreshButton.textContent = isBusy ? 'Aktualisierung …' : 'Jetzt aktualisieren';
+  }
+
+  function renderArtwork(image, wrapper, fallback, url, alt) {
+    if (!image || !wrapper || !fallback) {
+      return;
+    }
+
+    const safeUrl = normalizeHttpsUrl(url);
+    if (!safeUrl) {
+      wrapper.hidden = true;
+      fallback.hidden = false;
+      if (typeof image.removeAttribute === 'function') {
+        image.removeAttribute('src');
+      } else {
+        image.src = '';
       }
-    };
+      image.alt = '';
+      return;
+    }
 
-    return adapters[APP_CONFIG.nowPlaying.adapter] || adapters['generic-json'];
+    wrapper.hidden = false;
+    fallback.hidden = true;
+    image.src = safeUrl;
+    image.alt = alt;
   }
 
-  function normalizeTrack(source) {
-    const title = source && typeof source === 'object'
-      ? String(source.title || source.track || source.song || source.name || '').trim()
-      : '';
-    const artist = source && typeof source === 'object'
-      ? String(source.artist || source.interpret || source.creator || source.dj || '').trim()
-      : '';
-    const playedAt = source && typeof source === 'object'
-      ? String(source.playedAt || source.startedAt || source.timestamp || source.time || '').trim()
-      : '';
-    const meta = source && typeof source === 'object'
-      ? String(source.show || source.program || '').trim()
-      : '';
+  function renderLiveDataSummary() {
+    const hasError = Boolean(liveDataStatusState.nowPlaying.lastError || liveDataStatusState.station.lastError || liveDataStatusState.schedule.lastError);
+    const hasLoading = Boolean(liveDataStatusState.nowPlaying.loading || liveDataStatusState.station.loading || liveDataStatusState.schedule.loading);
+    const lastSuccessAt = getLastSuccessfulLiveDataAt();
 
-    return {
-      title,
-      artist,
-      playedAt,
-      meta
-    };
+    if (liveDataStatus) {
+      liveDataStatus.textContent = hasError
+        ? 'Live-Daten momentan nicht vollständig erreichbar'
+        : (hasLoading ? 'Live-Daten werden aktualisiert' : 'Live-Daten aktiv');
+    }
+
+    if (liveDataUpdated) {
+      liveDataUpdated.textContent = lastSuccessAt
+        ? formatDateTime(lastSuccessAt)
+        : 'Noch kein erfolgreicher API-Abruf';
+    }
+
+    if (liveDataSource) {
+      liveDataSource.textContent = hasError
+        ? getLiveDataSourceText() + ' Letzter erfolgreicher Abruf: ' + (lastSuccessAt ? formatDateTime(lastSuccessAt) : 'noch keiner') + '. Wenn der Browser die API nicht direkt erreicht, konfiguriere einen echten Same-Origin-Proxy.'
+        : getLiveDataSourceText();
+    }
+
+    setLiveDataButtonBusy(hasLoading);
+  }
+
+  function updatePageTitle() {
+    const currentTrack = nowPlayingState.current;
+    const currentLabel = currentTrack ? [currentTrack.artist, currentTrack.title].filter(Boolean).join(' – ') : '';
+    document.title = currentLabel ? currentLabel + ' | ' + baseDocumentTitle : baseDocumentTitle;
+  }
+
+  function renderStationProfile() {
+    const stationMetaParts = [];
+    const stationName = stationProfileState && stationProfileState.name ? stationProfileState.name : STATION_NAME;
+
+    setText(stationProfileTitle, stationName);
+    setText(
+      stationProfileDescription,
+      stationProfileState && stationProfileState.description
+        ? stationProfileState.description
+        : (liveDataStatusState.station.lastError
+          ? 'Senderinformationen konnten momentan nicht verifiziert geladen werden.'
+          : 'Verifizierte Senderinformationen werden aus dem offiziellen laut.fm-Station-Endpoint geladen, sobald die API erreichbar ist.')
+    );
+
+    if (stationProfileState && stationProfileState.genres.length) {
+      stationMetaParts.push('Genres: ' + stationProfileState.genres.join(', '));
+    }
+    if (typeof listenersState === 'number') {
+      stationMetaParts.push('Hörer:innen: ' + String(listenersState));
+    }
+    if (nextArtistsState.length) {
+      stationMetaParts.push('Als Nächstes laut API: ' + nextArtistsState.join(', '));
+    }
+    if (!stationMetaParts.length) {
+      stationMetaParts.push(liveDataStatusState.station.lastError
+        ? 'Live-Daten momentan nicht erreichbar.'
+        : 'Keine weiteren verifizierten Stationsdetails von der API geliefert.');
+    }
+    setText(stationProfileMeta, stationMetaParts.join(' · '));
+
+    if (stationProfileListeners) {
+      stationProfileListeners.textContent = typeof listenersState === 'number'
+        ? String(listenersState) + ' aktuelle Hörer:innen laut API'
+        : 'Listener-Wert wird nur angezeigt, wenn die API einen gültigen Zahlenwert liefert.';
+    }
+
+    if (stationProfileNextArtists) {
+      stationProfileNextArtists.textContent = nextArtistsState.length
+        ? nextArtistsState.join(', ')
+        : 'Keine verifizierten Next-Artists-Daten verfügbar.';
+    }
+
+    if (stationProfileLink) {
+      const pageUrl = stationProfileState && stationProfileState.pageUrl ? stationProfileState.pageUrl : 'https://laut.fm/' + STATION_NAME;
+      stationProfileLink.href = pageUrl;
+      stationProfileLink.hidden = !pageUrl;
+    }
+
+    renderArtwork(
+      stationProfileImage,
+      stationProfileImageWrap,
+      stationProfileImageFallback,
+      stationProfileState && stationProfileState.imageUrl,
+      stationName ? stationName + ' Senderbild' : 'Senderbild'
+    );
   }
 
   function buildHistoryKey(entry) {
-    return [entry.title, entry.artist, entry.playedAt].map((value) => String(value || '').trim().toLowerCase()).join('|');
+    return [entry.title, entry.artist, entry.startedAt].map((value) => String(value || '').trim().toLowerCase()).join('|');
   }
 
   function dedupeHistory(entries) {
@@ -2080,11 +2356,11 @@
       item.appendChild(heading);
 
       const detailParts = [];
-      if (entry.playedAt) {
-        detailParts.push(formatDateTime(entry.playedAt));
+      if (entry.startedAt) {
+        detailParts.push(formatDateTime(entry.startedAt));
       }
-      if (entry.meta) {
-        detailParts.push(entry.meta);
+      if (entry.album) {
+        detailParts.push(entry.album);
       }
       item.appendChild(createDetailBlock('p', 'history-meta', detailParts.length ? detailParts.join(' · ') : 'Zeitstempel derzeit nicht verfügbar'));
 
@@ -2096,14 +2372,27 @@
     setText(nowPlayingTitle, 'Titelinformationen derzeit nicht verfügbar');
     setText(nowPlayingArtist, messageText);
     setText(nowPlayingSource, sourceText);
-    renderHistory([], 'Noch keine Historie verfügbar. Ohne same-origin-Metadatenquelle bleibt dieser Bereich leer; der Stream selbst funktioniert weiterhin normal.');
+    renderArtwork(nowPlayingArtwork, nowPlayingArtworkWrap, nowPlayingArtworkFallback, '', '');
+    renderHistory(
+      nowPlayingState.history,
+      liveDataStatusState.nowPlaying.lastError
+        ? 'Letzte Titel konnten momentan nicht frisch geladen werden. Letzter erfolgreicher Abruf: ' + (liveDataStatusState.nowPlaying.lastSuccessAt ? formatDateTime(liveDataStatusState.nowPlaying.lastSuccessAt) : 'noch keiner') + '.'
+        : 'Die offizielle laut.fm-API liefert derzeit noch keine Historie.'
+    );
+    if (historySource) {
+      historySource.textContent = liveDataStatusState.nowPlaying.lastError
+        ? 'Historien-API-Status: Fehler · Letzter erfolgreicher Abruf ' + (liveDataStatusState.nowPlaying.lastSuccessAt ? formatDateTime(liveDataStatusState.nowPlaying.lastSuccessAt) : 'noch nicht erfolgt') + '.'
+        : 'Historien-API-Status: wartet auf erste erfolgreiche Antwort.';
+    }
     nowPlayingState = {
       current: null,
-      history: []
+      history: nowPlayingState.history
     };
     syncFavoriteButton();
     updateMediaSessionMetadata();
     updateStationStatus();
+    updatePageTitle();
+    renderLiveDataSummary();
   }
 
   function applyNowPlayingData(data) {
@@ -2115,64 +2404,223 @@
 
     if (data.current) {
       setText(nowPlayingTitle, data.current.title || 'Titelinformationen derzeit nicht verfügbar');
-      setText(nowPlayingArtist, data.current.artist || 'Interpret derzeit nicht verfügbar');
-      setText(nowPlayingSource, getNowPlayingSourceLabel());
+      setText(
+        nowPlayingArtist,
+        [data.current.artist || 'Interpret derzeit nicht verfügbar', data.current.album].filter(Boolean).join(' · ')
+      );
+      setText(
+        nowPlayingSource,
+        getLiveDataSourceText() + ' Letzter erfolgreicher Song-Abruf: ' + (liveDataStatusState.nowPlaying.lastSuccessAt ? formatDateTime(liveDataStatusState.nowPlaying.lastSuccessAt) : 'soeben') + '.'
+      );
+      renderArtwork(
+        nowPlayingArtwork,
+        nowPlayingArtworkWrap,
+        nowPlayingArtworkFallback,
+        data.current.artworkUrl,
+        [data.current.artist, data.current.title].filter(Boolean).join(' – ') || 'Aktuelles Cover'
+      );
     } else {
       setText(nowPlayingTitle, 'Titelinformationen derzeit nicht verfügbar');
-      setText(nowPlayingArtist, 'Die konfigurierte Quelle liefert aktuell keine verlässlichen Titeldaten.');
-      setText(nowPlayingSource, getNowPlayingSourceLabel());
+      setText(nowPlayingArtist, 'Die offizielle laut.fm-API liefert aktuell keinen verlässlichen Now-Playing-Eintrag.');
+      setText(nowPlayingSource, getLiveDataSourceText());
+      renderArtwork(nowPlayingArtwork, nowPlayingArtworkWrap, nowPlayingArtworkFallback, '', '');
     }
 
-    renderHistory(history, 'Die Datenquelle liefert aktuell noch keine Historie. Prüfe bei Bedarf JSON-Felder, Aktualisierungstakt und Zeitstempel.');
+    renderHistory(history, 'Die offizielle laut.fm-API liefert aktuell keine letzten Songs.');
+    if (historySource) {
+      historySource.textContent = 'Historien-API-Status: bereit · Letzter erfolgreicher Abruf ' + (liveDataStatusState.nowPlaying.lastSuccessAt ? formatDateTime(liveDataStatusState.nowPlaying.lastSuccessAt) : 'soeben') + '.';
+    }
     syncFavoriteButton();
     updateMediaSessionMetadata();
     updateStationStatus();
+    updatePageTitle();
+    renderLiveDataSummary();
   }
 
-  async function refreshNowPlaying() {
-    if (!isNowPlayingConfigured()) {
-      renderNowPlayingFallback(
-        hasExternalNowPlayingEndpoint()
-          ? 'Die konfigurierte Now-Playing-Quelle liegt außerhalb der eigenen Origin und bleibt ohne bewusste CSP-Anpassung deaktiviert.'
-          : 'Live-Metadaten bleiben deaktiviert, bis in der Konfiguration eine echte same-origin-Quelle hinterlegt ist. Der Stream selbst ist davon unabhängig nutzbar.',
-        getNowPlayingSourceLabel()
-      );
+  async function fetchJsonWithTimeout(url) {
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    let timeoutId = 0;
+
+    try {
+      if (controller) {
+        timeoutId = window.setTimeout(() => controller.abort(), getLautFmTimeoutMs());
+      }
+
+      const response = await window.fetch(url, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: { Accept: 'application/json' },
+        signal: controller ? controller.signal : undefined
+      });
+      if (!response || !response.ok) {
+        throw new Error('http-' + String(response && response.status ? response.status : 'unavailable'));
+      }
+      return response.json();
+    } finally {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    }
+  }
+
+  async function refreshNowPlaying(options) {
+    if (typeof window.fetch !== 'function') {
+      liveDataStatusState.nowPlaying.lastError = 'Fetch API nicht verfügbar';
+      renderNowPlayingFallback('Dieser Browser stellt keine Fetch-API für laut.fm bereit.', getLiveDataSourceText());
       return;
     }
 
+    const requestId = liveDataStatusState.nowPlaying.requestId + 1;
+    liveDataStatusState.nowPlaying.requestId = requestId;
+    liveDataStatusState.nowPlaying.loading = true;
+    renderLiveDataSummary();
+
     try {
-      const response = await window.fetch(
-        getNowPlayingEndpoint(),
-        Object.assign({}, APP_CONFIG.nowPlaying.requestInit || {}, { method: 'GET', cache: 'no-store' })
-      );
-      if (!response || !response.ok) {
-        throw new Error('now-playing-unavailable');
+      const responses = await Promise.all([
+        fetchJsonWithTimeout(buildLautFmEndpoint('current_song')),
+        fetchJsonWithTimeout(buildLautFmEndpoint('last_songs')),
+        fetchJsonWithTimeout(buildLautFmEndpoint('listeners')),
+        fetchJsonWithTimeout(buildLautFmEndpoint('next_artists'))
+      ]);
+
+      if (requestId !== liveDataStatusState.nowPlaying.requestId) {
+        return;
       }
 
-      const payload = await response.json();
-      const adapter = getNowPlayingAdapter();
-      const parsed = adapter.parse(payload || {});
-      applyNowPlayingData(parsed);
+      listenersState = normalizeListenersCount(responses[2]);
+      nextArtistsState = normalizeNextArtists(responses[3]);
+      liveDataStatusState.nowPlaying.lastSuccessAt = new Date().toISOString();
+      liveDataStatusState.nowPlaying.lastError = '';
+      applyNowPlayingData({
+        current: normalizeTrack(responses[0]),
+        history: (Array.isArray(responses[1]) ? responses[1] : []).map(normalizeTrack).filter(Boolean)
+      });
+      renderStationProfile();
     } catch (error) {
+      if (requestId !== liveDataStatusState.nowPlaying.requestId) {
+        return;
+      }
+      liveDataStatusState.nowPlaying.lastError = buildApiErrorLabel(error);
       renderNowPlayingFallback(
-        'Die konfigurierte Quelle ist derzeit nicht erreichbar oder liefert keine lesbaren Titeldaten. Prüfe Pfad, Antwortformat und ob die Quelle unter derselben Origin erreichbar bleibt.',
-        getNowPlayingSourceLabel()
+        'Die offiziellen Songdaten konnten gerade nicht geladen werden. Prüfe Verbindung, CORS-Freigabe oder einen optionalen Same-Origin-Proxy.',
+        getLiveDataSourceText() + ' Letzter erfolgreicher Song-Abruf: ' + (liveDataStatusState.nowPlaying.lastSuccessAt ? formatDateTime(liveDataStatusState.nowPlaying.lastSuccessAt) : 'noch keiner') + '.'
       );
+      renderStationProfile();
     } finally {
-      scheduleNowPlayingRefresh();
+      if (requestId === liveDataStatusState.nowPlaying.requestId) {
+        liveDataStatusState.nowPlaying.loading = false;
+        renderLiveDataSummary();
+      }
+      if (!options || options.scheduleNextPoll !== false) {
+        scheduleNowPlayingRefresh();
+      }
+    }
+  }
+
+  async function refreshStationProfile(options) {
+    if (typeof window.fetch !== 'function') {
+      liveDataStatusState.station.lastError = 'Fetch API nicht verfügbar';
+      renderStationProfile();
+      return;
+    }
+
+    const requestId = liveDataStatusState.station.requestId + 1;
+    liveDataStatusState.station.requestId = requestId;
+    liveDataStatusState.station.loading = true;
+    renderLiveDataSummary();
+
+    try {
+      const payload = await fetchJsonWithTimeout(buildLautFmEndpoint(''));
+      if (requestId !== liveDataStatusState.station.requestId) {
+        return;
+      }
+      stationProfileState = normalizeStationProfile(payload);
+      liveDataStatusState.station.lastSuccessAt = new Date().toISOString();
+      liveDataStatusState.station.lastError = '';
+      renderStationProfile();
+    } catch (error) {
+      if (requestId !== liveDataStatusState.station.requestId) {
+        return;
+      }
+      liveDataStatusState.station.lastError = buildApiErrorLabel(error);
+      renderStationProfile();
+    } finally {
+      if (requestId === liveDataStatusState.station.requestId) {
+        liveDataStatusState.station.loading = false;
+        renderLiveDataSummary();
+      }
+      if (!options || options.scheduleNextPoll !== false) {
+        scheduleStationRefresh();
+      }
+    }
+  }
+
+  async function refreshSchedule(options) {
+    if (typeof window.fetch !== 'function') {
+      liveDataStatusState.schedule.lastError = 'Fetch API nicht verfügbar';
+      renderSchedule();
+      return;
+    }
+
+    const requestId = liveDataStatusState.schedule.requestId + 1;
+    liveDataStatusState.schedule.requestId = requestId;
+    liveDataStatusState.schedule.loading = true;
+    renderLiveDataSummary();
+
+    try {
+      const payload = await fetchJsonWithTimeout(buildLautFmEndpoint('schedule'));
+      if (requestId !== liveDataStatusState.schedule.requestId) {
+        return;
+      }
+      scheduleState = normalizeScheduleEntries(payload);
+      liveDataStatusState.schedule.lastSuccessAt = new Date().toISOString();
+      liveDataStatusState.schedule.lastError = '';
+      renderSchedule();
+    } catch (error) {
+      if (requestId !== liveDataStatusState.schedule.requestId) {
+        return;
+      }
+      liveDataStatusState.schedule.lastError = buildApiErrorLabel(error);
+      renderSchedule();
+    } finally {
+      if (requestId === liveDataStatusState.schedule.requestId) {
+        liveDataStatusState.schedule.loading = false;
+        renderLiveDataSummary();
+      }
+      if (!options || options.scheduleNextPoll !== false) {
+        scheduleScheduleRefresh();
+      }
     }
   }
 
   function scheduleNowPlayingRefresh() {
     clearNowPlayingTimer();
-    if (!isNowPlayingConfigured()) {
-      return;
-    }
-
-    const interval = Math.max(15000, Number.parseInt(String(APP_CONFIG.nowPlaying.pollIntervalMs), 10) || 60000);
     nowPlayingTimer = window.setTimeout(() => {
       refreshNowPlaying();
-    }, interval);
+    }, getLautFmPollIntervalMs());
+  }
+
+  function scheduleStationRefresh() {
+    clearStationInfoTimer();
+    stationInfoTimer = window.setTimeout(() => {
+      refreshStationProfile();
+    }, getStationPollIntervalMs());
+  }
+
+  function scheduleScheduleRefresh() {
+    clearScheduleTimer();
+    scheduleTimer = window.setTimeout(() => {
+      refreshSchedule();
+    }, getSchedulePollIntervalMs());
+  }
+
+  function refreshAllLiveData() {
+    clearNowPlayingTimer();
+    clearStationInfoTimer();
+    clearScheduleTimer();
+    refreshNowPlaying({ scheduleNextPoll: true });
+    refreshStationProfile({ scheduleNextPoll: true });
+    refreshSchedule({ scheduleNextPoll: true });
   }
 
   function registerServiceWorker() {
@@ -2308,15 +2756,18 @@
   applyTheme(getStoredThemePreference());
   setState('ready', 'Bereit zum Start', 'Die Wiedergabe startet erst nach deiner Aktion und meldet Status sowie Neuversuche direkt im Player.');
   renderNowPlayingFallback(
-    'Live-Metadaten bleiben deaktiviert, bis in der Konfiguration eine echte same-origin-Quelle hinterlegt ist. Der Stream selbst ist davon unabhängig nutzbar.',
-    'Keine Now-Playing-Quelle konfiguriert. Für Titelinfos und Historie kann eine same-origin-Quelle gepflegt werden.'
+    'Die offiziellen Songdaten werden vorbereitet.',
+    getLiveDataSourceText()
   );
+  renderStationProfile();
+  renderSchedule();
+  renderLiveDataSummary();
   setupMediaSession();
   bindNavigation();
   initScrollReveal();
   setBackToTopVisibility();
   registerServiceWorker();
-  refreshNowPlaying();
+  refreshAllLiveData();
 
   if (shareButton) {
     shareButton.addEventListener('click', handleShare);
@@ -2392,6 +2843,9 @@
   }
   if (favoriteTrackButton) {
     favoriteTrackButton.addEventListener('click', toggleCurrentFavorite);
+  }
+  if (liveDataRefreshButton) {
+    liveDataRefreshButton.addEventListener('click', refreshAllLiveData);
   }
   if (favoritesClearButton) {
     favoritesClearButton.addEventListener('click', clearFavorites);
@@ -2548,6 +3002,13 @@
     if (installStatus) {
       installStatus.textContent = 'Die App wurde installiert oder zum Homescreen hinzugefügt.';
     }
+  });
+  window.addEventListener('pagehide', () => {
+    clearNowPlayingTimer();
+    clearStationInfoTimer();
+    clearScheduleTimer();
+    clearLoadTimer();
+    clearReconnectTimer();
   });
   document.addEventListener('keydown', handleKeyboardShortcuts);
   if (backToTopButton) {

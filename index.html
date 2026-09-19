@@ -7,7 +7,7 @@
   <meta name="description" content="Übersichtliche Startseite von stream-musik.space mit Live-Status, kompaktem Browser-Player, Schnellzugriffen und klaren Wegen zu Live, Titeln, Hilfe und Kontakt.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="dark light">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm https://api.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
@@ -95,9 +95,9 @@
       <div class="status-capsules">
         <p class="status-capsule"><strong>Streamstatus</strong><span id="station-status">Bereit für manuellen Start</span></p>
         <p class="status-capsule"><strong>Now Playing</strong><span id="now-playing-track">Titelinformationen derzeit nicht verfügbar</span></p>
-        <p class="status-capsule"><strong>Quelle</strong><span id="now-playing-source">Keine Now-Playing-Quelle konfiguriert.</span></p>
+        <p class="status-capsule"><strong>Quelle</strong><span id="now-playing-source">Quelle: offizielle laut.fm-API für jackdarckart.</span></p>
       </div>
-      <p class="content-meta" id="now-playing-artist">Live-Metadaten bleiben deaktiviert, bis eine echte Quelle konfiguriert ist.</p>
+      <p class="content-meta" id="now-playing-artist">Die offiziellen Songdaten werden geladen.</p>
       <div class="controls">
         <button class="button play-button" id="play" type="button" aria-pressed="false">Stream starten</button>
         <button class="button icon-button" id="share" type="button" data-share-target="page">Startseite teilen</button>
@@ -108,6 +108,36 @@
         <a class="button secondary" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Offizielles laut.fm öffnen</a>
       </div>
     </aside>
+  </div>
+</section>
+
+<section class="section" data-reveal>
+  <div class="wrap content-columns">
+    <article class="panel content-panel">
+      <div class="subpanel-head">
+        <h2>Verifiziertes Senderprofil</h2>
+        <span class="subpanel-label">Endpoint <code>/station/jackdarckart</code></span>
+      </div>
+      <div class="station-profile-grid">
+        <div class="station-media" id="station-profile-image-wrap" hidden>
+          <img class="station-art" id="station-profile-image" src="" alt="">
+        </div>
+        <p class="note compact-note" id="station-profile-image-fallback">Kein verifiziertes Senderbild von der API geliefert.</p>
+        <div>
+          <p class="now-playing-track" id="station-profile-title">jackdarckart</p>
+          <p class="now-playing-artist" id="station-profile-description">Verifizierte Senderinformationen werden live aus der offiziellen laut.fm-API geladen.</p>
+          <p class="content-meta" id="station-profile-meta">Genres, Website und weitere verifizierbare Details erscheinen nur, wenn die API sie tatsächlich liefert.</p>
+          <p class="content-meta" id="station-profile-listeners">Listener-Wert wird nur angezeigt, wenn die API einen gültigen Zahlenwert liefert.</p>
+          <p class="content-meta" id="station-profile-next-artists">Keine verifizierten Next-Artists-Daten verfügbar.</p>
+          <a class="content-link" id="station-profile-link" href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">Offizielle Senderseite öffnen</a>
+        </div>
+      </div>
+    </article>
+    <article class="panel editorial-module">
+      <span class="eyebrow">Live-Daten-Ehrlichkeit</span>
+      <h2>Keine Fake-Songs, keine Fake-Hörerzahlen, keine Fake-Sendungen.</h2>
+      <p>Diese Website blendet nur verifizierbare Werte aus den offiziellen laut.fm-Endpunkten ein. Wenn die API leer ist oder gerade nicht erreichbar bleibt, wird das offen als Live-Datenproblem gezeigt — inklusive Zeitstempel des letzten erfolgreichen Abrufs.</p>
+    </article>
   </div>
 </section>
 
@@ -153,6 +183,19 @@
     </div>
   </div>
 </section>
+  <section class="section section-muted live-data-section" data-reveal>
+    <div class="wrap">
+      <article class="panel content-panel live-data-panel">
+        <div class="subpanel-head">
+          <h2>Live-Datenstatus</h2>
+          <button class="button secondary" id="live-data-refresh" type="button">Jetzt aktualisieren</button>
+        </div>
+        <p class="status-line"><span class="meta-label">Status</span><span id="live-data-status">Live-Daten werden vorbereitet</span></p>
+        <p class="status-line"><span class="meta-label">Zuletzt aktualisiert</span><span id="live-data-updated">Noch kein erfolgreicher API-Abruf</span></p>
+        <p class="share-status note" id="live-data-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
+      </article>
+    </div>
+  </section>
 </main>
   <div class="sticky-player" id="sticky-player" data-state="ready" aria-label="Schnellzugriff auf den Live-Player">
   <div class="sticky-player-actions">

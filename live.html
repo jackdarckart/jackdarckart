@@ -7,7 +7,7 @@
   <meta name="description" content="Live hören auf stream-musik.space mit vollständigem Browser-Audioplayer, Retry-/Offline-Logik, Sleep-Timer, Tastaturkürzeln und Direktstream-Fallback.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="dark light">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm https://api.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/live.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
@@ -98,13 +98,17 @@
         <section class="subpanel" aria-labelledby="now-playing-heading">
           <div class="subpanel-head">
             <h3 id="now-playing-heading">Now Playing</h3>
-            <span class="subpanel-label">Konfigurierbare Datenquelle</span>
+            <span class="subpanel-label">offizielle laut.fm-API</span>
           </div>
-          <p class="note compact-note">Dieser Bereich zeigt bei konfigurierter Quelle den aktuellen Titel. Ohne Quelle bleibt die Wiedergabe voll nutzbar; Verlauf und Favoriten liegen auf <a href="./titel.html">titel.html</a>.</p>
+          <p class="note compact-note">Dieser Bereich ruft den aktuellen Song live über <code>/station/jackdarckart/current_song</code> ab. Bei API-Fehlern bleibt die Wiedergabe nutzbar, aber der Titelstatus wird ehrlich als technischer Fehler mit letztem erfolgreichen Abruf ausgewiesen.</p>
+          <div class="media-art-shell" id="now-playing-artwork-wrap" hidden>
+            <img class="media-art" id="now-playing-artwork" src="" alt="">
+          </div>
+          <p class="note compact-note" id="now-playing-artwork-fallback">Kein verifiziertes Cover von der API geliefert.</p>
           <p class="now-playing-track" id="now-playing-track">Titelinformationen derzeit nicht verfügbar</p>
-          <p class="now-playing-artist" id="now-playing-artist">Live-Metadaten bleiben deaktiviert, bis eine echte Quelle konfiguriert ist.</p>
+          <p class="now-playing-artist" id="now-playing-artist">Live-Metadaten werden geladen.</p>
           <p class="status-line"><span class="meta-label">Senderstatus</span><span id="station-status">Bereit für manuellen Start</span></p>
-          <p class="share-status note" id="now-playing-source" aria-live="polite">Keine Now-Playing-Quelle konfiguriert.</p>
+          <p class="share-status note" id="now-playing-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
         </section>
 
         <div class="status-grid" aria-label="Player-Status und Diagnose">
@@ -234,6 +238,19 @@
           </aside>
         </section>
       </div>
+    </div>
+  </section>
+  <section class="section section-muted live-data-section" data-reveal>
+    <div class="wrap">
+      <article class="panel content-panel live-data-panel">
+        <div class="subpanel-head">
+          <h2>Live-Datenstatus</h2>
+          <button class="button secondary" id="live-data-refresh" type="button">Jetzt aktualisieren</button>
+        </div>
+        <p class="status-line"><span class="meta-label">Status</span><span id="live-data-status">Live-Daten werden vorbereitet</span></p>
+        <p class="status-line"><span class="meta-label">Zuletzt aktualisiert</span><span id="live-data-updated">Noch kein erfolgreicher API-Abruf</span></p>
+        <p class="share-status note" id="live-data-source" aria-live="polite">Quelle: offizielle laut.fm-API für jackdarckart.</p>
+      </article>
     </div>
   </section>
 </main>

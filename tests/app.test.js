@@ -96,6 +96,10 @@ class MockElement {
     return Object.prototype.hasOwnProperty.call(this.attributes, name) ? this.attributes[name] : null;
   }
 
+  removeAttribute(name) {
+    delete this.attributes[name];
+  }
+
   querySelectorAll(selector) {
     if (selector === 'i' || selector === 'a') {
       return this.children;
@@ -277,6 +281,24 @@ function createEnvironment(options = {}) {
     'news-list',
     'archive-list',
     'platform-links',
+    'live-data-status',
+    'live-data-updated',
+    'live-data-source',
+    'live-data-refresh',
+    'history-source',
+    'schedule-source',
+    'now-playing-artwork',
+    'now-playing-artwork-wrap',
+    'now-playing-artwork-fallback',
+    'station-profile-title',
+    'station-profile-description',
+    'station-profile-meta',
+    'station-profile-link',
+    'station-profile-listeners',
+    'station-profile-next-artists',
+    'station-profile-image',
+    'station-profile-image-wrap',
+    'station-profile-image-fallback',
     'feedback-kind',
     'feedback-name',
     'feedback-subject',
@@ -442,6 +464,7 @@ function createEnvironment(options = {}) {
     Array,
     Object,
     Intl,
+    AbortController,
     setTimeout: windowObject.setTimeout,
     clearTimeout: windowObject.clearTimeout
   });
@@ -585,45 +608,51 @@ async function testMuteButtonRestoresAudiblePlaybackFromZeroVolume() {
   assert.equal(elements['volume-text'].textContent, '70%', 'restoring audio should refresh the visible volume label');
 }
 
-async function testNowPlayingIsNotFetchedWithoutConfiguredSource() {
-  let fetchCalls = 0;
+async function testOfficialLautFmApiIsUsedForLiveMetadata() {
+  const fetchedUrls = [];
   const env = createEnvironment({
-    fetch: async () => {
-      fetchCalls += 1;
-      return { ok: true, json: async () => ({}) };
-    }
-  });
-
-  await flushMicrotasks();
-
-  assert.equal(fetchCalls, 0, 'default configuration should not trigger now-playing fetches');
-  assert.equal(env.elements['now-playing-track'].textContent, 'Titelinformationen derzeit nicht verfügbar');
-  assert.match(env.elements['now-playing-artist'].textContent, /deaktiviert/);
-  assert.match(env.elements['now-playing-source'].textContent, /same-origin/i, 'default fallback should explain how a local metadata source can be configured');
-}
-
-async function testShareUsesCurrentTrackWhenMetadataIsAvailable() {
-  let fetchedUrl = '';
-  const env = createEnvironment({
-    appConfig: {
-      nowPlaying: {
-        endpoint: 'metadata/now-playing.json'
-      }
-    },
     fetch: async (url) => {
-      fetchedUrl = url;
+      fetchedUrls.push(url);
+      if (url.endsWith('/current_song')) {
+        return {
+          ok: true,
+          json: async () => ({
+            title: 'Mitternacht',
+            artist: { name: 'jackdarckart' },
+            album: 'Night Signals',
+            art: 'https://assets.laut.fm/current.jpg',
+            started_at: '2026-09-19T12:00:00.000Z'
+          })
+        };
+      }
+      if (url.endsWith('/last_songs')) {
+        return {
+          ok: true,
+          json: async () => ([
+            { title: 'Mitternacht', artist: { name: 'jackdarckart' }, started_at: '2026-09-19T12:00:00.000Z' },
+            { title: 'Mitternacht', artist: { name: 'jackdarckart' }, started_at: '2026-09-19T12:00:00.000Z' },
+            { title: 'Wolkenlauf', artist: { name: 'jackdarckart' }, started_at: '2026-09-19T11:45:00.000Z' }
+          ])
+        };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 24 }) };
+      }
+      if (url.endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([{ name: 'M83' }, { name: 'Kavinsky' }]) };
+      }
+      if (url.endsWith('/schedule')) {
+        return { ok: true, json: async () => ([]) };
+      }
       return {
         ok: true,
         json: async () => ({
-          current: {
-            title: 'Mitternacht',
-            artist: 'jackdarckart'
-          },
-          history: [
-            { title: 'Mitternacht', artist: 'jackdarckart', playedAt: '2026-09-19T12:00:00.000Z' },
-            { title: 'Mitternacht', artist: 'jackdarckart', playedAt: '2026-09-19T12:00:00.000Z' },
-            { title: 'Wolkenlauf', artist: 'jackdarckart', playedAt: '2026-09-19T11:45:00.000Z' }
-          ]
+          name: 'jackdarckart',
+          display_name: 'jackdarckart',
+          description: 'Night radio',
+          genres: ['Synthwave', 'Electronic'],
+          page_url: 'https://laut.fm/jackdarckart',
+          logo: 'https://assets.laut.fm/station.png'
         })
       };
     },
@@ -635,14 +664,15 @@ async function testShareUsesCurrentTrackWhenMetadataIsAvailable() {
 
   const shareCall = env.getShareCall();
   assert.ok(shareCall, 'share callback should receive data');
-  assert.equal(shareCall.title, 'jackdarckart');
-  assert.equal(shareCall.text, 'Jetzt live: jackdarckart – Mitternacht', 'share payload should include current track details when real metadata is available');
-  assert.equal(shareCall.url, 'https://stream-musik.space/');
-  assert.equal(env.elements['history-list'].children.length, 2, 'history should deduplicate repeated entries');
-  assert.equal(env.elements['history-empty'].hidden, true, 'history fallback should be hidden once entries exist');
-  assert.equal(env.navigator.mediaSession.metadata.title, 'Mitternacht', 'media session metadata should reflect real now-playing data');
-  assert.equal(fetchedUrl, 'https://stream-musik.space/metadata/now-playing.json', 'configured now-playing fetches should use the normalized endpoint');
-  assert.equal(env.elements['now-playing-source'].textContent, 'Datenquelle: stream-musik.space/metadata/now-playing.json · Aktualisierung ca. alle 1 min.', 'configured now-playing sources should expose a stable label including path and polling cadence');
+  assert.equal(shareCall.text, 'Jetzt live: jackdarckart – Mitternacht', 'share payload should include the official live track details');
+  assert.equal(env.elements['history-list'].children.length, 2, 'history should deduplicate repeated API entries');
+  assert.equal(env.navigator.mediaSession.metadata.title, 'Mitternacht', 'media session metadata should reflect official current-song data');
+  assert.equal(env.elements['now-playing-artwork'].src, 'https://assets.laut.fm/current.jpg', 'official artwork URLs should be applied to the cover image');
+  assert.match(env.elements['station-profile-meta'].textContent, /Synthwave, Electronic/, 'station profile should render verified genres from the station endpoint');
+  assert.match(env.elements['station-profile-listeners'].textContent, /24/, 'listener count should only render the verified API value');
+  assert.ok(fetchedUrls.some((url) => url === 'https://api.laut.fm/station/jackdarckart/current_song'), 'default configuration should request the official current-song endpoint');
+  assert.ok(fetchedUrls.some((url) => url === 'https://api.laut.fm/station/jackdarckart/last_songs'), 'default configuration should request the official last-songs endpoint');
+  assert.ok(fetchedUrls.some((url) => url === 'https://api.laut.fm/station/jackdarckart/schedule'), 'default configuration should request the official schedule endpoint');
 }
 
 async function testThemeSelectionUpdatesDatasetAndThemeColor() {
@@ -670,24 +700,20 @@ async function testOfflineRecoveryShowsDedicatedRetryAction() {
   assert.equal(env.elements['offline-retry'].hidden, false, 'retry action should become visible once the connection returns');
 }
 
-async function testExternalNowPlayingEndpointStaysDisabledByDefaultCsp() {
-  let fetchCalls = 0;
+async function testApiFailuresShowHonestFallbackState() {
   const env = createEnvironment({
-    appConfig: {
-      nowPlaying: {
-        endpoint: 'https://example.com/now-playing.json'
-      }
-    },
     fetch: async () => {
-      fetchCalls += 1;
-      return { ok: true, json: async () => ({}) };
+      throw new Error('network down');
     }
   });
 
   await flushMicrotasks();
 
-  assert.equal(fetchCalls, 0, 'external now-playing endpoints should stay disabled until CSP and code are explicitly widened');
-  assert.match(env.elements['now-playing-source'].textContent, /same-origin|CSP/, 'the UI should explain why the configured endpoint stays inactive');
+  assert.equal(env.elements['now-playing-track'].textContent, 'Titelinformationen derzeit nicht verfügbar');
+  assert.match(env.elements['now-playing-artist'].textContent, /offiziellen Songdaten konnten gerade nicht geladen werden/i);
+  assert.match(env.elements['live-data-status'].textContent, /nicht vollständig erreichbar/i);
+  assert.match(env.elements['live-data-source'].textContent, /Same-Origin-Proxy/i, 'failure state should mention the optional real proxy path');
+  assert.equal(env.elements['live-data-refresh'].disabled, false, 'manual refresh should remain available after an API failure');
 }
 
 function testUsesStationSpecificHttpsStreamUrl() {
@@ -698,105 +724,52 @@ function testUsesStationSpecificHttpsStreamUrl() {
   );
 }
 
-function getBerlinParts() {
-  const formatter = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Berlin',
-    weekday: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23'
-  });
-  const values = {};
-  for (const part of formatter.formatToParts(new Date())) {
-    if (part.type !== 'literal') {
-      values[part.type] = part.value;
-    }
-  }
-
-  const weekdayMap = {
-    Sun: 0,
-    Mon: 1,
-    Tue: 2,
-    Wed: 3,
-    Thu: 4,
-    Fri: 5,
-    Sat: 6
-  };
-
-  return {
-    day: weekdayMap[values.weekday],
-    hour: Number.parseInt(values.hour, 10),
-    minute: Number.parseInt(values.minute, 10)
-  };
-}
-
-function toTimeString(totalMinutes) {
-  const normalized = ((totalMinutes % 1440) + 1440) % 1440;
-  return String(Math.floor(normalized / 60)).padStart(2, '0') + ':' + String(normalized % 60).padStart(2, '0');
-}
-
-async function testScheduleHandlesOvernightWraparound() {
+async function testScheduleUsesOfficialApiEntriesForLiveAndNext() {
   const env = createEnvironment({
     now: '2026-09-21T00:30:00+02:00',
-    appConfig: {
-      content: {
-        schedule: {
-          timeZone: 'Europe/Berlin',
-          entries: [
+    fetch: async (url) => {
+      if (url.endsWith('/schedule')) {
+        return {
+          ok: true,
+          json: async () => ([
             {
-              day: 'Sonntag',
-              start: '23:00',
-              end: '01:00',
-              title: 'Late Night'
+              starts: '2026-09-20T23:00:00+02:00',
+              ends: '2026-09-21T01:00:00+02:00',
+              playlist: { name: 'Late Night' },
+              type: 'playlist'
             },
             {
-              day: 'Montag',
-              start: '02:00',
-              end: '03:00',
-              title: 'Morgenmix'
+              starts: '2026-09-21T02:00:00+02:00',
+              ends: '2026-09-21T03:00:00+02:00',
+              playlist: { name: 'Morgenmix' },
+              type: 'playlist'
             }
-          ]
-        }
+          ])
+        };
       }
+      if (url.endsWith('/current_song')) {
+        return { ok: true, json: async () => ({}) };
+      }
+      if (url.endsWith('/last_songs')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 0 }) };
+      }
+      if (url.endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
     }
   });
 
-  const highlightCards = env.elements['schedule-highlight'].children;
-  assert.equal(highlightCards.length, 2, 'overnight entries should still yield live and next highlight cards');
-  assert.match(highlightCards[0].children[0].textContent, /Late Night/, 'overnight entry should be detected as currently live after midnight');
-  assert.match(highlightCards[1].children[0].textContent, /Morgenmix/, 'next entry should still be identified after an overnight live slot');
-}
-
-async function testScheduleRespectsConfiguredTimezone() {
-  const env = createEnvironment({
-    now: '2026-09-21T00:30:00Z',
-    appConfig: {
-      content: {
-        schedule: {
-          timeZone: 'UTC',
-          entries: [
-            {
-              day: 'Sonntag',
-              start: '23:00',
-              end: '01:00',
-              title: 'UTC Late Show'
-            },
-            {
-              day: 'Montag',
-              start: '02:00',
-              end: '03:00',
-              title: 'UTC Next'
-            }
-          ]
-        }
-      }
-    }
-  });
+  await flushMicrotasks();
 
   const highlightCards = env.elements['schedule-highlight'].children;
-  assert.equal(highlightCards.length, 2, 'configured timezone should still produce live and next highlights');
-  assert.match(highlightCards[0].children[0].textContent, /UTC Late Show/, 'schedule should evaluate the current show in the configured timezone');
-  assert.match(highlightCards[1].children[0].textContent, /UTC Next/, 'schedule should compute the next show in the configured timezone');
+  assert.equal(highlightCards.length, 2, 'official schedule entries should still yield live and next highlight cards');
+  assert.match(highlightCards[0].children[0].textContent, /Late Night/, 'official schedule should detect the currently live entry after midnight');
+  assert.match(highlightCards[1].children[0].textContent, /Morgenmix/, 'official schedule should detect the next API entry');
+  assert.match(env.elements['schedule-source'].textContent, /Letzter erfolgreicher Abruf|bereit/, 'schedule source text should expose refresh state and timing');
 }
 
 async function testKeyboardShortcutsRespectInteractiveTargets() {
@@ -881,20 +854,27 @@ async function testSleepTimerResetsOnManualStop() {
 
 async function testFavoritesCanBeAddedAndRemovedLocally() {
   const env = createEnvironment({
-    appConfig: {
-      nowPlaying: {
-        endpoint: 'metadata/now-playing.json'
+    fetch: async (url) => {
+      if (url.endsWith('/current_song')) {
+        return {
+          ok: true,
+          json: async () => ({
+            title: 'Mitternacht',
+            artist: { name: 'jackdarckart' }
+          })
+        };
       }
-    },
-    fetch: async () => ({
-      ok: true,
-      json: async () => ({
-        current: {
-          title: 'Mitternacht',
-          artist: 'jackdarckart'
-        }
-      })
-    })
+      if (url.endsWith('/last_songs')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 0 }) };
+      }
+      if (url.endsWith('/next_artists') || url.endsWith('/schedule')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      return { ok: true, json: async () => ({ name: 'jackdarckart' }) };
+    }
   });
 
   await flushMicrotasks();
@@ -908,40 +888,30 @@ async function testFavoritesCanBeAddedAndRemovedLocally() {
   assert.equal(env.elements['favorites-empty'].hidden, false, 'empty state should return once all favorites are removed');
 }
 
-async function testScheduleShowsLiveAndNextWhenConfigured() {
-  const berlin = getBerlinParts();
-  const currentMinutes = berlin.hour * 60 + berlin.minute;
-  const nextMinutes = currentMinutes + 60;
-  const nextDay = berlin.day + Math.floor(nextMinutes / 1440);
-
+async function testSameOriginProxyConfigurationIsUsedWhenProvided() {
+  const fetchedUrls = [];
   const env = createEnvironment({
     appConfig: {
-      content: {
-        schedule: {
-          timeZone: 'Europe/Berlin',
-          entries: [
-            {
-              day: berlin.day,
-              start: toTimeString(currentMinutes),
-              end: toTimeString(currentMinutes + 15),
-              title: 'Live-Test'
-            },
-            {
-              day: nextDay % 7,
-              start: toTimeString(nextMinutes),
-              end: toTimeString(nextMinutes + 60),
-              title: 'Next-Test'
-            }
-          ]
-        }
+      lautFm: {
+        proxyBase: './api/lautfm/station/jackdarckart'
       }
+    },
+    fetch: async (url) => {
+      fetchedUrls.push(url);
+      if (url.endsWith('/schedule') || url.endsWith('/last_songs') || url.endsWith('/next_artists')) {
+        return { ok: true, json: async () => ([]) };
+      }
+      if (url.endsWith('/listeners')) {
+        return { ok: true, json: async () => ({ listeners: 4 }) };
+      }
+      return { ok: true, json: async () => ({ title: 'Proxy Song', artist: { name: 'Proxy Artist' } }) };
     }
   });
 
-  const highlightCards = env.elements['schedule-highlight'].children;
-  assert.equal(highlightCards.length, 2, 'configured schedule should render live and next highlight cards');
-  assert.match(highlightCards[0].children[1].textContent, /Jetzt live/, 'highlight should identify the currently live show');
-  assert.equal(env.elements['schedule-list'].children.length >= 2, true, 'configured schedule should render upcoming schedule cards');
+  await flushMicrotasks();
+
+  assert.ok(fetchedUrls.some((url) => url === 'https://stream-musik.space/api/lautfm/station/jackdarckart/current_song'), 'same-origin proxy base should be used for API requests when configured');
+  assert.match(env.elements['live-data-source'].textContent, /Same-Origin-Proxy/i, 'UI should disclose when a real proxy path is configured');
 }
 
 async function testEmptyStatesExplainHowSectionsAreMaintained() {
@@ -1035,17 +1005,15 @@ async function main() {
   await testMissingOptionalElementsDoNotCrashInitialization();
   await testMissingAudioElementShowsGuardedErrorState();
   await testMuteButtonRestoresAudiblePlaybackFromZeroVolume();
-  await testNowPlayingIsNotFetchedWithoutConfiguredSource();
-  await testShareUsesCurrentTrackWhenMetadataIsAvailable();
+  await testOfficialLautFmApiIsUsedForLiveMetadata();
   await testThemeSelectionUpdatesDatasetAndThemeColor();
   await testOfflineRecoveryShowsDedicatedRetryAction();
-  await testExternalNowPlayingEndpointStaysDisabledByDefaultCsp();
+  await testApiFailuresShowHonestFallbackState();
   await testKeyboardShortcutsRespectInteractiveTargets();
   await testSleepTimerResetsOnManualStop();
   await testFavoritesCanBeAddedAndRemovedLocally();
-  await testScheduleShowsLiveAndNextWhenConfigured();
-  await testScheduleHandlesOvernightWraparound();
-  await testScheduleRespectsConfiguredTimezone();
+  await testSameOriginProxyConfigurationIsUsedWhenProvided();
+  await testScheduleUsesOfficialApiEntriesForLiveAndNext();
   await testEmptyStatesExplainHowSectionsAreMaintained();
   await testFeedbackUsesHonestFallbacksAndValidation();
   await testFeedbackUsesConfiguredMailtoTarget();
