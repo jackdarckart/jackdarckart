@@ -504,10 +504,8 @@
         return;
       }
       elements.bitrateSelect.disabled = selected.id === 'wav';
-      if (selected.id === 'mp3') {
-        elements.bitrateSelect.value = PREFERRED_MP3_BITRATE;
-      } else if (selected.id !== 'wav') {
-        elements.bitrateSelect.value = DEFAULT_COMPRESSED_BITRATE;
+      if (selected.id !== 'wav') {
+        elements.bitrateSelect.value = getDefaultBitrateForFormat(selected);
       }
       elements.formatNote.textContent = selected.description;
     }
@@ -832,16 +830,15 @@
           : Number(elements.samplerateSelect.value);
         const rendered = await core.render(loadedBuffer, readSettings(), sampleRateValue);
         const exportFormat = getSelectedFormat();
-        const bitrate = Number(elements.bitrateSelect.value) || 192000;
+        const bitrate = Number(elements.bitrateSelect.value) || Number(getDefaultBitrateForFormat(exportFormat)) || 192000;
         const masteredBuffer = rendered.buffer;
         const blob = exportFormat.id === 'wav'
           ? core.encodeWav(masteredBuffer)
           : await recordCompressedExport(masteredBuffer, exportFormat, bitrate);
 
-        const filenameBase = sanitizeFilename((loadedFile && loadedFile.name) || 'master');
         storeRenderedAsset({
           blob,
-          filename: filenameBase + '-master.' + exportFormat.extension,
+          filename: buildRenderedFilename(loadedFile, exportFormat),
           report: rendered.report,
           format: exportFormat,
           sampleRate: rendered.buffer.sampleRate
@@ -1165,6 +1162,9 @@
       _downloadRenderedFileForTest() {
         downloadRenderedFile();
       },
+      _buildRenderedFilenameForTest(file, format) {
+        return buildRenderedFilename(file, format);
+      },
       _recordCompressedExportForTest(buffer, format, bitrate) {
         return recordCompressedExport(buffer, format, bitrate);
       }
@@ -1237,6 +1237,14 @@
       .replace(/[^a-z0-9-_]+/gi, '-')
       .replace(/-{2,}/g, '-')
       .replace(/^-|-$/g, '') || 'master';
+  }
+
+  function buildRenderedFilename(file, format) {
+    return sanitizeFilename((file && file.name) || 'master') + '-master.' + ((format && format.extension) || 'wav');
+  }
+
+  function getDefaultBitrateForFormat(format) {
+    return format && format.id === 'mp3' ? PREFERRED_MP3_BITRATE : DEFAULT_COMPRESSED_BITRATE;
   }
 
   function createRealtimeAudioContext(sampleRate) {

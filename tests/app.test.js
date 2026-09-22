@@ -2043,6 +2043,16 @@ function testConverterPageExposesStudioHooksAndLoader() {
     /MP3 erscheint nur bei nativer Browser-Unterstützung/i,
     'converter page should describe that MP3 export only appears with true native browser support'
   );
+  assert.equal(
+    (converterHtmlCode.match(/id="converter-format-select"/g) || []).length,
+    1,
+    'converter page should expose exactly one export-format select control'
+  );
+  assert.doesNotMatch(
+    converterHtmlCode,
+    /<option value="mp3">/i,
+    'converter page should not hardcode MP3 export options in static HTML because native support is detected at runtime'
+  );
   assert.match(
     converterHtmlCode,
     /Phase 27\.3/i,
@@ -2110,6 +2120,21 @@ async function testConverterMp3FormatExposureAndDefaults() {
   await env.elements['converter-format-select'].dispatch('change');
 
   assert.equal(env.elements['converter-bitrate-select'].value, '192000', 'switching away from MP3 should restore the standard compressed export bitrate');
+}
+
+function testConverterMp3FilenameUsesMp3Extension() {
+  const env = createConverterEnvironment();
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+
+  assert.equal(
+    studio._buildRenderedFilenameForTest(
+      { name: 'Mein Sommer Mix.final.wav' },
+      { id: 'mp3', extension: 'mp3' }
+    ),
+    'Mein-Sommer-Mix-final-master.mp3',
+    'converter studio should build rendered MP3 downloads with a sanitized base name and mp3 extension'
+  );
 }
 
 async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
@@ -2559,6 +2584,7 @@ async function main() {
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
   await testConverterMp3FormatExposureAndDefaults();
+  testConverterMp3FilenameUsesMp3Extension();
   await testConverterMp3FallbackMessageWhenNativeSupportMissing();
   testConverterDownloadClearsTemporaryAsset();
   await testConverterCompressedExportPath();
