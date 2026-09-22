@@ -21,6 +21,7 @@
       this.lowFrequency = 110;
       this.midFrequency = 2800;
       this.highFrequency = 7600;
+      this.fallbackBufferContext = null;
     }
 
     analyzeBuffer(buffer) {
@@ -190,8 +191,10 @@
         });
       }
 
-      const fallbackContext = this.createOfflineContext(numberOfChannels, Math.max(1, length), sampleRate);
-      return fallbackContext.createBuffer(numberOfChannels, length, sampleRate);
+      if (!this.fallbackBufferContext) {
+        this.fallbackBufferContext = this.createOfflineContext(1, 1, sampleRate);
+      }
+      return this.fallbackBufferContext.createBuffer(numberOfChannels, length, sampleRate);
     }
 
     createOfflineContext(numberOfChannels, length, sampleRate) {
@@ -514,7 +517,7 @@
         }
       ];
 
-      if (typeof MediaRecorder !== 'function' || typeof (window.AudioContext || window.webkitAudioContext) !== 'function') {
+      if (!canRecordCompressedAudio()) {
         return formats;
       }
 
@@ -853,7 +856,10 @@
             chunks.push(event.data);
           }
         });
-        recorder.addEventListener('error', () => reject(new Error('Browser-Encoder hat den lokalen Export abgebrochen.')));
+        recorder.addEventListener('error', async () => {
+          await closeAudioContextQuietly(exportContext);
+          reject(new Error('Browser-Encoder hat den lokalen Export abgebrochen.'));
+        });
         recorder.addEventListener('stop', async () => {
           try {
             await exportContext.close();
@@ -871,8 +877,14 @@
         }, { once: true });
 
         exportContext.resume().then(() => {
-          recorder.start();
-          source.start(0);
+          try {
+            recorder.start();
+            source.start(0);
+          } catch (error) {
+            closeAudioContextQuietly(exportContext).then(() => {
+              reject(new Error('Browser konnte den lokalen Encoder nicht starten.'));
+            });
+          }
         }).catch(async () => {
           try {
             await exportContext.close();
@@ -1198,17 +1210,34 @@
   }
 
   function createRealtimeAudioContext(sampleRate) {
-    const StandardCtor = window.AudioContext;
+    const StandardCtor = window.AudioContext || globalThis.AudioContext;
     if (typeof StandardCtor === 'function') {
       return new StandardCtor({ sampleRate });
     }
 
-    const WebkitCtor = window.webkitAudioContext;
+    const WebkitCtor = window.webkitAudioContext || globalThis.webkitAudioContext;
     if (typeof WebkitCtor === 'function') {
       return new WebkitCtor();
     }
 
     throw new Error('Web Audio API ist für komprimierte Browser-Exporte nicht verfügbar.');
+  }
+
+  function canRecordCompressedAudio() {
+    return typeof MediaRecorder === 'function'
+      && typeof (window.AudioContext || window.webkitAudioContext || globalThis.AudioContext || globalThis.webkitAudioContext) === 'function';
+  }
+
+  async function closeAudioContextQuietly(context) {
+    if (!context || typeof context.close !== 'function') {
+      return;
+    }
+
+    try {
+      await context.close();
+    } catch (error) {
+      return;
+    }
   }
 
   function escapeHtml(value) {

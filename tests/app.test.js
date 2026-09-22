@@ -2192,6 +2192,66 @@ async function testConverterCompressedExportPath() {
   assert.equal(env.getClosedAudioContexts(), 1, 'compressed export should close its temporary audio context after recording completes');
 }
 
+async function testConverterCompressedExportFailureClosesAudioContext() {
+  const env = createConverterEnvironment();
+
+  class FakeSource {
+    connect() {}
+    addEventListener() {}
+    start() {}
+  }
+
+  class FakeAudioContext {
+    createBufferSource() {
+      return new FakeSource();
+    }
+
+    createMediaStreamDestination() {
+      return { stream: {} };
+    }
+
+    async resume() {}
+
+    async close() {
+      env.markAudioContextClosed();
+    }
+  }
+
+  class FailingMediaRecorder {
+    constructor(stream, options) {
+      this.stream = stream;
+      this.options = options;
+      this.state = 'inactive';
+      env.setRecorderMimeType(options.mimeType);
+    }
+
+    addEventListener() {}
+
+    start() {
+      throw new Error('encoder failed');
+    }
+  }
+
+  env.window.AudioContext = FakeAudioContext;
+  env.window.MediaRecorder = FailingMediaRecorder;
+  env.context.MediaRecorder = FailingMediaRecorder;
+
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  await assert.rejects(
+    studio._recordCompressedExportForTest(
+      { sampleRate: 44100 },
+      { mimeType: 'audio/webm;codecs=opus', extension: 'webm' },
+      192000
+    ),
+    /Encoder nicht starten/,
+    'compressed export should reject when the encoder start path throws synchronously'
+  );
+  assert.equal(env.getClosedAudioContexts(), 1, 'compressed export should still close the temporary audio context when encoder startup fails');
+}
+
 function testServiceWorkerCachesAllHtmlPages() {
   for (const file of htmlPages) {
     assert.match(swCode, new RegExp(`['"]${escapeRegExp('./' + file)}['"]`), `service worker should precache ${file}`);
@@ -2429,6 +2489,7 @@ async function main() {
   testConverterPageExposesStudioHooksAndLoader();
   testConverterDownloadClearsTemporaryAsset();
   await testConverterCompressedExportPath();
+  await testConverterCompressedExportFailureClosesAudioContext();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();
