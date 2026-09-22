@@ -506,7 +506,7 @@
       elements.bitrateSelect.disabled = selected.id === 'wav';
       if (selected.id === 'mp3') {
         elements.bitrateSelect.value = PREFERRED_MP3_BITRATE;
-      } else if (!elements.bitrateSelect.value) {
+      } else if (selected.id !== 'wav') {
         elements.bitrateSelect.value = DEFAULT_COMPRESSED_BITRATE;
       }
       elements.formatNote.textContent = selected.description;

@@ -2105,6 +2105,11 @@ async function testConverterMp3FormatExposureAndDefaults() {
   assert.equal(env.elements['converter-bitrate-select'].value, '320000', 'MP3 export should default to the highest available bitrate in the browser UI');
   assert.equal(env.elements['converter-bitrate-select'].disabled, false, 'MP3 export should keep bitrate selection enabled');
   assert.match(env.elements['converter-format-note'].textContent, /320 kbps/i, 'MP3 helper text should disclose the high-quality default');
+
+  env.elements['converter-format-select'].value = 'webm-opus';
+  await env.elements['converter-format-select'].dispatch('change');
+
+  assert.equal(env.elements['converter-bitrate-select'].value, '192000', 'switching away from MP3 should restore the standard compressed export bitrate');
 }
 
 async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
