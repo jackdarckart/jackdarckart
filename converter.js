@@ -824,9 +824,11 @@
       const exportFormat = getSelectedFormat();
       const mp3Support = exportFormat.id === 'mp3' ? getMp3Support() : null;
       setRenderState('loading', 'Master wird lokal gerendert …');
-      elements.renderStatus.textContent = exportFormat.id === 'mp3' && mp3Support && mp3Support.serverEndpoint && !mp3Support.nativeMimeType && !mp3Support.clientEncoder
-        ? 'Offline-Render läuft lokal im Browser. Die fertige WAV-Datei wird danach an den konfigurierten Same-Origin-Konverter für MP3 übergeben.'
-        : 'Offline-Render läuft lokal im Browser. Keine Daten verlassen dieses Gerät.';
+      elements.renderStatus.textContent = exportFormat.id === 'mp3' && mp3Support && mp3Support.clientEncoder && !mp3Support.nativeMimeType
+        ? 'Offline-Render läuft lokal im Browser. MP3 wird direkt mit dem integrierten lokalen Encoder erzeugt.'
+        : (exportFormat.id === 'mp3' && mp3Support && mp3Support.serverEndpoint && !mp3Support.nativeMimeType && !mp3Support.clientEncoder
+          ? 'Offline-Render läuft lokal im Browser. Die fertige WAV-Datei wird danach an den konfigurierten Same-Origin-Konverter für MP3 übergeben.'
+          : 'Offline-Render läuft lokal im Browser. Keine Daten verlassen dieses Gerät.');
       elements.renderButton.disabled = true;
       try {
         const sampleRateValue = elements.samplerateSelect.value === 'source'
@@ -970,7 +972,7 @@
     }
 
     function buildMp3Description(mp3Support) {
-      return 'MP3 erzeugt eine echte .mp3-Datei und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: '
+      return 'MP3 ist lokal verfügbar, erzeugt eine echte .mp3-Datei direkt im Browser ohne Upload und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: '
         + buildMp3RouteList(mp3Support) + '.';
     }
 
@@ -1321,7 +1323,7 @@
 
   function buildMp3AvailabilityText(mp3Support) {
     if (mp3Support && mp3Support.available) {
-      return 'MP3 ist verfügbar. Nutzbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
+      return 'MP3 ist lokal verfügbar. Nutzbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
     }
     return 'MP3 ist derzeit nicht verfügbar, weil weder ein nativer Browser-Encoder noch ein lokaler MP3-Encoder oder Same-Origin-Konverter erkannt wurde.';
   }
@@ -1332,7 +1334,7 @@
       routes.push('nativer Browser-Encoder');
     }
     if (mp3Support && mp3Support.clientEncoder) {
-      routes.push('lokaler MP3-Encoder');
+      routes.push('lokaler MP3-Encoder im App-Bundle');
     }
     if (mp3Support && mp3Support.serverEndpoint) {
       routes.push('Same-Origin-Konverter');
