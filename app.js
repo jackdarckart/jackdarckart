@@ -33,6 +33,7 @@
   const PERSISTENT_AUDIO_KEY = '__JACKDARCKART_PERSISTENT_AUDIO__';
   const PERSISTENT_STATE_KEY = '__JACKDARCKART_PERSISTENT_STATE__';
   const INTERNAL_NAVIGATION_KEY = '__JACKDARCKART_INTERNAL_NAVIGATION__';
+  const OPTIONAL_PAGE_MODULE_STATUS_KEY = '__JACKDARCKART_OPTIONAL_PAGE_MODULE_STATUS__';
   const OPTIONAL_PAGE_MODULES = {
     'converter.html': {
       globalKey: '__JACKDARCKART_CONVERTER__',
@@ -417,6 +418,13 @@
     return window[OPTIONAL_PAGE_MODULE_PROMISES_KEY];
   }
 
+  function getOptionalPageModuleStatus() {
+    if (!window[OPTIONAL_PAGE_MODULE_STATUS_KEY] || typeof window[OPTIONAL_PAGE_MODULE_STATUS_KEY] !== 'object') {
+      window[OPTIONAL_PAGE_MODULE_STATUS_KEY] = {};
+    }
+    return window[OPTIONAL_PAGE_MODULE_STATUS_KEY];
+  }
+
   function loadOptionalPageModule(config) {
     if (!config || !config.globalKey || !config.src) {
       return Promise.resolve(null);
@@ -435,12 +443,17 @@
       }
 
       promises[src] = new Promise((resolve, reject) => {
+        const status = getOptionalPageModuleStatus();
         const script = document.createElement('script');
         script.src = src;
         script.defer = true;
-        script.onload = () => resolve(src === config.src ? (window[config.globalKey] || null) : null);
+        script.onload = () => {
+          status[src] = { loaded: true, error: '' };
+          resolve(src === config.src ? (window[config.globalKey] || null) : null);
+        };
         script.onerror = () => {
           delete promises[src];
+          status[src] = { loaded: false, error: 'optional-page-module-load-failed' };
           reject(new Error('optional-page-module-load-failed'));
         };
         (document.head || document.body || document.documentElement).appendChild(script);
