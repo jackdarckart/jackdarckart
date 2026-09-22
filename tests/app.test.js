@@ -2153,6 +2153,11 @@ async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
   studio.init();
 
   assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should hide MP3 when the browser cannot produce native MP3 output');
+  assert.match(
+    env.elements['converter-format-note'].textContent,
+    /MP3-Export .*WAV .*Fallback-Option/i,
+    'converter studio should explain that WAV remains the fallback when native MP3 encoding is unavailable'
+  );
   await assert.rejects(
     studio._recordCompressedExportForTest(
       { sampleRate: 44100 },
@@ -2162,6 +2167,97 @@ async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
     /MP3-Export ist in diesem Browser nicht nativ verfügbar/,
     'converter studio should surface a clear MP3-specific fallback message when native support is unavailable'
   );
+}
+
+async function testConverterMp3CompressedExportPath() {
+  const env = createConverterEnvironment();
+
+  class FakeSource {
+    constructor() {
+      this.listeners = new Map();
+    }
+
+    connect() {}
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    start() {
+      const endedListener = this.listeners.get('ended');
+      if (endedListener) {
+        endedListener();
+      }
+    }
+  }
+
+  class FakeAudioContext {
+    createBufferSource() {
+      return new FakeSource();
+    }
+
+    createMediaStreamDestination() {
+      return { stream: {} };
+    }
+
+    async resume() {}
+
+    async close() {
+      env.markAudioContextClosed();
+    }
+  }
+
+  class FakeMediaRecorder {
+    static isTypeSupported(mimeType) {
+      return mimeType === 'audio/mpeg';
+    }
+
+    constructor(stream, options) {
+      this.stream = stream;
+      this.options = options;
+      this.state = 'inactive';
+      this.listeners = new Map();
+      env.setRecorderMimeType(options.mimeType);
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    start() {
+      this.state = 'recording';
+    }
+
+    stop() {
+      this.state = 'inactive';
+      const dataListener = this.listeners.get('dataavailable');
+      if (dataListener) {
+        dataListener({ data: new Blob(['encoded-mp3'], { type: this.options.mimeType }) });
+      }
+      const stopListener = this.listeners.get('stop');
+      if (stopListener) {
+        stopListener();
+      }
+    }
+  }
+
+  env.window.AudioContext = FakeAudioContext;
+  env.window.MediaRecorder = FakeMediaRecorder;
+  env.context.MediaRecorder = FakeMediaRecorder;
+
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  const blob = await studio._recordCompressedExportForTest(
+    { sampleRate: 44100 },
+    { id: 'mp3', mimeType: 'audio/mpeg', extension: 'mp3' },
+    320000
+  );
+
+  assert.equal(blob.type, 'audio/mpeg', 'MP3 export should resolve an MP3 blob when native browser encoding is available');
+  assert.equal(env.getRecorderMimeType(), 'audio/mpeg', 'MP3 export should initialize MediaRecorder with the detected MP3 mime type');
+  assert.equal(env.getClosedAudioContexts(), 1, 'MP3 export should close its temporary audio context after recording completes');
 }
 
 function testConverterDownloadClearsTemporaryAsset() {
@@ -2586,6 +2682,7 @@ async function main() {
   await testConverterMp3FormatExposureAndDefaults();
   testConverterMp3FilenameUsesMp3Extension();
   await testConverterMp3FallbackMessageWhenNativeSupportMissing();
+  await testConverterMp3CompressedExportPath();
   testConverterDownloadClearsTemporaryAsset();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
