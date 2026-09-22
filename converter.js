@@ -854,7 +854,8 @@
           try {
             await exportContext.close();
           } catch (error) {
-            return error;
+            reject(new Error('Browser-Encoder konnte den lokalen Export-Kontext nicht sauber schließen.'));
+            return;
           }
           resolve(new Blob(chunks, { type: format.mimeType }));
         }, { once: true });
@@ -1100,7 +1101,16 @@
 
     return {
       init,
-      destroy: destroyStudio
+      destroy: destroyStudio,
+      _seedRenderedAssetForTest(asset) {
+        storeRenderedAsset(asset);
+      },
+      _hasRenderedAssetForTest() {
+        return Boolean(renderedAsset);
+      },
+      _downloadRenderedFileForTest() {
+        downloadRenderedFile();
+      }
     };
   }
 
@@ -1183,6 +1193,7 @@
 
   window[MODULE_KEY] = {
     bootstrap,
-    destroy
+    destroy,
+    _createStudioForTest: createStudio
   };
 }());

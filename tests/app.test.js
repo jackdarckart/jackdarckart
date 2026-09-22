@@ -600,6 +600,219 @@ function createEnvironment(options = {}) {
   };
 }
 
+
+function createCanvasContextStub() {
+  return {
+    setTransform() {},
+    clearRect() {},
+    fillRect() {},
+    beginPath() {},
+    moveTo() {},
+    lineTo() {},
+    stroke() {},
+    fillText() {},
+    createLinearGradient() {
+      return {
+        addColorStop() {}
+      };
+    }
+  };
+}
+
+function createConverterEnvironment() {
+  const timers = new Map();
+  let timerId = 1;
+  let revokedUrl = '';
+  let clickedDownloads = 0;
+  const documentListeners = new Map();
+  let elements = {};
+  const document = {
+    body: new MockElement('body'),
+    documentElement: new MockElement('html'),
+    createElement(tagName) {
+      const element = new MockElement(tagName, document);
+      element.click = () => {
+        clickedDownloads += 1;
+      };
+      return element;
+    },
+    getElementById(id) {
+      return elements[id] || null;
+    },
+    querySelector() {
+      return null;
+    },
+    addEventListener(type, listener) {
+      if (!documentListeners.has(type)) {
+        documentListeners.set(type, []);
+      }
+      documentListeners.get(type).push(listener);
+    }
+  };
+
+  const ids = [
+    'converter-file-input',
+    'converter-browse-button',
+    'converter-reset-button',
+    'converter-dropzone-shell',
+    'converter-import-status',
+    'converter-file-name',
+    'converter-file-duration',
+    'converter-file-rate',
+    'converter-file-size',
+    'converter-file-format',
+    'converter-file-channels',
+    'converter-auto-enhance',
+    'converter-preview-toggle',
+    'converter-preview-stop',
+    'converter-render-button',
+    'converter-download-button',
+    'converter-clear-render',
+    'converter-format-select',
+    'converter-bitrate-select',
+    'converter-samplerate-select',
+    'converter-format-note',
+    'converter-render-state',
+    'converter-render-state-text',
+    'converter-render-status',
+    'converter-cleanup-timer',
+    'converter-cleanup-state',
+    'converter-analysis-summary',
+    'converter-waveform',
+    'converter-spectrum',
+    'converter-vault-button',
+    'converter-vault-status',
+    'converter-eq-low',
+    'converter-eq-mid',
+    'converter-eq-high',
+    'converter-comp-threshold',
+    'converter-comp-ratio',
+    'converter-limiter-ceiling',
+    'converter-stereo-width',
+    'converter-target-lufs',
+    'converter-eq-low-value',
+    'converter-eq-mid-value',
+    'converter-eq-high-value',
+    'converter-comp-threshold-value',
+    'converter-comp-ratio-value',
+    'converter-limiter-ceiling-value',
+    'converter-stereo-width-value',
+    'converter-target-lufs-value'
+  ];
+
+  elements = Object.fromEntries(ids.map((id) => [id, new MockElement(id, document)]));
+  for (const id of ['converter-waveform', 'converter-spectrum']) {
+    elements[id].clientWidth = 480;
+    elements[id].clientHeight = 180;
+    elements[id].getContext = () => createCanvasContextStub();
+  }
+  elements['converter-format-select'].value = 'wav';
+  elements['converter-bitrate-select'].value = '192000';
+  elements['converter-samplerate-select'].value = 'source';
+  elements['converter-eq-low'].value = '0';
+  elements['converter-eq-mid'].value = '0';
+  elements['converter-eq-high'].value = '0';
+  elements['converter-comp-threshold'].value = '-18';
+  elements['converter-comp-ratio'].value = '2.8';
+  elements['converter-limiter-ceiling'].value = '-1';
+  elements['converter-stereo-width'].value = '115';
+  elements['converter-target-lufs'].value = '-12';
+  elements['converter-render-state'].dataset = {};
+
+  const windowObject = {
+    document,
+    devicePixelRatio: 1,
+    navigator: {},
+    location: {
+      href: 'https://stream-musik.space/converter.html',
+      pathname: '/converter.html'
+    },
+    AudioContext: undefined,
+    webkitAudioContext: undefined,
+    MediaRecorder: undefined,
+    setTimeout(callback, delay) {
+      const id = timerId++;
+      timers.set(id, { callback, delay, repeat: false });
+      return id;
+    },
+    clearTimeout(id) {
+      timers.delete(id);
+    },
+    setInterval(callback, delay) {
+      const id = timerId++;
+      timers.set(id, { callback, delay, repeat: true });
+      return id;
+    },
+    clearInterval(id) {
+      timers.delete(id);
+    },
+    addEventListener() {},
+    removeEventListener() {}
+  };
+
+  const urlApi = {
+    createObjectURL() {
+      return 'blob:converter-test';
+    },
+    revokeObjectURL(url) {
+      revokedUrl = url;
+    }
+  };
+
+  const context = vm.createContext({
+    window: windowObject,
+    document,
+    console,
+    URL: urlApi,
+    Blob,
+    Math,
+    Number,
+    String,
+    Date,
+    Promise,
+    Error,
+    Boolean,
+    Array,
+    Object,
+    globalThis: null,
+    setTimeout: windowObject.setTimeout,
+    clearTimeout: windowObject.clearTimeout,
+    setInterval: windowObject.setInterval,
+    clearInterval: windowObject.clearInterval,
+    requestAnimationFrame: () => 1,
+    cancelAnimationFrame() {}
+  });
+  context.globalThis = context;
+  windowObject.URL = urlApi;
+
+  return {
+    context,
+    window: windowObject,
+    elements,
+    getRevokedUrl() {
+      return revokedUrl;
+    },
+    getClickedDownloads() {
+      return clickedDownloads;
+    },
+    runTimersByDelay(delay) {
+      const matchingIds = Array.from(timers.entries())
+        .filter(([, timer]) => timer.delay === delay)
+        .map(([id]) => id);
+      for (const id of matchingIds) {
+        const timer = timers.get(id);
+        if (!timer) {
+          continue;
+        }
+        if (!timer.repeat) {
+          timers.delete(id);
+        }
+        timer.callback();
+      }
+    }
+  };
+}
+
 async function testReusesExistingSourceWithoutForcedReload() {
   const env = createEnvironment({
     missingIds: ['menu-toggle', 'site-nav', 'sticky-player', 'sticky-play', 'back-to-top', 'year']
@@ -1837,6 +2050,36 @@ function testConverterPageExposesStudioHooksAndLoader() {
   );
 }
 
+
+function testConverterDownloadClearsTemporaryAsset() {
+  const env = createConverterEnvironment();
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  studio._seedRenderedAssetForTest({
+    blob: new Blob(['demo'], { type: 'audio/wav' }),
+    filename: 'demo-master.wav',
+    report: {
+      outputApproxLufs: -12,
+      peakAfter: 0.5
+    },
+    format: {
+      id: 'wav',
+      extension: 'wav'
+    },
+    sampleRate: 44100
+  });
+
+  assert.equal(studio._hasRenderedAssetForTest(), true, 'converter studio should keep a rendered asset in temporary memory before download');
+
+  studio._downloadRenderedFileForTest();
+  env.runTimersByDelay(250);
+
+  assert.equal(env.getClickedDownloads(), 1, 'converter studio should trigger one local download click for the rendered asset');
+  assert.equal(studio._hasRenderedAssetForTest(), false, 'converter studio should clear the temporary rendered asset immediately after download starts');
+  assert.equal(env.getRevokedUrl(), 'blob:converter-test', 'converter studio should revoke the generated blob URL after cleanup');
+}
+
 function testServiceWorkerCachesAllHtmlPages() {
   for (const file of htmlPages) {
     assert.match(swCode, new RegExp(`['"]${escapeRegExp('./' + file)}['"]`), `service worker should precache ${file}`);
@@ -2072,6 +2315,7 @@ async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
+  testConverterDownloadClearsTemporaryAsset();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();
