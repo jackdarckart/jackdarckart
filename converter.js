@@ -1305,3 +1305,4 @@
     _createStudioForTest: createStudio
   };
 }());
+ 
