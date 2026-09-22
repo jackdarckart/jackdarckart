@@ -932,7 +932,7 @@
       }
 
       if (mp3Support.serverEndpoint) {
-        return requestServerMp3Conversion(masteredBuffer, bitrate, mp3Support.serverEndpoint);
+        return requestServerMp3Conversion(masteredBuffer, bitrate, mp3Support.serverEndpoint, core.encodeWav(masteredBuffer));
       }
 
       throw new Error('MP3-Export ist hier nicht verfügbar. Es wird nativer MP3-Support, ein lokaler MP3-Encoder oder ein Same-Origin-Konverter benötigt.');
@@ -1457,7 +1457,7 @@
     throw new Error('Lokaler MP3-Encoder wird nicht unterstützt.');
   }
 
-  async function requestServerMp3Conversion(masteredBuffer, bitrate, endpoint) {
+  async function requestServerMp3Conversion(masteredBuffer, bitrate, endpoint, wavBlob) {
     if (!endpoint) {
       throw new Error('Kein Same-Origin-Konverter für MP3 konfiguriert.');
     }
@@ -1467,7 +1467,6 @@
     if (!fetchImplementation) {
       throw new Error('Serverseitiger MP3-Export erfordert fetch-Unterstützung im Browser.');
     }
-    const wavBlob = core.encodeWav(masteredBuffer);
     const response = await fetchImplementation(endpoint, {
       method: 'POST',
       credentials: 'same-origin',
@@ -1479,7 +1478,7 @@
         'X-Converter-Sample-Rate': String(masteredBuffer.sampleRate),
         'X-Converter-Channels': String(masteredBuffer.numberOfChannels)
       },
-      body: wavBlob
+      body: wavBlob instanceof Blob ? wavBlob : new BrowserAudioMasteringCore().encodeWav(masteredBuffer)
     });
     if (!response || !response.ok || typeof response.blob !== 'function') {
       throw new Error('Same-Origin-Konverter konnte keine MP3-Datei erzeugen.');
