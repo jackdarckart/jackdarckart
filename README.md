@@ -77,7 +77,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
-- `converter.html` – lokales Browser-Studio für Audio-Import, Waveform/Spectrum, Auto-Enhance, Mastering-Regler und privacy-first Export mit 2-Minuten-Cleanup
+- `converter.html` – lokales Browser-Studio für Audio-Import, Waveform/Spectrum, Auto-Enhance, Mastering-Regler und privacy-first Export mit echtem MP3-Workflow und 2-Minuten-Cleanup
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
 - `events.html` – bestätigte Events und Specials oder professioneller Leerzustand
 - `news.html` – Sender-/Website-Neuigkeiten oder redaktioneller Leerzustand
@@ -93,7 +93,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
-- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive lokaler Preview, Waveform/Spectrum, Cleanup-Timer und Vault-Stub
+- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive lokaler Preview, echtem MP3-Export (nativer Encoder, lokaler Encoder oder Same-Origin-Konverter), Cleanup-Timer und Vault-Stub
 - `manifest.webmanifest` – PWA-Metadaten und Mehrseiten-Shortcuts
 - `sw.js` – App-Shell-Cache für alle HTML-Seiten und statischen Assets, ohne Stream-Caching
 - `tests/app.test.js` – Node-basierte Regressionstests für kritische UI-/Player- und Strukturregeln
@@ -163,6 +163,24 @@ window.__JACKDARCKART_CONFIG__ = {
 - `/api/lautfm/station/jackdarckart/last_songs`
 - `/api/lautfm/station/jackdarckart/schedule`
 - …
+
+### Optionaler Same-Origin-MP3-Konverter
+
+Das Converter Studio rendert WAV immer lokal. Für MP3 nutzt es bevorzugt einen lokalen Encoder; alternativ kann ein echter Same-Origin-Endpunkt die lokal gerenderte WAV-Datei per `POST` in MP3 umwandeln.
+
+Beispiel:
+
+```js
+window.__JACKDARCKART_CONFIG__ = {
+  converter: {
+    mp3Export: {
+      serverEndpoint: '/api/converter/mp3'
+    }
+  }
+};
+```
+
+Der Endpunkt muss eine lokal gerenderte WAV-Datei (`Content-Type: audio/wav`) entgegennehmen und als Antwort eine echte MP3-Datei (`audio/mpeg`) zurückgeben.
 
 ### Statische Inhaltsbereiche
 
