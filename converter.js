@@ -507,7 +507,7 @@
       if (selected.id !== 'wav') {
         elements.bitrateSelect.value = getDefaultBitrateForFormat(selected);
       }
-      elements.formatNote.textContent = selected.description;
+      elements.formatNote.textContent = getFormatNoteText(selected);
     }
 
     function getExportFormats() {
@@ -526,11 +526,7 @@
         return formats;
       }
 
-      const supportedMp3MimeType = resolveSupportedMimeType([
-        'audio/mpeg',
-        'audio/mp3',
-        'audio/mpeg;codecs=mp3'
-      ]);
+      const supportedMp3MimeType = resolveSupportedMp3MimeType();
       if (supportedMp3MimeType) {
         formats.push({
           id: 'mp3',
@@ -1247,6 +1243,18 @@
     return format && format.id === 'mp3' ? PREFERRED_MP3_BITRATE : DEFAULT_COMPRESSED_BITRATE;
   }
 
+  function getFormatNoteText(format) {
+    if (!format) {
+      return '';
+    }
+
+    if (format.id !== 'wav' || resolveSupportedMp3MimeType()) {
+      return format.description;
+    }
+
+    return format.description + ' MP3-Export wird in diesem Browser nicht nativ angeboten, daher bleibt WAV die klare Fallback-Option.';
+  }
+
   function createRealtimeAudioContext(sampleRate) {
     const StandardCtor = window.AudioContext || globalThis.AudioContext;
     if (typeof StandardCtor === 'function') {
@@ -1277,6 +1285,14 @@
       }
     }
     return '';
+  }
+
+  function resolveSupportedMp3MimeType() {
+    return resolveSupportedMimeType([
+      'audio/mpeg',
+      'audio/mp3',
+      'audio/mpeg;codecs=mp3'
+    ]);
   }
 
   function isMimeTypeSupported(mimeType) {
