@@ -2249,8 +2249,8 @@ async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
   assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should hide MP3 when the browser cannot produce native MP3 output');
   assert.match(
     env.elements['converter-format-note'].textContent,
-    /MP3-Export .*WAV .*Fallback-Option/i,
-    'converter studio should explain that WAV remains the fallback when native MP3 encoding is unavailable'
+    /WAV wird lokal als PCM exportiert[\s\S]*MP3 erscheint erst, wenn nativer Support, ein lokaler Encoder oder ein Same-Origin-Konverter verfügbar ist/i,
+    'converter studio should explain that WAV remains available until an MP3 path is actually supported'
   );
   await assert.rejects(
     studio._recordCompressedExportForTest(
