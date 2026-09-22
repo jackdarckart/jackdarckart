@@ -99,7 +99,7 @@
       const sampleRate = Number.isFinite(targetSampleRate) ? targetSampleRate : buffer.sampleRate;
       const channelCount = Math.min(2, Math.max(1, buffer.numberOfChannels));
       const frameCount = Math.max(1, Math.ceil(buffer.duration * sampleRate));
-      const offlineContext = new OfflineAudioContext(channelCount, frameCount, sampleRate);
+      const offlineContext = this.createOfflineContext(channelCount, frameCount, sampleRate);
       const source = offlineContext.createBufferSource();
       source.buffer = buffer;
 
@@ -190,8 +190,19 @@
         });
       }
 
-      const fallbackContext = new OfflineAudioContext(numberOfChannels, Math.max(1, length), sampleRate);
+      const fallbackContext = this.createOfflineContext(numberOfChannels, Math.max(1, length), sampleRate);
       return fallbackContext.createBuffer(numberOfChannels, length, sampleRate);
+    }
+
+    createOfflineContext(numberOfChannels, length, sampleRate) {
+      const OfflineCtor = window.OfflineAudioContext
+        || window.webkitOfflineAudioContext
+        || globalThis.OfflineAudioContext
+        || globalThis.webkitOfflineAudioContext;
+      if (typeof OfflineCtor !== 'function') {
+        throw new Error('OfflineAudioContext wird von diesem Browser nicht unterstützt.');
+      }
+      return new OfflineCtor(numberOfChannels, length, sampleRate);
     }
 
     getMakeupGain(settings) {
@@ -831,8 +842,7 @@
       if (typeof MediaRecorder !== 'function') {
         throw new Error('Für dieses Zielformat steht kein Browser-Encoder zur Verfügung.');
       }
-      const ContextCtor = window.AudioContext || window.webkitAudioContext;
-      const exportContext = new ContextCtor({ sampleRate: buffer.sampleRate });
+      const exportContext = createRealtimeAudioContext(buffer.sampleRate);
       const source = exportContext.createBufferSource();
       source.buffer = buffer;
       const destination = exportContext.createMediaStreamDestination();
@@ -869,7 +879,15 @@
         exportContext.resume().then(() => {
           recorder.start();
           source.start(0);
-        }).catch(() => reject(new Error('Browser konnte den lokalen Encoder nicht starten.')));
+        }).catch(async () => {
+          try {
+            await exportContext.close();
+          } catch (error) {
+            reject(new Error('Browser konnte den lokalen Encoder nicht starten und den Audio-Kontext nicht sauber schließen.'));
+            return;
+          }
+          reject(new Error('Browser konnte den lokalen Encoder nicht starten.'));
+        });
       });
     }
 
@@ -1180,6 +1198,20 @@
       .replace(/[^a-z0-9-_]+/gi, '-')
       .replace(/-{2,}/g, '-')
       .replace(/^-|-$/g, '') || 'master';
+  }
+
+  function createRealtimeAudioContext(sampleRate) {
+    const StandardCtor = window.AudioContext;
+    if (typeof StandardCtor === 'function') {
+      return new StandardCtor({ sampleRate });
+    }
+
+    const WebkitCtor = window.webkitAudioContext;
+    if (typeof WebkitCtor === 'function') {
+      return new WebkitCtor();
+    }
+
+    throw new Error('Web Audio API ist für komprimierte Browser-Exporte nicht verfügbar.');
   }
 
   function escapeHtml(value) {
