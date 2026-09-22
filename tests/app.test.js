@@ -2160,7 +2160,7 @@ async function testConverterMp3FormatExposureWithoutNativeSupportWhenServerConfi
     appConfig: {
       converter: {
         mp3Export: {
-          serverEndpoint: '/api/converter/mp3'
+          serverEndpoint: '../api/converter/mp3'
         }
       }
     }
@@ -2243,7 +2243,7 @@ async function testConverterMp3UsesSameOriginServerFallback() {
     appConfig: {
       converter: {
         mp3Export: {
-          serverEndpoint: '/api/converter/mp3'
+          serverEndpoint: '../api/converter/mp3'
         }
       }
     },
@@ -2268,7 +2268,7 @@ async function testConverterMp3UsesSameOriginServerFallback() {
 
   assert.equal(blob.type, 'audio/mpeg', 'converter studio should accept the server response as a real MP3 file');
   assert.equal(fetchCalls.length, 1, 'converter studio should perform exactly one same-origin conversion request for MP3 fallback');
-  assert.equal(fetchCalls[0].url, '/api/converter/mp3', 'converter studio should call the configured same-origin MP3 conversion endpoint');
+  assert.equal(fetchCalls[0].url, '/api/converter/mp3', 'converter studio should normalize relative same-origin MP3 conversion endpoints before requesting them');
   assert.equal(fetchCalls[0].options.method, 'POST', 'converter studio should upload the locally rendered WAV as a POST body for server-side MP3 conversion');
   assert.equal(fetchCalls[0].options.headers['X-Converter-Target-Format'], 'mp3', 'converter studio should declare MP3 as the desired server output format');
 }

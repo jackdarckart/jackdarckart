@@ -1474,13 +1474,48 @@
     if (/^https?:\/\//i.test(trimmed)) {
       return origin && trimmed.indexOf(origin + '/') === 0 ? trimmed : '';
     }
-    return trimmed;
+    return normalizeSameOriginPath(trimmed);
   }
 
   function getWindowOrigin() {
     const href = window && window.location && window.location.href;
     const match = typeof href === 'string' ? href.match(/^[a-z]+:\/\/[^/]+/i) : null;
     return match ? match[0] : '';
+  }
+
+  function normalizeSameOriginPath(value) {
+    if (typeof value !== 'string' || !value) {
+      return '';
+    }
+    const parts = String(value).match(/^([^?#]*)([?#].*)?$/);
+    const rawPath = parts && parts[1] ? parts[1] : value;
+    const suffix = parts && parts[2] ? parts[2] : '';
+    if (!rawPath) {
+      return '';
+    }
+    if (rawPath.charAt(0) === '/') {
+      return rawPath + suffix;
+    }
+    const locationPath = window && window.location && typeof window.location.pathname === 'string'
+      ? window.location.pathname
+      : '/';
+    const baseDir = locationPath.replace(/[^/]*$/, '');
+    const segments = (baseDir + rawPath).split('/');
+    const normalized = [];
+    for (let index = 0; index < segments.length; index += 1) {
+      const segment = segments[index];
+      if (!segment || segment === '.') {
+        continue;
+      }
+      if (segment === '..') {
+        if (normalized.length) {
+          normalized.pop();
+        }
+        continue;
+      }
+      normalized.push(segment);
+    }
+    return '/' + normalized.join('/') + suffix;
   }
 
   async function encodeMp3WithLameJs(buffer, bitrate, lamejs) {
@@ -1567,11 +1602,15 @@
     }
 
     await encoder.flush();
+    await Promise.resolve();
+    if (encoderFailure) {
+      if (typeof encoder.close === 'function') {
+        encoder.close();
+      }
+      throw new Error('WebCodecs-MP3-Encoder konnte die MP3-Datei nicht fertigstellen.');
+    }
     if (typeof encoder.close === 'function') {
       encoder.close();
-    }
-    if (encoderFailure) {
-      throw new Error('WebCodecs-MP3-Encoder konnte die MP3-Datei nicht fertigstellen.');
     }
     return new Blob(chunks, { type: 'audio/mpeg' });
   }
