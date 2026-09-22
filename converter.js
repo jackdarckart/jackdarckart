@@ -4,8 +4,26 @@
   const MODULE_KEY = '__JACKDARCKART_CONVERTER__';
   const CLEANUP_WINDOW_MS = 2 * 60 * 1000;
   const DEFAULT_COMPRESSED_BITRATE = '192000';
-  const PREFERRED_MP3_BITRATE = '320000';
+  const PREFERRED_MP3_BITRATE = DEFAULT_COMPRESSED_BITRATE;
   const MP3_MIME_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/mpeg;codecs=mp3'];
+  const BROWSER_DEPENDENT_EXPORT_FORMATS = [
+    {
+      id: 'webm-opus',
+      label: 'WebM / Opus · browserabhängig',
+      extension: 'webm',
+      mimeType: 'audio/webm;codecs=opus',
+      description: 'WebM/Opus nutzt den Browser-Encoder in Echtzeit. Exportgeschwindigkeit hängt von Dauer und Browser ab.',
+      approximate: true
+    },
+    {
+      id: 'ogg-opus',
+      label: 'Ogg / Opus · browserabhängig',
+      extension: 'ogg',
+      mimeType: 'audio/ogg;codecs=opus',
+      description: 'Ogg/Opus erscheint nur bei nativer Browser-Unterstützung und wird lokal in Echtzeit aufgezeichnet.',
+      approximate: true
+    }
+  ];
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -421,7 +439,7 @@
     }
 
     function init() {
-      populateFormatOptions();
+      syncExportFormatOptions();
       updateControlOutputs();
       drawWaveformIdle();
       drawSpectrumIdle();
@@ -474,6 +492,8 @@
       });
 
       bind(elements.formatSelect, 'change', updateFormatNote);
+      bind(window, 'focus', syncExportFormatOptions);
+      bind(window, 'pageshow', syncExportFormatOptions);
       updateFormatNote();
     }
 
@@ -488,15 +508,21 @@
       }
     }
 
-    function populateFormatOptions() {
+    function syncExportFormatOptions() {
       if (!elements.formatSelect) {
         return;
       }
 
+      const selectedValue = elements.formatSelect.value;
       const options = getExportFormats();
+      const nextValue = options.some((option) => option.id === selectedValue)
+        ? selectedValue
+        : ((options[0] && options[0].id) || '');
       elements.formatSelect.innerHTML = options.map((option, index) => (
-        '<option value="' + escapeHtml(option.id) + '"' + (index === 0 ? ' selected' : '') + '>' + escapeHtml(option.label) + '</option>'
+        '<option value="' + escapeHtml(option.id) + '"' + (option.id === nextValue || (!nextValue && index === 0) ? ' selected' : '') + '>' + escapeHtml(option.label) + '</option>'
       )).join('');
+      elements.formatSelect.value = nextValue;
+      updateFormatNote();
     }
 
     function updateFormatNote() {
@@ -508,7 +534,7 @@
       if (selected.id !== 'wav') {
         elements.bitrateSelect.value = getDefaultBitrateForFormat(selected);
       }
-      elements.formatNote.textContent = getFormatNoteText(selected);
+      elements.formatNote.textContent = getFormatNoteText(selected, getMp3Support());
     }
 
     function getExportFormats() {
@@ -519,9 +545,7 @@
           label: 'WAV · verlustfrei',
           extension: 'wav',
           mimeType: 'audio/wav',
-          description: mp3Support.available
-            ? 'WAV wird lokal als PCM exportiert und steht unabhängig vom Browser-Codec immer zur Verfügung.'
-            : 'WAV wird lokal als PCM exportiert und steht unabhängig vom Browser-Codec immer zur Verfügung. MP3 erscheint erst, wenn nativer Support, ein lokaler Encoder oder ein Same-Origin-Konverter verfügbar ist.',
+          description: 'WAV wird lokal als PCM exportiert und steht unabhängig vom Browser-Codec immer verlustfrei zur Verfügung.',
           approximate: false
         }
       ];
@@ -534,24 +558,7 @@
         return formats;
       }
 
-      [
-        {
-          id: 'webm-opus',
-          label: 'WebM / Opus · browserabhängig',
-          extension: 'webm',
-          mimeType: 'audio/webm;codecs=opus',
-          description: 'WebM/Opus nutzt den Browser-Encoder in Echtzeit. Exportgeschwindigkeit hängt von Dauer und Browser ab.',
-          approximate: true
-        },
-        {
-          id: 'ogg-opus',
-          label: 'Ogg / Opus · browserabhängig',
-          extension: 'ogg',
-          mimeType: 'audio/ogg;codecs=opus',
-          description: 'Ogg/Opus erscheint nur bei nativer Browser-Unterstützung und wird lokal in Echtzeit aufgezeichnet.',
-          approximate: true
-        }
-      ].forEach((candidate) => {
+      BROWSER_DEPENDENT_EXPORT_FORMATS.forEach((candidate) => {
         if (resolveSupportedMimeType([candidate.mimeType])) {
           formats.push(candidate);
         }
@@ -813,6 +820,7 @@
       if (!loadedBuffer) {
         return;
       }
+      syncExportFormatOptions();
       const exportFormat = getSelectedFormat();
       const mp3Support = exportFormat.id === 'mp3' ? getMp3Support() : null;
       setRenderState('loading', 'Master wird lokal gerendert …');
@@ -962,18 +970,8 @@
     }
 
     function buildMp3Description(mp3Support) {
-      const routes = [];
-      if (mp3Support && mp3Support.nativeMimeType) {
-        routes.push('nativer Browser-Encoder');
-      }
-      if (mp3Support && mp3Support.clientEncoder) {
-        routes.push('lokaler MP3-Encoder');
-      }
-      if (mp3Support && mp3Support.serverEndpoint) {
-        routes.push('Same-Origin-Konverter');
-      }
-      return 'MP3 erzeugt eine echte .mp3-Datei und nutzt standardmäßig 320 kbps. Verfügbarer Pfad: '
-        + (routes.length ? routes.join(', ') : 'derzeit keiner') + '.';
+      return 'MP3 erzeugt eine echte .mp3-Datei und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: '
+        + buildMp3RouteList(mp3Support) + '.';
     }
 
     function storeRenderedAsset(asset) {
@@ -1222,6 +1220,9 @@
       },
       _renderMp3ExportForTest(buffer, bitrate) {
         return renderMp3Export(buffer, bitrate);
+      },
+      _refreshExportFormatsForTest() {
+        syncExportFormatOptions();
       }
     };
   }
@@ -1302,11 +1303,49 @@
     return format && format.id === 'mp3' ? PREFERRED_MP3_BITRATE : DEFAULT_COMPRESSED_BITRATE;
   }
 
-  function getFormatNoteText(format) {
+  function getFormatNoteText(format, mp3Support) {
     if (!format) {
       return '';
     }
-    return format.description;
+    const supportSummary = [];
+    if (format.id !== 'mp3') {
+      supportSummary.push(buildMp3AvailabilityText(mp3Support));
+    }
+    BROWSER_DEPENDENT_EXPORT_FORMATS.forEach((candidate) => {
+      if (candidate.id !== format.id) {
+        supportSummary.push(buildBrowserDependentFormatAvailabilityText(candidate));
+      }
+    });
+    return [format.description].concat(supportSummary.filter(Boolean)).join(' ');
+  }
+
+  function buildMp3AvailabilityText(mp3Support) {
+    if (mp3Support && mp3Support.available) {
+      return 'MP3 ist verfügbar. Nutzbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
+    }
+    return 'MP3 ist derzeit nicht verfügbar, weil weder ein nativer Browser-Encoder noch ein lokaler MP3-Encoder oder Same-Origin-Konverter erkannt wurde.';
+  }
+
+  function buildMp3RouteList(mp3Support) {
+    const routes = [];
+    if (mp3Support && mp3Support.nativeMimeType) {
+      routes.push('nativer Browser-Encoder');
+    }
+    if (mp3Support && mp3Support.clientEncoder) {
+      routes.push('lokaler MP3-Encoder');
+    }
+    if (mp3Support && mp3Support.serverEndpoint) {
+      routes.push('Same-Origin-Konverter');
+    }
+    return routes.length ? routes.join(', ') : 'keinen nutzbaren Pfad';
+  }
+
+  function buildBrowserDependentFormatAvailabilityText(format) {
+    if (!format || !format.mimeType) {
+      return '';
+    }
+    return format.label.replace(/\s*·.*$/, '') + ' ist browserabhängig und '
+      + (isMimeTypeSupported(format.mimeType) ? 'in diesem Browser verfügbar.' : 'in diesem Browser derzeit nicht verfügbar.');
   }
 
   function createRealtimeAudioContext(sampleRate) {
