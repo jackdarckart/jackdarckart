@@ -1008,7 +1008,11 @@
           updateFormatNote();
         }
         return supportsWebCodecsMp3;
-      }).catch(() => false);
+      }).catch(() => {
+        supportsWebCodecsMp3 = false;
+        webCodecsMp3Probe = null;
+        return false;
+      });
       return webCodecsMp3Probe;
     }
 
@@ -1472,7 +1476,9 @@
     }
     const origin = getWindowOrigin();
     if (/^https?:\/\//i.test(trimmed)) {
-      return origin && trimmed.indexOf(origin + '/') === 0 ? trimmed : '';
+      return origin && (trimmed === origin || trimmed.indexOf(origin + '/') === 0 || trimmed.indexOf(origin + '?') === 0 || trimmed.indexOf(origin + '#') === 0)
+        ? trimmed
+        : '';
     }
     return normalizeSameOriginPath(trimmed);
   }
