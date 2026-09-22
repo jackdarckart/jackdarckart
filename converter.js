@@ -1667,7 +1667,8 @@
         | ((bytes[7] & 0x7F) << 14)
         | ((bytes[8] & 0x7F) << 7)
         | (bytes[9] & 0x7F);
-      startOffset = 10 + tagSize;
+      const hasFooter = (bytes[5] & 0x10) === 0x10;
+      startOffset = 10 + tagSize + (hasFooter ? 10 : 0);
     }
 
     const maxOffset = Math.min(bytes.length - 4, startOffset + 4096);
