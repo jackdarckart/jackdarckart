@@ -2040,8 +2040,8 @@ function testConverterPageExposesStudioHooksAndLoader() {
   );
   assert.match(
     converterHtmlCode,
-    /MP3 wird dynamisch eingeblendet, sobald nativer Support, ein lokaler Encoder oder ein Same-Origin-Konverter verfügbar ist/i,
-    'converter page should describe the dynamic MP3 availability paths'
+    /MP3 wird nur mit nutzbarem Browser-\/Encoder-Pfad angeboten[\s\S]*browserabhängig[\s\S]*derzeit nicht verfügbar/i,
+    'converter page should describe available, browser-dependent and unavailable export paths'
   );
   assert.equal(
     (converterHtmlCode.match(/id="converter-format-select"/g) || []).length,
@@ -2112,14 +2112,34 @@ async function testConverterMp3FormatExposureAndDefaults() {
   env.elements['converter-format-select'].value = 'mp3';
   await env.elements['converter-format-select'].dispatch('change');
 
-  assert.equal(env.elements['converter-bitrate-select'].value, '320000', 'MP3 export should default to the highest available bitrate in the browser UI');
+  assert.equal(env.elements['converter-bitrate-select'].value, '192000', 'MP3 export should default to the standard compressed export bitrate in the browser UI');
   assert.equal(env.elements['converter-bitrate-select'].disabled, false, 'MP3 export should keep bitrate selection enabled');
-  assert.match(env.elements['converter-format-note'].textContent, /320 kbps/i, 'MP3 helper text should disclose the high-quality default');
+  assert.match(env.elements['converter-format-note'].textContent, /192 kbps/i, 'MP3 helper text should disclose the standard compressed export default');
 
   env.elements['converter-format-select'].value = 'webm-opus';
   await env.elements['converter-format-select'].dispatch('change');
 
   assert.equal(env.elements['converter-bitrate-select'].value, '192000', 'switching away from MP3 should restore the standard compressed export bitrate');
+}
+
+function testConverterOpusFormatExposureMatchesMimeSupport() {
+  class FakeMediaRecorder {
+    static isTypeSupported(mimeType) {
+      return mimeType === 'audio/ogg;codecs=opus';
+    }
+  }
+
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: FakeMediaRecorder
+  });
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.match(env.elements['converter-format-select'].innerHTML, /value="wav"/, 'converter studio should always expose WAV');
+  assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="webm-opus"/, 'converter studio should hide unsupported WebM/Opus export');
+  assert.match(env.elements['converter-format-select'].innerHTML, /value="ogg-opus"/, 'converter studio should expose Ogg/Opus only when the browser supports that mime type');
 }
 
 async function testConverterMp3FormatExposureWithLocalEncoderAdapter() {
@@ -2249,8 +2269,8 @@ async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
   assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should hide MP3 when the browser cannot produce native MP3 output');
   assert.match(
     env.elements['converter-format-note'].textContent,
-    /WAV wird lokal als PCM exportiert[\s\S]*MP3 erscheint erst, wenn nativer Support, ein lokaler Encoder oder ein Same-Origin-Konverter verfügbar ist/i,
-    'converter studio should explain that WAV remains available until an MP3 path is actually supported'
+    /MP3 ist derzeit nicht verfügbar, weil weder ein nativer Browser-Encoder noch ein lokaler MP3-Encoder oder Same-Origin-Konverter erkannt wurde/i,
+    'converter studio should explain clearly why MP3 is currently unavailable while WAV remains available'
   );
   await assert.rejects(
     studio._recordCompressedExportForTest(
@@ -2260,6 +2280,136 @@ async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
     ),
     /MP3-Export ist in diesem Browser nicht nativ verfügbar/,
     'converter studio should surface a clear MP3-specific fallback message when native support is unavailable'
+  );
+}
+
+async function testConverterNativeMp3MimeDetectionSupportsAlternateMimeTypes() {
+  const env = createConverterEnvironment();
+
+  class FakeSource {
+    constructor() {
+      this.listeners = new Map();
+    }
+
+    connect() {}
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    start() {
+      const endedListener = this.listeners.get('ended');
+      if (endedListener) {
+        endedListener();
+      }
+    }
+  }
+
+  class FakeAudioContext {
+    createBufferSource() {
+      return new FakeSource();
+    }
+
+    createMediaStreamDestination() {
+      return { stream: {} };
+    }
+
+    async resume() {}
+
+    async close() {
+      env.markAudioContextClosed();
+    }
+  }
+
+  class FakeMediaRecorder {
+    static isTypeSupported(mimeType) {
+      return mimeType === 'audio/mp3';
+    }
+
+    constructor(stream, options) {
+      this.stream = stream;
+      this.options = options;
+      this.state = 'inactive';
+      this.listeners = new Map();
+      env.setRecorderMimeType(options.mimeType);
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    start() {
+      this.state = 'recording';
+    }
+
+    stop() {
+      this.state = 'inactive';
+      const dataListener = this.listeners.get('dataavailable');
+      if (dataListener) {
+        dataListener({ data: new Blob(['encoded-alt-mp3'], { type: this.options.mimeType }) });
+      }
+      const stopListener = this.listeners.get('stop');
+      if (stopListener) {
+        stopListener();
+      }
+    }
+  }
+
+  env.window.AudioContext = FakeAudioContext;
+  env.window.MediaRecorder = FakeMediaRecorder;
+  env.context.MediaRecorder = FakeMediaRecorder;
+
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.match(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should expose MP3 when an alternate native MP3 mime type is supported');
+
+  const blob = await studio._renderMp3ExportForTest(
+    { sampleRate: 44100 },
+    192000
+  );
+
+  assert.equal(blob.type, 'audio/mp3', 'converter studio should render native MP3 exports with the detected supported mime type');
+  assert.equal(env.getRecorderMimeType(), 'audio/mp3', 'converter studio should pass the detected alternate MP3 mime type into MediaRecorder');
+}
+
+async function testConverterFormatRefreshClearsUnavailableSelection() {
+  let supportedMimeTypes = new Set(['audio/mpeg', 'audio/webm;codecs=opus']);
+
+  class FakeMediaRecorder {
+    static isTypeSupported(mimeType) {
+      return supportedMimeTypes.has(mimeType);
+    }
+  }
+
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: FakeMediaRecorder
+  });
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  env.elements['converter-format-select'].value = 'mp3';
+  await env.elements['converter-format-select'].dispatch('change');
+  assert.equal(env.elements['converter-bitrate-select'].disabled, false, 'converter studio should keep bitrate selection active while MP3 is available');
+
+  supportedMimeTypes = new Set();
+  studio._refreshExportFormatsForTest();
+
+  assert.equal(env.elements['converter-format-select'].value, 'wav', 'converter studio should fall back to WAV when the previous compressed format is no longer available');
+  assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should remove MP3 from the format list after support disappears');
+  assert.equal(env.elements['converter-bitrate-select'].disabled, true, 'converter studio should disable bitrate selection after falling back to WAV');
+  assert.match(
+    env.elements['converter-format-note'].textContent,
+    /MP3 ist derzeit nicht verfügbar, weil weder ein nativer Browser-Encoder noch ein lokaler MP3-Encoder oder Same-Origin-Konverter erkannt wurde/i,
+    'converter studio should explain the missing MP3 prerequisite after capability refresh'
+  );
+  assert.match(
+    env.elements['converter-format-note'].textContent,
+    /WebM \/ Opus ist browserabhängig und in diesem Browser derzeit nicht verfügbar/i,
+    'converter studio should explain browser-dependent Opus availability after capability refresh'
   );
 }
 
@@ -2774,10 +2924,13 @@ async function main() {
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
   await testConverterMp3FormatExposureAndDefaults();
+  testConverterOpusFormatExposureMatchesMimeSupport();
   await testConverterMp3FormatExposureWithLocalEncoderAdapter();
   testConverterMp3FilenameUsesMp3Extension();
   await testConverterMp3FormatExposureWithSameOriginConverter();
   await testConverterMp3FallbackMessageWhenNativeSupportMissing();
+  await testConverterNativeMp3MimeDetectionSupportsAlternateMimeTypes();
+  await testConverterFormatRefreshClearsUnavailableSelection();
   await testConverterMp3CompressedExportPath();
   testConverterDownloadClearsTemporaryAsset();
   await testConverterCompressedExportPath();
