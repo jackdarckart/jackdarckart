@@ -2144,6 +2144,8 @@ async function testConverterMp3FormatExposureWithLocalEncoderAdapter() {
   studio.init();
 
   assert.match(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should expose MP3 when a local encoder adapter is registered');
+  env.elements['converter-format-select'].value = 'mp3';
+  await env.elements['converter-format-select'].dispatch('change');
   assert.match(env.elements['converter-format-note'].textContent, /lokaler MP3-Encoder/i, 'converter studio should disclose the local encoder route in the helper text');
 
   const blob = await studio._renderMp3ExportForTest({
@@ -2208,6 +2210,8 @@ async function testConverterMp3FormatExposureWithSameOriginConverter() {
   studio.init();
 
   assert.match(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should expose MP3 when a same-origin converter is configured');
+  env.elements['converter-format-select'].value = 'mp3';
+  await env.elements['converter-format-select'].dispatch('change');
   assert.match(env.elements['converter-format-note'].textContent, /Same-Origin-Konverter/i, 'converter studio should disclose the same-origin converter route in the helper text');
 
   const blob = await studio._renderMp3ExportForTest({
