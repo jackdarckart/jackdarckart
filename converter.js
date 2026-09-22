@@ -3,6 +3,8 @@
 (function () {
   const MODULE_KEY = '__JACKDARCKART_CONVERTER__';
   const CLEANUP_WINDOW_MS = 2 * 60 * 1000;
+  const DEFAULT_COMPRESSED_BITRATE = '192000';
+  const PREFERRED_MP3_BITRATE = '320000';
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -502,6 +504,11 @@
         return;
       }
       elements.bitrateSelect.disabled = selected.id === 'wav';
+      if (selected.id === 'mp3') {
+        elements.bitrateSelect.value = PREFERRED_MP3_BITRATE;
+      } else if (selected.id !== 'wav') {
+        elements.bitrateSelect.value = DEFAULT_COMPRESSED_BITRATE;
+      }
       elements.formatNote.textContent = selected.description;
     }
 
@@ -519,6 +526,22 @@
 
       if (!canRecordCompressedAudio()) {
         return formats;
+      }
+
+      const supportedMp3MimeType = resolveSupportedMimeType([
+        'audio/mpeg',
+        'audio/mp3',
+        'audio/mpeg;codecs=mp3'
+      ]);
+      if (supportedMp3MimeType) {
+        formats.push({
+          id: 'mp3',
+          label: 'MP3 · beste Browser-Qualität',
+          extension: 'mp3',
+          mimeType: supportedMp3MimeType,
+          description: 'MP3 wird nur bei echtem nativen Browser-Support angeboten und nutzt standardmäßig 320 kbps als höchste praktische In-Browser-Qualität.',
+          approximate: true
+        });
       }
 
       [
@@ -539,7 +562,7 @@
           approximate: true
         }
       ].forEach((candidate) => {
-        if (typeof MediaRecorder.isTypeSupported === 'function' && MediaRecorder.isTypeSupported(candidate.mimeType)) {
+        if (resolveSupportedMimeType([candidate.mimeType])) {
           formats.push(candidate);
         }
       });
@@ -838,6 +861,13 @@
     async function recordCompressedExport(masteredBuffer, format, bitrate) {
       if (typeof MediaRecorder !== 'function') {
         throw new Error('Für dieses Zielformat steht kein Browser-Encoder zur Verfügung.');
+      }
+      if (!isMimeTypeSupported(format && format.mimeType)) {
+        throw new Error(
+          format && format.id === 'mp3'
+            ? 'MP3-Export ist in diesem Browser nicht nativ verfügbar. Bitte WAV oder eine angebotene Browser-Option verwenden.'
+            : 'Für dieses Zielformat steht im aktuellen Browser kein nativer Encoder bereit. Bitte WAV oder ein anderes angebotenes Format verwenden.'
+        );
       }
       const exportContext = createRealtimeAudioContext(masteredBuffer.sampleRate);
       const source = exportContext.createBufferSource();
@@ -1226,6 +1256,26 @@
   function canRecordCompressedAudio() {
     return typeof MediaRecorder === 'function'
       && typeof (window.AudioContext || window.webkitAudioContext || globalThis.AudioContext || globalThis.webkitAudioContext) === 'function';
+  }
+
+  function resolveSupportedMimeType(mimeTypes) {
+    if (!Array.isArray(mimeTypes)) {
+      return '';
+    }
+    for (let index = 0; index < mimeTypes.length; index += 1) {
+      const mimeType = mimeTypes[index];
+      if (isMimeTypeSupported(mimeType)) {
+        return mimeType;
+      }
+    }
+    return '';
+  }
+
+  function isMimeTypeSupported(mimeType) {
+    return Boolean(mimeType)
+      && typeof MediaRecorder === 'function'
+      && typeof MediaRecorder.isTypeSupported === 'function'
+      && MediaRecorder.isTypeSupported(mimeType);
   }
 
   async function closeAudioContextQuietly(context) {
