@@ -1671,7 +1671,7 @@
       startOffset = 10 + tagSize + (hasFooter ? 10 : 0);
     }
 
-    const maxOffset = Math.min(bytes.length - 4, startOffset + 4096);
+    const maxOffset = bytes.length - 4;
     for (let offset = startOffset; offset <= maxOffset; offset += 1) {
       if (isMp3FrameHeader(bytes, offset)) {
         return true;
