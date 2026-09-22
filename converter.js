@@ -476,8 +476,8 @@
         });
       });
 
-      bind(elements.formatSelect, 'change', updateFormatNote);
-      updateFormatNote();
+      bind(elements.formatSelect, 'change', handleFormatSelectionChange);
+      handleFormatSelectionChange();
     }
 
     function handleResize() {
@@ -516,6 +516,10 @@
         elements.bitrateSelect.value = getDefaultBitrateForFormat(selected);
       }
       elements.formatNote.textContent = selected.description;
+    }
+
+    function handleFormatSelectionChange() {
+      updateFormatNote();
     }
 
     function getExportFormats() {
@@ -1005,7 +1009,7 @@
         if (supportsWebCodecsMp3) {
           const currentValue = elements.formatSelect ? elements.formatSelect.value : '';
           populateFormatOptions(currentValue);
-          updateFormatNote();
+          handleFormatSelectionChange();
         }
         return supportsWebCodecsMp3;
       }).catch(() => {
@@ -1476,9 +1480,8 @@
     }
     const origin = getWindowOrigin();
     if (/^https?:\/\//i.test(trimmed)) {
-      return origin && (trimmed === origin || trimmed.indexOf(origin + '/') === 0 || trimmed.indexOf(origin + '?') === 0 || trimmed.indexOf(origin + '#') === 0)
-        ? trimmed
-        : '';
+      const resolvedUrl = tryCreateUrl(trimmed);
+      return resolvedUrl && resolvedUrl.origin === origin ? resolvedUrl.href : '';
     }
     return normalizeSameOriginPath(trimmed);
   }
@@ -1487,6 +1490,20 @@
     const href = window && window.location && window.location.href;
     const match = typeof href === 'string' ? href.match(/^[a-z]+:\/\/[^/]+/i) : null;
     return match ? match[0] : '';
+  }
+
+  function tryCreateUrl(value) {
+    const UrlCtor = (window && typeof window.URL === 'function' && typeof window.URL.createObjectURL === 'function')
+      ? window.URL
+      : (typeof globalThis.URL === 'function' ? globalThis.URL : null);
+    if (typeof UrlCtor !== 'function') {
+      return null;
+    }
+    try {
+      return new UrlCtor(value, window.location && window.location.href ? window.location.href : undefined);
+    } catch (error) {
+      return null;
+    }
   }
 
   function normalizeSameOriginPath(value) {

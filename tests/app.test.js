@@ -759,20 +759,21 @@ function createConverterEnvironment(options = {}) {
     removeEventListener() {}
   };
 
-  const urlApi = {
-    createObjectURL() {
-      return 'blob:converter-test';
-    },
-    revokeObjectURL(url) {
-      revokedUrl = url;
-    }
+  function MockUrl(value, base) {
+    return new URL(value, base);
+  }
+  MockUrl.createObjectURL = function createObjectURL() {
+    return 'blob:converter-test';
+  };
+  MockUrl.revokeObjectURL = function revokeObjectURL(url) {
+    revokedUrl = url;
   };
 
   const context = vm.createContext({
     window: windowObject,
     document,
     console,
-    URL: urlApi,
+    URL: MockUrl,
     Blob,
     MediaRecorder: options.MediaRecorder,
     AudioEncoder: options.AudioEncoder,
@@ -799,7 +800,7 @@ function createConverterEnvironment(options = {}) {
     cancelAnimationFrame() {}
   });
   context.globalThis = context;
-  windowObject.URL = urlApi;
+  windowObject.URL = MockUrl;
 
   return {
     context,
