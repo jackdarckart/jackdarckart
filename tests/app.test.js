@@ -2040,6 +2040,11 @@ function testConverterPageExposesStudioHooksAndLoader() {
   );
   assert.match(
     converterHtmlCode,
+    /MP3 erscheint nur bei nativer Browser-Unterstützung/i,
+    'converter page should describe that MP3 export only appears with true native browser support'
+  );
+  assert.match(
+    converterHtmlCode,
     /Phase 27\.3/i,
     'converter page should clearly label the vault integration as a Phase 27.3 dependency'
   );
@@ -2075,6 +2080,59 @@ function testConverterPageExposesStudioHooksAndLoader() {
   );
 }
 
+
+async function testConverterMp3FormatExposureAndDefaults() {
+  class FakeMediaRecorder {
+    static isTypeSupported(mimeType) {
+      return mimeType === 'audio/mpeg' || mimeType === 'audio/webm;codecs=opus';
+    }
+  }
+
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: FakeMediaRecorder
+  });
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.match(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should expose MP3 when the browser reports native MP3 encoder support');
+  assert.match(env.elements['converter-format-select'].innerHTML, /value="wav"/, 'converter studio should keep WAV export available alongside MP3');
+
+  env.elements['converter-format-select'].value = 'mp3';
+  await env.elements['converter-format-select'].dispatch('change');
+
+  assert.equal(env.elements['converter-bitrate-select'].value, '320000', 'MP3 export should default to the highest available bitrate in the browser UI');
+  assert.equal(env.elements['converter-bitrate-select'].disabled, false, 'MP3 export should keep bitrate selection enabled');
+  assert.match(env.elements['converter-format-note'].textContent, /320 kbps/i, 'MP3 helper text should disclose the high-quality default');
+}
+
+async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
+  class FakeMediaRecorder {
+    static isTypeSupported() {
+      return false;
+    }
+  }
+
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: FakeMediaRecorder
+  });
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should hide MP3 when the browser cannot produce native MP3 output');
+  await assert.rejects(
+    studio._recordCompressedExportForTest(
+      { sampleRate: 44100 },
+      { id: 'mp3', mimeType: 'audio/mpeg', extension: 'mp3' },
+      320000
+    ),
+    /MP3-Export ist in diesem Browser nicht nativ verfügbar/,
+    'converter studio should surface a clear MP3-specific fallback message when native support is unavailable'
+  );
+}
 
 function testConverterDownloadClearsTemporaryAsset() {
   const env = createConverterEnvironment();
@@ -2144,6 +2202,10 @@ async function testConverterCompressedExportPath() {
   }
 
   class FakeMediaRecorder {
+    static isTypeSupported(mimeType) {
+      return mimeType === 'audio/webm;codecs=opus';
+    }
+
     constructor(stream, options) {
       this.stream = stream;
       this.options = options;
@@ -2218,6 +2280,10 @@ async function testConverterCompressedExportFailureClosesAudioContext() {
   }
 
   class FailingMediaRecorder {
+    static isTypeSupported(mimeType) {
+      return mimeType === 'audio/webm;codecs=opus';
+    }
+
     constructor(stream, options) {
       this.stream = stream;
       this.options = options;
@@ -2487,6 +2553,8 @@ async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
+  await testConverterMp3FormatExposureAndDefaults();
+  await testConverterMp3FallbackMessageWhenNativeSupportMissing();
   testConverterDownloadClearsTemporaryAsset();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
