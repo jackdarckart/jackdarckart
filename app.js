@@ -36,6 +36,7 @@
   const OPTIONAL_PAGE_MODULES = {
     'converter.html': {
       globalKey: '__JACKDARCKART_CONVERTER__',
+      preloadScripts: ['./assets/vendor/lame.min.js'],
       src: './converter.js'
     }
   };
@@ -426,23 +427,32 @@
     }
 
     const promises = getOptionalPageModulePromises();
-    if (promises[config.src]) {
-      return promises[config.src];
+    const sources = (Array.isArray(config.preloadScripts) ? config.preloadScripts : []).concat(config.src);
+
+    function loadScript(src) {
+      if (promises[src]) {
+        return promises[src];
+      }
+
+      promises[src] = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.defer = true;
+        script.onload = () => resolve(src === config.src ? (window[config.globalKey] || null) : null);
+        script.onerror = () => {
+          delete promises[src];
+          reject(new Error('optional-page-module-load-failed'));
+        };
+        (document.head || document.body || document.documentElement).appendChild(script);
+      });
+
+      return promises[src];
     }
 
-    promises[config.src] = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = config.src;
-      script.defer = true;
-      script.onload = () => resolve(window[config.globalKey] || null);
-      script.onerror = () => {
-        delete promises[config.src];
-        reject(new Error('optional-page-module-load-failed'));
-      };
-      (document.head || document.body || document.documentElement).appendChild(script);
-    });
-
-    return promises[config.src];
+    return sources.reduce(
+      (chain, src) => chain.then(() => loadScript(src)),
+      Promise.resolve(null)
+    );
   }
 
   function initOptionalPageModule() {
