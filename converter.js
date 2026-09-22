@@ -1072,11 +1072,14 @@
       if (!endpoint) {
         throw new Error('Kein Same-Origin-Konverter für MP3 konfiguriert.');
       }
-      if (!window || typeof window.fetch !== 'function') {
+      const fetchImplementation = (window && typeof window.fetch === 'function')
+        ? window.fetch.bind(window)
+        : (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : null);
+      if (!fetchImplementation) {
         throw new Error('Serverseitiger MP3-Export erfordert fetch-Unterstützung im Browser.');
       }
       const wavBlob = core.encodeWav(masteredBuffer);
-      const response = await window.fetch(endpoint, {
+      const response = await fetchImplementation(endpoint, {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
@@ -1493,7 +1496,7 @@
   }
 
   function tryCreateUrl(value) {
-    const UrlCtor = (window && typeof window.URL === 'function' && typeof window.URL.createObjectURL === 'function')
+    const UrlCtor = (window && typeof window.URL === 'function')
       ? window.URL
       : (typeof globalThis.URL === 'function' ? globalThis.URL : null);
     if (typeof UrlCtor !== 'function') {
