@@ -50,7 +50,7 @@
       return { peak, rms, loudnessDb };
     }
 
-    createPreviewChain(context, settings, analyser) {
+    createPreviewChain(context, settings, analyser, sourceChannelCount) {
       const input = context.createGain();
       const lowEq = context.createBiquadFilter();
       lowEq.type = 'lowshelf';
@@ -78,7 +78,7 @@
       const makeup = context.createGain();
       makeup.gain.value = this.getMakeupGain(settings);
 
-      const widthStage = this.createStereoWidthStage(context, settings.stereoWidth);
+      const widthStage = this.createStereoWidthStage(context, settings.stereoWidth, sourceChannelCount);
       const limiter = context.createWaveShaper();
       limiter.curve = this.createLimiterCurve(this.dbToLinear(settings.limiterCeiling));
       limiter.oversample = '4x';
@@ -104,7 +104,7 @@
       source.buffer = buffer;
 
       const analyser = offlineContext.createAnalyser();
-      const chain = this.createPreviewChain(offlineContext, settings, analyser);
+      const chain = this.createPreviewChain(offlineContext, settings, analyser, buffer.numberOfChannels);
       chain.output.connect(offlineContext.destination);
       source.connect(chain.input);
       source.start(0);
@@ -211,8 +211,8 @@
       return Math.max(0.5, Math.min(1.9, this.dbToLinear((eqBoost * 0.18) + ratioPush)));
     }
 
-    createStereoWidthStage(context, stereoWidthPercent) {
-      if (context.destination.channelCount < 2) {
+    createStereoWidthStage(context, stereoWidthPercent, sourceChannelCount) {
+      if (sourceChannelCount < 2) {
         const passthrough = context.createGain();
         return { input: passthrough, output: passthrough };
       }
@@ -693,7 +693,7 @@
       const analyser = context.createAnalyser();
       analyser.fftSize = spectrumFftSize;
       analyser.smoothingTimeConstant = 0.82;
-      const chain = core.createPreviewChain(context, readSettings(), analyser);
+      const chain = core.createPreviewChain(context, readSettings(), analyser, loadedBuffer.numberOfChannels);
       chain.output.connect(context.destination);
       source.connect(chain.input);
       source.start(0, Math.max(0, offsetSeconds));
@@ -814,9 +814,10 @@
         const rendered = await core.render(loadedBuffer, readSettings(), sampleRateValue);
         const exportFormat = getSelectedFormat();
         const bitrate = Number(elements.bitrateSelect.value) || 192000;
+        const masteredBuffer = rendered.buffer;
         const blob = exportFormat.id === 'wav'
-          ? core.encodeWav(rendered.buffer)
-          : await recordCompressedExport(rendered.buffer, exportFormat, bitrate);
+          ? core.encodeWav(masteredBuffer)
+          : await recordCompressedExport(masteredBuffer, exportFormat, bitrate);
 
         const filenameBase = sanitizeFilename((loadedFile && loadedFile.name) || 'master');
         storeRenderedAsset({
@@ -838,13 +839,13 @@
       }
     }
 
-    async function recordCompressedExport(buffer, format, bitrate) {
+    async function recordCompressedExport(masteredBuffer, format, bitrate) {
       if (typeof MediaRecorder !== 'function') {
         throw new Error('Für dieses Zielformat steht kein Browser-Encoder zur Verfügung.');
       }
-      const exportContext = createRealtimeAudioContext(buffer.sampleRate);
+      const exportContext = createRealtimeAudioContext(masteredBuffer.sampleRate);
       const source = exportContext.createBufferSource();
-      source.buffer = buffer;
+      source.buffer = masteredBuffer;
       const destination = exportContext.createMediaStreamDestination();
       source.connect(destination);
       const chunks = [];
@@ -1128,6 +1129,9 @@
       },
       _downloadRenderedFileForTest() {
         downloadRenderedFile();
+      },
+      _recordCompressedExportForTest(buffer, format, bitrate) {
+        return recordCompressedExport(buffer, format, bitrate);
       }
     };
   }

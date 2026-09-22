@@ -619,11 +619,13 @@ function createCanvasContextStub() {
   };
 }
 
-function createConverterEnvironment() {
+function createConverterEnvironment(options = {}) {
   const timers = new Map();
   let timerId = 1;
   let revokedUrl = '';
   let clickedDownloads = 0;
+  let recorderMimeType = '';
+  let closedAudioContexts = 0;
   const documentListeners = new Map();
   let elements = {};
   const document = {
@@ -727,9 +729,9 @@ function createConverterEnvironment() {
       href: 'https://stream-musik.space/converter.html',
       pathname: '/converter.html'
     },
-    AudioContext: undefined,
+    AudioContext: options.AudioContext,
     webkitAudioContext: undefined,
-    MediaRecorder: undefined,
+    MediaRecorder: options.MediaRecorder,
     setTimeout(callback, delay) {
       const id = timerId++;
       timers.set(id, { callback, delay, repeat: false });
@@ -765,6 +767,7 @@ function createConverterEnvironment() {
     console,
     URL: urlApi,
     Blob,
+    MediaRecorder: options.MediaRecorder,
     Math,
     Number,
     String,
@@ -794,6 +797,18 @@ function createConverterEnvironment() {
     },
     getClickedDownloads() {
       return clickedDownloads;
+    },
+    setRecorderMimeType(value) {
+      recorderMimeType = value;
+    },
+    markAudioContextClosed() {
+      closedAudioContexts += 1;
+    },
+    getRecorderMimeType() {
+      return recorderMimeType;
+    },
+    getClosedAudioContexts() {
+      return closedAudioContexts;
     },
     runTimersByDelay(delay) {
       const matchingIds = Array.from(timers.entries())
@@ -2080,6 +2095,93 @@ function testConverterDownloadClearsTemporaryAsset() {
   assert.equal(env.getRevokedUrl(), 'blob:converter-test', 'converter studio should revoke the generated blob URL after cleanup');
 }
 
+async function testConverterCompressedExportPath() {
+  const env = createConverterEnvironment();
+
+  class FakeSource {
+    constructor() {
+      this.listeners = new Map();
+    }
+
+    connect() {}
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    start() {
+      const endedListener = this.listeners.get('ended');
+      if (endedListener) {
+        endedListener();
+      }
+    }
+  }
+
+  class FakeAudioContext {
+    createBufferSource() {
+      return new FakeSource();
+    }
+
+    createMediaStreamDestination() {
+      return { stream: {} };
+    }
+
+    async resume() {}
+
+    async close() {
+      env.markAudioContextClosed();
+    }
+  }
+
+  class FakeMediaRecorder {
+    constructor(stream, options) {
+      this.stream = stream;
+      this.options = options;
+      this.state = 'inactive';
+      this.listeners = new Map();
+      env.setRecorderMimeType(options.mimeType);
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    start() {
+      this.state = 'recording';
+    }
+
+    stop() {
+      this.state = 'inactive';
+      const dataListener = this.listeners.get('dataavailable');
+      if (dataListener) {
+        dataListener({ data: new Blob(['encoded'], { type: this.options.mimeType }) });
+      }
+      const stopListener = this.listeners.get('stop');
+      if (stopListener) {
+        stopListener();
+      }
+    }
+  }
+
+  env.window.AudioContext = FakeAudioContext;
+  env.window.MediaRecorder = FakeMediaRecorder;
+  env.context.MediaRecorder = FakeMediaRecorder;
+
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  const blob = await studio._recordCompressedExportForTest(
+    { sampleRate: 44100 },
+    { mimeType: 'audio/webm;codecs=opus', extension: 'webm' },
+    192000
+  );
+
+  assert.equal(blob.type, 'audio/webm;codecs=opus', 'compressed export should resolve a blob using the requested codec mime type');
+  assert.equal(env.getRecorderMimeType(), 'audio/webm;codecs=opus', 'compressed export should initialize MediaRecorder with the selected codec');
+  assert.equal(env.getClosedAudioContexts(), 1, 'compressed export should close its temporary audio context after recording completes');
+}
+
 function testServiceWorkerCachesAllHtmlPages() {
   for (const file of htmlPages) {
     assert.match(swCode, new RegExp(`['"]${escapeRegExp('./' + file)}['"]`), `service worker should precache ${file}`);
@@ -2316,6 +2418,7 @@ async function main() {
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
   testConverterDownloadClearsTemporaryAsset();
+  await testConverterCompressedExportPath();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();
