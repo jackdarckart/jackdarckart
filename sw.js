@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'stream-musik-space-v5';
+const CACHE_NAME = 'stream-musik-space-v6';
 const OFFLINE_FALLBACK_URL = new URL('./index.html', self.location.href).href;
 const APP_SHELL = [
   './',
