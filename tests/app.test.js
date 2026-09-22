@@ -4,6 +4,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const appCode = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+const converterJsCode = fs.readFileSync(path.join(__dirname, '..', 'converter.js'), 'utf8');
+const converterHtmlCode = fs.readFileSync(path.join(__dirname, '..', 'converter.html'), 'utf8');
 const swCode = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 const stylesCode = fs.readFileSync(path.join(__dirname, '..', 'styles.css'), 'utf8');
 const liveHtmlCode = fs.readFileSync(path.join(__dirname, '..', 'live.html'), 'utf8');
@@ -12,6 +14,7 @@ const htmlPages = [
   'index.html',
   'live.html',
   'titel.html',
+  'converter.html',
   'sendeplan.html',
   'events.html',
   'news.html',
@@ -593,6 +596,234 @@ function createEnvironment(options = {}) {
       }
       timers.delete(id);
       await callback();
+    }
+  };
+}
+
+
+function createCanvasContextStub() {
+  return {
+    setTransform() {},
+    clearRect() {},
+    fillRect() {},
+    beginPath() {},
+    moveTo() {},
+    lineTo() {},
+    stroke() {},
+    fillText() {},
+    createLinearGradient() {
+      return {
+        addColorStop() {}
+      };
+    }
+  };
+}
+
+function createConverterEnvironment(options = {}) {
+  const timers = new Map();
+  let timerId = 1;
+  let revokedUrl = '';
+  let clickedDownloads = 0;
+  let recorderMimeType = '';
+  let closedAudioContexts = 0;
+  const documentListeners = new Map();
+  let elements = {};
+  const document = {
+    body: new MockElement('body'),
+    documentElement: new MockElement('html'),
+    createElement(tagName) {
+      const element = new MockElement(tagName, document);
+      element.click = () => {
+        clickedDownloads += 1;
+      };
+      return element;
+    },
+    getElementById(id) {
+      return elements[id] || null;
+    },
+    querySelector() {
+      return null;
+    },
+    addEventListener(type, listener) {
+      if (!documentListeners.has(type)) {
+        documentListeners.set(type, []);
+      }
+      documentListeners.get(type).push(listener);
+    }
+  };
+
+  const ids = [
+    'converter-file-input',
+    'converter-browse-button',
+    'converter-reset-button',
+    'converter-dropzone-shell',
+    'converter-import-status',
+    'converter-file-name',
+    'converter-file-duration',
+    'converter-file-rate',
+    'converter-file-size',
+    'converter-file-format',
+    'converter-file-channels',
+    'converter-auto-enhance',
+    'converter-preview-toggle',
+    'converter-preview-stop',
+    'converter-render-button',
+    'converter-download-button',
+    'converter-clear-render',
+    'converter-format-select',
+    'converter-bitrate-select',
+    'converter-samplerate-select',
+    'converter-format-note',
+    'converter-render-state',
+    'converter-render-state-text',
+    'converter-render-status',
+    'converter-cleanup-timer',
+    'converter-cleanup-state',
+    'converter-analysis-summary',
+    'converter-waveform',
+    'converter-spectrum',
+    'converter-vault-button',
+    'converter-vault-status',
+    'converter-eq-low',
+    'converter-eq-mid',
+    'converter-eq-high',
+    'converter-comp-threshold',
+    'converter-comp-ratio',
+    'converter-limiter-ceiling',
+    'converter-stereo-width',
+    'converter-target-lufs',
+    'converter-eq-low-value',
+    'converter-eq-mid-value',
+    'converter-eq-high-value',
+    'converter-comp-threshold-value',
+    'converter-comp-ratio-value',
+    'converter-limiter-ceiling-value',
+    'converter-stereo-width-value',
+    'converter-target-lufs-value'
+  ];
+
+  elements = Object.fromEntries(ids.map((id) => [id, new MockElement(id, document)]));
+  for (const id of ['converter-waveform', 'converter-spectrum']) {
+    elements[id].clientWidth = 480;
+    elements[id].clientHeight = 180;
+    elements[id].getContext = () => createCanvasContextStub();
+  }
+  elements['converter-format-select'].value = 'wav';
+  elements['converter-bitrate-select'].value = '192000';
+  elements['converter-samplerate-select'].value = 'source';
+  elements['converter-eq-low'].value = '0';
+  elements['converter-eq-mid'].value = '0';
+  elements['converter-eq-high'].value = '0';
+  elements['converter-comp-threshold'].value = '-18';
+  elements['converter-comp-ratio'].value = '2.8';
+  elements['converter-limiter-ceiling'].value = '-1';
+  elements['converter-stereo-width'].value = '115';
+  elements['converter-target-lufs'].value = '-12';
+  elements['converter-render-state'].dataset = {};
+
+  const windowObject = {
+    document,
+    devicePixelRatio: 1,
+    navigator: {},
+    location: {
+      href: 'https://stream-musik.space/converter.html',
+      pathname: '/converter.html'
+    },
+    AudioContext: options.AudioContext,
+    webkitAudioContext: undefined,
+    MediaRecorder: options.MediaRecorder,
+    setTimeout(callback, delay) {
+      const id = timerId++;
+      timers.set(id, { callback, delay, repeat: false });
+      return id;
+    },
+    clearTimeout(id) {
+      timers.delete(id);
+    },
+    setInterval(callback, delay) {
+      const id = timerId++;
+      timers.set(id, { callback, delay, repeat: true });
+      return id;
+    },
+    clearInterval(id) {
+      timers.delete(id);
+    },
+    addEventListener() {},
+    removeEventListener() {}
+  };
+
+  const urlApi = {
+    createObjectURL() {
+      return 'blob:converter-test';
+    },
+    revokeObjectURL(url) {
+      revokedUrl = url;
+    }
+  };
+
+  const context = vm.createContext({
+    window: windowObject,
+    document,
+    console,
+    URL: urlApi,
+    Blob,
+    MediaRecorder: options.MediaRecorder,
+    Math,
+    Number,
+    String,
+    Date,
+    Promise,
+    Error,
+    Boolean,
+    Array,
+    Object,
+    globalThis: null,
+    setTimeout: windowObject.setTimeout,
+    clearTimeout: windowObject.clearTimeout,
+    setInterval: windowObject.setInterval,
+    clearInterval: windowObject.clearInterval,
+    requestAnimationFrame: () => 1,
+    cancelAnimationFrame() {}
+  });
+  context.globalThis = context;
+  windowObject.URL = urlApi;
+
+  return {
+    context,
+    window: windowObject,
+    elements,
+    getRevokedUrl() {
+      return revokedUrl;
+    },
+    getClickedDownloads() {
+      return clickedDownloads;
+    },
+    setRecorderMimeType(value) {
+      recorderMimeType = value;
+    },
+    markAudioContextClosed() {
+      closedAudioContexts += 1;
+    },
+    getRecorderMimeType() {
+      return recorderMimeType;
+    },
+    getClosedAudioContexts() {
+      return closedAudioContexts;
+    },
+    runTimersByDelay(delay) {
+      const matchingIds = Array.from(timers.entries())
+        .filter(([, timer]) => timer.delay === delay)
+        .map(([id]) => id);
+      for (const id of matchingIds) {
+        const timer = timers.get(id);
+        if (!timer) {
+          continue;
+        }
+        if (!timer.repeat) {
+          timers.delete(id);
+        }
+        timer.callback();
+      }
     }
   };
 }
@@ -1673,7 +1904,9 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
     assert.ok(siteNavMatch, `${file} should expose a parsable main navigation section`);
     assert.ok(footerNavMatch, `${file} should expose a parsable footer navigation section`);
     assert.match(siteNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the main navigation`);
+    assert.match(siteNavMatch[1], /href="\.\/converter\.html"/, `${file} should expose the shared converter-studio entry in the main navigation`);
     assert.match(footerNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the footer navigation`);
+    assert.match(footerNavMatch[1], /href="\.\/converter\.html"/, `${file} should expose the shared converter-studio entry in the footer navigation`);
     assert.equal((siteNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the main navigation`);
     assert.equal((footerNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the footer navigation`);
     assert.match(siteNavMatch[1], new RegExp(`<a href="${escapeRegExp(expectedHref)}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the main navigation`);
@@ -1777,6 +2010,246 @@ function testLivePageExposesEnhancedModulesAndHooks() {
     /class\s*=\s*["'](?=[^"']*\bcontent-columns\b)(?=[^"']*\blive-insights-grid\b)[^"']*["']/,
     'live page should include the responsive insights grid layout'
   );
+}
+
+function testConverterPageExposesStudioHooksAndLoader() {
+  for (const hook of [
+    'converter-file-input',
+    'converter-auto-enhance',
+    'converter-preview-toggle',
+    'converter-render-button',
+    'converter-download-button',
+    'converter-cleanup-timer',
+    'converter-waveform',
+    'converter-spectrum',
+    'converter-vault-button',
+    'converter-vault-status'
+  ]) {
+    const escapedHook = hook.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assert.match(
+      converterHtmlCode,
+      new RegExp(`id\\s*=\\s*["']${escapedHook}["']`),
+      `converter page should expose ${hook} for the studio workflow`
+    );
+  }
+
+  assert.match(
+    converterHtmlCode,
+    /2-Minuten-Cleanup|2:00-Cleanup|2-Minuten-Cleanup-Phase/,
+    'converter page should explain the explicit 2-minute privacy cleanup flow'
+  );
+  assert.match(
+    converterHtmlCode,
+    /Phase 27\.3/i,
+    'converter page should clearly label the vault integration as a Phase 27.3 dependency'
+  );
+  assert.match(
+    converterJsCode,
+    /CLEANUP_WINDOW_MS\s*=\s*2\s*\*\s*60\s*\*\s*1000/,
+    'converter studio should retain rendered files for exactly two minutes before automatic cleanup'
+  );
+  assert.match(
+    converterJsCode,
+    /class VaultSyncAdapterStub/,
+    'converter studio should keep the vault sync integration as an explicit stub instead of faking storage'
+  );
+  assert.match(
+    appCode,
+    /converter\.html[\s\S]*converter\.js|converter\.js[\s\S]*converter\.html/,
+    'app.js should lazily load converter.js when the persistent shell navigates to converter.html'
+  );
+  assert.match(
+    appCode,
+    /delete promises\[config\.src\][\s\S]*optional-page-module-load-failed/,
+    'app.js should clear a failed optional page-module load so later navigations can retry it'
+  );
+  assert.match(
+    swCode,
+    /['"]\.\/converter\.js['"]/,
+    'service worker should precache converter.js for the studio page'
+  );
+  assert.match(
+    converterJsCode,
+    /leftDirect\.gain\.value = \(1 \+ width\) \* 0\.5[\s\S]*leftCross\.gain\.value = \(1 - width\) \* 0\.5/,
+    'converter studio should keep a stereo-width mapping where 100 percent preserves the original stereo image'
+  );
+}
+
+
+function testConverterDownloadClearsTemporaryAsset() {
+  const env = createConverterEnvironment();
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  studio._seedRenderedAssetForTest({
+    blob: new Blob(['demo'], { type: 'audio/wav' }),
+    filename: 'demo-master.wav',
+    report: {
+      outputApproxLufs: -12,
+      peakAfter: 0.5
+    },
+    format: {
+      id: 'wav',
+      extension: 'wav'
+    },
+    sampleRate: 44100
+  });
+
+  assert.equal(studio._hasRenderedAssetForTest(), true, 'converter studio should keep a rendered asset in temporary memory before download');
+
+  studio._downloadRenderedFileForTest();
+  env.runTimersByDelay(250);
+
+  assert.equal(env.getClickedDownloads(), 1, 'converter studio should trigger one local download click for the rendered asset');
+  assert.equal(studio._hasRenderedAssetForTest(), false, 'converter studio should clear the temporary rendered asset immediately after download starts');
+  assert.equal(env.getRevokedUrl(), 'blob:converter-test', 'converter studio should revoke the generated blob URL after cleanup');
+}
+
+async function testConverterCompressedExportPath() {
+  const env = createConverterEnvironment();
+
+  class FakeSource {
+    constructor() {
+      this.listeners = new Map();
+    }
+
+    connect() {}
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    start() {
+      const endedListener = this.listeners.get('ended');
+      if (endedListener) {
+        endedListener();
+      }
+    }
+  }
+
+  class FakeAudioContext {
+    createBufferSource() {
+      return new FakeSource();
+    }
+
+    createMediaStreamDestination() {
+      return { stream: {} };
+    }
+
+    async resume() {}
+
+    async close() {
+      env.markAudioContextClosed();
+    }
+  }
+
+  class FakeMediaRecorder {
+    constructor(stream, options) {
+      this.stream = stream;
+      this.options = options;
+      this.state = 'inactive';
+      this.listeners = new Map();
+      env.setRecorderMimeType(options.mimeType);
+    }
+
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+
+    start() {
+      this.state = 'recording';
+    }
+
+    stop() {
+      this.state = 'inactive';
+      const dataListener = this.listeners.get('dataavailable');
+      if (dataListener) {
+        dataListener({ data: new Blob(['encoded'], { type: this.options.mimeType }) });
+      }
+      const stopListener = this.listeners.get('stop');
+      if (stopListener) {
+        stopListener();
+      }
+    }
+  }
+
+  env.window.AudioContext = FakeAudioContext;
+  env.window.MediaRecorder = FakeMediaRecorder;
+  env.context.MediaRecorder = FakeMediaRecorder;
+
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  const blob = await studio._recordCompressedExportForTest(
+    { sampleRate: 44100 },
+    { mimeType: 'audio/webm;codecs=opus', extension: 'webm' },
+    192000
+  );
+
+  assert.equal(blob.type, 'audio/webm;codecs=opus', 'compressed export should resolve a blob using the requested codec mime type');
+  assert.equal(env.getRecorderMimeType(), 'audio/webm;codecs=opus', 'compressed export should initialize MediaRecorder with the selected codec');
+  assert.equal(env.getClosedAudioContexts(), 1, 'compressed export should close its temporary audio context after recording completes');
+}
+
+async function testConverterCompressedExportFailureClosesAudioContext() {
+  const env = createConverterEnvironment();
+
+  class FakeSource {
+    connect() {}
+    addEventListener() {}
+    start() {}
+  }
+
+  class FakeAudioContext {
+    createBufferSource() {
+      return new FakeSource();
+    }
+
+    createMediaStreamDestination() {
+      return { stream: {} };
+    }
+
+    async resume() {}
+
+    async close() {
+      env.markAudioContextClosed();
+    }
+  }
+
+  class FailingMediaRecorder {
+    constructor(stream, options) {
+      this.stream = stream;
+      this.options = options;
+      this.state = 'inactive';
+      env.setRecorderMimeType(options.mimeType);
+    }
+
+    addEventListener() {}
+
+    start() {
+      throw new Error('encoder failed');
+    }
+  }
+
+  env.window.AudioContext = FakeAudioContext;
+  env.window.MediaRecorder = FailingMediaRecorder;
+  env.context.MediaRecorder = FailingMediaRecorder;
+
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  await assert.rejects(
+    studio._recordCompressedExportForTest(
+      { sampleRate: 44100 },
+      { mimeType: 'audio/webm;codecs=opus', extension: 'webm' },
+      192000
+    ),
+    /Encoder nicht starten/,
+    'compressed export should reject when the encoder start path throws synchronously'
+  );
+  assert.equal(env.getClosedAudioContexts(), 1, 'compressed export should still close the temporary audio context when encoder startup fails');
 }
 
 function testServiceWorkerCachesAllHtmlPages() {
@@ -2013,6 +2486,10 @@ function testIssueHelpPageAndTemplatesArePresent() {
 async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
+  testConverterPageExposesStudioHooksAndLoader();
+  testConverterDownloadClearsTemporaryAsset();
+  await testConverterCompressedExportPath();
+  await testConverterCompressedExportFailureClosesAudioContext();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();

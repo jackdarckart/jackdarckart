@@ -1,12 +1,13 @@
 'use strict';
 
-const CACHE_NAME = 'stream-musik-space-v3';
+const CACHE_NAME = 'stream-musik-space-v4';
 const OFFLINE_FALLBACK_URL = new URL('./index.html', self.location.href).href;
 const APP_SHELL = [
   './',
   './index.html',
   './live.html',
   './titel.html',
+  './converter.html',
   './sendeplan.html',
   './events.html',
   './news.html',
@@ -19,6 +20,7 @@ const APP_SHELL = [
   './impressum.html',
   './styles.css',
   './app.js',
+  './converter.js',
   './manifest.webmanifest',
   './assets/app-icon-192.png',
   './assets/app-icon-512.png',

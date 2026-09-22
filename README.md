@@ -9,7 +9,7 @@ Die Website bleibt bewusst eine kleine, statische Radio-Web-App ohne Build-Pipel
 - direkte Browser-Wiedergabe nach echter Nutzeraktion
 - interne Seitennavigation ohne vollständigen Reload: die Shell bleibt bestehen und tauscht nur `main#content`/Navigationsmarkierungen aus, damit derselbe laufende Webplayer beim Seitenwechsel erhalten bleibt
 - sichtbare Status-, Fehler-, Retry-, Puffer- und Offline-Hinweise
-- kompakte Startseite plus getrennte Inhaltsseiten für Live, Titel, Sendeplan, Events, News, Archiv, Hilfe, Issue-Hilfe, Kontakt, Datenschutz und Impressum
+- kompakte Startseite plus getrennte Inhaltsseiten für Live, Titel, Converter-Studio, Sendeplan, Events, News, Archiv, Hilfe, Issue-Hilfe, Kontakt, Datenschutz und Impressum
 - Sleep-Timer, Tastaturkürzel, Theme-Umschaltung, lokale Favoriten, Filter-/Kopierhilfen und Share-Funktionen
 - Live-Daten aus der offiziellen laut.fm-API für Songs, Senderprofil, Hörerzahl, Next Artists und Sendeplan
 - informative Fehler-/Leerzustände ohne erfundene Termine, Titel, Hörerzahlen oder Archivdaten
@@ -77,6 +77,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
+- `converter.html` – lokales Browser-Studio für Audio-Import, Waveform/Spectrum, Auto-Enhance, Mastering-Regler und privacy-first Export mit 2-Minuten-Cleanup
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
 - `events.html` – bestätigte Events und Specials oder professioneller Leerzustand
 - `news.html` – Sender-/Website-Neuigkeiten oder redaktioneller Leerzustand
@@ -92,6 +93,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
+- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive lokaler Preview, Waveform/Spectrum, Cleanup-Timer und Vault-Stub
 - `manifest.webmanifest` – PWA-Metadaten und Mehrseiten-Shortcuts
 - `sw.js` – App-Shell-Cache für alle HTML-Seiten und statischen Assets, ohne Stream-Caching
 - `tests/app.test.js` – Node-basierte Regressionstests für kritische UI-/Player- und Strukturregeln
@@ -186,6 +188,7 @@ Danach z. B. diese Seiten im Browser prüfen:
 - `http://127.0.0.1:8000/index.html`
 - `http://127.0.0.1:8000/live.html`
 - `http://127.0.0.1:8000/titel.html`
+- `http://127.0.0.1:8000/converter.html`
 - `http://127.0.0.1:8000/sendeplan.html`
 
 ## Tests

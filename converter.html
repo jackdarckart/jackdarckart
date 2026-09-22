@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="de" data-theme="dark" data-theme-preference="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Converter Studio | stream-musik.space</title>
+  <meta name="description" content="Cyber-Audio Mastering & Transcoding Studio auf stream-musik.space für lokale Browser-Audioverarbeitung, Analyse, Preview und privacy-first Export ohne Server-Uploads.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="color-scheme" content="dark light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' blob: https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm https://api.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
+  <link rel="canonical" href="https://stream-musik.space/converter.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:site_name" content="stream-musik.space">
+  <meta property="og:title" content="Converter Studio | stream-musik.space">
+  <meta property="og:description" content="Lokales Browser-Studio für Auto-Enhance, EQ, Kompressor, Limiter, Stereo-Width, Waveform/Spectrum und privacy-first Export ohne Uploads.">
+  <meta property="og:url" content="https://stream-musik.space/converter.html">
+  <meta property="og:image" content="https://stream-musik.space/assets/social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Converter Studio | stream-musik.space">
+  <meta name="twitter:description" content="Cyber-Audio Mastering & Transcoding Studio für lokale Audio-Transformationen, Analyse und privacy-first Export direkt im Browser.">
+  <meta name="twitter:image" content="https://stream-musik.space/assets/social-preview.png">
+  <meta name="theme-color" content="#070b18">
+  <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"stream-musik.space","url":"https://stream-musik.space/","inLanguage":"de-DE","description":"Installierbare, datenschutzfreundliche Radio-Web-App für den offiziellen jackdarckart laut.fm-Stream."},{"@type":"WebPage","name":"Converter Studio","url":"https://stream-musik.space/converter.html","inLanguage":"de-DE","description":"Lokales Browser-Studio für Audio-Mastering, Analyse und privacy-first Export ohne Server-Uploads.","isPartOf":{"@id":"https://stream-musik.space/#website"}}]}</script>
+</head>
+<body>
+  <a class="skip-link" href="#content">Zum Inhalt springen</a>
+  <header class="site-header">
+  <div class="wrap nav-shell">
+    <a class="brand" href="./index.html" aria-label="stream-musik.space Startseite">
+      <span class="logo" aria-hidden="true">JD</span>
+      <span>
+        <span class="brand-title">jackdarckart</span>
+        <span class="brand-subtitle">stream-musik.space · statische Radio-Web-App auf laut.fm-Basis</span>
+      </span>
+    </a>
+    <div class="nav-tools">
+      <label class="theme-switch" for="theme-select">
+        <span>Theme</span>
+        <select id="theme-select" aria-label="Farbschema wählen">
+          <option value="auto">Auto</option>
+          <option value="dark">Dunkel</option>
+          <option value="light">Hell</option>
+        </select>
+      </label>
+    </div>
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Navigation öffnen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Hauptnavigation"><div class="nav-cluster"><span class="nav-cluster-label">Hören</span><div class="nav-cluster-links"><a href="./index.html">Start</a><a href="./live.html">Live hören</a><a href="./titel.html">Titel</a><a href="./converter.html" aria-current="page" class="is-current">Studio</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Entdecken</span><div class="nav-cluster-links"><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a></div></div><div class="nav-cluster"><span class="nav-cluster-label">Infos</span><div class="nav-cluster-links"><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./issue-hilfe.html">Issue-Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a></div></div></nav>
+  </div>
+</header>
+  <main id="content">
+    <section class="section page-hero-section converter-hero" data-reveal>
+      <div class="wrap converter-hero-layout">
+        <div class="page-hero-copy converter-hero-copy">
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol>
+              <li><a href="./index.html">Startseite</a></li>
+              <li aria-current="page">Converter Studio</li>
+            </ol>
+          </nav>
+          <span class="eyebrow"><span class="dot" aria-hidden="true"></span>PHASE 29 · Cyber-Audio Mastering &amp; Transcoding Studio</span>
+          <h1>Lokales Audio-Mastering im Browser – dunkel, modular und kompromisslos privacy-first.</h1>
+          <p>Das Studio verarbeitet Audiodateien ausschließlich client-seitig. Upload, Analyse, Vorschau, Mastering und Export bleiben lokal in deinem Browser. Wo Browser-DSP nur best-effort arbeiten kann, wird das klar markiert – inklusive vorbereitetem Adapterpunkt für spätere WASM-/Vault-Upgrades.</p>
+          <div class="actions">
+            <a class="button primary" href="#converter-dropzone">Datei laden</a>
+            <a class="button secondary" href="#converter-export-panel">Zum Export</a>
+          </div>
+          <ul class="converter-badges" aria-label="Studio-Eigenschaften">
+            <li>Lokal im Browser</li>
+            <li>Auto-Enhance + manuelle Regler</li>
+            <li>Waveform + Echtzeit-Spektrum</li>
+            <li>2-Minuten-Cleanup nach Render</li>
+          </ul>
+        </div>
+        <aside class="panel converter-hero-panel" data-reveal>
+          <div class="subpanel-head">
+            <h2>Studio-Kette</h2>
+            <span class="subpanel-label">Web Audio API · modularer DSP-Wrapper</span>
+          </div>
+          <ol class="timeline-flow converter-signal-flow">
+            <li><strong>Import:</strong> lokale Datei per Drag &amp; Drop oder Dateidialog.</li>
+            <li><strong>Analyse:</strong> Metadaten, Wellenform und Spektrum im Browser.</li>
+            <li><strong>Mastering:</strong> EQ, Kompressor, Limiter, Stereo-Width und Loudness-Ziel.</li>
+            <li><strong>Export:</strong> lokale Renderdatei mit sichtbarer 2:00-Cleanup-Phase.</li>
+          </ol>
+          <p class="note">LUFS-Normierung und Limiter arbeiten hier best-effort approximativ auf Browser-Basis. Ein zukünftiger WASM-/DSP-Core kann über denselben Adapter eingebunden werden.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" data-reveal>
+      <div class="wrap converter-layout">
+        <article class="panel content-panel converter-import-panel">
+          <div class="subpanel-head">
+            <h2 id="converter-dropzone">Import &amp; Datei-Metadaten</h2>
+            <span class="subpanel-label">nur lokal · kein Upload</span>
+          </div>
+          <label class="studio-dropzone" id="converter-dropzone-shell" for="converter-file-input" tabindex="0">
+            <input id="converter-file-input" type="file" accept="audio/*" hidden>
+            <span class="studio-dropzone-eyebrow">Drag &amp; Drop / Tap to load</span>
+            <strong>Audio-Datei hier ablegen</strong>
+            <span>Unterstützt Browser-kompatible lokale Audioformate. Dauer, Samplerate und Format werden nach dem Dekodieren lokal ausgelesen.</span>
+          </label>
+          <div class="actions converter-import-actions">
+            <button class="button secondary" id="converter-browse-button" type="button">Datei auswählen</button>
+            <button class="button secondary" id="converter-reset-button" type="button" disabled>Studio zurücksetzen</button>
+          </div>
+          <p class="share-status note" id="converter-import-status" aria-live="polite">Noch keine Datei geladen. Alle Verarbeitungsschritte bleiben lokal in diesem Browser.</p>
+          <div class="converter-meta-grid" aria-label="Audio-Metadaten">
+            <article class="studio-stat"><span>Datei</span><strong id="converter-file-name">–</strong></article>
+            <article class="studio-stat"><span>Dauer</span><strong id="converter-file-duration">–</strong></article>
+            <article class="studio-stat"><span>Samplerate</span><strong id="converter-file-rate">–</strong></article>
+            <article class="studio-stat"><span>Größe</span><strong id="converter-file-size">–</strong></article>
+            <article class="studio-stat"><span>Format</span><strong id="converter-file-format">–</strong></article>
+            <article class="studio-stat"><span>Kanäle</span><strong id="converter-file-channels">–</strong></article>
+          </div>
+        </article>
+
+        <aside class="panel editorial-module converter-guidance-panel">
+          <span class="eyebrow">Privacy &amp; Fallbacks</span>
+          <h2>Was exakt ist – und was bewusst als Approximation markiert wird.</h2>
+          <ul class="issue-checklist converter-checklist">
+            <li><strong>Exakt lokal:</strong> Import, Browser-Dekodierung, Waveform, Preview, WAV-Export, Cleanup-Timer.</li>
+            <li><strong>Best-effort:</strong> LUFS-ähnliche Loudness-Schätzung, Limiter-Ceiling und Stereo-Width im Browser-DSP.</li>
+            <li><strong>Codec-Fallback:</strong> zusätzliche Zielformate erscheinen nur, wenn dein Browser einen echten Encoder anbietet.</li>
+            <li><strong>Vault:</strong> Verschlüsselter Sync ist nur als Stub vorbereitet und benötigt Phase 27.3 separat.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section section-muted" data-reveal>
+      <div class="wrap converter-console-grid">
+        <article class="panel content-panel converter-controls-panel">
+          <div class="subpanel-head">
+            <h2>Mastering-Regler</h2>
+            <span class="subpanel-label">Preset + granularer Feinschliff</span>
+          </div>
+          <div class="actions converter-console-actions">
+            <button class="button primary" id="converter-auto-enhance" type="button" disabled>Auto-Enhance anwenden</button>
+            <button class="button secondary" id="converter-preview-toggle" type="button" disabled>Preview starten</button>
+            <button class="button secondary" id="converter-preview-stop" type="button" disabled>Preview stoppen</button>
+          </div>
+          <div class="converter-control-grid">
+            <label class="field-group studio-range" for="converter-eq-low">
+              <span>Bass EQ <output id="converter-eq-low-value" for="converter-eq-low">0 dB</output></span>
+              <input id="converter-eq-low" type="range" min="-12" max="12" step="0.5" value="0">
+            </label>
+            <label class="field-group studio-range" for="converter-eq-mid">
+              <span>Presence EQ <output id="converter-eq-mid-value" for="converter-eq-mid">0 dB</output></span>
+              <input id="converter-eq-mid" type="range" min="-12" max="12" step="0.5" value="0">
+            </label>
+            <label class="field-group studio-range" for="converter-eq-high">
+              <span>Air EQ <output id="converter-eq-high-value" for="converter-eq-high">0 dB</output></span>
+              <input id="converter-eq-high" type="range" min="-12" max="12" step="0.5" value="0">
+            </label>
+            <label class="field-group studio-range" for="converter-comp-threshold">
+              <span>Compressor Threshold <output id="converter-comp-threshold-value" for="converter-comp-threshold">-18 dB</output></span>
+              <input id="converter-comp-threshold" type="range" min="-36" max="0" step="1" value="-18">
+            </label>
+            <label class="field-group studio-range" for="converter-comp-ratio">
+              <span>Compressor Ratio <output id="converter-comp-ratio-value" for="converter-comp-ratio">2.8:1</output></span>
+              <input id="converter-comp-ratio" type="range" min="1" max="8" step="0.1" value="2.8">
+            </label>
+            <label class="field-group studio-range" for="converter-limiter-ceiling">
+              <span>Limiter Ceiling <output id="converter-limiter-ceiling-value" for="converter-limiter-ceiling">-1.0 dBFS</output></span>
+              <input id="converter-limiter-ceiling" type="range" min="-6" max="0" step="0.1" value="-1">
+            </label>
+            <label class="field-group studio-range" for="converter-stereo-width">
+              <span>Stereo Width <output id="converter-stereo-width-value" for="converter-stereo-width">115 %</output></span>
+              <input id="converter-stereo-width" type="range" min="0" max="200" step="1" value="115">
+            </label>
+            <label class="field-group studio-range" for="converter-target-lufs">
+              <span>Ziel-Loudness <output id="converter-target-lufs-value" for="converter-target-lufs">-12 LUFS approx.</output></span>
+              <input id="converter-target-lufs" type="range" min="-18" max="-8" step="0.5" value="-12">
+            </label>
+          </div>
+          <p class="note" id="converter-settings-note">Änderungen wirken auf Render und auf neue Preview-Starts. Die Loudness-Anzeige ist eine browserseitige Best-Effort-Schätzung, keine volle Broadcast-Messung.</p>
+        </article>
+
+        <article class="panel content-panel converter-export-panel" id="converter-export-panel">
+          <div class="subpanel-head">
+            <h2>Render &amp; Export</h2>
+            <span class="subpanel-label">lokal · temporär im Speicher</span>
+          </div>
+          <div class="converter-export-grid">
+            <label class="field-group" for="converter-format-select">
+              <span>Zielformat</span>
+              <select id="converter-format-select" aria-describedby="converter-format-note"></select>
+            </label>
+            <label class="field-group" for="converter-bitrate-select">
+              <span>Bitrate</span>
+              <select id="converter-bitrate-select">
+                <option value="128000">128 kbps</option>
+                <option value="192000" selected>192 kbps</option>
+                <option value="256000">256 kbps</option>
+                <option value="320000">320 kbps</option>
+              </select>
+            </label>
+            <label class="field-group" for="converter-samplerate-select">
+              <span>Samplerate</span>
+              <select id="converter-samplerate-select">
+                <option value="source" selected>Quelle beibehalten</option>
+                <option value="44100">44.1 kHz</option>
+                <option value="48000">48 kHz</option>
+                <option value="96000">96 kHz</option>
+              </select>
+            </label>
+          </div>
+          <p class="note compact-note" id="converter-format-note">WAV ist verlustfrei und exakt lokal verfügbar. Zusätzliche Codec-Optionen erscheinen nur, wenn dein Browser einen echten Encoder unterstützt.</p>
+          <div class="actions converter-export-actions">
+            <button class="button primary" id="converter-render-button" type="button" disabled>Master rendern</button>
+            <button class="button secondary" id="converter-download-button" type="button" disabled>Master herunterladen</button>
+            <button class="button secondary" id="converter-clear-render" type="button" disabled>Temporäre Datei löschen</button>
+          </div>
+          <div class="status" id="converter-render-state" data-state="ready" role="status" aria-live="polite" aria-busy="false">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="converter-render-state-text">Bereit – nach dem Laden einer Datei kann lokal gerendert werden.</span>
+          </div>
+          <p class="share-status note" id="converter-render-status" aria-live="polite">Noch keine temporäre Master-Datei im Speicher.</p>
+          <div class="converter-cleanup-shell" aria-live="polite">
+            <p class="meta-label">Privacy-First Cleanup</p>
+            <div class="converter-cleanup-row">
+              <strong id="converter-cleanup-timer">02:00</strong>
+              <span id="converter-cleanup-state">Timer startet erst nach erfolgreichem Render.</span>
+            </div>
+          </div>
+          <div class="converter-analysis-summary" id="converter-analysis-summary">
+            <p><strong>Analyse:</strong> Noch keine Datei geladen.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" data-reveal>
+      <div class="wrap converter-visual-grid">
+        <article class="panel content-panel">
+          <div class="subpanel-head">
+            <h2>Waveform</h2>
+            <span class="subpanel-label">geladene Quelle</span>
+          </div>
+          <figure class="converter-visual-shell">
+            <canvas id="converter-waveform" class="converter-canvas" width="960" height="280" aria-label="Waveform der geladenen Audiodatei"></canvas>
+            <figcaption class="note">Die Waveform zeigt die geladene Ausgangsdatei. Für große Dateien wird eine verdichtete Übersicht dargestellt.</figcaption>
+          </figure>
+        </article>
+        <article class="panel content-panel">
+          <div class="subpanel-head">
+            <h2>Realtime Spectrum</h2>
+            <span class="subpanel-label">Preview-Ausgang</span>
+          </div>
+          <figure class="converter-visual-shell">
+            <canvas id="converter-spectrum" class="converter-canvas" width="960" height="280" aria-label="Realtime-Spektrum der Preview"></canvas>
+            <figcaption class="note">Das Spektrum reagiert in Echtzeit auf die lokale Preview. Ohne laufende Vorschau bleibt die Analyzer-Fläche in einem klaren Idle-State.</figcaption>
+          </figure>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-muted" data-reveal>
+      <div class="wrap converter-layout">
+        <article class="panel content-panel">
+          <div class="subpanel-head">
+            <h2>Vault-Sync Placeholder</h2>
+            <span class="subpanel-label">Phase 27.3 separat erforderlich</span>
+          </div>
+          <p>Die dauerhafte Speicherung in einem verschlüsselten Vault wird hier bewusst nicht vorgetäuscht. Dieses Studio enthält nur einen Adapterpunkt für eine spätere, echte Phase-27.3-Integration mit separater E2EE-, Schlüssel- und Sync-Implementierung.</p>
+          <div class="actions">
+            <button class="button secondary" id="converter-vault-button" type="button">Vault-Sync prüfen</button>
+          </div>
+          <p class="share-status note" id="converter-vault-status" aria-live="polite">Kein Vault erkannt. Für E2EE-Sync wird die separate Phase-27.3-Implementierung benötigt.</p>
+        </article>
+        <article class="panel editorial-module">
+          <span class="eyebrow">Studio-Hinweis</span>
+          <h2>Für saubere A/B-Vergleiche den Live-Stream pausieren.</h2>
+          <p>Die Site behält ihren Live-Player bewusst seitenübergreifend bei. Wenn du auf dieser Studio-Seite eine lokale Preview vergleichst, ist es sinnvoll, laufende Stream-Wiedergabe vorher zu pausieren, damit zwei Audiosignale nicht gleichzeitig spielen.</p>
+          <a class="content-link" href="./live.html#player">Zum Live-Player</a>
+        </article>
+      </div>
+    </section>
+  </main>
+  <div class="sticky-player" id="sticky-player" data-state="ready" aria-label="Schnellzugriff auf den Live-Player">
+  <div class="sticky-player-actions">
+    <button class="button primary sticky-play-button" id="sticky-play" type="button" aria-pressed="false">Stream starten</button>
+    <a class="button secondary" href="./live.html#player">Zum Live-Player</a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap footer-shell">
+    <div>
+      <span>© <span id="year"></span> jackdarckart · stream-musik.space</span>
+      <p class="footer-status">Technischer Status: statische, installierbare Browser-Oberfläche mit lokalem Komfortspeicher, sichtbarer Stream-Diagnose, PWA-Unterstützung und bewusst optionalen Inhaltsdaten.</p>
+    </div>
+    <nav class="footer-nav" aria-label="Footer-Navigation"><a href="./index.html">Start</a><a href="./live.html">Live</a><a href="./titel.html">Titel</a><a href="./converter.html" aria-current="page" class="is-current">Studio</a><a href="./sendeplan.html">Sendeplan</a><a href="./events.html">Events</a><a href="./news.html">News</a><a href="./archiv.html">Archiv</a><a href="./ueber-uns.html">Über uns</a><a href="./hilfe.html">Hilfe</a><a href="./issue-hilfe.html">Issue-Hilfe</a><a href="./kontakt.html">Kontakt</a><a href="./datenschutz.html">Datenschutz</a><a href="./impressum.html">Impressum</a><a href="https://laut.fm/jackdarckart" target="_blank" rel="noopener noreferrer">laut.fm</a></nav>
+  </div>
+</footer>
+
+<button class="back-to-top" id="back-to-top" type="button" aria-label="Nach oben">↑</button>
+<audio id="audio" preload="none" playsinline hidden>Dein Browser unterstützt Audio nicht.</audio>
+<noscript>
+  <p class="noscript-banner">Für Player, Theme-Umschaltung, Studio-Analyse und privacy-first Export wird JavaScript benötigt.</p>
+</noscript>
+<script src="./app.js" defer></script>
+</body>
+</html>
