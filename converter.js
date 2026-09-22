@@ -5,6 +5,7 @@
   const CLEANUP_WINDOW_MS = 2 * 60 * 1000;
   const DEFAULT_COMPRESSED_BITRATE = '192000';
   const PREFERRED_MP3_BITRATE = '320000';
+  const MP3_MIME_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/mpeg;codecs=mp3'];
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -511,31 +512,26 @@
     }
 
     function getExportFormats() {
+      const mp3Support = getMp3Support();
       const formats = [
         {
           id: 'wav',
           label: 'WAV · verlustfrei',
           extension: 'wav',
           mimeType: 'audio/wav',
-          description: 'WAV wird lokal als PCM exportiert und steht unabhängig vom Browser-Codec immer zur Verfügung.',
+          description: mp3Support.available
+            ? 'WAV wird lokal als PCM exportiert und steht unabhängig vom Browser-Codec immer zur Verfügung.'
+            : 'WAV wird lokal als PCM exportiert und steht unabhängig vom Browser-Codec immer zur Verfügung. MP3 erscheint erst, wenn nativer Support, ein lokaler Encoder oder ein Same-Origin-Konverter verfügbar ist.',
           approximate: false
         }
       ];
 
-      if (!canRecordCompressedAudio()) {
-        return formats;
+      if (mp3Support.available) {
+        formats.push(buildMp3Format(mp3Support));
       }
 
-      const supportedMp3MimeType = resolveSupportedMp3MimeType();
-      if (supportedMp3MimeType) {
-        formats.push({
-          id: 'mp3',
-          label: 'MP3 · beste Browser-Qualität',
-          extension: 'mp3',
-          mimeType: supportedMp3MimeType,
-          description: 'MP3 wird nur bei echtem nativen Browser-Support angeboten und nutzt standardmäßig 320 kbps als höchste praktische In-Browser-Qualität.',
-          approximate: true
-        });
+      if (!canRecordCompressedAudio()) {
+        return formats;
       }
 
       [
@@ -817,19 +813,24 @@
       if (!loadedBuffer) {
         return;
       }
+      const exportFormat = getSelectedFormat();
+      const mp3Support = exportFormat.id === 'mp3' ? getMp3Support() : null;
       setRenderState('loading', 'Master wird lokal gerendert …');
-      elements.renderStatus.textContent = 'Offline-Render läuft lokal im Browser. Keine Daten verlassen dieses Gerät.';
+      elements.renderStatus.textContent = exportFormat.id === 'mp3' && mp3Support && mp3Support.serverEndpoint && !mp3Support.nativeMimeType && !mp3Support.clientEncoder
+        ? 'Offline-Render läuft lokal im Browser. Die fertige WAV-Datei wird danach an den konfigurierten Same-Origin-Konverter für MP3 übergeben.'
+        : 'Offline-Render läuft lokal im Browser. Keine Daten verlassen dieses Gerät.';
       elements.renderButton.disabled = true;
       try {
         const sampleRateValue = elements.samplerateSelect.value === 'source'
           ? loadedBuffer.sampleRate
           : Number(elements.samplerateSelect.value);
         const rendered = await core.render(loadedBuffer, readSettings(), sampleRateValue);
-        const exportFormat = getSelectedFormat();
         const bitrate = Number(elements.bitrateSelect.value) || Number(getDefaultBitrateForFormat(exportFormat)) || 192000;
         const masteredBuffer = rendered.buffer;
         const blob = exportFormat.id === 'wav'
           ? core.encodeWav(masteredBuffer)
+          : exportFormat.id === 'mp3'
+            ? await renderMp3Export(masteredBuffer, bitrate)
           : await recordCompressedExport(masteredBuffer, exportFormat, bitrate);
 
         storeRenderedAsset({
@@ -918,6 +919,61 @@
           reject(new Error('Browser konnte den lokalen Encoder nicht starten.'));
         });
       });
+    }
+
+    async function renderMp3Export(masteredBuffer, bitrate) {
+      const mp3Support = getMp3Support();
+      if (mp3Support.nativeMimeType) {
+        return recordCompressedExport(masteredBuffer, buildMp3Format(mp3Support), bitrate);
+      }
+
+      if (mp3Support.clientEncoder) {
+        return encodeMp3Locally(masteredBuffer, bitrate, mp3Support.clientEncoder);
+      }
+
+      if (mp3Support.serverEndpoint) {
+        return requestServerMp3Conversion(masteredBuffer, bitrate, mp3Support.serverEndpoint, core.encodeWav(masteredBuffer));
+      }
+
+      throw new Error('MP3-Export ist hier nicht verfügbar. Es wird nativer MP3-Support, ein lokaler MP3-Encoder oder ein Same-Origin-Konverter benötigt.');
+    }
+
+    function getMp3Support() {
+      const nativeMimeType = resolveSupportedMp3MimeType();
+      const clientEncoder = getClientMp3Encoder();
+      const serverEndpoint = resolveMp3ServerEndpoint();
+      return {
+        nativeMimeType,
+        clientEncoder,
+        serverEndpoint,
+        available: Boolean(nativeMimeType || clientEncoder || serverEndpoint)
+      };
+    }
+
+    function buildMp3Format(mp3Support) {
+      return {
+        id: 'mp3',
+        label: 'MP3 · echter Export',
+        extension: 'mp3',
+        mimeType: (mp3Support && mp3Support.nativeMimeType) || 'audio/mpeg',
+        description: buildMp3Description(mp3Support),
+        approximate: true
+      };
+    }
+
+    function buildMp3Description(mp3Support) {
+      const routes = [];
+      if (mp3Support && mp3Support.nativeMimeType) {
+        routes.push('nativer Browser-Encoder');
+      }
+      if (mp3Support && mp3Support.clientEncoder) {
+        routes.push('lokaler MP3-Encoder');
+      }
+      if (mp3Support && mp3Support.serverEndpoint) {
+        routes.push('Same-Origin-Konverter');
+      }
+      return 'MP3 erzeugt eine echte .mp3-Datei und nutzt standardmäßig 320 kbps. Verfügbarer Pfad: '
+        + (routes.length ? routes.join(', ') : 'derzeit keiner') + '.';
     }
 
     function storeRenderedAsset(asset) {
@@ -1163,6 +1219,9 @@
       },
       _recordCompressedExportForTest(buffer, format, bitrate) {
         return recordCompressedExport(buffer, format, bitrate);
+      },
+      _renderMp3ExportForTest(buffer, bitrate) {
+        return renderMp3Export(buffer, bitrate);
       }
     };
   }
@@ -1247,12 +1306,7 @@
     if (!format) {
       return '';
     }
-
-    if (format.id !== 'wav' || resolveSupportedMp3MimeType()) {
-      return format.description;
-    }
-
-    return format.description + ' MP3-Export wird in diesem Browser nicht nativ angeboten, daher bleibt WAV die klare Fallback-Option.';
+    return format.description;
   }
 
   function createRealtimeAudioContext(sampleRate) {
@@ -1288,11 +1342,7 @@
   }
 
   function resolveSupportedMp3MimeType() {
-    return resolveSupportedMimeType([
-      'audio/mpeg',
-      'audio/mp3',
-      'audio/mpeg;codecs=mp3'
-    ]);
+    return resolveSupportedMimeType(MP3_MIME_TYPES);
   }
 
   function isMimeTypeSupported(mimeType) {
@@ -1300,6 +1350,202 @@
       && typeof MediaRecorder === 'function'
       && typeof MediaRecorder.isTypeSupported === 'function'
       && MediaRecorder.isTypeSupported(mimeType);
+  }
+
+  function getClientMp3Encoder() {
+    const customEncoder = window.__JACKDARCKART_MP3_ENCODER__ || globalThis.__JACKDARCKART_MP3_ENCODER__;
+    if (customEncoder && typeof customEncoder.encode === 'function') {
+      return { id: 'adapter', encoder: customEncoder };
+    }
+    const lamejs = window.lamejs || globalThis.lamejs;
+    if (lamejs && typeof lamejs.Mp3Encoder === 'function') {
+      return { id: 'lamejs', library: lamejs };
+    }
+    return null;
+  }
+
+  function resolveMp3ServerEndpoint() {
+    const config = (window.__JACKDARCKART_CONFIG__ || globalThis.__JACKDARCKART_CONFIG__ || {}).converter;
+    const endpoint = config && config.mp3Export && config.mp3Export.serverEndpoint;
+    if (typeof endpoint !== 'string') {
+      return '';
+    }
+    const trimmed = endpoint.trim();
+    if (!trimmed || /^data:|^blob:|^javascript:/i.test(trimmed) || trimmed.startsWith('//')) {
+      return '';
+    }
+    if (/^https?:\/\//i.test(trimmed)) {
+      const resolvedUrl = tryCreateUrl(trimmed);
+      return resolvedUrl && resolvedUrl.origin === getWindowOrigin() ? resolvedUrl.href : '';
+    }
+    return normalizeSameOriginPath(trimmed);
+  }
+
+  function getWindowOrigin() {
+    const href = window && window.location && window.location.href;
+    const match = typeof href === 'string' ? href.match(/^[a-z]+:\/\/[^/]+/i) : null;
+    return match ? match[0] : '';
+  }
+
+  function tryCreateUrl(value) {
+    const UrlCtor = (window && typeof window.URL === 'function')
+      ? window.URL
+      : (typeof globalThis.URL === 'function' ? globalThis.URL : null);
+    if (typeof UrlCtor !== 'function') {
+      return null;
+    }
+    try {
+      return new UrlCtor(value, window.location && window.location.href ? window.location.href : undefined);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function normalizeSameOriginPath(value) {
+    if (typeof value !== 'string' || !value) {
+      return '';
+    }
+    const parts = String(value).match(/^([^?#]*)([?#].*)?$/);
+    const rawPath = parts && parts[1] ? parts[1] : value;
+    const suffix = parts && parts[2] ? parts[2] : '';
+    if (!rawPath) {
+      return '';
+    }
+    if (rawPath.charAt(0) === '/') {
+      return rawPath + suffix;
+    }
+    const locationPath = window && window.location && typeof window.location.pathname === 'string'
+      ? window.location.pathname
+      : '/';
+    const baseDir = locationPath.replace(/[^/]*$/, '');
+    const segments = (baseDir + rawPath).split('/');
+    const normalized = [];
+    for (let index = 0; index < segments.length; index += 1) {
+      const segment = segments[index];
+      if (!segment || segment === '.') {
+        continue;
+      }
+      if (segment === '..') {
+        if (normalized.length) {
+          normalized.pop();
+        }
+        continue;
+      }
+      normalized.push(segment);
+    }
+    return '/' + normalized.join('/') + suffix;
+  }
+
+  async function encodeMp3Locally(masteredBuffer, bitrate, encoder) {
+    if (!encoder || !encoder.id) {
+      throw new Error('Lokaler MP3-Encoder ist nicht verfügbar.');
+    }
+
+    if (encoder.id === 'adapter') {
+      const blob = await encoder.encoder.encode({
+        audioBuffer: masteredBuffer,
+        bitrate,
+        mimeType: 'audio/mpeg'
+      });
+      return normalizeMp3Blob(blob);
+    }
+
+    if (encoder.id === 'lamejs') {
+      return encodeMp3WithLameJs(masteredBuffer, bitrate, encoder.library);
+    }
+
+    throw new Error('Lokaler MP3-Encoder wird nicht unterstützt.');
+  }
+
+  async function requestServerMp3Conversion(masteredBuffer, bitrate, endpoint, wavBlob) {
+    if (!endpoint) {
+      throw new Error('Kein Same-Origin-Konverter für MP3 konfiguriert.');
+    }
+    const fetchImplementation = (window && typeof window.fetch === 'function')
+      ? window.fetch.bind(window)
+      : (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : null);
+    if (!fetchImplementation) {
+      throw new Error('Serverseitiger MP3-Export erfordert fetch-Unterstützung im Browser.');
+    }
+    const response = await fetchImplementation(endpoint, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Accept': 'audio/mpeg',
+        'Content-Type': 'audio/wav',
+        'X-Converter-Target-Format': 'mp3',
+        'X-Converter-Bitrate': String(bitrate),
+        'X-Converter-Sample-Rate': String(masteredBuffer.sampleRate),
+        'X-Converter-Channels': String(masteredBuffer.numberOfChannels)
+      },
+      body: wavBlob instanceof Blob ? wavBlob : new BrowserAudioMasteringCore().encodeWav(masteredBuffer)
+    });
+    if (!response || !response.ok || typeof response.blob !== 'function') {
+      throw new Error('Same-Origin-Konverter konnte keine MP3-Datei erzeugen.');
+    }
+    return normalizeMp3Blob(await response.blob());
+  }
+
+  async function encodeMp3WithLameJs(buffer, bitrate, lamejs) {
+    const sampleRate = Math.max(8000, Math.round(buffer.sampleRate) || 44100);
+    const channelCount = Math.min(2, Math.max(1, buffer.numberOfChannels || 1));
+    const bitrateKbps = normalizeMp3BitrateKbps(bitrate);
+    const encoder = new lamejs.Mp3Encoder(channelCount, sampleRate, bitrateKbps);
+    const frameSize = 1152;
+    const chunks = [];
+    for (let offset = 0; offset < buffer.length; offset += frameSize) {
+      const frames = Math.min(frameSize, buffer.length - offset);
+      const left = convertAudioBufferChannelToInt16(buffer, 0, offset, frames);
+      const right = channelCount > 1
+        ? convertAudioBufferChannelToInt16(buffer, 1, offset, frames)
+        : null;
+      const encoded = channelCount > 1
+        ? encoder.encodeBuffer(left, right)
+        : encoder.encodeBuffer(left);
+      if (encoded && encoded.length) {
+        chunks.push(new Uint8Array(encoded));
+      }
+    }
+    const flushed = encoder.flush();
+    if (flushed && flushed.length) {
+      chunks.push(new Uint8Array(flushed));
+    }
+    return new Blob(chunks, { type: 'audio/mpeg' });
+  }
+
+  function convertAudioBufferChannelToInt16(buffer, channelIndex, offset, frameCount) {
+    const source = buffer.getChannelData(Math.min(channelIndex, buffer.numberOfChannels - 1));
+    const pcm = new Int16Array(frameCount);
+    for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
+      pcm[frameIndex] = floatToInt16Sample(source ? source[offset + frameIndex] || 0 : 0);
+    }
+    return pcm;
+  }
+
+  function floatToInt16Sample(sample) {
+    const clamped = Math.max(-1, Math.min(1, Number(sample) || 0));
+    return clamped < 0 ? Math.round(clamped * 0x8000) : Math.round(clamped * 0x7FFF);
+  }
+
+  function normalizeMp3BitrateKbps(bitrate) {
+    const value = Math.round((Number(bitrate) || Number(PREFERRED_MP3_BITRATE)) / 1000);
+    const supported = [96, 112, 128, 160, 192, 224, 256, 320];
+    return supported.reduce((closest, candidate) => (
+      Math.abs(candidate - value) < Math.abs(closest - value) ? candidate : closest
+    ), supported[0]);
+  }
+
+  async function normalizeMp3Blob(blob) {
+    if (blob instanceof Blob && blob.type === 'audio/mpeg') {
+      return blob;
+    }
+    if (!(blob instanceof Blob)) {
+      throw new Error('MP3-Encoder lieferte keine Blob-Antwort zurück.');
+    }
+    const arrayBuffer = typeof blob.arrayBuffer === 'function'
+      ? await blob.arrayBuffer()
+      : blob;
+    return new Blob([arrayBuffer], { type: 'audio/mpeg' });
   }
 
   async function closeAudioContextQuietly(context) {

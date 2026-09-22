@@ -2040,8 +2040,8 @@ function testConverterPageExposesStudioHooksAndLoader() {
   );
   assert.match(
     converterHtmlCode,
-    /MP3 erscheint nur bei nativer Browser-Unterstützung/i,
-    'converter page should describe that MP3 export only appears with true native browser support'
+    /MP3 wird dynamisch eingeblendet, sobald nativer Support, ein lokaler Encoder oder ein Same-Origin-Konverter verfügbar ist/i,
+    'converter page should describe the dynamic MP3 availability paths'
   );
   assert.equal(
     (converterHtmlCode.match(/id="converter-format-select"/g) || []).length,
@@ -2122,6 +2122,46 @@ async function testConverterMp3FormatExposureAndDefaults() {
   assert.equal(env.elements['converter-bitrate-select'].value, '192000', 'switching away from MP3 should restore the standard compressed export bitrate');
 }
 
+async function testConverterMp3FormatExposureWithLocalEncoderAdapter() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder {
+      static isTypeSupported() {
+        return false;
+      }
+    }
+  });
+  const encodedCalls = [];
+  env.window.__JACKDARCKART_MP3_ENCODER__ = {
+    async encode(options) {
+      encodedCalls.push(options);
+      return new Blob(['adapter-mp3'], { type: options.mimeType });
+    }
+  };
+  env.context.__JACKDARCKART_MP3_ENCODER__ = env.window.__JACKDARCKART_MP3_ENCODER__;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.match(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should expose MP3 when a local encoder adapter is registered');
+  env.elements['converter-format-select'].value = 'mp3';
+  await env.elements['converter-format-select'].dispatch('change');
+  assert.match(env.elements['converter-format-note'].textContent, /lokaler MP3-Encoder/i, 'converter studio should disclose the local encoder route in the helper text');
+
+  const blob = await studio._renderMp3ExportForTest({
+    sampleRate: 44100,
+    numberOfChannels: 1,
+    length: 4,
+    getChannelData() {
+      return new Float32Array([0, 0.25, -0.25, 0]);
+    }
+  }, 256000);
+
+  assert.equal(blob.type, 'audio/mpeg', 'converter studio should normalize local adapter output to an MP3 blob');
+  assert.equal(encodedCalls.length, 1, 'converter studio should call the registered local MP3 encoder once');
+  assert.equal(encodedCalls[0].bitrate, 256000, 'converter studio should forward the selected bitrate to the local MP3 encoder');
+}
+
 function testConverterMp3FilenameUsesMp3Extension() {
   const env = createConverterEnvironment();
   vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
@@ -2135,6 +2175,60 @@ function testConverterMp3FilenameUsesMp3Extension() {
     'Mein-Sommer-Mix-final-master.mp3',
     'converter studio should build rendered MP3 downloads with a sanitized base name and mp3 extension'
   );
+}
+
+async function testConverterMp3FormatExposureWithSameOriginConverter() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder {
+      static isTypeSupported() {
+        return false;
+      }
+    }
+  });
+  const fetchCalls = [];
+  env.window.__JACKDARCKART_CONFIG__ = {
+    converter: {
+      mp3Export: {
+        serverEndpoint: '/api/converter/mp3'
+      }
+    }
+  };
+  env.context.__JACKDARCKART_CONFIG__ = env.window.__JACKDARCKART_CONFIG__;
+  env.window.fetch = async (url, options) => {
+    fetchCalls.push({ url, options });
+    return {
+      ok: true,
+      async blob() {
+        return new Blob(['server-mp3'], { type: 'audio/mpeg' });
+      }
+    };
+  };
+  env.context.fetch = env.window.fetch;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.match(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should expose MP3 when a same-origin converter is configured');
+  env.elements['converter-format-select'].value = 'mp3';
+  await env.elements['converter-format-select'].dispatch('change');
+  assert.match(env.elements['converter-format-note'].textContent, /Same-Origin-Konverter/i, 'converter studio should disclose the same-origin converter route in the helper text');
+
+  const blob = await studio._renderMp3ExportForTest({
+    sampleRate: 48000,
+    numberOfChannels: 2,
+    length: 4,
+    getChannelData(channelIndex) {
+      return channelIndex === 0
+        ? new Float32Array([0, 0.25, -0.25, 0])
+        : new Float32Array([0, -0.25, 0.25, 0]);
+    }
+  }, 224000);
+
+  assert.equal(blob.type, 'audio/mpeg', 'converter studio should accept MP3 blobs from the same-origin converter');
+  assert.equal(fetchCalls.length, 1, 'converter studio should perform one same-origin conversion request per MP3 render');
+  assert.equal(fetchCalls[0].url, '/api/converter/mp3', 'converter studio should post rendered WAV data to the configured same-origin endpoint');
+  assert.equal(fetchCalls[0].options.headers['X-Converter-Bitrate'], '224000', 'converter studio should send the requested MP3 bitrate to the same-origin converter');
 }
 
 async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
@@ -2155,8 +2249,8 @@ async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
   assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should hide MP3 when the browser cannot produce native MP3 output');
   assert.match(
     env.elements['converter-format-note'].textContent,
-    /MP3-Export .*WAV .*Fallback-Option/i,
-    'converter studio should explain that WAV remains the fallback when native MP3 encoding is unavailable'
+    /WAV wird lokal als PCM exportiert[\s\S]*MP3 erscheint erst, wenn nativer Support, ein lokaler Encoder oder ein Same-Origin-Konverter verfügbar ist/i,
+    'converter studio should explain that WAV remains available until an MP3 path is actually supported'
   );
   await assert.rejects(
     studio._recordCompressedExportForTest(
@@ -2680,7 +2774,9 @@ async function main() {
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
   await testConverterMp3FormatExposureAndDefaults();
+  await testConverterMp3FormatExposureWithLocalEncoderAdapter();
   testConverterMp3FilenameUsesMp3Extension();
+  await testConverterMp3FormatExposureWithSameOriginConverter();
   await testConverterMp3FallbackMessageWhenNativeSupportMissing();
   await testConverterMp3CompressedExportPath();
   testConverterDownloadClearsTemporaryAsset();
