@@ -2,6 +2,8 @@
 
 (function () {
   const MODULE_KEY = '__JACKDARCKART_CONVERTER__';
+  const OPTIONAL_PAGE_MODULE_STATUS_KEY = '__JACKDARCKART_OPTIONAL_PAGE_MODULE_STATUS__';
+  const BUNDLED_MP3_ENCODER_SRC = './assets/vendor/lame.min.js';
   const CLEANUP_WINDOW_MS = 2 * 60 * 1000;
   const DEFAULT_COMPRESSED_BITRATE = '192000';
   const PREFERRED_MP3_BITRATE = DEFAULT_COMPRESSED_BITRATE;
@@ -26,6 +28,7 @@
   ];
   const spectrumFftSize = 2048;
   let currentStudio = null;
+  let cachedLameProbe = null;
 
   class VaultSyncAdapterStub {
     isAvailable() {
@@ -934,7 +937,10 @@
     async function renderMp3Export(masteredBuffer, bitrate) {
       const mp3Support = getMp3Support();
       if (mp3Support.nativeMimeType) {
-        return recordCompressedExport(masteredBuffer, buildMp3Format(mp3Support), bitrate);
+        return normalizeMp3Blob(
+          await recordCompressedExport(masteredBuffer, buildMp3Format(mp3Support), bitrate),
+          buildMp3ValidationOptions(masteredBuffer, bitrate)
+        );
       }
 
       if (mp3Support.clientEncoder) {
@@ -945,18 +951,19 @@
         return requestServerMp3Conversion(masteredBuffer, bitrate, mp3Support.serverEndpoint, core.encodeWav(masteredBuffer));
       }
 
-      throw new Error('MP3-Export ist hier nicht verfügbar. Es wird nativer MP3-Support, ein lokaler MP3-Encoder oder ein Same-Origin-Konverter benötigt.');
+      throw new Error(buildMp3UnavailableMessage(mp3Support));
     }
 
     function getMp3Support() {
       const nativeMimeType = resolveSupportedMp3MimeType();
-      const clientEncoder = getClientMp3Encoder();
+      const clientEncoderSupport = getClientMp3EncoderSupport();
       const serverEndpoint = resolveMp3ServerEndpoint();
       return {
         nativeMimeType,
-        clientEncoder,
+        clientEncoder: clientEncoderSupport.encoder,
+        clientEncoderError: clientEncoderSupport.error,
         serverEndpoint,
-        available: Boolean(nativeMimeType || clientEncoder || serverEndpoint)
+        available: Boolean(nativeMimeType || clientEncoderSupport.encoder || serverEndpoint)
       };
     }
 
@@ -972,8 +979,15 @@
     }
 
     function buildMp3Description(mp3Support) {
-      return 'MP3 ist lokal verfügbar, erzeugt eine echte .mp3-Datei direkt im Browser ohne Upload und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: '
-        + buildMp3RouteList(mp3Support) + '.';
+      if (mp3Support && (mp3Support.nativeMimeType || mp3Support.clientEncoder)) {
+        return 'MP3 ist lokal verfügbar, erzeugt eine echte .mp3-Datei direkt im Browser ohne Upload und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: '
+          + buildMp3RouteList(mp3Support) + '.';
+      }
+      if (mp3Support && mp3Support.serverEndpoint) {
+        return 'MP3 ist über den konfigurierten Same-Origin-Konverter verfügbar und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: '
+          + buildMp3RouteList(mp3Support) + '.';
+      }
+      return 'MP3 ist verfügbar und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
     }
 
     function storeRenderedAsset(asset) {
@@ -1323,9 +1337,15 @@
 
   function buildMp3AvailabilityText(mp3Support) {
     if (mp3Support && mp3Support.available) {
-      return 'MP3 ist lokal verfügbar. Nutzbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
+      if (mp3Support.nativeMimeType || mp3Support.clientEncoder) {
+        return 'MP3 ist lokal verfügbar. Nutzbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
+      }
+      return 'MP3 ist über den konfigurierten Same-Origin-Konverter verfügbar. Nutzbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
     }
-    return 'MP3 ist derzeit nicht verfügbar, weil weder ein nativer Browser-Encoder noch ein lokaler MP3-Encoder oder Same-Origin-Konverter erkannt wurde.';
+    if (mp3Support && mp3Support.clientEncoderError) {
+      return 'MP3 ist derzeit nicht verfügbar. ' + mp3Support.clientEncoderError + ' Nutze bis dahin WAV oder warte auf nativen MP3-Support.';
+    }
+    return 'MP3 ist derzeit nicht verfügbar, weil weder ein nativer Browser-Encoder noch ein lokaler MP3-Encoder oder Same-Origin-Konverter erkannt wurde. Nutze bis dahin WAV oder warte auf nativen MP3-Support.';
   }
 
   function buildMp3RouteList(mp3Support) {
@@ -1393,16 +1413,80 @@
       && MediaRecorder.isTypeSupported(mimeType);
   }
 
-  function getClientMp3Encoder() {
+  function isMp3MimeType(mimeType) {
+    return MP3_MIME_TYPES.includes(String(mimeType || '').trim());
+  }
+
+  function getClientMp3EncoderSupport() {
     const customEncoder = window.__JACKDARCKART_MP3_ENCODER__ || globalThis.__JACKDARCKART_MP3_ENCODER__;
     if (customEncoder && typeof customEncoder.encode === 'function') {
-      return { id: 'adapter', encoder: customEncoder };
+      return { encoder: { id: 'adapter', encoder: customEncoder }, error: '' };
     }
+    const bundledLoadState = getBundledMp3EncoderLoadState();
     const lamejs = window.lamejs || globalThis.lamejs;
     if (lamejs && typeof lamejs.Mp3Encoder === 'function') {
-      return { id: 'lamejs', library: lamejs };
+      const probeResult = probeLameJsEncoder(lamejs);
+      if (probeResult.ok) {
+        return { encoder: { id: 'lamejs', library: lamejs }, error: '' };
+      }
+      return { encoder: null, error: probeResult.error };
     }
-    return null;
+    if (bundledLoadState && bundledLoadState.loaded === false) {
+      return {
+        encoder: null,
+        error: 'Der gebündelte lokale MP3-Encoder konnte nicht geladen werden. Die Datei ./assets/vendor/lame.min.js fehlt oder ist nicht erreichbar.'
+      };
+    }
+    if (bundledLoadState && bundledLoadState.loaded) {
+      return {
+        encoder: null,
+        error: 'Der gebündelte lokale MP3-Encoder wurde geladen, stellt aber keinen funktionsfähigen window.lamejs.Mp3Encoder bereit.'
+      };
+    }
+    return { encoder: null, error: '' };
+  }
+
+  function getBundledMp3EncoderLoadState() {
+    const status = window[OPTIONAL_PAGE_MODULE_STATUS_KEY] || globalThis[OPTIONAL_PAGE_MODULE_STATUS_KEY];
+    if (!status || typeof status !== 'object') {
+      return null;
+    }
+    return status[BUNDLED_MP3_ENCODER_SRC] || null;
+  }
+
+  function probeLameJsEncoder(library) {
+    if (cachedLameProbe
+      && cachedLameProbe.library === library
+      && cachedLameProbe.encoderCtor === library.Mp3Encoder) {
+      return cachedLameProbe.result;
+    }
+
+    let result;
+    try {
+      const encoder = new library.Mp3Encoder(1, 44100, 128);
+      const bytes = combineByteChunks([
+        encoder.encodeBuffer(new Int16Array(1152)),
+        encoder.flush()
+      ]);
+      validateMp3Bytes(bytes, {
+        bitrate: 128000,
+        durationSeconds: 1152 / 44100,
+        sourceLabel: 'Der gebündelte lokale MP3-Encoder'
+      });
+      result = { ok: true, error: '' };
+    } catch (error) {
+      result = {
+        ok: false,
+        error: 'Der gebündelte lokale MP3-Encoder ist vorhanden, erzeugt aber keine gültigen MP3-Daten.'
+      };
+    }
+
+    cachedLameProbe = {
+      library,
+      encoderCtor: library.Mp3Encoder,
+      result
+    };
+    return result;
   }
 
   function resolveMp3ServerEndpoint() {
@@ -1488,7 +1572,7 @@
         bitrate,
         mimeType: 'audio/mpeg'
       });
-      return normalizeMp3Blob(blob);
+      return normalizeMp3Blob(blob, buildMp3ValidationOptions(masteredBuffer, bitrate));
     }
 
     if (encoder.id === 'lamejs') {
@@ -1524,7 +1608,7 @@
     if (!response || !response.ok || typeof response.blob !== 'function') {
       throw new Error('Same-Origin-Konverter konnte keine MP3-Datei erzeugen.');
     }
-    return normalizeMp3Blob(await response.blob());
+    return normalizeMp3Blob(await response.blob(), buildMp3ValidationOptions(masteredBuffer, bitrate));
   }
 
   async function encodeMp3WithLameJs(buffer, bitrate, lamejs) {
@@ -1551,7 +1635,7 @@
     if (flushed && flushed.length) {
       chunks.push(new Uint8Array(flushed));
     }
-    return new Blob(chunks, { type: 'audio/mpeg' });
+    return normalizeMp3Blob(new Blob(chunks, { type: 'audio/mpeg' }), buildMp3ValidationOptions(buffer, bitrate));
   }
 
   function convertAudioBufferChannelToInt16(buffer, channelIndex, offset, frameCount) {
@@ -1576,17 +1660,91 @@
     ), supported[0]);
   }
 
-  async function normalizeMp3Blob(blob) {
-    if (blob instanceof Blob && blob.type === 'audio/mpeg') {
-      return blob;
-    }
+  function buildMp3ValidationOptions(buffer, bitrate) {
+    const sampleRate = Math.max(1, Number(buffer && buffer.sampleRate) || 44100);
+    const length = Math.max(0, Number(buffer && buffer.length) || 0);
+    return {
+      bitrate,
+      durationSeconds: length / sampleRate,
+      sourceLabel: 'Der MP3-Export'
+    };
+  }
+
+  async function normalizeMp3Blob(blob, options) {
     if (!(blob instanceof Blob)) {
       throw new Error('MP3-Encoder lieferte keine Blob-Antwort zurück.');
     }
     const arrayBuffer = typeof blob.arrayBuffer === 'function'
       ? await blob.arrayBuffer()
       : blob;
-    return new Blob([arrayBuffer], { type: 'audio/mpeg' });
+    const bytes = arrayBuffer instanceof Uint8Array
+      ? arrayBuffer
+      : new Uint8Array(arrayBuffer);
+    validateMp3Bytes(bytes, options);
+    if (isMp3MimeType(blob.type)) {
+      return blob;
+    }
+    return new Blob([bytes], { type: 'audio/mpeg' });
+  }
+
+  function combineByteChunks(chunks) {
+    const normalized = (Array.isArray(chunks) ? chunks : []).reduce((items, chunk) => {
+      if (chunk && chunk.length) {
+        items.push(chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk));
+      }
+      return items;
+    }, []);
+    const total = normalized.reduce((sum, chunk) => sum + chunk.length, 0);
+    const combined = new Uint8Array(total);
+    let offset = 0;
+    normalized.forEach((chunk) => {
+      combined.set(chunk, offset);
+      offset += chunk.length;
+    });
+    return combined;
+  }
+
+  function validateMp3Bytes(bytes, options) {
+    if (!(bytes instanceof Uint8Array) || !bytes.length) {
+      throw new Error(buildInvalidMp3Message('Der Encoder lieferte eine leere Datei.'));
+    }
+    if (!startsWithMp3Header(bytes)) {
+      throw new Error(buildInvalidMp3Message('Die erzeugte Datei beginnt nicht mit einem gültigen MP3-Header.'));
+    }
+    const minimumBytes = getMinimumExpectedMp3Bytes(options);
+    if (bytes.length < minimumBytes) {
+      throw new Error(buildInvalidMp3Message('Die erzeugte Datei ist für die Audiodauer unplausibel klein.'));
+    }
+  }
+
+  function startsWithMp3Header(bytes) {
+    if (bytes.length >= 3 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
+      return true;
+    }
+    return bytes.length >= 2
+      && bytes[0] === 0xFF
+      && (bytes[1] & 0xE0) === 0xE0;
+  }
+
+  function getMinimumExpectedMp3Bytes(options) {
+    const durationSeconds = Math.max(0, Number(options && options.durationSeconds) || 0);
+    const bitrate = Math.max(0, Number(options && options.bitrate) || 0);
+    if (!durationSeconds || !bitrate) {
+      return 16;
+    }
+    const expectedBytes = durationSeconds * (bitrate / 8);
+    return Math.max(16, Math.min(4096, Math.floor(expectedBytes * 0.01)));
+  }
+
+  function buildInvalidMp3Message(problem) {
+    return 'MP3-Export fehlgeschlagen: ' + problem + ' Bitte nutze WAV oder warte auf nativen MP3-Support.';
+  }
+
+  function buildMp3UnavailableMessage(mp3Support) {
+    if (mp3Support && mp3Support.clientEncoderError) {
+      return 'MP3-Export ist derzeit nicht verfügbar. ' + mp3Support.clientEncoderError + ' Bitte nutze WAV oder warte auf nativen MP3-Support.';
+    }
+    return 'MP3-Export ist hier nicht verfügbar. Es wird nativer MP3-Support, ein lokaler MP3-Encoder oder ein Same-Origin-Konverter benötigt. Bitte nutze WAV oder warte auf nativen MP3-Support.';
   }
 
   async function closeAudioContextQuietly(context) {

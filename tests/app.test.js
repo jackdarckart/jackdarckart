@@ -37,6 +37,29 @@ function loadBundledMp3Encoder(env) {
   vm.runInContext(bundledLameJsCode, env.context, { filename: 'assets/vendor/lame.min.js' });
 }
 
+function createValidMp3Blob(type = 'audio/mpeg', size = 128) {
+  const bytes = new Uint8Array(Math.max(16, size));
+  bytes[0] = 0x49;
+  bytes[1] = 0x44;
+  bytes[2] = 0x33;
+  bytes[3] = 0x04;
+  bytes[4] = 0x00;
+  bytes[5] = 0x00;
+  return new Blob([bytes], { type });
+}
+
+async function assertBlobStartsWithMp3Header(blob, message) {
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const hasId3Header = bytes.length >= 3
+    && bytes[0] === 0x49
+    && bytes[1] === 0x44
+    && bytes[2] === 0x33;
+  const hasFrameSync = bytes.length >= 2
+    && bytes[0] === 0xFF
+    && (bytes[1] & 0xE0) === 0xE0;
+  assert.ok(hasId3Header || hasFrameSync, message);
+}
+
 class MockElement {
   constructor(id, ownerDocument) {
     this.id = id;
@@ -2084,6 +2107,11 @@ function testConverterPageExposesStudioHooksAndLoader() {
     'app.js should clear failed optional page-module script loads so later navigations can retry them'
   );
   assert.match(
+    appCode,
+    /OPTIONAL_PAGE_MODULE_STATUS_KEY[\s\S]*status\[src\]\s*=\s*\{\s*loaded:\s*true,\s*error:\s*''\s*\}[\s\S]*status\[src\]\s*=\s*\{\s*loaded:\s*false,\s*error:\s*'optional-page-module-load-failed'\s*\}/,
+    'app.js should track optional page-module preload success and failure so converter.js can distinguish a missing bundled MP3 encoder asset from a working load'
+  );
+  assert.match(
     swCode,
     /['"]\.\/converter\.js['"]/,
     'service worker should precache converter.js for the studio page'
@@ -2210,6 +2238,7 @@ async function testConverterMp3BundledLocalEncoderRenderFallbackWithoutNativeMim
 
   assert.equal(blob.type, 'audio/mpeg', 'converter studio should render a real MP3 blob through the bundled local encoder when native MP3 mime support is absent');
   assert.ok(blob.size > 0, 'converter studio should emit non-empty MP3 output through the bundled local encoder');
+  await assertBlobStartsWithMp3Header(blob, 'converter studio should validate that bundled local encoder output begins with a real MP3 header');
   assert.deepEqual(encoderSetup, { channels: 2, sampleRate: 44100, bitrateKbps: 192 }, 'converter studio should keep using normalizeMp3BitrateKbps for bundled local MP3 rendering');
   assert.equal(env.getRecorderMimeType(), '', 'converter studio should fall back to the bundled local encoder instead of MediaRecorder when native MP3 support is unavailable');
 }
@@ -2227,7 +2256,7 @@ async function testConverterMp3FormatExposureWithLocalEncoderAdapter() {
   env.window.__JACKDARCKART_MP3_ENCODER__ = {
     async encode(options) {
       encodedCalls.push(options);
-      return new Blob(['adapter-mp3'], { type: options.mimeType });
+      return createValidMp3Blob(options.mimeType, 96);
     }
   };
   env.context.__JACKDARCKART_MP3_ENCODER__ = env.window.__JACKDARCKART_MP3_ENCODER__;
@@ -2250,6 +2279,7 @@ async function testConverterMp3FormatExposureWithLocalEncoderAdapter() {
   }, 256000);
 
   assert.equal(blob.type, 'audio/mpeg', 'converter studio should normalize local adapter output to an MP3 blob');
+  await assertBlobStartsWithMp3Header(blob, 'converter studio should reject invalid adapter output and keep only MP3-shaped blobs');
   assert.equal(encodedCalls.length, 1, 'converter studio should call the registered local MP3 encoder once');
   assert.equal(encodedCalls[0].bitrate, 256000, 'converter studio should forward the selected bitrate to the local MP3 encoder');
 }
@@ -2292,7 +2322,7 @@ async function testConverterMp3FormatExposureWithSameOriginConverter() {
     return {
       ok: true,
       async blob() {
-        return new Blob(['server-mp3'], { type: 'audio/mpeg' });
+        return createValidMp3Blob('audio/mpeg', 96);
       }
     };
   };
@@ -2318,9 +2348,80 @@ async function testConverterMp3FormatExposureWithSameOriginConverter() {
   }, 224000);
 
   assert.equal(blob.type, 'audio/mpeg', 'converter studio should accept MP3 blobs from the same-origin converter');
+  await assertBlobStartsWithMp3Header(blob, 'converter studio should validate same-origin MP3 responses before treating them as downloadable output');
   assert.equal(fetchCalls.length, 1, 'converter studio should perform one same-origin conversion request per MP3 render');
   assert.equal(fetchCalls[0].url, '/api/converter/mp3', 'converter studio should post rendered WAV data to the configured same-origin endpoint');
   assert.equal(fetchCalls[0].options.headers['X-Converter-Bitrate'], '224000', 'converter studio should send the requested MP3 bitrate to the same-origin converter');
+}
+
+async function testConverterMp3BundledEncoderFailureStaysUnavailable() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder {
+      static isTypeSupported() {
+        return false;
+      }
+    }
+  });
+  env.window.__JACKDARCKART_OPTIONAL_PAGE_MODULE_STATUS__ = {
+    './assets/vendor/lame.min.js': { loaded: false, error: 'optional-page-module-load-failed' }
+  };
+  env.context.__JACKDARCKART_OPTIONAL_PAGE_MODULE_STATUS__ = env.window.__JACKDARCKART_OPTIONAL_PAGE_MODULE_STATUS__;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should keep MP3 hidden when the bundled encoder asset failed to load');
+  assert.match(env.elements['converter-format-note'].textContent, /lame\.min\.js fehlt oder ist nicht erreichbar/i, 'converter studio should explain that MP3 is unavailable because the bundled encoder asset could not be loaded');
+  await assert.rejects(
+    studio._renderMp3ExportForTest(
+      {
+        sampleRate: 44100,
+        numberOfChannels: 1,
+        length: 44100,
+        getChannelData() {
+          return new Float32Array(44100);
+        }
+      },
+      192000
+    ),
+    /MP3-Export ist derzeit nicht verfügbar[\s\S]*Bitte nutze WAV oder warte auf nativen MP3-Support/i,
+    'converter studio should fail loudly with a user-facing fallback message when the bundled encoder asset is missing'
+  );
+}
+
+async function testConverterRejectsBrokenBundledEncoderOutput() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder {
+      static isTypeSupported() {
+        return false;
+      }
+    }
+  });
+  env.window.__JACKDARCKART_OPTIONAL_PAGE_MODULE_STATUS__ = {
+    './assets/vendor/lame.min.js': { loaded: true, error: '' }
+  };
+  env.context.__JACKDARCKART_OPTIONAL_PAGE_MODULE_STATUS__ = env.window.__JACKDARCKART_OPTIONAL_PAGE_MODULE_STATUS__;
+  env.window.lamejs = {
+    Mp3Encoder: function BrokenMp3Encoder() {
+      return {
+        encodeBuffer() {
+          return new Uint8Array([0x00, 0x01, 0x02, 0x03]);
+        },
+        flush() {
+          return new Uint8Array();
+        }
+      };
+    }
+  };
+  env.context.lamejs = env.window.lamejs;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should hide MP3 when the bundled encoder probe cannot produce a valid MP3 header');
+  assert.match(env.elements['converter-format-note'].textContent, /erzeugt aber keine gültigen MP3-Daten/i, 'converter studio should explain when the bundled encoder loads but fails validation');
 }
 
 async function testConverterMp3FallbackMessageWhenNativeSupportMissing() {
@@ -2418,7 +2519,7 @@ async function testConverterNativeMp3MimeDetectionSupportsAlternateMimeTypes() {
       this.state = 'inactive';
       const dataListener = this.listeners.get('dataavailable');
       if (dataListener) {
-        dataListener({ data: new Blob(['encoded-alt-mp3'], { type: this.options.mimeType }) });
+        dataListener({ data: createValidMp3Blob(this.options.mimeType, 128) });
       }
       const stopListener = this.listeners.get('stop');
       if (stopListener) {
@@ -2443,6 +2544,7 @@ async function testConverterNativeMp3MimeDetectionSupportsAlternateMimeTypes() {
   );
 
   assert.equal(blob.type, 'audio/mp3', 'converter studio should render native MP3 exports with the detected supported mime type');
+  await assertBlobStartsWithMp3Header(blob, 'converter studio should validate alternate native MP3 mime outputs before returning them');
   assert.equal(env.getRecorderMimeType(), 'audio/mp3', 'converter studio should pass the detected alternate MP3 mime type into MediaRecorder');
 }
 
@@ -2548,7 +2650,7 @@ async function testConverterMp3CompressedExportPath() {
       this.state = 'inactive';
       const dataListener = this.listeners.get('dataavailable');
       if (dataListener) {
-        dataListener({ data: new Blob(['encoded-mp3'], { type: this.options.mimeType }) });
+        dataListener({ data: createValidMp3Blob(this.options.mimeType, 128) });
       }
       const stopListener = this.listeners.get('stop');
       if (stopListener) {
@@ -2572,6 +2674,7 @@ async function testConverterMp3CompressedExportPath() {
   );
 
   assert.equal(blob.type, 'audio/mpeg', 'MP3 export should resolve an MP3 blob when native browser encoding is available');
+  await assertBlobStartsWithMp3Header(blob, 'MP3 export should only resolve blobs that begin with a valid MP3 header');
   assert.equal(env.getRecorderMimeType(), 'audio/mpeg', 'MP3 export should initialize MediaRecorder with the detected MP3 mime type');
   assert.equal(env.getClosedAudioContexts(), 1, 'MP3 export should close its temporary audio context after recording completes');
 }
@@ -3001,6 +3104,8 @@ async function main() {
   await testConverterMp3FormatExposureWithLocalEncoderAdapter();
   testConverterMp3FilenameUsesMp3Extension();
   await testConverterMp3FormatExposureWithSameOriginConverter();
+  await testConverterMp3BundledEncoderFailureStaysUnavailable();
+  await testConverterRejectsBrokenBundledEncoderOutput();
   await testConverterMp3FallbackMessageWhenNativeSupportMissing();
   await testConverterMp3BundledLocalEncoderRenderFallbackWithoutNativeMimeSupport();
   await testConverterNativeMp3MimeDetectionSupportsAlternateMimeTypes();
