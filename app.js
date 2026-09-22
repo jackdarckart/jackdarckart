@@ -435,7 +435,10 @@
       script.src = config.src;
       script.defer = true;
       script.onload = () => resolve(window[config.globalKey] || null);
-      script.onerror = () => reject(new Error('optional-page-module-load-failed'));
+      script.onerror = () => {
+        delete promises[config.src];
+        reject(new Error('optional-page-module-load-failed'));
+      };
       (document.head || document.body || document.documentElement).appendChild(script);
     });
 

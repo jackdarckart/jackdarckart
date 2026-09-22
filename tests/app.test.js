@@ -2059,9 +2059,19 @@ function testConverterPageExposesStudioHooksAndLoader() {
     'app.js should lazily load converter.js when the persistent shell navigates to converter.html'
   );
   assert.match(
+    appCode,
+    /delete promises\[config\.src\][\s\S]*optional-page-module-load-failed/,
+    'app.js should clear a failed optional page-module load so later navigations can retry it'
+  );
+  assert.match(
     swCode,
     /['"]\.\/converter\.js['"]/,
     'service worker should precache converter.js for the studio page'
+  );
+  assert.match(
+    converterJsCode,
+    /leftDirect\.gain\.value = \(1 \+ width\) \* 0\.5[\s\S]*leftCross\.gain\.value = \(1 - width\) \* 0\.5/,
+    'converter studio should keep a stereo-width mapping where 100 percent preserves the original stereo image'
   );
 }
 

@@ -225,10 +225,10 @@
       const leftCross = context.createGain();
       const rightCross = context.createGain();
 
-      leftDirect.gain.value = 1;
-      rightDirect.gain.value = 1;
-      leftCross.gain.value = 1 - width;
-      rightCross.gain.value = 1 - width;
+      leftDirect.gain.value = (1 + width) * 0.5;
+      rightDirect.gain.value = (1 + width) * 0.5;
+      leftCross.gain.value = (1 - width) * 0.5;
+      rightCross.gain.value = (1 - width) * 0.5;
 
       input.connect(leftDirect, 0);
       input.connect(rightCross, 0);
@@ -744,13 +744,6 @@
 
     async function resetPlaybackOnly() {
       stopPreview(true);
-      if (audioContext && audioContext.state !== 'closed') {
-        try {
-          await audioContext.suspend();
-        } catch (error) {
-          return;
-        }
-      }
     }
 
     function cleanupPreviewState() {
