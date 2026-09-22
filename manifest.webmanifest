@@ -8,7 +8,10 @@
   "display": "standalone",
   "background_color": "#070b18",
   "theme_color": "#070b18",
-  "categories": ["music", "entertainment"],
+  "categories": [
+    "music",
+    "entertainment"
+  ],
   "shortcuts": [
     {
       "name": "Live hören",
@@ -19,6 +22,11 @@
       "name": "Titel & Verlauf",
       "short_name": "Titel",
       "url": "./titel.html"
+    },
+    {
+      "name": "Converter Studio",
+      "short_name": "Studio",
+      "url": "./converter.html"
     },
     {
       "name": "Hilfe",

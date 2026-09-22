@@ -33,6 +33,13 @@
   const PERSISTENT_AUDIO_KEY = '__JACKDARCKART_PERSISTENT_AUDIO__';
   const PERSISTENT_STATE_KEY = '__JACKDARCKART_PERSISTENT_STATE__';
   const INTERNAL_NAVIGATION_KEY = '__JACKDARCKART_INTERNAL_NAVIGATION__';
+  const OPTIONAL_PAGE_MODULES = {
+    'converter.html': {
+      globalKey: '__JACKDARCKART_CONVERTER__',
+      src: './converter.js'
+    }
+  };
+  const OPTIONAL_PAGE_MODULE_PROMISES_KEY = '__JACKDARCKART_OPTIONAL_PAGE_MODULE_PROMISES__';
   const restoredPersistentState = readAndClearPersistentState();
 
   const audio = resolveAudioElement();
@@ -356,6 +363,8 @@
       liveDataAbortControllers[key] = null;
     });
 
+    destroyOptionalPageModule();
+
     while (listenerCleanups.length) {
       const cleanup = listenerCleanups.pop();
       try {
@@ -388,6 +397,72 @@
     }
 
     return document.querySelector(selector);
+  }
+
+  function getOptionalPageModuleConfig() {
+    if (!window.location || typeof window.location.pathname !== 'string') {
+      return null;
+    }
+
+    const pathname = window.location.pathname;
+    const filename = pathname.split('/').filter(Boolean).pop() || 'index.html';
+    return OPTIONAL_PAGE_MODULES[filename] || null;
+  }
+
+  function getOptionalPageModulePromises() {
+    if (!window[OPTIONAL_PAGE_MODULE_PROMISES_KEY] || typeof window[OPTIONAL_PAGE_MODULE_PROMISES_KEY] !== 'object') {
+      window[OPTIONAL_PAGE_MODULE_PROMISES_KEY] = {};
+    }
+    return window[OPTIONAL_PAGE_MODULE_PROMISES_KEY];
+  }
+
+  function loadOptionalPageModule(config) {
+    if (!config || !config.globalKey || !config.src) {
+      return Promise.resolve(null);
+    }
+
+    if (window[config.globalKey]) {
+      return Promise.resolve(window[config.globalKey]);
+    }
+
+    const promises = getOptionalPageModulePromises();
+    if (promises[config.src]) {
+      return promises[config.src];
+    }
+
+    promises[config.src] = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = config.src;
+      script.defer = true;
+      script.onload = () => resolve(window[config.globalKey] || null);
+      script.onerror = () => reject(new Error('optional-page-module-load-failed'));
+      (document.head || document.body || document.documentElement).appendChild(script);
+    });
+
+    return promises[config.src];
+  }
+
+  function initOptionalPageModule() {
+    const config = getOptionalPageModuleConfig();
+    if (!config) {
+      return;
+    }
+
+    loadOptionalPageModule(config)
+      .then((pageModule) => {
+        if (pageModule && typeof pageModule.bootstrap === 'function') {
+          pageModule.bootstrap();
+        }
+      })
+      .catch(() => null);
+  }
+
+  function destroyOptionalPageModule() {
+    const config = getOptionalPageModuleConfig();
+    const pageModule = config ? window[config.globalKey] : null;
+    if (pageModule && typeof pageModule.destroy === 'function') {
+      pageModule.destroy();
+    }
   }
 
   function hasStreamSource() {
@@ -3851,6 +3926,7 @@
   initScrollReveal();
   setBackToTopVisibility();
   registerServiceWorker();
+  initOptionalPageModule();
   window[APP_INSTANCE_KEY] = {
     destroy: destroyApp,
     navigateWithinPersistentShell

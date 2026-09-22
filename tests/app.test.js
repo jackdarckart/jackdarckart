@@ -4,6 +4,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const appCode = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+const converterJsCode = fs.readFileSync(path.join(__dirname, '..', 'converter.js'), 'utf8');
+const converterHtmlCode = fs.readFileSync(path.join(__dirname, '..', 'converter.html'), 'utf8');
 const swCode = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 const stylesCode = fs.readFileSync(path.join(__dirname, '..', 'styles.css'), 'utf8');
 const liveHtmlCode = fs.readFileSync(path.join(__dirname, '..', 'live.html'), 'utf8');
@@ -12,6 +14,7 @@ const htmlPages = [
   'index.html',
   'live.html',
   'titel.html',
+  'converter.html',
   'sendeplan.html',
   'events.html',
   'news.html',
@@ -1673,7 +1676,9 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
     assert.ok(siteNavMatch, `${file} should expose a parsable main navigation section`);
     assert.ok(footerNavMatch, `${file} should expose a parsable footer navigation section`);
     assert.match(siteNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the main navigation`);
+    assert.match(siteNavMatch[1], /href="\.\/converter\.html"/, `${file} should expose the shared converter-studio entry in the main navigation`);
     assert.match(footerNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the footer navigation`);
+    assert.match(footerNavMatch[1], /href="\.\/converter\.html"/, `${file} should expose the shared converter-studio entry in the footer navigation`);
     assert.equal((siteNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the main navigation`);
     assert.equal((footerNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the footer navigation`);
     assert.match(siteNavMatch[1], new RegExp(`<a href="${escapeRegExp(expectedHref)}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the main navigation`);
@@ -1776,6 +1781,59 @@ function testLivePageExposesEnhancedModulesAndHooks() {
     liveHtmlCode,
     /class\s*=\s*["'](?=[^"']*\bcontent-columns\b)(?=[^"']*\blive-insights-grid\b)[^"']*["']/,
     'live page should include the responsive insights grid layout'
+  );
+}
+
+function testConverterPageExposesStudioHooksAndLoader() {
+  for (const hook of [
+    'converter-file-input',
+    'converter-auto-enhance',
+    'converter-preview-toggle',
+    'converter-render-button',
+    'converter-download-button',
+    'converter-cleanup-timer',
+    'converter-waveform',
+    'converter-spectrum',
+    'converter-vault-button',
+    'converter-vault-status'
+  ]) {
+    const escapedHook = hook.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assert.match(
+      converterHtmlCode,
+      new RegExp(`id\\s*=\\s*["']${escapedHook}["']`),
+      `converter page should expose ${hook} for the studio workflow`
+    );
+  }
+
+  assert.match(
+    converterHtmlCode,
+    /2-Minuten-Cleanup|2:00-Cleanup|2-Minuten-Cleanup-Phase/,
+    'converter page should explain the explicit 2-minute privacy cleanup flow'
+  );
+  assert.match(
+    converterHtmlCode,
+    /Phase 27\.3/i,
+    'converter page should clearly label the vault integration as a Phase 27.3 dependency'
+  );
+  assert.match(
+    converterJsCode,
+    /CLEANUP_WINDOW_MS\s*=\s*2\s*\*\s*60\s*\*\s*1000/,
+    'converter studio should retain rendered files for exactly two minutes before automatic cleanup'
+  );
+  assert.match(
+    converterJsCode,
+    /class VaultSyncAdapterStub/,
+    'converter studio should keep the vault sync integration as an explicit stub instead of faking storage'
+  );
+  assert.match(
+    appCode,
+    /converter\.html[\s\S]*converter\.js|converter\.js[\s\S]*converter\.html/,
+    'app.js should lazily load converter.js when the persistent shell navigates to converter.html'
+  );
+  assert.match(
+    swCode,
+    /['"]\.\/converter\.js['"]/,
+    'service worker should precache converter.js for the studio page'
   );
 }
 
@@ -2013,6 +2071,7 @@ function testIssueHelpPageAndTemplatesArePresent() {
 async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
+  testConverterPageExposesStudioHooksAndLoader();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();
