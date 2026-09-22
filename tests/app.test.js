@@ -37,6 +37,10 @@ function loadBundledMp3Encoder(env) {
   vm.runInContext(bundledLameJsCode, env.context, { filename: 'assets/vendor/lame.min.js' });
 }
 
+function createMockMp3Blob(type = 'audio/mpeg') {
+  return new Blob([Uint8Array.from([0xFF, 0xFB, 0xB0, 0x04, 0x00, 0x00, 0x03, 0xB9])], { type });
+}
+
 class MockElement {
   constructor(id, ownerDocument) {
     this.id = id;
@@ -2045,8 +2049,8 @@ function testConverterPageExposesStudioHooksAndLoader() {
   );
   assert.match(
     converterHtmlCode,
-    /MP3 steht standardmäßig lokal im Browser bereit[\s\S]*browserabhängig[\s\S]*nativer Unterstützung/i,
-    'converter page should describe available, browser-dependent and unavailable export paths'
+    /MP3, WebM\/Opus und Ogg\/Opus werden erst nach der Laufzeitprüfung eingeblendet[\s\S]*jeweilige Pfad tatsächlich verfügbar/i,
+    'converter page should describe capability-gated export availability instead of advertising MP3 up front'
   );
   assert.equal(
     (converterHtmlCode.match(/id="converter-format-select"/g) || []).length,
@@ -2172,8 +2176,41 @@ async function testConverterMp3FormatExposureWithBundledLocalEncoder() {
   env.elements['converter-format-select'].value = 'mp3';
   await env.elements['converter-format-select'].dispatch('change');
 
-  assert.match(env.elements['converter-format-note'].textContent, /MP3 ist lokal verfügbar/i, 'converter studio should explain that MP3 is locally available when the bundled encoder is loaded');
+  assert.match(env.elements['converter-format-note'].textContent, /MP3 ist verfügbar/i, 'converter studio should explain that MP3 is available when the bundled encoder is loaded');
   assert.match(env.elements['converter-format-note'].textContent, /lokaler MP3-Encoder im App-Bundle/i, 'converter studio should disclose that the bundled local encoder powers MP3 export');
+}
+
+function testConverterMp3FormatStaysHiddenWhenBundledEncoderProbeFails() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder {
+      static isTypeSupported() {
+        return false;
+      }
+    }
+  });
+  loadBundledMp3Encoder(env);
+  env.context.lamejs.Mp3Encoder = function BrokenMp3Encoder() {
+    return {
+      encodeBuffer() {
+        return new Uint8Array(0);
+      },
+      flush() {
+        return new Uint8Array(0);
+      }
+    };
+  };
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.match(env.elements['converter-format-select'].innerHTML, /value="wav"/, 'converter studio should keep WAV available when the bundled MP3 probe fails');
+  assert.doesNotMatch(env.elements['converter-format-select'].innerHTML, /value="mp3"/, 'converter studio should hide MP3 when the bundled encoder asset is loaded but unusable');
+  assert.match(
+    env.elements['converter-format-note'].textContent,
+    /MP3 ist derzeit nicht verfügbar/i,
+    'converter studio should explain that MP3 stays unavailable until a usable encoder path exists'
+  );
 }
 
 async function testConverterMp3BundledLocalEncoderRenderFallbackWithoutNativeMimeSupport() {
@@ -2227,7 +2264,7 @@ async function testConverterMp3FormatExposureWithLocalEncoderAdapter() {
   env.window.__JACKDARCKART_MP3_ENCODER__ = {
     async encode(options) {
       encodedCalls.push(options);
-      return new Blob(['adapter-mp3'], { type: options.mimeType });
+      return createMockMp3Blob(options.mimeType);
     }
   };
   env.context.__JACKDARCKART_MP3_ENCODER__ = env.window.__JACKDARCKART_MP3_ENCODER__;
@@ -2252,6 +2289,39 @@ async function testConverterMp3FormatExposureWithLocalEncoderAdapter() {
   assert.equal(blob.type, 'audio/mpeg', 'converter studio should normalize local adapter output to an MP3 blob');
   assert.equal(encodedCalls.length, 1, 'converter studio should call the registered local MP3 encoder once');
   assert.equal(encodedCalls[0].bitrate, 256000, 'converter studio should forward the selected bitrate to the local MP3 encoder');
+}
+
+async function testConverterMp3LocalAdapterRejectsInvalidOutput() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder {
+      static isTypeSupported() {
+        return false;
+      }
+    }
+  });
+  env.window.__JACKDARCKART_MP3_ENCODER__ = {
+    async encode() {
+      return new Blob(['not-an-mp3'], { type: 'audio/mpeg' });
+    }
+  };
+  env.context.__JACKDARCKART_MP3_ENCODER__ = env.window.__JACKDARCKART_MP3_ENCODER__;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  await assert.rejects(
+    studio._renderMp3ExportForTest({
+      sampleRate: 44100,
+      numberOfChannels: 1,
+      length: 4,
+      getChannelData() {
+        return new Float32Array([0, 0.25, -0.25, 0]);
+      }
+    }, 192000),
+    /keine gültige MP3-Datei[\s\S]*Download wurde/i,
+    'converter studio should reject invalid local encoder output before any corrupt MP3 download can be offered'
+  );
 }
 
 function testConverterMp3FilenameUsesMp3Extension() {
@@ -2292,7 +2362,7 @@ async function testConverterMp3FormatExposureWithSameOriginConverter() {
     return {
       ok: true,
       async blob() {
-        return new Blob(['server-mp3'], { type: 'audio/mpeg' });
+        return createMockMp3Blob('audio/mpeg');
       }
     };
   };
@@ -2418,7 +2488,7 @@ async function testConverterNativeMp3MimeDetectionSupportsAlternateMimeTypes() {
       this.state = 'inactive';
       const dataListener = this.listeners.get('dataavailable');
       if (dataListener) {
-        dataListener({ data: new Blob(['encoded-alt-mp3'], { type: this.options.mimeType }) });
+        dataListener({ data: createMockMp3Blob(this.options.mimeType) });
       }
       const stopListener = this.listeners.get('stop');
       if (stopListener) {
@@ -2548,7 +2618,7 @@ async function testConverterMp3CompressedExportPath() {
       this.state = 'inactive';
       const dataListener = this.listeners.get('dataavailable');
       if (dataListener) {
-        dataListener({ data: new Blob(['encoded-mp3'], { type: this.options.mimeType }) });
+        dataListener({ data: createMockMp3Blob(this.options.mimeType) });
       }
       const stopListener = this.listeners.get('stop');
       if (stopListener) {
@@ -2998,7 +3068,9 @@ async function main() {
   await testConverterMp3FormatExposureAndDefaults();
   testConverterOpusFormatExposureMatchesMimeSupport();
   await testConverterMp3FormatExposureWithBundledLocalEncoder();
+  testConverterMp3FormatStaysHiddenWhenBundledEncoderProbeFails();
   await testConverterMp3FormatExposureWithLocalEncoderAdapter();
+  await testConverterMp3LocalAdapterRejectsInvalidOutput();
   testConverterMp3FilenameUsesMp3Extension();
   await testConverterMp3FormatExposureWithSameOriginConverter();
   await testConverterMp3FallbackMessageWhenNativeSupportMissing();

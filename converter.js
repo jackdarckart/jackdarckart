@@ -26,6 +26,7 @@
   ];
   const spectrumFftSize = 2048;
   let currentStudio = null;
+  let cachedBundledMp3EncoderProbe = null;
 
   class VaultSyncAdapterStub {
     isAvailable() {
@@ -934,7 +935,10 @@
     async function renderMp3Export(masteredBuffer, bitrate) {
       const mp3Support = getMp3Support();
       if (mp3Support.nativeMimeType) {
-        return recordCompressedExport(masteredBuffer, buildMp3Format(mp3Support), bitrate);
+        return normalizeMp3Blob(
+          await recordCompressedExport(masteredBuffer, buildMp3Format(mp3Support), bitrate),
+          'Nativer Browser-Encoder'
+        );
       }
 
       if (mp3Support.clientEncoder) {
@@ -972,7 +976,7 @@
     }
 
     function buildMp3Description(mp3Support) {
-      return 'MP3 ist lokal verfügbar, erzeugt eine echte .mp3-Datei direkt im Browser ohne Upload und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: '
+      return 'MP3 ist verfügbar, erzeugt eine echte .mp3-Datei und nutzt standardmäßig 192 kbps. Verfügbarer Pfad: '
         + buildMp3RouteList(mp3Support) + '.';
     }
 
@@ -1323,7 +1327,7 @@
 
   function buildMp3AvailabilityText(mp3Support) {
     if (mp3Support && mp3Support.available) {
-      return 'MP3 ist lokal verfügbar. Nutzbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
+      return 'MP3 ist verfügbar. Nutzbarer Pfad: ' + buildMp3RouteList(mp3Support) + '.';
     }
     return 'MP3 ist derzeit nicht verfügbar, weil weder ein nativer Browser-Encoder noch ein lokaler MP3-Encoder oder Same-Origin-Konverter erkannt wurde.';
   }
@@ -1399,10 +1403,44 @@
       return { id: 'adapter', encoder: customEncoder };
     }
     const lamejs = window.lamejs || globalThis.lamejs;
-    if (lamejs && typeof lamejs.Mp3Encoder === 'function') {
+    if (lamejs && typeof lamejs.Mp3Encoder === 'function' && isBundledLameJsEncoderUsable(lamejs)) {
       return { id: 'lamejs', library: lamejs };
     }
     return null;
+  }
+
+  function isBundledLameJsEncoderUsable(lamejs) {
+    const encoderCtor = lamejs && lamejs.Mp3Encoder;
+    if (cachedBundledMp3EncoderProbe
+      && cachedBundledMp3EncoderProbe.library === lamejs
+      && cachedBundledMp3EncoderProbe.encoderCtor === encoderCtor) {
+      return cachedBundledMp3EncoderProbe.available;
+    }
+
+    const available = probeBundledLameJsEncoder(lamejs);
+    cachedBundledMp3EncoderProbe = {
+      library: lamejs,
+      encoderCtor,
+      available
+    };
+    return available;
+  }
+
+  function probeBundledLameJsEncoder(lamejs) {
+    try {
+      if (!lamejs || typeof lamejs.Mp3Encoder !== 'function') {
+        return false;
+      }
+      const encoder = new lamejs.Mp3Encoder(1, 44100, normalizeMp3BitrateKbps(PREFERRED_MP3_BITRATE));
+      if (!encoder || typeof encoder.encodeBuffer !== 'function' || typeof encoder.flush !== 'function') {
+        return false;
+      }
+      const frame = encoder.encodeBuffer(new Int16Array(1152));
+      const flushed = encoder.flush();
+      return looksLikeMp3Binary(toUint8Array(frame)) || looksLikeMp3Binary(toUint8Array(flushed));
+    } catch (error) {
+      return false;
+    }
   }
 
   function resolveMp3ServerEndpoint() {
@@ -1488,11 +1526,14 @@
         bitrate,
         mimeType: 'audio/mpeg'
       });
-      return normalizeMp3Blob(blob);
+      return normalizeMp3Blob(blob, 'Lokaler MP3-Encoder');
     }
 
     if (encoder.id === 'lamejs') {
-      return encodeMp3WithLameJs(masteredBuffer, bitrate, encoder.library);
+      return normalizeMp3Blob(
+        await encodeMp3WithLameJs(masteredBuffer, bitrate, encoder.library),
+        'Lokaler MP3-Encoder im App-Bundle'
+      );
     }
 
     throw new Error('Lokaler MP3-Encoder wird nicht unterstützt.');
@@ -1524,7 +1565,7 @@
     if (!response || !response.ok || typeof response.blob !== 'function') {
       throw new Error('Same-Origin-Konverter konnte keine MP3-Datei erzeugen.');
     }
-    return normalizeMp3Blob(await response.blob());
+    return normalizeMp3Blob(await response.blob(), 'Same-Origin-Konverter');
   }
 
   async function encodeMp3WithLameJs(buffer, bitrate, lamejs) {
@@ -1576,17 +1617,86 @@
     ), supported[0]);
   }
 
-  async function normalizeMp3Blob(blob) {
-    if (blob instanceof Blob && blob.type === 'audio/mpeg') {
-      return blob;
-    }
+  async function normalizeMp3Blob(blob, sourceLabel) {
     if (!(blob instanceof Blob)) {
       throw new Error('MP3-Encoder lieferte keine Blob-Antwort zurück.');
     }
     const arrayBuffer = typeof blob.arrayBuffer === 'function'
       ? await blob.arrayBuffer()
       : blob;
-    return new Blob([arrayBuffer], { type: 'audio/mpeg' });
+    const bytes = toUint8Array(arrayBuffer);
+    if (!looksLikeMp3Binary(bytes)) {
+      throw new Error((sourceLabel || 'MP3-Export') + ' lieferte keine gültige MP3-Datei. Der Download wurde zum Schutz vor einer defekten .mp3-Datei abgebrochen.');
+    }
+    return new Blob([bytes], { type: normalizeMp3MimeType(blob.type) });
+  }
+
+  function normalizeMp3MimeType(mimeType) {
+    const normalized = String(mimeType || '').trim().toLowerCase();
+    return MP3_MIME_TYPES.indexOf(normalized) >= 0 ? normalized : 'audio/mpeg';
+  }
+
+  function toUint8Array(value) {
+    if (!value) {
+      return new Uint8Array(0);
+    }
+    if (value instanceof Uint8Array) {
+      return value;
+    }
+    const tag = Object.prototype.toString.call(value);
+    if (value instanceof ArrayBuffer || tag === '[object ArrayBuffer]' || tag === '[object SharedArrayBuffer]') {
+      return new Uint8Array(value);
+    }
+    if (ArrayBuffer.isView && ArrayBuffer.isView(value)) {
+      return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+    }
+    if (typeof value.length === 'number') {
+      return Uint8Array.from(value);
+    }
+    return new Uint8Array(0);
+  }
+
+  function looksLikeMp3Binary(bytes) {
+    if (!(bytes instanceof Uint8Array) || bytes.length < 4) {
+      return false;
+    }
+
+    let startOffset = 0;
+    if (bytes.length >= 10 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
+      const tagSize = ((bytes[6] & 0x7F) << 21)
+        | ((bytes[7] & 0x7F) << 14)
+        | ((bytes[8] & 0x7F) << 7)
+        | (bytes[9] & 0x7F);
+      startOffset = 10 + tagSize;
+    }
+
+    const maxOffset = Math.min(bytes.length - 4, startOffset + 4096);
+    for (let offset = startOffset; offset <= maxOffset; offset += 1) {
+      if (isMp3FrameHeader(bytes, offset)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function isMp3FrameHeader(bytes, offset) {
+    if (!bytes || offset < 0 || offset + 3 >= bytes.length) {
+      return false;
+    }
+    if (bytes[offset] !== 0xFF || (bytes[offset + 1] & 0xE0) !== 0xE0) {
+      return false;
+    }
+
+    const versionBits = (bytes[offset + 1] >> 3) & 0x03;
+    const layerBits = (bytes[offset + 1] >> 1) & 0x03;
+    const bitrateBits = (bytes[offset + 2] >> 4) & 0x0F;
+    const sampleRateBits = (bytes[offset + 2] >> 2) & 0x03;
+
+    return versionBits !== 0x01
+      && layerBits === 0x01
+      && bitrateBits !== 0x00
+      && bitrateBits !== 0x0F
+      && sampleRateBits !== 0x03;
   }
 
   async function closeAudioContextQuietly(context) {
