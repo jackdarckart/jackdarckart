@@ -4,7 +4,9 @@
   const configuredApi = window.__JACKDARCKART_CONFIG__?.game?.apiBase;
   const API = typeof configuredApi === 'string' && (configuredApi.startsWith('https://') || configuredApi.startsWith('/api/'))
     ? configuredApi.replace(/\/+$/, '')
-    : 'https://vault.stream-musik.space/api/quantum-vault';
+    : ['localhost', '127.0.0.1'].includes(window.location.hostname)
+      ? './api/quantum-vault'
+      : 'https://vault.stream-musik.space/api/quantum-vault';
   const AUTO_SAVE_MS = 30000;
   const elements = {
     authShell: document.getElementById('auth-shell'),

@@ -1980,6 +1980,7 @@ function testQuantumVaultGameIntegration() {
     'game client must not use browser persistence or submit account identifiers');
   assert.match(gameJs, /credentials:\s*'include'/);
   assert.match(gameHtml, /connect-src 'self' https:\/\/vault\.stream-musik\.space/);
+  assert.match(swCode, /stream-musik-space-v7/, 'new Worker URL must invalidate cached game scripts');
   assert.match(gameHtml, /Cloudflare-Cookie/);
   assert.match(gameHtml, /Passwort-Hash \(PBKDF2\)/);
   assert.match(gameJs, /error\.status\s*=\s*response\.status/);
@@ -2021,9 +2022,15 @@ async function testGameCloudflareCookieFlow() {
     upgrades: {}, stats: { harvests: 0, forges: 0, upgrades: 0, nodes: 0, manualSaves: 0, autosaves: 0 },
     treeNodes: [], jukebox: []
   };
-  for (const configuredBase of [null, 'https://example.org/api/quantum-vault/', 'http://example.org/api/quantum-vault']) {
+  for (const [configuredBase, hostname] of [
+    [null, 'stream-musik.space'],
+    ['https://example.org/api/quantum-vault/', 'stream-musik.space'],
+    ['http://example.org/api/quantum-vault', 'stream-musik.space'],
+    [null, 'localhost']
+  ]) {
     const base = configuredBase?.startsWith('https://')
-      ? configuredBase.slice(0, -1) : 'https://vault.stream-musik.space/api/quantum-vault';
+      ? configuredBase.slice(0, -1)
+      : hostname === 'localhost' ? './api/quantum-vault' : 'https://vault.stream-musik.space/api/quantum-vault';
     const calls = [];
     const elements = new Map();
     const getElement = (id) => {
@@ -2073,7 +2080,7 @@ async function testGameCloudflareCookieFlow() {
       };
     };
     const context = vm.createContext({
-      window: { __JACKDARCKART_CONFIG__: configuredBase ? { game: { apiBase: configuredBase } } : undefined,
+      window: { location: { hostname }, __JACKDARCKART_CONFIG__: configuredBase ? { game: { apiBase: configuredBase } } : undefined,
         setInterval: () => 1, clearInterval: () => {}, setTimeout: (callback) => callback() },
       document, fetch,
       FormData: class {
