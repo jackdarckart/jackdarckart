@@ -162,14 +162,14 @@
       ? window.fetch.bind(window)
       : (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : null);
     if (!fetchImplementation) return false;
+    const AbortControllerCtor = window.AbortController || globalThis.AbortController;
+    const controller = AbortControllerCtor ? new AbortControllerCtor() : null;
+    let timer = null;
+    if (controller && typeof window.setTimeout === 'function') {
+      timer = window.setTimeout(() => controller.abort(), 3000);
+    }
     try {
       const probeUrl = endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') + 'probe=1';
-      const AbortControllerCtor = window.AbortController || globalThis.AbortController;
-      const controller = AbortControllerCtor ? new AbortControllerCtor() : null;
-      let timer = null;
-      if (controller && typeof window.setTimeout === 'function') {
-        timer = window.setTimeout(() => controller.abort(), 3000);
-      }
       const options = {
         method: 'GET',
         mode: 'same-origin',
@@ -179,9 +179,6 @@
       };
       if (controller) options.signal = controller.signal;
       const response = await fetchImplementation(probeUrl, options);
-      if (timer && typeof window.clearTimeout === 'function') {
-        window.clearTimeout(timer);
-      }
       if (response && response.ok) {
         return true;
       }
@@ -192,6 +189,10 @@
       return false;
     } catch (error) {
       return false;
+    } finally {
+      if (timer && typeof window.clearTimeout === 'function') {
+        window.clearTimeout(timer);
+      }
     }
   }
 
@@ -1218,7 +1219,7 @@
         let reason;
         const isCorsBlocked = Boolean(error && (error.remoteCorsBlocked === true || error.name === 'TypeError' || error instanceof TypeError));
         const isDownloaderProblem = Boolean(error && error.downloaderUnavailable);
-        if (error.name === 'AbortError') {
+        if (Boolean(error && error.name === 'AbortError')) {
           reason = `${actionLabel} hat das Zeitlimit überschritten oder wurde abgebrochen.`;
         } else if (isDownloader && !resolveSunoDownloader().configured) {
           reason = SUNO_DOWNLOADER_ERROR_NOT_CONFIGURED;
