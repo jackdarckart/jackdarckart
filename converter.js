@@ -1339,9 +1339,6 @@
       },
       _refreshExportFormatsForTest() {
         syncExportFormatOptions();
-      },
-      _importRemoteAudioForTest() {
-        return handleRemoteImport();
       }
     };
   }
@@ -1770,6 +1767,9 @@
     if (labels.length < 2) {
       return true;
     }
+    if (/^(?:0x[0-9a-f]+|\d+)(?:\.(?:0x[0-9a-f]+|\d+))*$/.test(host)) {
+      return true;
+    }
     if (!/^[a-z]{2,}$/.test(labels[labels.length - 1])) {
       return true;
     }
@@ -1893,6 +1893,10 @@
       throw new Error('Die Remote-Quelle antwortete nicht gültig (HTTP-Status ' + status + ').');
     }
 
+    if (response.type === 'opaque' || response.type === 'opaqueredirect') {
+      throw new Error('Die Remote-Quelle lieferte eine undurchsichtige Antwort ohne CORS-Freigabe und wurde blockiert.');
+    }
+
     if (typeof response.url === 'string' && response.url && !validateRemoteAudioUrl(response.url).ok) {
       throw new Error('Die Remote-Quelle leitete auf ein unsicheres Ziel weiter und wurde blockiert.');
     }
@@ -1933,7 +1937,13 @@
     const pathname = url ? String(url.pathname || '') : '';
     const lastSegment = pathname.split('/').filter(Boolean).pop() || '';
     if (lastSegment) {
-      return decodeURIComponent(lastSegment).slice(0, 120);
+      let readableSegment = lastSegment;
+      try {
+        readableSegment = decodeURIComponent(lastSegment);
+      } catch (error) {
+        readableSegment = lastSegment;
+      }
+      return readableSegment.slice(0, 120);
     }
     const extension = normalizeRemoteContentType(contentType) === 'audio/wav' ? 'wav' : 'mp3';
     return 'remote-audio.' + extension;

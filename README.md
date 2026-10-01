@@ -176,6 +176,8 @@ Der Remote-Import lädt Audio ausschließlich clientseitig in den Arbeitsspeiche
 - **Quota-Guard**: harte Obergrenze von 80 MB pro Remote-Datei.
 - **Defensives Decoding**: `AudioContext`-Fehler werden abgefangen und als verständliche Meldung angezeigt.
 
+Weil Nutzer:innen beliebige HTTPS-Audio-Quellen einfügen können, erlaubt `converter.html` als einzige Seite `connect-src 'self' https:`. Alle anderen Seiten behalten ihre enge CSP. Die eigentliche Ziel-Prüfung passiert in `converter.js` über die oben genannten Zero-Trust-Regeln; `script-src 'self'` bleibt unverändert streng.
+
 Suno-Share-Links der Form `https://suno.com/song/<id>` werden clientseitig auf die öffentliche CDN-Medien-URL aufgelöst. Der Abruf erfordert, dass die Quelle CORS erlaubt.
 
 ### Statische Inhaltsbereiche

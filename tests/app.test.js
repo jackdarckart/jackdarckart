@@ -3070,7 +3070,9 @@ function testConverterRemoteUrlValidationEnforcesHttpsAndBlocksInternalTargets()
     'https://[::1]/track.mp3',
     'https://router.local/track.mp3',
     'https://intranet/track.mp3',
-    'https://0177.0.0.1/track.mp3'
+    'https://0177.0.0.1/track.mp3',
+    'https://2130706433/track.mp3',
+    'https://0x7f.0x0.0x0.0x1/track.mp3'
   ]) {
     const result = validate(blocked);
     assert.equal(result.ok, false, `remote import should block the internal destination ${blocked}`);
@@ -3128,6 +3130,29 @@ async function testConverterRemoteFetchGuardsMimeMagicBytesAndQuota() {
     }),
     /Audio-Signatur/i,
     'payloads without valid magic bytes should be rejected'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => createRemoteResponse({
+        headers: { 'content-type': 'audio/mpeg' },
+        body: createMp3PayloadBytes(maxBytes + 16)
+      })
+    }),
+    /Speicherlimit/i,
+    'oversized bodies should be rejected even when no content-length header is declared'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => {
+        const response = createRemoteResponse({ headers: { 'content-type': 'audio/mpeg' } });
+        response.type = 'opaque';
+        return response;
+      }
+    }),
+    /CORS/i,
+    'opaque responses without CORS clearance should be blocked'
   );
 
   await assert.rejects(
