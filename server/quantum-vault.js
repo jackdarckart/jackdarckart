@@ -156,16 +156,20 @@ function readJsonBody(request) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
+    let tooLarge = false;
     request.on('data', (chunk) => {
+      if (tooLarge) return;
       size += chunk.length;
       if (size > MAX_BODY_BYTES) {
+        tooLarge = true;
+        chunks.length = 0;
         reject(new VaultError('Request body is too large.', 413));
-        request.destroy();
         return;
       }
       chunks.push(chunk);
     });
     request.on('end', () => {
+      if (tooLarge) return;
       if (!chunks.length) {
         resolve({});
         return;
@@ -197,9 +201,14 @@ function createQuantumVaultHandler(options) {
   const randomBytes = typeof settings.randomBytes === 'function' ? settings.randomBytes : crypto.randomBytes;
   const scryptCost = settings.scryptCost || 16384;
   const secureCookie = settings.secureCookie !== undefined ? settings.secureCookie : true;
+  const authRateLimit = settings.authRateLimit || 10;
+  const authRateWindowMs = settings.authRateWindowMs || 60 * 1000;
+  const maxPasswordJobs = settings.maxPasswordJobs || 4;
   const sessions = new Map();
+  const authAttempts = new Map();
   let store = { version: 1, accounts: [] };
   let lock = Promise.resolve();
+  let passwordJobs = 0;
 
   if (fs.existsSync(dataFile)) {
     const loaded = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
@@ -213,6 +222,34 @@ function createQuantumVaultHandler(options) {
     const pending = lock.then(operation, operation);
     lock = pending.catch(() => null);
     return pending;
+  }
+
+  function checkAuthRate(request) {
+    const address = request.socket && request.socket.remoteAddress
+      ? request.socket.remoteAddress
+      : 'unknown';
+    const current = now();
+    const attempt = authAttempts.get(address);
+    if (!attempt || current - attempt.startedAt >= authRateWindowMs) {
+      authAttempts.set(address, { count: 1, startedAt: current });
+      return;
+    }
+    attempt.count += 1;
+    if (attempt.count > authRateLimit) {
+      throw new VaultError('Too many authentication attempts. Try again later.', 429);
+    }
+  }
+
+  async function passwordDigest(password, salt) {
+    if (passwordJobs >= maxPasswordJobs) {
+      throw new VaultError('Authentication service is busy. Try again shortly.', 503);
+    }
+    passwordJobs += 1;
+    try {
+      return await hashPassword(password, salt, scryptCost);
+    } finally {
+      passwordJobs -= 1;
+    }
   }
 
   async function persist() {
@@ -300,7 +337,7 @@ function createQuantumVaultHandler(options) {
         throw new VaultError('This handle is already registered.', 409);
       }
       const salt = randomBytes(16);
-      const passwordHash = await hashPassword(password, salt, scryptCost);
+      const passwordHash = await passwordDigest(password, salt);
       const timestamp = new Date(now()).toISOString();
       const account = {
         id: randomBytes(16).toString('hex'),
@@ -323,7 +360,7 @@ function createQuantumVaultHandler(options) {
     const password = validatePassword(body.password);
     const account = store.accounts.find((entry) => entry.handleKey === handle.key);
     const salt = account ? Buffer.from(account.salt, 'base64') : randomBytes(16);
-    const candidate = await hashPassword(password, salt, scryptCost);
+    const candidate = await passwordDigest(password, salt);
     const expected = account ? Buffer.from(account.passwordHash, 'base64') : randomBytes(64);
     if (!account || expected.length !== candidate.length || !crypto.timingSafeEqual(expected, candidate)) {
       throw new VaultError('Invalid handle or password.', 401);
@@ -403,13 +440,17 @@ function createQuantumVaultHandler(options) {
       const route = url.pathname.slice(API_PREFIX.length) || '/';
 
       if (route === '/register' && request.method === 'POST') {
-        const account = await register(await readJsonBody(request));
+        const body = await readJsonBody(request);
+        checkAuthRate(request);
+        const account = await register(body);
         const token = issueSession(account.id);
         send(response, 201, accountPayload(account), { 'Set-Cookie': sessionCookie(token) });
         return true;
       }
       if (route === '/login' && request.method === 'POST') {
-        const account = await login(await readJsonBody(request));
+        const body = await readJsonBody(request);
+        checkAuthRate(request);
+        const account = await login(body);
         const token = issueSession(account.id);
         send(response, 200, accountPayload(account), { 'Set-Cookie': sessionCookie(token) });
         return true;

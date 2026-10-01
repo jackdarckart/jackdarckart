@@ -52,6 +52,14 @@ async function main() {
     assert.equal(page.status, 200);
     assert.match(await page.text(), /SINGULARITY ARCADE/);
 
+    const oversized = await fetch(`${running.origin}/api/quantum-vault/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ handle: 'large', password: 'x'.repeat(17000) })
+    });
+    assert.equal(oversized.status, 413);
+    assert.match((await oversized.json()).error, /too large/i);
+
     const weak = await request(running.origin, '/register', {
       method: 'POST',
       json: { handle: 'pilot', password: 'short' }
@@ -184,6 +192,24 @@ async function main() {
     assert.equal(login.response.status, 200);
     assert.equal(login.payload.state.vibeScore, 40, 'encrypted vault state must survive server restarts');
     assert.equal(login.payload.state.upgrades.resonator, 1);
+
+    await running.close();
+    running = await startServer(Object.assign({}, options, {
+      dataFile: path.join(tempRoot, 'rate-limit.json'),
+      authRateLimit: 2
+    }));
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const invalid = await request(running.origin, '/login', {
+        method: 'POST',
+        json: { handle: 'UnknownPilot', password: 'incorrect-password' }
+      });
+      assert.equal(invalid.response.status, 401);
+    }
+    const throttled = await request(running.origin, '/login', {
+      method: 'POST',
+      json: { handle: 'UnknownPilot', password: 'incorrect-password' }
+    });
+    assert.equal(throttled.response.status, 429);
 
     console.log('quantum vault tests passed');
   } finally {

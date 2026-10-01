@@ -17,6 +17,7 @@
   let autoSaveTimer = 0;
   let actionPending = false;
   let dirty = false;
+  let authGeneration = 0;
 
   async function request(route, options) {
     const settings = Object.assign({ credentials: 'same-origin', headers: {} }, options || {});
@@ -28,7 +29,11 @@
     } catch (error) {
       payload = {};
     }
-    if (!response.ok) throw new Error(payload.error || 'Vault ist nicht erreichbar.');
+    if (!response.ok) {
+      const error = new Error(payload.error || 'Vault ist nicht erreichbar.');
+      error.status = response.status;
+      throw error;
+    }
     return payload;
   }
 
@@ -73,6 +78,7 @@
   }
 
   function showAuth(message) {
+    authGeneration += 1;
     currentState = null;
     dirty = false;
     elements.authShell.hidden = false;
@@ -90,6 +96,7 @@
   }
 
   async function authenticate(route, form) {
+    const generation = ++authGeneration;
     const data = new FormData(form);
     setMessage(elements.authMessage, 'Authentifizierung läuft …', false);
     try {
@@ -97,6 +104,7 @@
         method: 'POST',
         body: JSON.stringify({ handle: data.get('handle'), password: data.get('password') })
       });
+      if (generation !== authGeneration) return;
       form.reset();
       render(payload);
       startAutosave();
@@ -111,15 +119,22 @@
   async function performAction(body, source) {
     if (actionPending || !currentState) return;
     actionPending = true;
+    const generation = authGeneration;
     source.disabled = true;
     setMessage(elements.gameMessage, 'Vault validiert Aktion …', false);
     try {
       const payload = await request('/action', { method: 'POST', body: JSON.stringify(body) });
+      if (generation !== authGeneration || !currentState) return;
       render(payload);
       dirty = true;
       elements.saveState.textContent = 'Autosave ausstehend';
       setMessage(elements.gameMessage, 'Aktion bestätigt und im Vault persistiert.', false);
     } catch (error) {
+      if (error.status === 401) {
+        showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
+        setConnection('offline', 'Session abgelaufen');
+        return;
+      }
       setMessage(elements.gameMessage, error.message, true);
     } finally {
       const cooldown = body.action === 'harvest' ? 720 : 0;
@@ -132,15 +147,22 @@
 
   async function save(kind) {
     if (!currentState) return;
+    const generation = authGeneration;
     const button = document.getElementById('save-button');
     button.disabled = true;
     elements.saveState.textContent = kind === 'auto' ? 'Autosave läuft …' : 'Speichern …';
     try {
       const payload = await request('/save', { method: 'POST', body: JSON.stringify({ kind }) });
+      if (generation !== authGeneration || !currentState) return;
       render(payload);
       dirty = false;
       elements.saveState.textContent = kind === 'auto' ? 'Autosave abgeschlossen' : 'Manuell gespeichert';
     } catch (error) {
+      if (error.status === 401) {
+        showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
+        setConnection('offline', 'Session abgelaufen');
+        return;
+      }
       elements.saveState.textContent = 'Speichern fehlgeschlagen';
       setMessage(elements.gameMessage, error.message, true);
     } finally {
@@ -193,21 +215,32 @@
   document.getElementById('save-button').addEventListener('click', () => save('manual'));
   document.getElementById('leaderboard-refresh').addEventListener('click', loadLeaderboard);
   document.getElementById('logout-button').addEventListener('click', async () => {
+    const generation = authGeneration;
     try {
       await request('/logout', { method: 'POST', body: '{}' });
     } catch (error) {
+      if (error.status === 401) {
+        showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
+        setConnection('offline', 'Session abgelaufen');
+        return;
+      }
       setMessage(elements.gameMessage, error.message, true);
       return;
     }
+    if (generation !== authGeneration) return;
     showAuth('Session beendet. Dein Fortschritt bleibt im Vault.');
     setConnection('', 'Bereit für Login');
   });
 
+  const bootstrapGeneration = authGeneration;
   Promise.all([
     request('/session').then((payload) => {
+      if (bootstrapGeneration !== authGeneration) return;
       render(payload);
       startAutosave();
-    }).catch(() => showAuth()),
+    }).catch(() => {
+      if (bootstrapGeneration === authGeneration) showAuth();
+    }),
     loadLeaderboard()
   ]).finally(() => {
     if (!currentState) setConnection('', 'Bereit für Login');

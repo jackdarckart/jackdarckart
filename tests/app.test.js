@@ -1959,6 +1959,9 @@ function testQuantumVaultGameIntegration() {
   assert.doesNotMatch(gameJs, /localStorage|sessionStorage|userId|accountId/,
     'game client must not use browser persistence or submit account identifiers');
   assert.match(gameJs, /credentials:\s*'same-origin'/);
+  assert.match(gameJs, /error\.status\s*=\s*response\.status/);
+  assert.match(gameJs, /generation\s*!==\s*authGeneration/);
+  assert.match(gameJs, /error\.status\s*===\s*401/);
   assert.match(swCode, /'\.\/game\.html'/);
   assert.match(swCode, /'\.\/game\.js'/);
   assert.match(swCode, /'\.\/game\.css'/);
