@@ -148,6 +148,94 @@
     return error;
   }
 
+  const QUALITY_WEIGHTS = {
+    clipping: 30, squashed: 16, wide: 8, harshness: 14, brittle: 6, dull: 6,
+    phase: 18, balance: 8, loudness: 14, tonality: 10, rumble: 8
+  };
+  // Share of each penalty the mastering chain can realistically repair.
+  const QUALITY_FIX_RATES = {
+    clipping: 0.35, squashed: 0.2, wide: 0.6, harshness: 0.75, brittle: 0.6, dull: 0.6,
+    phase: 0.8, balance: 0, loudness: 0.9, tonality: 0.65, rumble: 0.85
+  };
+  const assessmentCache = new WeakMap();
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function harshnessSeverity(presenceTiltDb, trebleTiltDb) {
+    return Math.max(clamp((presenceTiltDb + 4) / 6, 0, 1), clamp((trebleTiltDb + 11) / 6, 0, 1));
+  }
+
+  function rumbleSeverity(dcOffset, subRatioDb) {
+    return Math.max(clamp(dcOffset / 0.03, 0, 1), clamp((subRatioDb + 6) / 6, 0, 1));
+  }
+
+  // Scan state layout: 0-3 filter memories (40/250/3500/8000 Hz one-poles),
+  // 4-8 band energies (sub/low/mid/presence/air), 9 DC sum, 10 peak,
+  // 11 clipped samples, 12 stereo cross product.
+  const SCAN_STATE_SIZE = 13;
+
+  // Small per-block kernel: invoked many times per file so the JIT optimises
+  // it quickly instead of running one long, partially optimised loop.
+  function scanBlock(channel, partner, start, end, state, coefficients) {
+    const cSub = coefficients[0];
+    const cLow = coefficients[1];
+    const cMid = coefficients[2];
+    const cHigh = coefficients[3];
+    let fSub = state[0];
+    let fLow = state[1];
+    let fMid = state[2];
+    let fHigh = state[3];
+    let peak = state[10];
+    let sub = 0;
+    let low = 0;
+    let mid = 0;
+    let presence = 0;
+    let air = 0;
+    let dc = 0;
+    let clipped = 0;
+    let energy = 0;
+    for (let i = start; i < end; i += 1) {
+      const sample = channel[i];
+      const absolute = sample < 0 ? -sample : sample;
+      if (absolute > peak) peak = absolute;
+      if (absolute >= 0.98) clipped += 1;
+      energy += sample * sample;
+      dc += sample;
+      fSub += cSub * (sample - fSub);
+      fLow += cLow * (sample - fLow);
+      fMid += cMid * (sample - fMid);
+      fHigh += cHigh * (sample - fHigh);
+      const midBand = fMid - fLow;
+      const presenceBand = fHigh - fMid;
+      const airBand = sample - fHigh;
+      sub += fSub * fSub;
+      low += fLow * fLow;
+      mid += midBand * midBand;
+      presence += presenceBand * presenceBand;
+      air += airBand * airBand;
+    }
+    let cross = 0;
+    if (partner) {
+      for (let i = start; i < end; i += 1) cross += channel[i] * partner[i];
+    }
+    state[0] = fSub;
+    state[1] = fLow;
+    state[2] = fMid;
+    state[3] = fHigh;
+    state[4] += sub;
+    state[5] += low;
+    state[6] += mid;
+    state[7] += presence;
+    state[8] += air;
+    state[9] += dc;
+    state[10] = peak;
+    state[11] += clipped;
+    state[12] += cross;
+    return energy;
+  }
+
   class BrowserAudioMasteringCore {
     constructor() {
       this.lowFrequency = 110;
@@ -187,116 +275,224 @@
       if (!buffer || !buffer.length || !buffer.sampleRate || !buffer.numberOfChannels) {
         throw new Error('Keine analysierbare Audioquelle.');
       }
-      const sums = [0, 0, 0, 0];
-      const coefficients = [250, 3500, 8000].map((hz) => 1 - Math.exp(-2 * Math.PI * Math.min(hz, buffer.sampleRate * 0.45) / buffer.sampleRate));
-      let sum = 0;
-      let peak = 0;
-      let clipped = 0;
-      let cross = 0;
-      let leftEnergy = 0;
-      let rightEnergy = 0;
+      const length = buffer.length;
+      const sampleRate = buffer.sampleRate;
+      const coefficient = (hz) => 1 - Math.exp(-2 * Math.PI * Math.min(hz, sampleRate * 0.45) / sampleRate);
+      const filterCoefficients = [coefficient(40), coefficient(250), coefficient(3500), coefficient(8000)];
       const channels = Array.from({ length: Math.min(2, buffer.numberOfChannels) }, (_, index) => buffer.getChannelData(index));
-      for (const channel of channels) {
-        const filters = [0, 0, 0];
-        for (let i = 0; i < buffer.length; i += 1) {
-          const sample = channel[i];
-          if (!Number.isFinite(sample)) throw new Error('Ungültige Audiodaten.');
-          peak = Math.max(peak, Math.abs(sample));
-          sum += sample * sample;
-          if (Math.abs(sample) >= 0.98) clipped += 1;
-          for (let band = 0; band < 3; band += 1) {
-            filters[band] += coefficients[band] * (sample - filters[band]);
-          }
-          const values = [filters[0], filters[1] - filters[0], filters[2] - filters[1], sample - filters[2]];
-          for (let band = 0; band < 4; band += 1) sums[band] += values[band] * values[band];
+      const channelCount = channels.length;
+      const blockSize = Math.max(1, Math.round(sampleRate * 0.2));
+      const blockCount = Math.ceil(length / blockSize);
+      const blockEnergy = new Float64Array(blockCount);
+      const channelEnergy = [0, 0];
+      const sums = new Float64Array(SCAN_STATE_SIZE);
+      for (let channelIndex = 0; channelIndex < channelCount; channelIndex += 1) {
+        const channel = channels[channelIndex];
+        const partner = channelIndex === 1 ? channels[0] : null;
+        const state = new Float64Array(SCAN_STATE_SIZE);
+        let energy = 0;
+        for (let block = 0, start = 0; start < length; block += 1, start += blockSize) {
+          const blockSum = scanBlock(channel, partner, start, Math.min(length, start + blockSize), state, filterCoefficients);
+          blockEnergy[block] += blockSum;
+          energy += blockSum;
         }
-      }
-      if (channels.length === 2) {
-        for (let i = 0; i < buffer.length; i += 1) {
-          const left = channels[0][i];
-          const right = channels[1][i];
-          cross += left * right;
-          leftEnergy += left * left;
-          rightEnergy += right * right;
+        // Non-finite samples propagate into the DC and energy sums.
+        if (!Number.isFinite(state[9]) || !Number.isFinite(energy)) throw new Error('Ungültige Audiodaten.');
+        for (let index = 4; index < SCAN_STATE_SIZE; index += 1) {
+          sums[index] = index === 10 ? Math.max(sums[index], state[index]) : sums[index] + state[index];
         }
+        channelEnergy[channelIndex] = energy;
       }
-      const count = buffer.length * channels.length;
+      const peak = sums[10];
+      const clipped = sums[11];
+      const count = length * channelCount;
+      const sum = channelEnergy[0] + channelEnergy[1];
       const rms = Math.sqrt(sum / count);
-      const bandRms = sums.map((value) => Math.sqrt(value / count));
+      const bandRms = [sums[5], sums[6], sums[7], sums[8]].map((value) => Math.sqrt(value / count));
       const tilt = (a, b) => 20 * Math.log10((a + 1e-8) / (b + 1e-8));
       const bassTiltDb = tilt(bandRms[0], bandRms[1]);
       const presenceTiltDb = tilt(bandRms[2], bandRms[1]);
       const trebleTiltDb = tilt(bandRms[3], bandRms[1]);
       const crestDb = tilt(peak, rms);
-      const correlation = channels.length === 2 && leftEnergy * rightEnergy > 0
-        ? cross / Math.sqrt(leftEnergy * rightEnergy) : 1;
+      const correlation = channelCount === 2 && channelEnergy[0] * channelEnergy[1] > 0
+        ? sums[12] / Math.sqrt(channelEnergy[0] * channelEnergy[1]) : 1;
+      const blockLevels = this.measureBlockLevels(blockEnergy, blockSize, length, channelCount);
+      const loudnessDb = rms ? 20 * Math.log10(rms) : -Infinity;
+      const audible = rms > 1e-5;
+      const dcOffset = Math.abs(sums[9] / count);
+      const subRatioDb = tilt(Math.sqrt(sums[4] / count), rms);
       return {
-        peak, rms, loudnessDb: rms ? 20 * Math.log10(rms) : -Infinity,
+        peak, rms, loudnessDb,
+        gatedLoudnessDb: Number.isFinite(blockLevels.gatedDb) ? blockLevels.gatedDb : loudnessDb,
+        loudnessRangeDb: blockLevels.rangeDb,
         bandRms, bassTiltDb, presenceTiltDb, trebleTiltDb,
         brightnessDb: tilt(bandRms[2] + bandRms[3], bandRms[0] + bandRms[1]),
         crestDb, clippingRatio: clipped / count, stereoCorrelation: correlation,
-        harshness: rms > 1e-5 && (presenceTiltDb > -2 || trebleTiltDb > -9),
+        channelCount,
+        balanceDb: channelCount === 2 && channelEnergy[0] > 0 && channelEnergy[1] > 0
+          ? 10 * Math.log10(channelEnergy[0] / channelEnergy[1]) : 0,
+        dcOffset, subRatioDb,
+        harshness: audible && harshnessSeverity(presenceTiltDb, trebleTiltDb) > 0.3,
         phasey: correlation < -0.15,
-        brittle: rms > 1e-5 && crestDb > 15 && (presenceTiltDb > -5 || trebleTiltDb > -12)
+        brittle: audible && crestDb > 15 && (presenceTiltDb > -5 || trebleTiltDb > -12),
+        rumble: audible && rumbleSeverity(dcOffset, subRatioDb) >= 0.5
       };
+    }
+
+    measureBlockLevels(blockEnergy, blockSize, length, channelCount) {
+      const levels = [];
+      let absoluteEnergy = 0;
+      for (let block = 0; block < blockEnergy.length; block += 1) {
+        const frames = Math.min(blockSize, length - block * blockSize);
+        const meanSquare = blockEnergy[block] / (frames * channelCount);
+        if (meanSquare > 1e-7) {
+          levels.push(meanSquare);
+          absoluteEnergy += meanSquare;
+        }
+      }
+      if (!levels.length) {
+        return { gatedDb: -Infinity, rangeDb: 0 };
+      }
+      const relativeGate = (absoluteEnergy / levels.length) * 0.01;
+      const gated = levels.filter((value) => value >= relativeGate);
+      const gatedMean = gated.reduce((total, value) => total + value, 0) / gated.length;
+      let rangeDb = 0;
+      if (gated.length >= 3) {
+        const sorted = gated.map((value) => 10 * Math.log10(value)).sort((a, b) => a - b);
+        const pick = (ratio) => sorted[Math.min(sorted.length - 1, Math.round((sorted.length - 1) * ratio))];
+        rangeDb = pick(0.95) - pick(0.1);
+      }
+      return { gatedDb: 10 * Math.log10(gatedMean), rangeDb };
+    }
+
+    assessProfile(profile) {
+      if (!profile || typeof profile !== 'object') {
+        return null;
+      }
+      const cached = assessmentCache.get(profile);
+      if (cached) {
+        return cached;
+      }
+      const audible = Number(profile.rms) > 1e-5;
+      const number = (value, fallback) => (Number.isFinite(Number(value)) ? Number(value) : fallback);
+      const loudness = Number.isFinite(profile.gatedLoudnessDb) ? profile.gatedLoudnessDb : profile.loudnessDb;
+      const crest = number(profile.crestDb, 12);
+      const clippingRatio = number(profile.clippingRatio, 0);
+      const correlation = number(profile.stereoCorrelation, 1);
+      const severities = {
+        clipping: clippingRatio <= 0.0002 ? 0 : clamp(0.35 + (clippingRatio - 0.001) * 65, 0.15, 1),
+        squashed: audible ? clamp((10 - crest) / 6, 0, 1) : 0,
+        wide: audible ? Math.max(clamp((number(profile.loudnessRangeDb, 0) - 12) / 10, 0, 1), clamp((crest - 20) / 8, 0, 1)) : 0,
+        harshness: audible ? harshnessSeverity(number(profile.presenceTiltDb, -10), number(profile.trebleTiltDb, -20)) : 0,
+        brittle: profile.brittle ? 1 : 0,
+        dull: audible ? clamp((-26 - number(profile.trebleTiltDb, -20)) / 10, 0, 1) : 0,
+        phase: number(profile.channelCount, 2) === 2 ? clamp((0.25 - correlation) / 0.75, 0, 1) : 0,
+        balance: clamp((Math.abs(number(profile.balanceDb, 0)) - 1.5) / 4.5, 0, 1),
+        loudness: Number.isFinite(loudness) ? clamp((Math.abs(loudness + 14) - 3) / 9, 0, 1) : 1,
+        tonality: audible ? clamp((Math.abs(number(profile.bassTiltDb, 2) - 2) - 4) / 8, 0, 1) : 0,
+        rumble: audible ? rumbleSeverity(number(profile.dcOffset, 0), number(profile.subRatioDb, -40)) : 0
+      };
+      const penalties = {};
+      let score = 100;
+      Object.keys(QUALITY_WEIGHTS).forEach((key) => {
+        penalties[key] = key === 'loudness' && !Number.isFinite(loudness)
+          ? 30
+          : QUALITY_WEIGHTS[key] * severities[key];
+        score -= penalties[key];
+      });
+      score = Math.round(clamp(score, 0, 100));
+      // Poor sources receive noticeably stronger corrections, clean sources
+      // are only nudged so the master does not get over-processed.
+      const intensity = clamp(0.55 + (100 - score) / 100, 0.55, 1.45);
+      const assessment = { severities, penalties, score, intensity, loudnessDb: loudness };
+      assessmentCache.set(profile, assessment);
+      return assessment;
     }
 
     chooseEnhancement(profile, options) {
-      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+      const assessment = this.assessProfile(profile);
+      if (!assessment) {
+        throw new Error('Kein Quellenprofil verfügbar.');
+      }
+      const s = assessment.severities;
       const strength = clamp(Number((options && options.strength) ?? 1) || 1, 0.5, 1.5);
-      const blend = (neutral, value) => neutral + (value - neutral) * strength;
-      const loud = profile.loudnessDb;
-      const compressed = profile.crestDb < 9 || profile.clippingRatio > 0.001;
-      const cleaner = profile.harshness || profile.phasey || profile.brittle
+      const amount = clamp(strength * assessment.intensity, 0.3, 2);
+      const blend = (neutral, value) => neutral + (value - neutral) * amount;
+      const loud = assessment.loudnessDb;
+      const squash = Math.max(s.squashed, s.clipping);
+      const compressed = squash >= 0.15;
+      const brittle = Boolean(profile.brittle);
+      const harsh = Boolean(profile.harshness);
+
+      let ratio = 2.2 + 1.4 * s.wide;
+      let threshold = -20 - 4 * s.wide;
+      if (compressed) {
+        ratio = 1.6 - 0.4 * squash;
+        threshold = -12 + 2 * squash;
+      }
+
+      let width = 100;
+      if (s.phase > 0) {
+        width = 100 - 50 * s.phase;
+      } else if (profile.channelCount === 2 && profile.stereoCorrelation > 0.8 && profile.stereoCorrelation < 0.97) {
+        width = 110;
+      }
+
+      let target = -12;
+      if (compressed || loud > -12) {
+        target = -14;
+      } else if (s.wide > 0.3) {
+        target = -13;
+      }
+
+      const cleaner = harsh || profile.phasey || brittle || profile.rumble
         ? {
-          presenceCut: blend(0, profile.harshness ? -2.5 : 0),
-          highCut: blend(0, profile.brittle || profile.harshness ? -1.5 : 0),
-          softenTransients: profile.brittle
+          presenceCut: harsh ? clamp(blend(0, -(1.5 + 2 * s.harshness)), -6, 0) : 0,
+          highCut: harsh || brittle ? clamp(blend(0, -(1 + 1.2 * Math.max(s.harshness, s.brittle))), -5, 0) : 0,
+          softenTransients: brittle,
+          rumbleCut: profile.rumble ? 30 : 0
         }
         : null;
-      return {
-        eqLow: blend(0, clamp((2 - profile.bassTiltDb) * 0.25, -3, 3)),
-        eqMid: blend(0, clamp(-profile.presenceTiltDb * 0.2, -2.5, 2)),
-        eqHigh: blend(0, clamp((-12 - profile.trebleTiltDb) * 0.2, -3, 2)),
-        compThreshold: blend(-18, compressed ? -12 : -20),
-        compRatio: blend(1, compressed ? 1.5 : 2.5),
-        limiterCeiling: profile.clippingRatio > 0.001 ? -2 : -1,
-        stereoWidth: blend(100, profile.phasey ? 65 : 100),
-        targetLufs: blend(-12, compressed || loud > -12 ? -14 : -12),
+      const settings = {
+        eqLow: clamp(blend(0, clamp((2 - profile.bassTiltDb) * 0.3, -4, 4) - 0.5 * s.rumble), -6, 6),
+        eqMid: clamp(blend(0, clamp(-profile.presenceTiltDb * 0.22, -3, 2.5) - 0.8 * s.harshness), -6, 4),
+        eqHigh: clamp(blend(0, clamp((-12 - profile.trebleTiltDb) * 0.22, -3.5, 3) - 0.8 * s.harshness - 0.5 * s.brittle + 0.5 * s.dull), -6, 5),
+        compThreshold: blend(-18, threshold),
+        compRatio: clamp(blend(1, ratio), 1, 5),
+        limiterCeiling: s.clipping > 0 ? -1 - 1.5 * s.clipping : -1,
+        stereoWidth: clamp(blend(100, width), 40, 130),
+        targetLufs: blend(-12, target),
         artifactCleaner: cleaner
       };
+      settings.insight = {
+        score: assessment.score,
+        intensity: amount,
+        projectedScore: this.projectScore(assessment, amount)
+      };
+      return settings;
+    }
+
+    projectScore(assessment, amount) {
+      if (!assessment) {
+        return null;
+      }
+      const coverage = clamp(amount, 0, 1);
+      let projected = 100;
+      Object.keys(assessment.penalties).forEach((key) => {
+        const fix = assessment.penalties[key] >= 30 && key === 'loudness' ? 0 : (QUALITY_FIX_RATES[key] || 0);
+        projected -= assessment.penalties[key] * (1 - fix * coverage);
+      });
+      return Math.round(clamp(Math.max(projected, assessment.score), 0, 100));
     }
 
     scoreProfile(profile) {
-      if (!profile) {
-        return null;
-      }
-      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-      let score = 100;
-      score -= clamp(profile.clippingRatio * 4000, 0, 32);
-      if (profile.crestDb < 9) {
-        score -= clamp((9 - profile.crestDb) * 3.5, 0, 22);
-      }
-      if (profile.harshness) {
-        score -= 12;
-      }
-      if (profile.brittle) {
-        score -= 8;
-      }
-      if (profile.phasey) {
-        score -= 16;
-      }
-      if (Number.isFinite(profile.loudnessDb)) {
-        score -= clamp(Math.abs(profile.loudnessDb + 14) * 1.6, 0, 16);
-      } else {
-        score -= 30;
-      }
-      score -= clamp(Math.abs(profile.bassTiltDb - 2) * 0.6, 0, 10);
-      return Math.round(clamp(score, 0, 100));
+      const assessment = this.assessProfile(profile);
+      return assessment ? assessment.score : null;
     }
 
     describeProfile(profile) {
-      if (!profile) {
+      const assessment = this.assessProfile(profile);
+      if (!assessment) {
         return [{
           id: 'unavailable',
           tone: 'warn',
@@ -304,34 +500,52 @@
           detail: 'Die Quelle konnte nicht vollständig vermessen werden. Es greift ein neutrales Standard-Preset.'
         }];
       }
+      const s = assessment.severities;
+      const tone = (severity) => (severity >= 0.6 ? 'alert' : (severity >= 0.2 ? 'warn' : 'good'));
       const findings = [];
       const dB = (value) => (value > 0 ? '+' : '') + value.toFixed(1) + ' dB';
-      findings.push(profile.clippingRatio > 0.001
-        ? { id: 'clipping', tone: 'alert', label: 'Clipping erkannt', detail: (profile.clippingRatio * 100).toFixed(2) + ' % der Samples liegen am Anschlag. Limiter-Ceiling wird abgesenkt.' }
+      findings.push(profile.clippingRatio > 0.0002
+        ? { id: 'clipping', tone: s.clipping >= 0.3 ? 'alert' : 'warn', label: 'Clipping erkannt', detail: (profile.clippingRatio * 100).toFixed(2) + ' % der Samples liegen am Anschlag. Limiter-Ceiling wird abgesenkt und die Kompression geschont.' }
         : { id: 'clipping', tone: 'good', label: 'Kein Clipping', detail: 'Die Spitzenpegel der Quelle bleiben unterhalb der Übersteuerungsgrenze.' });
-      findings.push(profile.crestDb < 9
-        ? { id: 'dynamics', tone: 'warn', label: 'Dynamik stark komprimiert', detail: 'Crest-Faktor ' + profile.crestDb.toFixed(1) + ' dB. Die Kompression wird bewusst schonend eingestellt.' }
-        : { id: 'dynamics', tone: 'good', label: 'Dynamik in Ordnung', detail: 'Crest-Faktor ' + profile.crestDb.toFixed(1) + ' dB bietet genug Spielraum für sauberes Mastering.' });
+      const range = Number.isFinite(profile.loudnessRangeDb) ? ' · Lautheitsumfang ' + profile.loudnessRangeDb.toFixed(1) + ' dB' : '';
+      if (s.squashed >= 0.2) {
+        findings.push({ id: 'dynamics', tone: tone(s.squashed), label: 'Dynamik stark komprimiert', detail: 'Crest-Faktor ' + profile.crestDb.toFixed(1) + ' dB' + range + '. Die Kompression wird bewusst schonend eingestellt.' });
+      } else if (s.wide >= 0.2) {
+        findings.push({ id: 'dynamics', tone: 'warn', label: 'Sehr große Dynamik', detail: 'Crest-Faktor ' + profile.crestDb.toFixed(1) + ' dB' + range + '. Der Kompressor gleicht leise und laute Passagen stärker an.' });
+      } else {
+        findings.push({ id: 'dynamics', tone: 'good', label: 'Dynamik in Ordnung', detail: 'Crest-Faktor ' + profile.crestDb.toFixed(1) + ' dB' + range + ' bietet genug Spielraum für sauberes Mastering.' });
+      }
       findings.push(profile.harshness || profile.brittle
-        ? { id: 'harshness', tone: 'warn', label: 'Harsche Höhen', detail: 'Präsenz ' + dB(profile.presenceTiltDb) + ' · Höhen ' + dB(profile.trebleTiltDb) + '. Artefakt-Reinigung wird aktiviert.' }
-        : { id: 'harshness', tone: 'good', label: 'Höhen ausgewogen', detail: 'Präsenz ' + dB(profile.presenceTiltDb) + ' · Höhen ' + dB(profile.trebleTiltDb) + '.' });
-      findings.push(profile.phasey
-        ? { id: 'stereo', tone: 'alert', label: 'Phasiges Stereobild', detail: 'Korrelation ' + profile.stereoCorrelation.toFixed(2) + '. Die Stereobreite wird für Mono-Kompatibilität reduziert.' }
+        ? { id: 'harshness', tone: tone(Math.max(s.harshness, s.brittle * 0.5)), label: 'Harsche Höhen', detail: 'Präsenz ' + dB(profile.presenceTiltDb) + ' · Höhen ' + dB(profile.trebleTiltDb) + '. Artefakt-Reinigung wird aktiviert.' }
+        : (s.dull >= 0.2
+          ? { id: 'harshness', tone: 'warn', label: 'Dumpfe Höhen', detail: 'Höhen ' + dB(profile.trebleTiltDb) + ' gegenüber den Mitten. Der Air-EQ hebt behutsam an.' }
+          : { id: 'harshness', tone: 'good', label: 'Höhen ausgewogen', detail: 'Präsenz ' + dB(profile.presenceTiltDb) + ' · Höhen ' + dB(profile.trebleTiltDb) + '.' }));
+      findings.push(profile.phasey || s.phase >= 0.2
+        ? { id: 'stereo', tone: profile.phasey ? 'alert' : 'warn', label: 'Phasiges Stereobild', detail: 'Korrelation ' + profile.stereoCorrelation.toFixed(2) + '. Die Stereobreite wird für Mono-Kompatibilität reduziert.' }
         : { id: 'stereo', tone: 'good', label: 'Stereobild stabil', detail: 'Korrelation ' + profile.stereoCorrelation.toFixed(2) + ' bleibt mono-kompatibel.' });
+      if (profile.channelCount === 2) {
+        findings.push(s.balance > 0
+          ? { id: 'balance', tone: tone(s.balance), label: 'Kanäle unausgewogen', detail: (profile.balanceDb > 0 ? 'Links' : 'Rechts') + ' ist ' + Math.abs(profile.balanceDb).toFixed(1) + ' dB lauter. Das fließt in den Qualitäts-Score ein.' }
+          : { id: 'balance', tone: 'good', label: 'Kanäle ausgewogen', detail: 'Links/Rechts-Differenz ' + Math.abs(profile.balanceDb || 0).toFixed(1) + ' dB.' });
+      }
       findings.push({
         id: 'tonality',
-        tone: Math.abs(profile.bassTiltDb - 2) > 6 ? 'warn' : 'good',
-        label: Math.abs(profile.bassTiltDb - 2) > 6 ? (profile.bassTiltDb > 2 ? 'Bassbetonte Quelle' : 'Bassarme Quelle') : 'Tonale Balance in Ordnung',
+        tone: tone(s.tonality),
+        label: s.tonality > 0 ? (profile.bassTiltDb > 2 ? 'Bassbetonte Quelle' : 'Bassarme Quelle') : 'Tonale Balance in Ordnung',
         detail: 'Bass-Tilt ' + dB(profile.bassTiltDb) + ' gegenüber den unteren Mitten.'
       });
+      if (profile.rumble) {
+        findings.push({ id: 'rumble', tone: tone(s.rumble), label: 'Rumpeln / DC-Versatz', detail: 'Tiefstfrequenz-Anteil ' + dB(profile.subRatioDb) + '. Ein Rumpel-Filter unter 30 Hz räumt den Bass auf.' });
+      }
+      const loudness = assessment.loudnessDb;
       findings.push({
         id: 'loudness',
-        tone: Number.isFinite(profile.loudnessDb) && Math.abs(profile.loudnessDb + 14) > 6 ? 'warn' : 'good',
-        label: Number.isFinite(profile.loudnessDb)
-          ? (profile.loudnessDb > -8 ? 'Sehr laute Quelle' : (profile.loudnessDb < -20 ? 'Sehr leise Quelle' : 'Lautheit im Zielbereich'))
+        tone: Number.isFinite(loudness) ? tone(s.loudness) : 'warn',
+        label: Number.isFinite(loudness)
+          ? (loudness > -8 ? 'Sehr laute Quelle' : (loudness < -20 ? 'Sehr leise Quelle' : 'Lautheit im Zielbereich'))
           : 'Lautheit nicht bestimmbar',
-        detail: Number.isFinite(profile.loudnessDb)
-          ? 'approx. ' + profile.loudnessDb.toFixed(1) + ' LUFS vor dem Mastering.'
+        detail: Number.isFinite(loudness)
+          ? 'approx. ' + loudness.toFixed(1) + ' LUFS (gegated) vor dem Mastering.'
           : 'Für diese Quelle liess sich keine Lautheit schätzen.'
       });
       return findings;
@@ -359,7 +573,15 @@
         if (settings.artifactCleaner.softenTransients) {
           parts.push('schnellere Transienten-Kontrolle');
         }
+        if (settings.artifactCleaner.rumbleCut) {
+          parts.push('Rumpel-Filter unter ' + Math.round(settings.artifactCleaner.rumbleCut) + ' Hz');
+        }
         steps.push('Artefakt-Reinigung: ' + (parts.length ? parts.join(' · ') : 'aktiv'));
+      }
+      const insight = settings.insight;
+      if (insight && Number.isFinite(insight.score)) {
+        steps.push('Korrekturintensität ' + Math.round(insight.intensity * 100) + ' % · Score ' + insight.score
+          + (Number.isFinite(insight.projectedScore) ? ' → Prognose approx. ' + insight.projectedScore : ''));
       }
       return steps;
     }
@@ -383,6 +605,12 @@
       highEq.gain.value = settings.eqHigh;
 
       const cleaner = settings.artifactCleaner;
+      const rumbleCut = cleaner && cleaner.rumbleCut ? context.createBiquadFilter() : null;
+      if (rumbleCut) {
+        rumbleCut.type = 'highpass';
+        rumbleCut.frequency.value = cleaner.rumbleCut;
+        rumbleCut.Q.value = 0.707;
+      }
       const ringCut = cleaner && cleaner.presenceCut ? context.createBiquadFilter() : null;
       if (ringCut) {
         ringCut.type = 'peaking';
@@ -411,7 +639,12 @@
       limiter.curve = this.createLimiterCurve(this.dbToLinear(settings.limiterCeiling));
       limiter.oversample = '4x';
 
-      input.connect(lowEq);
+      if (rumbleCut) {
+        input.connect(rumbleCut);
+        rumbleCut.connect(lowEq);
+      } else {
+        input.connect(lowEq);
+      }
       lowEq.connect(midEq);
       midEq.connect(highEq);
       let tail = highEq;
@@ -757,6 +990,8 @@
     let loadedFile = null;
     let loadedBuffer = null;
     let sourceProfile = null;
+    let sourceLevels = null;
+    let sourceLevelsBuffer = null;
     let artifactCleaner = null;
     let enhanceSnapshot = null;
     let enhanceState = 'idle';
@@ -1180,7 +1415,9 @@
       const strength = getEnhanceStrength();
       let settings;
       try {
-        settings = core.chooseEnhancement(sourceProfile || core.analyzeSource(loadedBuffer), { strength: strength.factor });
+        // The source profile and its assessment are cached, so re-applying or
+        // changing the strength never re-scans the audio buffer.
+        settings = core.chooseEnhancement(sourceProfile, { strength: strength.factor });
       } catch (error) {
         settings = {
           eqLow: 1.5, eqMid: 2.5, eqHigh: 2, compThreshold: -20,
@@ -1198,7 +1435,7 @@
         }
       });
       artifactCleaner = settings.artifactCleaner;
-      appliedEnhancement = readSettings();
+      appliedEnhancement = { ...readSettings(), insight: settings.insight || null };
       enhanceState = 'applied';
       updateControlOutputs();
       elements.renderStatus.textContent = sourceProfile
@@ -1241,7 +1478,7 @@
           elements.enhanceScoreNote.textContent = !loadedBuffer
             ? 'Der Qualitäts-Check startet automatisch, sobald du eine Datei lädst.'
             : (Number.isFinite(score)
-              ? describeScoreNote(score)
+              ? describeScoreNote(score) + describeProjection()
               : 'Die Quelle liess sich nicht vollständig vermessen. Es greift ein neutrales Standard-Preset.');
         }
       }
@@ -1254,7 +1491,7 @@
             + '<span>' + escapeHtml(finding.detail) + '</span>'
             + '</li>'
           )).join('')
-          : '<li class="enhance-finding" data-tone="idle"><strong>Noch keine Analyse</strong><span>Lade eine Datei, dann prüft das Studio Clipping, Dynamik, Höhen, Stereobild und Lautheit automatisch.</span></li>';
+          : '<li class="enhance-finding" data-tone="idle"><strong>Noch keine Analyse</strong><span>Lade eine Datei, dann prüft das Studio Clipping, Dynamik, Höhen, Stereobild, Kanalbalance und Lautheit automatisch.</span></li>';
       }
 
       if (elements.enhanceSteps) {
@@ -1300,6 +1537,15 @@
         return 'good';
       }
       return score >= 55 ? 'warn' : 'alert';
+    }
+
+    function describeProjection() {
+      const insight = enhanceState === 'applied' && appliedEnhancement && appliedEnhancement.insight;
+      if (!insight || !Number.isFinite(insight.projectedScore)) {
+        return '';
+      }
+      const gain = insight.projectedScore - insight.score;
+      return ' Prognose nach Auto-Enhance: approx. ' + insight.projectedScore + (gain > 0 ? ' (+' + gain + ')' : '') + '.';
     }
 
     function describeScoreNote(score) {
@@ -1657,8 +1903,22 @@
       updateAnalysisSummary();
     }
 
+    function getSourceLevels() {
+      if (!loadedBuffer) {
+        return null;
+      }
+      if (sourceLevelsBuffer !== loadedBuffer) {
+        // Mono/stereo sources were already fully measured by the quality check.
+        sourceLevels = sourceProfile && loadedBuffer.numberOfChannels <= 2
+          ? { peak: sourceProfile.peak, rms: sourceProfile.rms, loudnessDb: sourceProfile.loudnessDb }
+          : core.analyzeBuffer(loadedBuffer);
+        sourceLevelsBuffer = loadedBuffer;
+      }
+      return sourceLevels;
+    }
+
     function updateAnalysisSummary(renderReport, asset) {
-      const sourceAnalysis = loadedBuffer ? core.analyzeBuffer(loadedBuffer) : null;
+      const sourceAnalysis = getSourceLevels();
       const output = [];
       if (!loadedBuffer) {
         elements.analysisSummary.innerHTML = '<p><strong>Analyse:</strong> Noch keine Datei geladen.</p>';

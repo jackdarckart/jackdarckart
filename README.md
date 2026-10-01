@@ -91,7 +91,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `datenschutz.html` – sachliche Datenschutz- und Sicherheitsinformationen
 - `impressum.html` – Impressum mit Anbieterkennzeichnung, Kontakt und Verantwortlichkeit
 
-Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrelation und passt EQ, Kompression und Lautstärkeziel an die Quelle an. Bei auffälligen Höhen, Transienten oder phasigem Stereo werden vorsichtige DSP-Korrekturen zugeschaltet. Dies sind Heuristiken, keine KI-Modell- oder Broadcast-Loudness-Messung; falls die Analyse fehlschlägt, bleibt das klassische Preset nutzbar.
+Auto-Enhance schätzt lokal in einem schnellen Durchlauf Frequenzbalance, Dynamik (Crest-Faktor und Lautheitsumfang), gegatete Lautheit, Clipping, Stereo-Korrelation, Kanalbalance sowie Rumpeln/DC-Versatz. Jeder Befund wird nach Schweregrad gewichtet: Daraus entstehen der Qualitäts-Score, eine Prognose nach dem Mastering und die Korrekturintensität – schwache Quellen werden deutlich kräftiger korrigiert, saubere Quellen nur behutsam. Bei auffälligen Höhen, Transienten, phasigem Stereo oder Rumpeln werden gezielte DSP-Korrekturen (Ringing-Cut, Höhen-Glättung, Transienten-Kontrolle, Rumpel-Filter) zugeschaltet. Dies sind Heuristiken, keine KI-Modell- oder Broadcast-Loudness-Messung; falls die Analyse fehlschlägt, bleibt das klassische Preset nutzbar.
 
 ## Technische Struktur
 
