@@ -96,14 +96,13 @@ Remote-Import verarbeitet Audio ausschließlich im Browser: HTTPS, Hostnamen ohn
 
 ### Proxy-Fallback für nicht CORS-freigegebene Quellen
 
-Wenn die Quelle (z. B. das Suno-CDN) keine CORS-Freigabe liefert, scheitert der direkte Browserabruf. Dafür gibt es einen optionalen, vertrauenswürdigen Same-Origin-Resolver: Der Converter versucht zuerst den direkten Abruf und fällt erst bei einem CORS-/Netzwerkfehler auf den Proxy zurück (`preferProxy: true` dreht die Reihenfolge um). Lokaler Import, Preview, Auto-Enhance, Render, Cleanup und die bestehenden Exportwege bleiben unverändert.
+Wenn ein Suno-CDN-Medium keine CORS-Freigabe liefert, scheitert der direkte Browserabruf. Dafür gibt es einen optionalen, vertrauenswürdigen Same-Origin-Resolver: Der Converter versucht immer zuerst den direkten Abruf und fällt erst bei einem CORS-/Netzwerkfehler auf den Proxy zurück. Der Proxy wird ausschließlich für unterstützte Suno-CDN-Mediendateien verwendet; andere Remote-Audioquellen bleiben beim direkten Import. Lokaler Import, Preview, Auto-Enhance, Render, Cleanup und die bestehenden Exportwege bleiben unverändert.
 
 ```js
 window.__JACKDARCKART_CONFIG__ = {
   converter: {
     remoteImport: {
-      proxyEndpoint: '/api/remote-audio',
-      preferProxy: false
+      proxyEndpoint: '/api/remote-audio'
     }
   }
 };
@@ -114,7 +113,7 @@ Nur echte Same-Origin-Endpunkte werden akzeptiert; fremde Origins, `data:`, `blo
 `server/remote-audio-proxy.js` ist die dependency-freie Node-Referenzimplementierung dieses Endpunkts (GitHub Pages selbst liefert kein Backend mit). Sie ist bewusst kein offener Proxy und prüft serverseitig erneut:
 
 - nur HTTPS, Standardport, keine Zugangsdaten, keine IP-Literale
-- Allow-List (Standard: `cdn\d*.suno.ai` mit `.mp3`/`.mp4`/`.m4a`), erweiterbar über `allowTarget`
+- feste Allow-List: `cdn\d*.suno.ai` mit `.mp3`/`.mp4`/`.m4a`; sie kann nicht über Anfrageparameter erweitert werden
 - DNS-Auflösung gegen private, lokale, Link-Local- und Multicast-Adressen abgesichert
 - Content-Type plus Containersignatur (`ftyp`-Familie, RIFF/WAVE, OggS, fLaC …)
 - Größenlimit (50 MB), Timeout (15 s) und maximal zwei erneut geprüfte Weiterleitungen

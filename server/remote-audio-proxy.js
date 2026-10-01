@@ -66,8 +66,7 @@ function defaultAllowTarget(url) {
   return SUNO_CDN_HOST_PATTERN.test(url.hostname) && SUNO_CDN_MEDIA_PATTERN.test(url.pathname);
 }
 
-function validateTargetUrl(input, options) {
-  const allowTarget = (options && options.allowTarget) || defaultAllowTarget;
+function validateTargetUrl(input) {
   let url;
   try {
     url = new URL(String(input || '').trim());
@@ -89,7 +88,7 @@ function validateTargetUrl(input, options) {
     throw new ProxyError('Lokale oder interne Ziele und IP-Adressen sind nicht erlaubt.', 403);
   }
   url.hash = '';
-  if (!allowTarget(url)) {
+  if (!defaultAllowTarget(url)) {
     throw new ProxyError('Dieses Ziel ist für den Proxy nicht freigegeben.', 403);
   }
   return url;
@@ -187,7 +186,7 @@ async function fetchRemoteAudio(target, options) {
         if (redirect === maxRedirects || !response.headers.location) {
           throw new ProxyError('Weiterleitung nicht erlaubt oder Limit erreicht.', 502);
         }
-        url = validateTargetUrl(new URL(response.headers.location, url).href, settings);
+        url = validateTargetUrl(new URL(response.headers.location, url).href);
         continue;
       }
       if (status !== 200) {
