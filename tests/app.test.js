@@ -1980,7 +1980,7 @@ function testQuantumVaultGameIntegration() {
     'game client must not use browser persistence or submit account identifiers');
   assert.match(gameJs, /credentials:\s*'include'/);
   assert.match(gameHtml, /connect-src 'self' https:\/\/vault\.stream-musik\.space/);
-  assert.match(swCode, /stream-musik-space-v7/, 'new Worker URL must invalidate cached game scripts');
+  assert.match(swCode, /stream-musik-space-v8/, 'cache version bump must invalidate cached game and converter scripts');
   assert.match(gameHtml, /Cloudflare-Cookie/);
   assert.match(gameHtml, /Passwort-Hash \(PBKDF2\)/);
   assert.match(gameJs, /error\.status\s*=\s*response\.status/);
@@ -3807,17 +3807,67 @@ async function testConverterAdaptiveEnhance() {
   assert.ok(core.chooseEnhancement(bright).eqLow > core.chooseEnhancement(bass).eqLow);
   const clipping = core.analyzeSource(buffer(tone(120, 1)));
   assert.ok(clipping.clippingRatio > 0.001);
-  assert.equal(core.chooseEnhancement(clipping).compRatio, 1.5);
-  assert.equal(core.chooseEnhancement(clipping).limiterCeiling, -2);
+  const clippingSettings = core.chooseEnhancement(clipping);
+  assert.ok(clippingSettings.compRatio <= 1.6, 'clipped sources must only be compressed gently');
+  assert.ok(clippingSettings.limiterCeiling <= -2, 'heavy clipping should lower the limiter ceiling noticeably');
   const left = tone(5000, 0.4);
   const phasey = core.analyzeSource(buffer(left, left.map((value) => -value)));
   assert.ok(phasey.phasey);
-  assert.equal(core.chooseEnhancement(phasey).stereoWidth, 65);
+  const phaseyWidth = core.chooseEnhancement(phasey).stereoWidth;
+  assert.ok(phaseyWidth < 70 && phaseyWidth >= 40, 'phase problems should narrow the stereo image clearly but not collapse it');
   const brittle = core.chooseEnhancement({ ...bright, brittle: true, crestDb: 18 });
   assert.equal(brittle.artifactCleaner.softenTransients, true);
   const silent = core.analyzeSource(buffer(new Float32Array(length)));
   assert.equal(silent.harshness, false);
   assert.equal(silent.clippingRatio, 0);
+  assert.equal(silent.rumble, false);
+  assert.throws(() => core.analyzeSource(buffer(Float32Array.from({ length }, (_, i) => (i === 10 ? NaN : 0.1)))), /Ungültige/);
+
+  // Smarter weighting: clean material is scored high and only nudged,
+  // poor material is scored low and corrected noticeably harder.
+  const cleanMix = Float32Array.from({ length }, (_, i) => (
+    Math.sin(2 * Math.PI * 90 * i / sampleRate) * 0.12
+    + Math.sin(2 * Math.PI * 440 * i / sampleRate) * 0.1
+    + Math.sin(2 * Math.PI * 1200 * i / sampleRate) * 0.06
+    + Math.sin(2 * Math.PI * 3000 * i / sampleRate) * 0.02
+    + Math.sin(2 * Math.PI * 9000 * i / sampleRate) * 0.006
+  ) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 0.7 * i / sampleRate)));
+  const cleanRight = Float32Array.from(cleanMix, (value, i) => value * 0.9 + 0.02 * Math.sin(2 * Math.PI * 660 * i / sampleRate));
+  const clean = core.analyzeSource(buffer(cleanMix, cleanRight));
+  assert.equal(clean.channelCount, 2);
+  assert.ok(Number.isFinite(clean.gatedLoudnessDb) && Number.isFinite(clean.loudnessRangeDb));
+  const cleanScore = core.scoreProfile(clean);
+  assert.ok(cleanScore >= 80, 'a clean mix should score as good (got ' + cleanScore + ')');
+  assert.ok(cleanScore > core.scoreProfile(bright) && core.scoreProfile(bright) > core.scoreProfile(clipping),
+    'score must rank clean > harsh > clipped');
+  assert.ok(core.scoreProfile(phasey) < core.scoreProfile(bright), 'phase problems must lower the score further');
+  assert.strictEqual(core.assessProfile(clean), core.assessProfile(clean), 'assessment must be cached per profile');
+  const cleanSettings = core.chooseEnhancement(clean);
+  assert.equal(cleanSettings.artifactCleaner, null, 'clean material must not trigger artifact cleaning');
+  assert.ok(cleanSettings.insight.intensity < clippingSettings.insight.intensity,
+    'correction intensity must adapt to the source quality');
+  assert.ok(cleanSettings.insight.intensity < 0.8, 'clean sources should be processed conservatively');
+  assert.ok(clippingSettings.insight.intensity > 1.1, 'poor sources should be processed more strongly');
+  assert.ok(clippingSettings.insight.projectedScore > clippingSettings.insight.score,
+    'the projected score must show a visible improvement for poor sources');
+  const brightSettings = core.chooseEnhancement(bright);
+  const strongBright = core.chooseEnhancement(bright, { strength: 1.4 });
+  assert.ok(strongBright.artifactCleaner.presenceCut < brightSettings.artifactCleaner.presenceCut,
+    'a higher strength should deepen the ringing cut');
+  assert.ok(brightSettings.artifactCleaner.presenceCut <= -2.5, 'harsh sources need a clearly audible ringing cut');
+  const dynamic = core.chooseEnhancement({ ...clean, loudnessRangeDb: 22 });
+  assert.ok(dynamic.compRatio > cleanSettings.compRatio, 'very dynamic sources should be compressed harder');
+  assert.ok(core.describeProfile({ ...clean, loudnessRangeDb: 22 }).some((finding) => finding.label === 'Sehr große Dynamik'));
+  const quietRight = Float32Array.from(cleanMix, (value) => value * 0.3);
+  const unbalanced = core.analyzeSource(buffer(cleanMix, quietRight));
+  assert.ok(unbalanced.balanceDb > 9, 'channel imbalance should be measured');
+  assert.ok(core.scoreProfile(unbalanced) < core.scoreProfile(clean));
+  assert.equal(core.describeProfile(unbalanced).find((finding) => finding.id === 'balance').tone, 'alert');
+  const rumbling = core.analyzeSource(buffer(Float32Array.from(cleanMix, (value, i) => value + 0.08 + 0.2 * Math.sin(2 * Math.PI * 15 * i / sampleRate))));
+  assert.equal(rumbling.rumble, true, 'DC offset and sub-sonic energy should be detected');
+  assert.equal(core.chooseEnhancement(rumbling).artifactCleaner.rumbleCut, 30);
+  assert.ok(core.describeProfile(rumbling).some((finding) => finding.id === 'rumble'));
+  assert.match(core.summarizeEnhancement(core.chooseEnhancement(rumbling)).join(' '), /Rumpel-Filter unter 30 Hz/);
 
   const created = [];
   const node = () => {
@@ -3840,6 +3890,11 @@ async function testConverterAdaptiveEnhance() {
   created.length = 0;
   core.createPreviewChain(context, core.chooseEnhancement(bass), node(), 1);
   assert.equal(created.some((item) => item.frequency.value === 4400), false);
+  assert.equal(created.some((item) => item.type === 'highpass'), false);
+  created.length = 0;
+  core.createPreviewChain(context, core.chooseEnhancement(rumbling), node(), 1);
+  assert.ok(created.some((item) => item.type === 'highpass' && item.frequency.value === 30),
+    'rumble cleaning should insert a high-pass filter into preview/render');
 
   const source = buffer(left);
   env.window.AudioContext = class FakeAudioContext {
@@ -3914,10 +3969,19 @@ async function testConverterAutomaticQualityWorkflow() {
     async close() {}
   };
 
+  const core = studio._coreForTest;
+  const originalAnalyzeSource = core.analyzeSource;
+  let analysisRuns = 0;
+  core.analyzeSource = function (...args) {
+    analysisRuns += 1;
+    return originalAnalyzeSource.apply(this, args);
+  };
+
   const file = { name: 'harsh.wav', size: 10, type: 'audio/wav', async arrayBuffer() { return new ArrayBuffer(10); } };
   env.elements['converter-file-input'].files = [file];
   await env.elements['converter-file-input'].dispatch('change');
 
+  assert.equal(analysisRuns, 1, 'import should analyse the source exactly once');
   assert.equal(studio._enhanceStateForTest(), 'applied', 'import should trigger the automatic quality improvement');
   assert.match(
     env.elements['converter-enhance-status'].textContent,
@@ -3926,9 +3990,19 @@ async function testConverterAutomaticQualityWorkflow() {
   );
   assert.match(env.elements['converter-enhance-findings'].innerHTML, /Clipping|Höhen|Stereobild/);
   assert.match(env.elements['converter-enhance-steps'].innerHTML, /Limiter-Ceiling/);
+  assert.match(env.elements['converter-enhance-steps'].innerHTML, /Artefakt-Reinigung: Ringing-Cut/);
+  assert.match(env.elements['converter-enhance-steps'].innerHTML, /Korrekturintensität \d+ % · Score \d+ → Prognose approx\. \d+/);
   assert.match(env.elements['converter-enhance-score-note'].textContent, /Auto-Enhance/);
+  const projection = env.elements['converter-enhance-score-note'].textContent.match(/Prognose nach Auto-Enhance: approx\. (\d+) \(\+(\d+)\)/);
+  assert.ok(projection, 'the score note should report the projected improvement');
   const score = Number(env.elements['converter-enhance-score'].textContent);
   assert.ok(Number.isFinite(score) && score >= 0 && score <= 100, 'quality score should be reported as a value between 0 and 100');
+  assert.ok(score < 80, 'a harsh, squashed test tone must not be rated as clean');
+  assert.ok(Number(projection[1]) > score, 'the projection must exceed the source score');
+  assert.ok(
+    Math.abs(Number(env.elements['converter-eq-mid'].value)) + Math.abs(Number(env.elements['converter-eq-high'].value)) >= 1.5,
+    'a harsh source must receive a clearly audible tonal correction'
+  );
   assert.equal(env.elements['converter-auto-enhance-undo'].disabled, false, 'undo must be available after an automatic enhancement');
 
   const balancedLow = Number(env.elements['converter-eq-low'].value);
@@ -3956,9 +4030,11 @@ async function testConverterAutomaticQualityWorkflow() {
     Math.abs(Number(env.elements['converter-eq-low'].value)) >= Math.abs(balancedLow),
     'a stronger setting should not reduce the corrective EQ move'
   );
+  assert.equal(analysisRuns, 1, 'changing the strength must reuse the cached source analysis');
 
   studio._undoAutoEnhanceForTest();
   assert.equal(studio._enhanceStateForTest(), 'reverted');
+  assert.doesNotMatch(env.elements['converter-enhance-score-note'].textContent, /Prognose/, 'undo should drop the projection');
   assert.equal(env.elements['converter-eq-low'].value, '0', 'undo should restore the slider values from before the enhancement');
   assert.equal(studio._settingsForTest().artifactCleaner, null, 'undo should also drop the artifact cleaner');
   assert.equal(env.elements['converter-auto-enhance-undo'].disabled, true, 'undo should disable itself after restoring');
@@ -3973,6 +4049,7 @@ async function testConverterAutomaticQualityWorkflow() {
   await env.elements['converter-auto-enhance'].dispatch('click');
   assert.equal(studio._enhanceStateForTest(), 'applied');
   assert.match(env.elements['converter-enhance-status'].textContent, /Manuell angewendet/);
+  assert.equal(analysisRuns, 2, 'manual application must reuse the analysis from the latest import');
 
   await env.elements['converter-eq-low'].dispatch('input');
   assert.equal(studio._enhanceStateForTest(), 'manual', 'manual slider changes should be reflected in the enhancement state');
