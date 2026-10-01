@@ -12,7 +12,6 @@ const converterHtmlCode = fs.readFileSync(path.join(__dirname, '..', 'converter.
 const swCode = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 const stylesCode = fs.readFileSync(path.join(__dirname, '..', 'styles.css'), 'utf8');
 const liveHtmlCode = fs.readFileSync(path.join(__dirname, '..', 'live.html'), 'utf8');
-const gameHtmlCode = fs.readFileSync(path.join(__dirname, '..', 'game.html'), 'utf8');
 const expectedStreamUrl = 'https://jackdarckart.stream.laut.fm/jackdarckart';
 const htmlPages = [
   'index.html',
@@ -23,7 +22,6 @@ const htmlPages = [
   'events.html',
   'news.html',
   'archiv.html',
-  'game.html',
   'ueber-uns.html',
   'hilfe.html',
   'issue-hilfe.html',
@@ -1925,10 +1923,9 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
     assert.ok(footerNavMatch, `${file} should expose a parsable footer navigation section`);
     assert.match(siteNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the main navigation`);
     assert.match(siteNavMatch[1], /href="\.\/converter\.html"/, `${file} should expose the shared converter-studio entry in the main navigation`);
-    assert.match(siteNavMatch[1], /href="\.\/game\.html"/, `${file} should expose the shared game-arcade entry in the main navigation`);
     assert.match(footerNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the footer navigation`);
     assert.match(footerNavMatch[1], /href="\.\/converter\.html"/, `${file} should expose the shared converter-studio entry in the footer navigation`);
-    assert.match(footerNavMatch[1], /href="\.\/game\.html"/, `${file} should expose the shared game-arcade entry in the footer navigation`);
+    assert.doesNotMatch(html, /href=["']\.\/game\.html["']|Singularity Arcade|Arcade Game/i, `${file} should not contain Arcade navigation or content`);
     assert.equal((siteNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the main navigation`);
     assert.equal((footerNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the footer navigation`);
     assert.match(siteNavMatch[1], new RegExp(`<a href="${escapeRegExp(expectedHref)}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the main navigation`);
@@ -1937,6 +1934,15 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
       assert.match(html, /<nav class="breadcrumbs" aria-label="Breadcrumb">/, `${file} should include breadcrumbs`);
     }
   }
+}
+
+function testArcadePageAndIntegrationAreRemoved() {
+  assert.equal(fs.existsSync(path.join(__dirname, '..', 'game.html')), false, 'game.html should be deleted');
+  assert.doesNotMatch(appCode, /initGameGateway|APP_CONFIG\.game|game\.stream-musik\.space/i, 'app.js should not retain Arcade gateway configuration or handlers');
+  assert.doesNotMatch(swCode, /game\.html/i, 'service worker should not precache the removed game page');
+  assert.doesNotMatch(stylesCode, /Arcade|game-hero|endpoint-launcher/i, 'styles should not retain unused Arcade gateway rules');
+  const readme = fs.readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
+  assert.doesNotMatch(readme, /game\.html|Singularity Arcade|Quantum Vault/i, 'README should not document the removed Arcade integration');
 }
 
 function testStickyPlayerCssKeepsPlayerWithinViewport() {
@@ -2135,142 +2141,6 @@ function testConverterPageExposesStudioHooksAndLoader() {
     'converter studio should keep a stereo-width mapping where 100 percent preserves the original stereo image'
   );
 }
-
-function testGameGatewayPageExposesStructureAndHooks() {
-  for (const hook of [
-    'endpoint-input',
-    'launch-btn',
-    'probe-btn',
-    'probe-status',
-    'preset-subdomain',
-    'preset-local',
-    'preset-repo',
-    'hero-launch-btn',
-    'hero-local-btn',
-    'hero-probe-btn'
-  ]) {
-    const escapedHook = hook.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    assert.match(
-      gameHtmlCode,
-      new RegExp(`id\\s*=\\s*["']${escapedHook}["']`),
-      `game gateway page should expose ${hook}`
-    );
-  }
-
-  assert.match(
-    gameHtmlCode,
-    /https:\/\/game\.stream-musik\.space/,
-    'game gateway page should reference the production subdomain destination'
-  );
-  assert.match(
-    gameHtmlCode,
-    /https:\/\/github\.com\/jackdarckart\/game/,
-    'game gateway page should link to the target repository'
-  );
-  assert.match(
-    gameHtmlCode,
-    /GitHub Pages[\s\S]*Node\.js/i,
-    'game gateway page should explain the architectural distinction between GitHub Pages and the Node.js backend'
-  );
-  assert.match(
-    gameHtmlCode,
-    /Quantum Vault|Singularity Arcade/i,
-    'game gateway page should describe the game lore and features'
-  );
-}
-
-async function testGameGatewayConfigAndInteractions() {
-  const env = createEnvironment({
-    extraIds: [
-      'endpoint-input',
-      'launch-btn',
-      'probe-btn',
-      'probe-status',
-      'preset-subdomain',
-      'preset-local',
-      'preset-repo',
-      'hero-probe-btn'
-    ]
-  });
-
-  const { elements } = env;
-
-  assert.equal(
-    elements['endpoint-input'].value,
-    'https://game.stream-musik.space',
-    'endpoint-input should be populated with default subdomain URL'
-  );
-
-  await elements['preset-local'].dispatch('click');
-  assert.equal(
-    elements['endpoint-input'].value,
-    'http://127.0.0.1:3000',
-    'preset-local should set local dev URL'
-  );
-
-  await elements['preset-repo'].dispatch('click');
-  assert.equal(
-    elements['endpoint-input'].value,
-    'https://github.com/jackdarckart/game',
-    'preset-repo should set repository URL'
-  );
-
-  await elements['preset-subdomain'].dispatch('click');
-  assert.equal(
-    elements['endpoint-input'].value,
-    'https://game.stream-musik.space',
-    'preset-subdomain should reset to subdomain URL'
-  );
-
-  await elements['launch-btn'].dispatch('click');
-  assert.equal(
-    env.getOpenedUrl(),
-    'https://game.stream-musik.space/',
-    'launch button should open the configured URL'
-  );
-
-  elements['endpoint-input'].value = 'javascript:alert(1)';
-  await elements['launch-btn'].dispatch('click');
-  assert.equal(
-    elements['probe-status'].dataset.state,
-    'error',
-    'launching invalid scheme should set probe-status error state'
-  );
-  assert.match(
-    elements['probe-status'].textContent,
-    /Ungültige URL/,
-    'launching invalid scheme should display error message'
-  );
-
-  let fetchedUrl = '';
-  env.window.fetch = async (url) => {
-    fetchedUrl = String(url);
-    return {
-      ok: true,
-      status: 200,
-      statusText: 'OK'
-    };
-  };
-
-  elements['endpoint-input'].value = 'https://game.stream-musik.space';
-  await elements['probe-btn'].dispatch('click');
-  assert.equal(
-    fetchedUrl,
-    'https://game.stream-musik.space/api/session',
-    'probe should query the health / session endpoint'
-  );
-  assert.equal(
-    elements['probe-status'].dataset.state,
-    'success',
-    'successful probe should set success state'
-  );
-  assert.match(
-    elements['probe-status'].textContent,
-    /erreichbar/i,
-    'probe success should confirm server availability'
-  );
-}
-
 
 async function testConverterMp3FormatExposureAndDefaults() {
   class FakeMediaRecorder {
@@ -3781,8 +3651,7 @@ async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
-  testGameGatewayPageExposesStructureAndHooks();
-  await testGameGatewayConfigAndInteractions();
+  testArcadePageAndIntegrationAreRemoved();
   await testConverterMp3FormatExposureAndDefaults();
   testConverterOpusFormatExposureMatchesMimeSupport();
   await testConverterMp3FormatExposureWithBundledLocalEncoder();

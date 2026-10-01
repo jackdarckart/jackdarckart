@@ -191,12 +191,6 @@
         requestTimeoutMs: 12000,
         scheduleTimeZone: 'Europe/Berlin'
       },
-      game: {
-        subdomainUrl: 'https://game.stream-musik.space',
-        localUrl: 'http://127.0.0.1:3000',
-        repoUrl: 'https://github.com/jackdarckart/game',
-        healthEndpoint: '/api/session'
-      },
       content: {
         events: [],
         news: [],
@@ -211,11 +205,6 @@
             label: 'Direkter Stream',
             url: directStreamUrl,
             description: 'Offizielle Stream-URL ohne zusätzliche Weiterleitungen'
-          },
-          {
-            label: 'Singularity Arcade (Subdomain)',
-            url: 'https://game.stream-musik.space',
-            description: 'Subdomain-Ziel des separaten Cyberpunk-Hacking-Games (Quantum Vault)'
           },
           {
             label: 'GitHub Issues',
@@ -3903,200 +3892,6 @@
     updateInstallPromptVisibility();
   }
 
-  function initGameGateway() {
-    const endpointInput = document.getElementById('endpoint-input') || document.getElementById('game-custom-url');
-    const launchBtn = document.getElementById('launch-btn') || document.getElementById('game-launch-tab');
-    const probeBtn = document.getElementById('probe-btn') || document.getElementById('game-probe-button');
-    const probeStatus = document.getElementById('probe-status') || document.getElementById('game-probe-status');
-    const presetSubdomainBtn = document.getElementById('preset-subdomain') || document.getElementById('game-preset-subdomain');
-    const presetLocalBtn = document.getElementById('preset-local') || document.getElementById('game-preset-local');
-    const presetRepoBtn = document.getElementById('preset-repo') || document.getElementById('game-preset-repo');
-    const heroProbeBtn = document.getElementById('hero-probe-btn') || document.getElementById('game-hero-probe-button');
-    const endpointDisplay = document.getElementById('game-endpoint-display');
-
-    if (!endpointInput && !launchBtn && !probeBtn && !heroProbeBtn) {
-      return;
-    }
-
-    const gameConfig = APP_CONFIG.game || {
-      subdomainUrl: 'https://game.stream-musik.space',
-      localUrl: 'http://127.0.0.1:3000',
-      repoUrl: 'https://github.com/jackdarckart/game',
-      healthEndpoint: '/api/session'
-    };
-
-    function updateDisplay(val) {
-      if (endpointDisplay && val) {
-        endpointDisplay.textContent = val;
-      }
-    }
-
-    if (endpointInput && !endpointInput.value) {
-      endpointInput.value = gameConfig.subdomainUrl;
-      updateDisplay(endpointInput.value);
-    }
-
-    if (presetSubdomainBtn) {
-      bindManagedEvent(presetSubdomainBtn, 'click', () => {
-        if (endpointInput) {
-          endpointInput.value = gameConfig.subdomainUrl;
-          updateDisplay(endpointInput.value);
-          if (typeof endpointInput.focus === 'function') {
-            endpointInput.focus();
-          }
-        }
-      });
-    }
-
-    if (presetLocalBtn) {
-      bindManagedEvent(presetLocalBtn, 'click', () => {
-        if (endpointInput) {
-          endpointInput.value = gameConfig.localUrl;
-          updateDisplay(endpointInput.value);
-          if (typeof endpointInput.focus === 'function') {
-            endpointInput.focus();
-          }
-        }
-      });
-    }
-
-    if (presetRepoBtn) {
-      bindManagedEvent(presetRepoBtn, 'click', () => {
-        if (endpointInput) {
-          endpointInput.value = gameConfig.repoUrl;
-          updateDisplay(endpointInput.value);
-          if (typeof endpointInput.focus === 'function') {
-            endpointInput.focus();
-          }
-        }
-      });
-    }
-
-    function sanitizeLaunchUrl(rawUrl) {
-      if (!rawUrl || typeof rawUrl !== 'string') {
-        return '';
-      }
-      const trimmed = rawUrl.trim();
-      try {
-        const parsed = new window.URL(trimmed, window.location.href);
-        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-          return parsed.href;
-        }
-      } catch (e) {
-        return '';
-      }
-      return '';
-    }
-
-    function handleLaunch() {
-      const raw = endpointInput ? endpointInput.value : gameConfig.subdomainUrl;
-      const valid = sanitizeLaunchUrl(raw);
-      if (!valid) {
-        if (probeStatus) {
-          probeStatus.textContent = 'Ungültige URL. Bitte gib eine vollständige http:// oder https:// Adresse ein.';
-          probeStatus.dataset.state = 'error';
-        }
-        return;
-      }
-      if (typeof window.open === 'function') {
-        window.open(valid, '_blank', 'noopener,noreferrer');
-      } else {
-        window.location.href = valid;
-      }
-    }
-
-    if (launchBtn) {
-      bindManagedEvent(launchBtn, 'click', handleLaunch);
-    }
-
-    if (endpointInput) {
-      bindManagedEvent(endpointInput, 'keydown', (event) => {
-        if (event && event.key === 'Enter') {
-          if (typeof event.preventDefault === 'function') {
-            event.preventDefault();
-          }
-          handleLaunch();
-        }
-      });
-    }
-
-    async function probeTarget(targetUrl) {
-      if (!probeStatus) {
-        return;
-      }
-      const valid = sanitizeLaunchUrl(targetUrl);
-      if (!valid) {
-        probeStatus.textContent = 'Ungültige URL für Verbindungstest.';
-        probeStatus.dataset.state = 'error';
-        return;
-      }
-
-      probeStatus.textContent = 'Verbindung wird geprüft …';
-      probeStatus.dataset.state = 'probing';
-
-      try {
-        let probeUrl = valid;
-        try {
-          const parsed = new window.URL(valid);
-          if (gameConfig.healthEndpoint && !parsed.pathname.includes('/api/')) {
-            parsed.pathname = parsed.pathname.replace(/\/+$/, '') + gameConfig.healthEndpoint;
-            probeUrl = parsed.href;
-          }
-        } catch (_) {}
-
-        if (typeof window.fetch !== 'function') {
-          probeStatus.textContent = 'Browser unterstützt keinen Verbindungstest. URL kann dennoch geöffnet werden.';
-          probeStatus.dataset.state = 'warning';
-          return;
-        }
-
-        const controller = typeof window.AbortController === 'function' ? new window.AbortController() : null;
-        const timeoutId = controller ? window.setTimeout(() => controller.abort(), 6000) : null;
-
-        const response = await window.fetch(probeUrl, {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'omit',
-          signal: controller ? controller.signal : undefined
-        });
-
-        if (timeoutId) {
-          window.clearTimeout(timeoutId);
-        }
-
-        if (response.ok || response.status === 401 || response.status === 200) {
-          probeStatus.textContent = 'Server erreichbar! Antwort-Status: ' + response.status + ' (' + (response.statusText || 'OK') + '). Game kann gestartet werden.';
-          probeStatus.dataset.state = 'success';
-        } else {
-          probeStatus.textContent = 'Server antwortet mit HTTP ' + response.status + '. Game-Dienst möglicherweise im Aufbau.';
-          probeStatus.dataset.state = 'warning';
-        }
-      } catch (err) {
-        if (err && err.name === 'AbortError') {
-          probeStatus.textContent = 'Zeitüberschreitung beim Verbindungsversuch (Timeout nach 6s). Ist der Game-Server gestartet?';
-          probeStatus.dataset.state = 'warning';
-        } else {
-          probeStatus.textContent = 'Keine direkte HTTP-Antwort (Netzwerk- oder CORS-Einschränkung). Bei getrenntem Node.js-Backend ist das normal — öffne das Spiel direkt im neuen Tab.';
-          probeStatus.dataset.state = 'warning';
-        }
-      }
-    }
-
-    if (probeBtn) {
-      bindManagedEvent(probeBtn, 'click', () => {
-        const target = endpointInput ? endpointInput.value : gameConfig.subdomainUrl;
-        return probeTarget(target);
-      });
-    }
-
-    if (heroProbeBtn) {
-      bindManagedEvent(heroProbeBtn, 'click', () => {
-        const target = endpointInput ? endpointInput.value : gameConfig.subdomainUrl;
-        return probeTarget(target);
-      });
-    }
-  }
-
   function updateFeedbackAvailability() {
     const contactConfig = APP_CONFIG.content.contact || {};
     const hasEmail = Boolean(String(contactConfig.email || '').trim());
@@ -4146,7 +3941,6 @@
   setBackToTopVisibility();
   registerServiceWorker();
   initOptionalPageModule();
-  initGameGateway();
   window[APP_INSTANCE_KEY] = {
     destroy: destroyApp,
     navigateWithinPersistentShell
