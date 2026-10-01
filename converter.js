@@ -26,6 +26,22 @@
       approximate: true
     }
   ];
+  const SUNO_PAGE_HOSTS = ['suno.com', 'www.suno.com'];
+  const SUNO_CDN_HOST_PATTERN = /^cdn\d*\.suno\.ai$/;
+  const SUNO_CDN_MEDIA_PATTERN = /\.(mp3|mp4|m4a)$/i;
+  const SUNO_SONG_ID_PATTERN = /^\/song\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i;
+  const REMOTE_AUDIO_MIME_TYPES = Object.assign(Object.create(null), {
+    'audio/mpeg': 'mp3', 'audio/mp3': 'mp3',
+    'audio/wav': 'wav', 'audio/wave': 'wav', 'audio/x-wav': 'wav',
+    'audio/ogg': 'ogg', 'application/ogg': 'ogg',
+    'audio/flac': 'flac', 'audio/x-flac': 'flac',
+    'audio/mp4': 'mp4', 'audio/x-m4a': 'mp4', 'audio/m4a': 'mp4',
+    'video/mp4': 'mp4', 'application/mp4': 'mp4',
+    'audio/webm': 'webm',
+    'audio/aiff': 'aiff', 'audio/x-aiff': 'aiff'
+  });
+  const REMOTE_IMPORT_STATUS_DEFAULT = 'Remote-Audio erfolgreich im Browser geladen. Keine Speicherung auf dem Server.';
+  const REMOTE_IMPORT_STATUS_MP4 = 'MP4/M4A-Audio erfolgreich im Browser dekodiert. Export als WAV ist verfügbar, MP3 nur bei vorhandener Encoder-Unterstützung. Keine Speicherung auf dem Server.';
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -51,20 +67,24 @@
     if (url.port && url.port !== '443') {
       throw new Error('Nur der Standard-HTTPS-Port ist erlaubt.');
     }
+    if (SUNO_CDN_HOST_PATTERN.test(host) && !SUNO_CDN_MEDIA_PATTERN.test(url.pathname)) {
+      throw new Error('Suno-CDN-Links müssen direkt auf eine .mp4-, .m4a- oder .mp3-Datei zeigen.');
+    }
     url.hash = '';
     return url;
   }
 
-  function resolveRemoteAudioUrl(input) {
+  function resolveRemoteAudioCandidates(input) {
     const url = validateRemoteAudioUrl(input);
-    if (!['suno.com', 'www.suno.com'].includes(url.hostname.toLowerCase().replace(/\.$/, ''))) {
-      return url;
+    if (!SUNO_PAGE_HOSTS.includes(url.hostname.toLowerCase().replace(/\.$/, ''))) {
+      return [url];
     }
-    const match = url.pathname.match(/^\/song\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i);
+    const match = url.pathname.match(SUNO_SONG_ID_PATTERN);
     if (!match) {
-      throw new Error('Suno-Link konnte nicht sicher aufgelöst werden. Bitte einen direkten HTTPS-Audiolink verwenden.');
+      throw new Error('Suno-Link konnte nicht sicher aufgelöst werden. Bitte einen direkten HTTPS-Audiolink (z. B. https://cdn1.suno.ai/<id>.mp4) verwenden.');
     }
-    return validateRemoteAudioUrl('https://cdn1.suno.ai/' + match[1] + '.mp3');
+    // Suno liefert dieselbe Song-ID als MP3- und MP4-Medienobjekt aus; beide Ziele werden gleich streng geprüft.
+    return ['mp3', 'mp4'].map((extension) => validateRemoteAudioUrl('https://cdn1.suno.ai/' + match[1] + '.' + extension));
   }
 
   function sniffRemoteAudio(bytes) {
@@ -80,18 +100,18 @@
     return '';
   }
 
+  function normalizeMimeType(contentType) {
+    return (contentType || '').split(';')[0].trim().toLowerCase();
+  }
+
+  function remoteAudioContainer(contentType) {
+    return REMOTE_AUDIO_MIME_TYPES[normalizeMimeType(contentType)] || '';
+  }
+
   function remoteAudioFormat(contentType, bytes) {
-    const mime = (contentType || '').split(';')[0].trim().toLowerCase();
-    const allowed = {
-      'audio/mpeg': 'mp3', 'audio/mp3': 'mp3',
-      'audio/wav': 'wav', 'audio/wave': 'wav', 'audio/x-wav': 'wav',
-      'audio/ogg': 'ogg', 'application/ogg': 'ogg',
-      'audio/flac': 'flac', 'audio/x-flac': 'flac',
-      'audio/mp4': 'mp4', 'audio/x-m4a': 'mp4', 'audio/m4a': 'mp4',
-      'audio/webm': 'webm',
-      'audio/aiff': 'aiff', 'audio/x-aiff': 'aiff'
-    };
-    if (!allowed[mime] || (bytes && sniffRemoteAudio(bytes) !== allowed[mime])) {
+    const mime = normalizeMimeType(contentType);
+    const container = remoteAudioContainer(mime);
+    if (!container || (bytes && sniffRemoteAudio(bytes) !== container)) {
       throw new Error('Die Antwort ist kein unterstütztes Audioformat (MIME/Dateisignatur).');
     }
     return mime;
@@ -101,12 +121,21 @@
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
     let reader;
     try {
-      const response = await window.fetch(url.href, {
-        mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
-        redirect: 'error', cache: 'no-store', signal: controller.signal
-      });
+      let response;
+      try {
+        response = await window.fetch(url.href, {
+          mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
+          redirect: 'error', cache: 'no-store', signal: controller.signal
+        });
+      } catch (error) {
+        // Netzwerk-/CORS-Fehler markieren eine nicht abrufbare Quelle, nicht einen inhaltlichen Fehler.
+        if (error && error.name !== 'AbortError') error.remoteSourceUnavailable = true;
+        throw error;
+      }
       if (!response.ok || response.type === 'opaque' || response.url !== url.href) {
-        throw new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
+        const unreachable = new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
+        unreachable.remoteSourceUnavailable = true;
+        throw unreachable;
       }
       const contentType = response.headers.get('Content-Type');
       // Fail closed before allocating a buffer, even if the server omits Content-Length.
@@ -847,17 +876,34 @@
       }
     }
 
+    async function fetchFirstAvailableRemoteAudio(candidates, generation) {
+      let lastError = null;
+      for (let index = 0; index < candidates.length; index += 1) {
+        const controller = new AbortController();
+        remoteController = controller;
+        try {
+          return { url: candidates[index], audio: await fetchRemoteAudio(candidates[index], controller) };
+        } catch (error) {
+          if (remoteController === controller) remoteController = null;
+          // Nur fehlende oder nicht abrufbare Quellen dürfen auf den nächsten Kandidaten ausweichen;
+          // Abbrüche, veraltete Importe und Inhaltsfehler werden sofort gemeldet.
+          const retryable = error && error.remoteSourceUnavailable === true;
+          if (generation !== importGeneration || !retryable) throw error;
+          lastError = error;
+        }
+      }
+      throw lastError || new Error('Remote-Import fehlgeschlagen.');
+    }
+
     async function handleRemoteImport() {
       cancelRemoteImport();
       const generation = importGeneration;
-      const controller = new AbortController();
-      remoteController = controller;
       elements.remoteButton.disabled = true;
       setRenderState('loading', 'Remote-Audio wird sicher geladen …');
       elements.importStatus.textContent = 'Remote-Audio wird geladen und im Browser geprüft …';
       try {
-        const url = resolveRemoteAudioUrl(elements.remoteInput.value);
-        const audio = await fetchRemoteAudio(url, controller);
+        const candidates = resolveRemoteAudioCandidates(elements.remoteInput.value);
+        const { url, audio } = await fetchFirstAvailableRemoteAudio(candidates, generation);
         if (generation !== importGeneration) return;
         const context = await ensureAudioContext();
         let buffer;
@@ -884,7 +930,9 @@
         drawWaveform(loadedBuffer);
         updateAnalysisSummary();
         setRenderState('ready', 'Remote-Audio bereit – Preview und Render bleiben lokal.');
-        elements.importStatus.textContent = 'Remote-Audio erfolgreich im Browser geladen. Keine Speicherung auf dem Server.';
+        elements.importStatus.textContent = remoteAudioContainer(audio.type) === 'mp4'
+          ? REMOTE_IMPORT_STATUS_MP4
+          : REMOTE_IMPORT_STATUS_DEFAULT;
       } catch (error) {
         if (generation !== importGeneration) return;
         const reason = error.name === 'AbortError'

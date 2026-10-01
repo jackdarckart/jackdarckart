@@ -2637,6 +2637,9 @@ async function testConverterRemoteImport() {
   env.window.fetch = async (url, options) => {
     fetchCalls.push({ url, options });
     abortSignal = options.signal;
+    if ((responseOptions.failUrls || []).includes(url)) {
+      throw new TypeError('Failed to fetch');
+    }
     const bytes = responseOptions.bytes || mp3;
     const chunks = responseOptions.chunks || [bytes];
     let index = 0;
@@ -2696,6 +2699,61 @@ async function testConverterRemoteImport() {
   await button.dispatch('click');
   assert.equal(fetchCalls.length, previousCalls);
   assert.match(status.textContent, /Suno-Link konnte nicht/);
+
+  const mp4 = Uint8Array.from(Buffer.from('0000ftypM4A 0000'));
+  const sunoMp4Url = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  responseOptions = { mime: 'video/mp4', bytes: mp4 };
+  input.value = sunoMp4Url;
+  await button.dispatch('click');
+  assert.equal(fetchCalls.at(-1).url, sunoMp4Url, 'direct Suno CDN MP4 links must be fetched unchanged');
+  assert.equal(fetchCalls.at(-1).options.credentials, 'omit');
+  assert.equal(fetchCalls.at(-1).options.referrerPolicy, 'no-referrer');
+  assert.equal(fetchCalls.at(-1).options.redirect, 'error');
+  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich/, 'direct Suno CDN MP4 import should report success');
+  assert.equal(env.elements['converter-render-button'].disabled, false, 'MP4 import must enable the existing render pipeline');
+  assert.equal(env.elements['converter-file-name'].textContent, '4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4');
+  const mp4Wav = Buffer.from(await studio._encodeWavForTest(audioBuffer).arrayBuffer());
+  assert.equal(mp4Wav.toString('ascii', 0, 4), 'RIFF', 'WAV export must still work after an MP4 import');
+  assert.equal(mp4Wav.toString('ascii', 8, 12), 'WAVE');
+
+  responseOptions = { mime: 'audio/x-m4a', bytes: mp4 };
+  await button.dispatch('click');
+  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich/, 'M4A MIME types should be accepted for Suno CDN media');
+  responseOptions = { mime: 'video/mp4', bytes: mp3 };
+  await button.dispatch('click');
+  assert.match(status.textContent, /MIME\/Dateisignatur/, 'MP4 MIME without an ftyp signature must be rejected');
+  responseOptions = { mime: 'video/mp4', bytes: mp4 };
+  decodeFails = true;
+  await button.dispatch('click');
+  assert.match(status.textContent, /nicht dekodiert/, 'undecodable MP4 payloads must fail cleanly');
+  decodeFails = false;
+
+  const beforeHostChecks = fetchCalls.length;
+  for (const blocked of [
+    'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c',
+    'https://cdn1.suno.ai/song/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c/',
+    'https://cdn2.suno.ai/payload.exe'
+  ]) {
+    input.value = blocked;
+    await button.dispatch('click');
+    assert.match(status.textContent, /Suno-CDN-Links/, `${blocked} must be rejected by the Suno CDN allow-list`);
+  }
+  assert.equal(fetchCalls.length, beforeHostChecks, 'blocked Suno CDN paths must not reach fetch');
+
+  fetchCalls = [];
+  responseOptions = {
+    mime: 'video/mp4',
+    bytes: mp4,
+    failUrls: ['https://cdn1.suno.ai/01234567-89ab-cdef-0123-456789abcdef.mp3']
+  };
+  input.value = 'https://suno.com/song/01234567-89ab-cdef-0123-456789abcdef';
+  await button.dispatch('click');
+  assert.deepEqual(fetchCalls.map((call) => call.url), [
+    'https://cdn1.suno.ai/01234567-89ab-cdef-0123-456789abcdef.mp3',
+    'https://cdn1.suno.ai/01234567-89ab-cdef-0123-456789abcdef.mp4'
+  ], 'Suno song links must fall back from the MP3 object to the direct CDN MP4');
+  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich/);
+  responseOptions = {};
 
   input.value = 'https://public.example/song.wav';
   responseOptions = { mime: 'audio/wav', bytes: wav };
