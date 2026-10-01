@@ -51,6 +51,8 @@
   const SUNO_DOWNLOADER_STATUS_FALLBACK = 'Suno-Downloader war nicht verfügbar; Fallback auf direkten Abruf durchgeführt.';
   const SUNO_DOWNLOADER_ERROR_NON_SUNO = 'Der Suno-Downloader akzeptiert nur freigegebene Suno-Links (suno.com/song/… oder cdn*.suno.ai/…).';
   const SUNO_DOWNLOADER_ERROR_BLOCKED = 'Ziel wurde vom Suno-Downloader als unsicher blockiert und nicht geladen.';
+  const SUNO_DOWNLOADER_ERROR_NOT_CONFIGURED = 'Suno-Downloader ist in dieser statischen Umgebung nicht konfiguriert (kein Backend vorhanden). Bitte die Datei lokal importieren oder die URL direkt importieren.';
+  const SUNO_DOWNLOADER_ERROR_UNAVAILABLE_CORS = 'Der Suno-Downloader war nicht erreichbar und der direkte Abruf ist durch CORS blockiert. Bitte die Datei lokal importieren.';
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -154,8 +156,50 @@
     }
   }
 
+  async function probeSunoDownloaderEndpoint(endpoint) {
+    if (!endpoint) return false;
+    const fetchImplementation = (window && typeof window.fetch === 'function')
+      ? window.fetch.bind(window)
+      : (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : null);
+    if (!fetchImplementation) return false;
+    try {
+      const probeUrl = endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') + 'probe=1';
+      const AbortControllerCtor = window.AbortController || globalThis.AbortController;
+      const controller = AbortControllerCtor ? new AbortControllerCtor() : null;
+      let timer = null;
+      if (controller && typeof window.setTimeout === 'function') {
+        timer = window.setTimeout(() => controller.abort(), 3000);
+      }
+      const options = {
+        method: 'GET',
+        mode: 'same-origin',
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer',
+        cache: 'no-store'
+      };
+      if (controller) options.signal = controller.signal;
+      const response = await fetchImplementation(probeUrl, options);
+      if (timer && typeof window.clearTimeout === 'function') {
+        window.clearTimeout(timer);
+      }
+      if (response && response.ok) {
+        return true;
+      }
+      if (response && response.status === 400) {
+        const ct = (response.headers && typeof response.headers.get === 'function' && response.headers.get('Content-Type')) || '';
+        return Boolean(ct && ct.includes('application/json'));
+      }
+      return false;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async function fetchRemoteAudio(url, controller, proxyEndpoint, options) {
     const isDownloader = Boolean(options && options.isDownloader);
+    if (isDownloader && !isSunoUrl(url)) {
+      throw new Error(SUNO_DOWNLOADER_ERROR_NON_SUNO);
+    }
     const requestHref = proxyEndpoint ? buildProxyRequestUrl(proxyEndpoint, url) : url.href;
     // `response.url` ist im Browser immer absolut; relative Proxy-Pfade müssen dafür aufgelöst werden.
     const absoluteRequestHref = proxyEndpoint ? ((tryCreateUrl(requestHref) || {}).href || requestHref) : requestHref;
@@ -176,6 +220,7 @@
             ? 'Der sichere Suno-Downloader war nicht erreichbar.'
             : 'Der vertrauenswürdige Proxy war nicht erreichbar.');
           serviceUnavailable.remoteSourceUnavailable = true;
+          if (isDownloader) serviceUnavailable.downloaderUnavailable = true;
           throw serviceUnavailable;
         }
         if (error) {
@@ -185,12 +230,21 @@
         throw error;
       }
       if (proxyEndpoint && response.status >= 400) {
+        if (isDownloader && response.status === 404) {
+          const notFound = new Error('Der sichere Suno-Downloader war nicht erreichbar.');
+          notFound.remoteSourceUnavailable = true;
+          notFound.downloaderUnavailable = true;
+          throw notFound;
+        }
         // 4xx des eigenen Proxys bzw. Downloaders sind endgültige Ablehnungen; 5xx melden den Grund und dürfen weiterhin ausweichen.
         if (response.status === 403) {
           throw new Error(isDownloader ? SUNO_DOWNLOADER_ERROR_BLOCKED : REMOTE_IMPORT_ERROR_BLOCKED);
         }
         const rejection = new Error(await readProxyErrorMessage(response, isDownloader ? 'Downloader-Ablehnung: ' : 'Proxy-Ablehnung: '));
-        if (response.status >= 500) rejection.remoteSourceUnavailable = true;
+        if (response.status >= 500) {
+          rejection.remoteSourceUnavailable = true;
+          if (isDownloader) rejection.downloaderUnavailable = true;
+        }
         throw rejection;
       }
       if (!response.ok || response.type === 'opaque' || response.url !== absoluteRequestHref) {
@@ -740,13 +794,62 @@
     let isPreviewStopping = false;
     let remoteController = null;
     let importGeneration = 0;
+    let downloaderState = {
+      configured: false,
+      available: null,
+      probing: false
+    };
+
+    function updateSunoButtonUi() {
+      if (!elements.sunoButton) return;
+      if (remoteController) {
+        elements.sunoButton.disabled = true;
+        return;
+      }
+      const downloader = resolveSunoDownloader();
+      if (!downloader.configured) {
+        elements.sunoButton.disabled = true;
+        elements.sunoButton.title = 'Suno-Downloader ist in dieser statischen Umgebung ohne Backend nicht verfügbar.';
+        elements.sunoButton.setAttribute('aria-disabled', 'true');
+      } else if (downloaderState.available === false) {
+        elements.sunoButton.disabled = true;
+        elements.sunoButton.title = 'Suno-Downloader ist konfiguriert, aber aktuell nicht erreichbar.';
+        elements.sunoButton.setAttribute('aria-disabled', 'true');
+      } else if (downloaderState.probing) {
+        elements.sunoButton.disabled = true;
+        elements.sunoButton.title = 'Suno-Downloader wird überprüft …';
+        elements.sunoButton.setAttribute('aria-disabled', 'true');
+      } else {
+        elements.sunoButton.disabled = false;
+        elements.sunoButton.title = 'Suno-Audio über den sicheren Downloader abrufen.';
+        elements.sunoButton.removeAttribute('aria-disabled');
+      }
+    }
+
+    async function checkDownloaderCapability() {
+      const downloader = resolveSunoDownloader();
+      downloaderState.configured = downloader.configured;
+      if (!downloader.configured) {
+        downloaderState.available = false;
+        downloaderState.probing = false;
+        updateSunoButtonUi();
+        return false;
+      }
+      downloaderState.probing = true;
+      updateSunoButtonUi();
+      const usable = await probeSunoDownloaderEndpoint(downloader.endpoint);
+      downloaderState.probing = false;
+      downloaderState.available = usable;
+      updateSunoButtonUi();
+      return usable;
+    }
 
     function cancelRemoteImport() {
       importGeneration += 1;
       if (remoteController) remoteController.abort();
       remoteController = null;
       if (elements.remoteButton) elements.remoteButton.disabled = false;
-      if (elements.sunoButton) elements.sunoButton.disabled = false;
+      updateSunoButtonUi();
     }
 
     function bind(target, type, listener, options) {
@@ -822,6 +925,15 @@
       bind(window, 'focus', syncExportFormatOptions);
       bind(window, 'pageshow', syncExportFormatOptions);
       updateFormatNote();
+
+      const downloader = resolveSunoDownloader();
+      if (downloader.configured) {
+        checkDownloaderCapability().catch(() => null);
+      } else {
+        downloaderState.configured = false;
+        downloaderState.available = false;
+        updateSunoButtonUi();
+      }
     }
 
     function handleResize() {
@@ -947,23 +1059,27 @@
       let lastError = null;
       let corsBlocked = false;
       let downloaderFellBack = false;
+      let downloaderUnavailable = false;
 
       for (let index = 0; index < candidates.length; index += 1) {
         const candidate = candidates[index];
         const isSunoCdnMedia = SUNO_CDN_HOST_PATTERN.test(candidate.hostname.toLowerCase())
           && SUNO_CDN_MEDIA_PATTERN.test(candidate.pathname);
         const isSunoSource = isSunoCdnMedia || isSunoUrl(candidate);
+        const canUseDownloader = isSunoSource && Boolean(downloader.endpoint);
 
         const attempts = [];
         if (isSunoDownloaderCall) {
-          if (downloader.endpoint) {
+          if (canUseDownloader) {
             attempts.push({ endpoint: downloader.endpoint, isDownloader: true });
+          } else if (!downloader.configured) {
+            downloaderUnavailable = true;
           }
           attempts.push({ endpoint: '', isDownloader: false });
           if (proxy.endpoint && isSunoCdnMedia) {
             attempts.push({ endpoint: proxy.endpoint, isDownloader: false });
           }
-        } else if (downloader.endpoint && isSunoSource) {
+        } else if (canUseDownloader) {
           attempts.push({ endpoint: downloader.endpoint, isDownloader: true });
           attempts.push({ endpoint: '', isDownloader: false });
           if (proxy.endpoint && isSunoCdnMedia) {
@@ -982,6 +1098,10 @@
           remoteController = controller;
           try {
             const audio = await fetchRemoteAudio(candidate, controller, endpoint, { isDownloader });
+            if (isDownloader) {
+              downloaderState.available = true;
+              updateSunoButtonUi();
+            }
             return {
               url: candidate,
               audio,
@@ -992,17 +1112,23 @@
             };
           } catch (error) {
             if (remoteController === controller) remoteController = null;
-            if (isDownloader && error && error.remoteSourceUnavailable === true) {
+            if (isDownloader && (error && (error.remoteSourceUnavailable === true || error.downloaderUnavailable === true))) {
               downloaderFellBack = true;
+              downloaderUnavailable = true;
+              downloaderState.available = false;
+              updateSunoButtonUi();
             }
             // Nur fehlende oder nicht abrufbare Quellen dürfen auf den Proxy bzw. den nächsten Kandidaten ausweichen;
             // Abbrüche, veraltete Importe und Inhaltsfehler werden sofort gemeldet.
             const retryable = error && error.remoteSourceUnavailable === true;
             if (generation !== importGeneration || !retryable) throw error;
-            if (error.remoteCorsBlocked === true) corsBlocked = true;
+            if (error && error.remoteCorsBlocked === true) corsBlocked = true;
             lastError = error;
           }
         }
+      }
+      if (lastError && (downloaderFellBack || downloaderUnavailable)) {
+        lastError.downloaderUnavailable = true;
       }
       throw lastError || new Error('Remote-Import fehlgeschlagen.');
     }
@@ -1026,6 +1152,9 @@
         }
 
         if (isDownloader) {
+          if (!resolveSunoDownloader().configured) {
+            throw new Error(SUNO_DOWNLOADER_ERROR_NOT_CONFIGURED);
+          }
           const parsed = validateRemoteAudioUrl(rawInput);
           if (!isSunoUrl(parsed)) {
             throw new Error(SUNO_DOWNLOADER_ERROR_NON_SUNO);
@@ -1086,18 +1215,29 @@
         }
       } catch (error) {
         if (generation !== importGeneration) return;
-        const reason = error.name === 'AbortError'
-          ? `${actionLabel} hat das Zeitlimit überschritten oder wurde abgebrochen.`
-          : (error && error.remoteCorsBlocked === true) || error instanceof TypeError
-            ? REMOTE_IMPORT_ERROR_CORS
-            : (error instanceof Error ? error.message : `${actionLabel} fehlgeschlagen.`);
+        let reason;
+        const isCorsBlocked = Boolean(error && (error.remoteCorsBlocked === true || error.name === 'TypeError' || error instanceof TypeError));
+        const isDownloaderProblem = Boolean(error && error.downloaderUnavailable);
+        if (error.name === 'AbortError') {
+          reason = `${actionLabel} hat das Zeitlimit überschritten oder wurde abgebrochen.`;
+        } else if (isDownloader && !resolveSunoDownloader().configured) {
+          reason = SUNO_DOWNLOADER_ERROR_NOT_CONFIGURED;
+        } else if (isDownloaderProblem && isCorsBlocked) {
+          reason = SUNO_DOWNLOADER_ERROR_UNAVAILABLE_CORS;
+        } else if (isCorsBlocked) {
+          reason = REMOTE_IMPORT_ERROR_CORS;
+        } else if (error instanceof Error) {
+          reason = error.message;
+        } else {
+          reason = `${actionLabel} fehlgeschlagen.`;
+        }
         setRenderState('error', reason);
         elements.importStatus.textContent = reason;
       } finally {
         if (generation === importGeneration) {
           remoteController = null;
           if (elements.remoteButton) elements.remoteButton.disabled = false;
-          if (elements.sunoButton) elements.sunoButton.disabled = false;
+          updateSunoButtonUi();
         }
       }
     }
@@ -1147,6 +1287,7 @@
       elements.renderButton.disabled = !hasBuffer;
       elements.downloadButton.disabled = !renderedAsset;
       elements.clearRender.disabled = !renderedAsset;
+      updateSunoButtonUi();
     }
 
     function updateControlOutputs() {
@@ -1608,7 +1749,7 @@
       }
       if (elements.remoteInput) elements.remoteInput.value = '';
       if (elements.remoteButton) elements.remoteButton.disabled = false;
-      if (elements.sunoButton) elements.sunoButton.disabled = false;
+      updateSunoButtonUi();
       ['fileName', 'fileDuration', 'fileRate', 'fileSize', 'fileFormat', 'fileChannels'].forEach((key) => {
         elements[key].textContent = '–';
       });
@@ -1768,6 +1909,15 @@
       },
       _encodeWavForTest(buffer) {
         return core.encodeWav(buffer);
+      },
+      _checkDownloaderCapabilityForTest() {
+        return checkDownloaderCapability();
+      },
+      _getDownloaderStateForTest() {
+        return Object.assign({}, downloaderState);
+      },
+      _updateSunoButtonUiForTest() {
+        updateSunoButtonUi();
       },
       _coreForTest: core,
       _settingsForTest: readSettings
@@ -1986,12 +2136,19 @@
     const config = readConverterConfig();
     const downloader = config && config.sunoDownloader;
     const remoteImport = config && config.remoteImport;
-    const endpoint = resolveSameOriginEndpoint(
-      (downloader && (downloader.endpoint || downloader.downloaderEndpoint))
+    if (downloader && (downloader.enabled === false || downloader.disabled === true)) {
+      return { endpoint: '', configured: false, disabled: true };
+    }
+    const rawEndpoint = (downloader && (downloader.endpoint || downloader.downloaderEndpoint))
       || (remoteImport && (remoteImport.sunoDownloaderEndpoint || remoteImport.downloaderEndpoint))
-      || (config && config.sunoDownloaderEndpoint)
-    );
-    return { endpoint };
+      || (config && config.sunoDownloaderEndpoint);
+    const endpoint = resolveSameOriginEndpoint(rawEndpoint);
+    return {
+      endpoint,
+      configured: Boolean(endpoint),
+      rawEndpoint: typeof rawEndpoint === 'string' ? rawEndpoint : '',
+      disabled: false
+    };
   }
 
   function getWindowOrigin() {
@@ -2185,7 +2342,11 @@
   window[MODULE_KEY] = {
     bootstrap,
     destroy,
-    _createStudioForTest: createStudio
+    _createStudioForTest: createStudio,
+    _resolveSunoDownloaderForTest: resolveSunoDownloader,
+    _probeSunoDownloaderEndpointForTest: probeSunoDownloaderEndpoint,
+    _isSunoUrlForTest: isSunoUrl,
+    _validateRemoteAudioUrlForTest: validateRemoteAudioUrl
   };
 }());
  

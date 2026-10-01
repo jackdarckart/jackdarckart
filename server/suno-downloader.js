@@ -290,23 +290,36 @@ function createSunoDownloaderHandler(options) {
     };
 
     try {
-      if (request.method !== 'GET') {
-        throw new SunoDownloaderError('Nur GET wird unterstützt.', 405);
+      if (request.method !== 'GET' && request.method !== 'HEAD') {
+        throw new SunoDownloaderError('Nur GET und HEAD werden unterstützt.', 405);
       }
       const requestUrl = new URL(request.url, 'https://downloader.invalid');
+      if (requestUrl.searchParams.has('check') || requestUrl.searchParams.has('probe')) {
+        send(200, request.method === 'HEAD' ? '' : JSON.stringify({ status: 'ok', service: 'suno-downloader' }), {
+          'Content-Type': 'application/json; charset=utf-8'
+        });
+        return;
+      }
+      if (request.method === 'HEAD' && !requestUrl.searchParams.has('url')) {
+        send(200, '', {
+          'Content-Type': 'application/json; charset=utf-8',
+          'X-Downloader-Service': 'suno'
+        });
+        return;
+      }
       const targetParam = requestUrl.searchParams.get('url');
       if (!targetParam) {
         throw new SunoDownloaderError('Ungültige Ziel-URL.', 400);
       }
       const audio = await downloadSunoAudio(targetParam, settings);
-      send(200, audio.body, {
+      send(200, request.method === 'HEAD' ? '' : audio.body, {
         'Content-Type': audio.contentType,
         'Content-Length': String(audio.body.length)
       });
     } catch (error) {
       const status = error instanceof SunoDownloaderError ? error.status : 502;
       const message = error instanceof SunoDownloaderError ? error.message : 'Suno-Download fehlgeschlagen.';
-      send(status, JSON.stringify({ error: message }), {
+      send(status, request.method === 'HEAD' ? '' : JSON.stringify({ error: message }), {
         'Content-Type': 'application/json; charset=utf-8'
       });
     }

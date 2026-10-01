@@ -3744,13 +3744,22 @@ async function testSunoDownloaderBackendValidationAndFetch() {
   assert.equal((await call('/api/suno-downloader?url=' + encodeURIComponent('http://cdn1.suno.ai/a.mp4'))).status, 400);
   assert.equal((await call('/api/suno-downloader?url=' + encodeURIComponent('https://127.0.0.1/a.mp4'))).status, 403);
   assert.equal((await call('/api/suno-downloader?url=' + encodeURIComponent('https://evil.example/a.mp4'))).status, 403);
+
+  const probeGet = await call('/api/suno-downloader?probe=1');
+  assert.equal(probeGet.status, 200);
+  assert.match(probeGet.headers['Content-Type'], /^application\/json/);
+  assert.deepEqual(JSON.parse(probeGet.body.toString()), { status: 'ok', service: 'suno-downloader' });
+
+  const probeHead = await call('/api/suno-downloader', 'HEAD');
+  assert.equal(probeHead.status, 200);
+  assert.match(probeHead.headers['Content-Type'], /^application\/json/);
 }
 
 async function testConverterSunoDownloaderClientIntegration() {
   const sunoMp4Url = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
   const downloaderHref = '/api/suno-downloader?url=' + encodeURIComponent(sunoMp4Url);
 
-  function createTestEnvironment(config) {
+  async function createTestEnvironment(config) {
     const env = createConverterEnvironment();
     const mp4 = Uint8Array.from(Buffer.from('0000ftypM4A 0000'));
     const mp3 = Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]);
@@ -3775,6 +3784,16 @@ async function testConverterSunoDownloaderClientIntegration() {
       const isDownloader = url.startsWith('/api/suno-downloader');
       if (isDownloader) {
         if (state.downloaderFails) throw new TypeError('Network error');
+        if (url.includes('probe=1')) {
+          return {
+            ok: true,
+            status: 200,
+            type: 'basic',
+            url: 'https://stream-musik.space' + url,
+            headers: { get(key) { return key.toLowerCase() === 'content-type' ? 'application/json' : null; } },
+            async json() { return { status: 'ok', service: 'suno-downloader' }; }
+          };
+        }
         if (state.downloaderStatus !== 200) {
           return {
             ok: false,
@@ -3823,17 +3842,21 @@ async function testConverterSunoDownloaderClientIntegration() {
     vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
     const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
     studio.init();
+    await studio._checkDownloaderCapabilityForTest();
     return { env, studio, state, fetchCalls, audioBuffer };
   }
 
   // 1. Dedicated "Suno herunterladen" button test with Suno CDN MP4
-  const { env, studio, state, fetchCalls, audioBuffer } = createTestEnvironment({
+  const { env, studio, state, fetchCalls, audioBuffer } = await createTestEnvironment({
     sunoDownloader: { endpoint: '/api/suno-downloader' }
   });
   const input = env.elements['converter-remote-url'];
   const importBtn = env.elements['converter-remote-import'];
   const sunoBtn = env.elements['converter-suno-download'];
   const status = env.elements['converter-import-status'];
+
+  assert.equal(sunoBtn.disabled, false, 'Suno button should be enabled when probe succeeds');
+  fetchCalls.length = 0;
 
   input.value = sunoMp4Url;
   await sunoBtn.dispatch('click');
@@ -3908,6 +3931,196 @@ async function testConverterSunoDownloaderClientIntegration() {
   assert.equal(sunoBtn.disabled, false);
   assert.equal(importBtn.disabled, false);
   assert.equal(input.value, '');
+
+  studio.destroy();
+}
+
+async function testConverterSunoDownloaderStaticHostingMode() {
+  const env = createConverterEnvironment();
+  const audioBuffer = {
+    duration: 1, sampleRate: 44100, numberOfChannels: 1,
+    getChannelData() { return new Float32Array([0.1, -0.1]); }
+  };
+  class FakeAudioContext {
+    decodeAudioData(buffer, resolve) { resolve(audioBuffer); }
+    async close() {}
+  }
+  const fetchCalls = [];
+  env.window.URL = URL;
+  env.window.AudioContext = FakeAudioContext;
+  delete env.window.__JACKDARCKART_CONFIG__;
+  env.window.fetch = async (url, options) => {
+    fetchCalls.push({ url, options });
+    return {
+      ok: true, status: 200, type: 'cors', url,
+      headers: { get(key) { return key === 'Content-Type' ? 'audio/mpeg' : null; } },
+      body: { getReader() {
+        let index = 0;
+        return {
+          async read() {
+            index += 1;
+            return index === 1 ? { done: false, value: Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]) } : { done: true };
+          },
+          async cancel() {}
+        };
+      } }
+    };
+  };
+  env.context.AbortController = AbortController;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  const sunoBtn = env.elements['converter-suno-download'];
+  const importBtn = env.elements['converter-remote-import'];
+  const input = env.elements['converter-remote-url'];
+  const status = env.elements['converter-import-status'];
+
+  // Static hosting default: no backend configured
+  assert.equal(sunoBtn.disabled, true, 'Suno downloader button must be disabled by default in static hosting');
+  assert.equal(sunoBtn.getAttribute('aria-disabled'), 'true');
+  assert.match(sunoBtn.title, /statischen Umgebung|ohne Backend|nicht eingerichtet|nicht verfügbar/, 'Suno button title must explain static hosting reality');
+
+  // Clicking disabled Suno button shows clear error without making any network call
+  input.value = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  await sunoBtn.dispatch('click');
+  assert.equal(fetchCalls.length, 0, 'No fetch should be made when downloader is not configured');
+  assert.match(status.textContent, /nicht konfiguriert/);
+
+  // App stays fully functional: direct URL import for CORS-enabled audio works
+  input.value = 'https://public.example/song.mp3';
+  await importBtn.dispatch('click');
+  assert.equal(fetchCalls.length, 1);
+  assert.equal(fetchCalls[0].url, 'https://public.example/song.mp3');
+  assert.match(status.textContent, /Remote-Audio erfolgreich im Browser geladen/);
+  assert.equal(env.elements['converter-render-button'].disabled, false, 'Audio render must be enabled after direct import');
+
+  // Resetting studio preserves disabled state of Suno button when no backend configured
+  await env.elements['converter-reset-button'].dispatch('click');
+  assert.equal(sunoBtn.disabled, true, 'Suno button must stay disabled on reset when no backend configured');
+  assert.equal(importBtn.disabled, false);
+
+  studio.destroy();
+}
+
+async function testConverterSunoDownloaderUnreachableEndpointFallback() {
+  const env = createConverterEnvironment();
+  const audioBuffer = {
+    duration: 1, sampleRate: 44100, numberOfChannels: 1,
+    getChannelData() { return new Float32Array([0.1, -0.1]); }
+  };
+  class FakeAudioContext {
+    decodeAudioData(buffer, resolve) { resolve(audioBuffer); }
+    async close() {}
+  }
+  const fetchCalls = [];
+  let corsFails = false;
+  env.window.URL = URL;
+  env.window.AudioContext = FakeAudioContext;
+  env.window.__JACKDARCKART_CONFIG__ = {
+    converter: { sunoDownloader: { endpoint: '/api/suno-downloader' } }
+  };
+  env.window.fetch = async (url, options) => {
+    fetchCalls.push({ url, options });
+    if (url.startsWith('/api/suno-downloader')) {
+      // Downloader endpoint returns 404 (e.g. GitHub Pages static server where endpoint is not deployed)
+      return {
+        ok: false, status: 404, type: 'basic', url: 'https://stream-musik.space' + url,
+        headers: { get() { return 'text/html'; } },
+        async text() { return '404 Not Found'; }
+      };
+    }
+    if (corsFails) throw new TypeError('Failed to fetch due to CORS restrictions');
+    return {
+      ok: true, status: 200, type: 'cors', url,
+      headers: { get(key) { return key === 'Content-Type' ? 'audio/mpeg' : null; } },
+      body: { getReader() {
+        let index = 0;
+        return {
+          async read() {
+            index += 1;
+            return index === 1 ? { done: false, value: Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]) } : { done: true };
+          },
+          async cancel() {}
+        };
+      } }
+    };
+  };
+  env.context.AbortController = AbortController;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  await studio._checkDownloaderCapabilityForTest();
+
+  const sunoBtn = env.elements['converter-suno-download'];
+  const importBtn = env.elements['converter-remote-import'];
+  const input = env.elements['converter-remote-url'];
+  const status = env.elements['converter-import-status'];
+
+  // Endpoint probe returned 404 -> button disabled and annotated
+  assert.equal(sunoBtn.disabled, true, 'Suno button must be disabled when endpoint probe fails with 404');
+  assert.match(sunoBtn.title, /nicht erreichbar/, 'Suno button title must reflect unreachable endpoint');
+
+  // Case 1: Import with Suno URL where direct fetch is CORS-blocked
+  corsFails = true;
+  fetchCalls.length = 0;
+  input.value = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  await importBtn.dispatch('click');
+  // Downloader was tried, returned 404; direct fetch fallback was tried, threw CORS TypeError
+  assert.match(status.textContent, /nicht erreichbar und der direkte Abruf ist durch CORS blockiert/,
+    'must show clear error distinguishing unreachable downloader and CORS blockage');
+
+  // Case 2: Import with Suno URL where direct fetch succeeds (CORS allowed)
+  corsFails = false;
+  fetchCalls.length = 0;
+  input.value = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  await importBtn.dispatch('click');
+  assert.match(status.textContent, /Remote-Audio erfolgreich im Browser geladen/,
+    'direct fetch fallback must succeed when CORS allows it');
+
+  studio.destroy();
+}
+
+async function testConverterSunoDownloaderClientUrlSafety() {
+  const env = createConverterEnvironment();
+  env.window.URL = URL;
+  env.window.__JACKDARCKART_CONFIG__ = {
+    converter: { sunoDownloader: { endpoint: '/api/suno-downloader' } }
+  };
+  const fetchCalls = [];
+  env.window.fetch = async (url, options) => {
+    fetchCalls.push({ url, options });
+    return {
+      ok: true, status: 200,
+      headers: { get(key) { return key.toLowerCase() === 'content-type' ? 'application/json' : null; } },
+      async json() { return { status: 'ok', service: 'suno-downloader' }; }
+    };
+  };
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  await studio._checkDownloaderCapabilityForTest();
+
+  const sunoBtn = env.elements['converter-suno-download'];
+  const input = env.elements['converter-remote-url'];
+  const status = env.elements['converter-import-status'];
+
+  const unsafeUrls = [
+    'http://cdn1.suno.ai/test.mp4',
+    'https://attacker.com/song.mp4',
+    'https://cdn1.suno.ai.attacker.com/test.mp4',
+    'javascript:alert(1)',
+    'data:audio/mp3;base64,AAA=',
+    'https://suno.com/about'
+  ];
+
+  for (const unsafe of unsafeUrls) {
+    fetchCalls.length = 0;
+    input.value = unsafe;
+    await sunoBtn.dispatch('click');
+    assert.equal(fetchCalls.length, 0, `Unsafe URL ${unsafe} must not trigger any fetch`);
+    assert.match(status.textContent, /akzeptiert nur freigegebene Suno-Links|Ungültige URL|Nur HTTPS-URLs sind erlaubt|müssen direkt auf/);
+  }
 
   studio.destroy();
 }
@@ -4036,6 +4249,9 @@ async function main() {
   await testRemoteAudioProxyHandlerResponses();
   await testSunoDownloaderBackendValidationAndFetch();
   await testConverterSunoDownloaderClientIntegration();
+  await testConverterSunoDownloaderStaticHostingMode();
+  await testConverterSunoDownloaderUnreachableEndpointFallback();
+  await testConverterSunoDownloaderClientUrlSafety();
   await testConverterAdaptiveEnhance();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
