@@ -407,14 +407,19 @@ async function loadState(env, userId) {
   }
 }
 
-async function persistState(env, user, state) {
+async function persistState(env, user, state, updateLeaderboard = true) {
   const timestamp = new Date().toISOString();
-  await env.DB.batch([
+  const statements = [
     env.DB.prepare('UPDATE vault_state SET state_json = ?, updated_at = ? WHERE user_id = ?')
-      .bind(JSON.stringify(state), timestamp, user.id),
-    env.DB.prepare('UPDATE leaderboard SET vibe_score = ?, updated_at = ? WHERE user_id = ?')
-      .bind(state.vibeScore, timestamp, user.id)
-  ]);
+      .bind(JSON.stringify(state), timestamp, user.id)
+  ];
+  if (updateLeaderboard) {
+    statements.push(
+      env.DB.prepare('UPDATE leaderboard SET vibe_score = ?, updated_at = ? WHERE user_id = ?')
+        .bind(state.vibeScore, timestamp, user.id)
+    );
+  }
+  await env.DB.batch(statements);
 }
 
 async function register(request, env, cors) {
@@ -537,7 +542,7 @@ export async function handleRequest(request, env) {
       state.stats[kind === 'auto' ? 'autosaves' : 'manualSaves'] += 1;
       state.stats.lastSavedAt = new Date().toISOString();
       state.revision += 1;
-      await persistState(env, authenticated.user, state);
+      await persistState(env, authenticated.user, state, false);
       return json({ handle: authenticated.user.handle, state: publicState(state) }, 200, cors);
     }
 

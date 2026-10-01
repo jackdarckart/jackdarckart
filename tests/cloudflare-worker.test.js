@@ -13,6 +13,7 @@ function createDatabase() {
   const vaultState = new Map();
   const leaderboard = new Map();
   const studioPresets = new Map();
+  let leaderboardUpdateCount = 0;
 
   function execute(sql, args) {
     if (sql.startsWith('SELECT id FROM users WHERE handle_key')) {
@@ -45,6 +46,7 @@ function createDatabase() {
       return { first: null };
     }
     if (sql.startsWith('UPDATE leaderboard')) {
+      leaderboardUpdateCount += 1;
       const entry = leaderboard.get(args[2]);
       if (entry) entry.vibe_score = args[0];
       return { first: null };
@@ -70,6 +72,7 @@ function createDatabase() {
   return {
     users,
     studioPresets,
+    get leaderboardUpdateCount() { return leaderboardUpdateCount; },
     prepare(sql) {
       return {
         bind(...args) {
@@ -262,6 +265,7 @@ async function main() {
   assert.equal(invalidAction.response.status, 400);
   assert.equal(invalidAction.payload.code, 'UNKNOWN_ACTION');
 
+  const leaderboardUpdatesBeforeSave = env.DB.leaderboardUpdateCount;
   const saved = await call(worker, env, '/save', {
     method: 'POST',
     cookie,
@@ -270,6 +274,8 @@ async function main() {
   assert.equal(saved.response.status, 200);
   assert.equal(saved.payload.state.vibeScore, 40);
   assert.equal(saved.payload.state.stats.manualSaves, 1);
+  assert.equal(env.DB.leaderboardUpdateCount, leaderboardUpdatesBeforeSave,
+    'saving state must not issue an unchanged leaderboard write');
 
   const badSaveKind = await call(worker, env, '/save', { method: 'POST', cookie, json: { kind: 'cheat' } });
   assert.equal(badSaveKind.response.status, 400);
