@@ -85,6 +85,10 @@ async function main() {
     assert.doesNotMatch(diskData, /correct-horse-vault/);
     assert.doesNotMatch(diskData, /"vibeScore"/, 'vault state should be encrypted at rest');
     assert.match(diskData, /"passwordHash":/);
+    const exposedVault = await fetch(`${running.origin}/data/vault.json`);
+    assert.equal(exposedVault.status, 404, 'persistent vault files must never be served');
+    const exposedGit = await fetch(`${running.origin}/.git/config`);
+    assert.equal(exposedGit.status, 404, 'repository internals must never be served');
 
     const session = await request(running.origin, '/session', { headers: { Cookie: cookie } });
     assert.equal(session.response.status, 200);

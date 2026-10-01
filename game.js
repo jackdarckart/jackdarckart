@@ -18,6 +18,7 @@
   let actionPending = false;
   let dirty = false;
   let authGeneration = 0;
+  let authPending = false;
 
   async function request(route, options) {
     const settings = Object.assign({ credentials: 'same-origin', headers: {} }, options || {});
@@ -96,6 +97,11 @@
   }
 
   async function authenticate(route, form) {
+    if (authPending) return;
+    authPending = true;
+    document.querySelectorAll('.auth-form button').forEach((button) => {
+      button.disabled = true;
+    });
     const generation = ++authGeneration;
     const data = new FormData(form);
     setMessage(elements.authMessage, 'Authentifizierung läuft …', false);
@@ -114,6 +120,13 @@
       if (generation !== authGeneration) return;
       setConnection('offline', 'Vault-Link fehlgeschlagen');
       setMessage(elements.authMessage, error.message, true);
+    } finally {
+      if (generation === authGeneration) {
+        authPending = false;
+        document.querySelectorAll('.auth-form button').forEach((button) => {
+          button.disabled = false;
+        });
+      }
     }
   }
 

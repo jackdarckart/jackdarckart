@@ -1962,6 +1962,7 @@ function testQuantumVaultGameIntegration() {
   assert.match(gameJs, /error\.status\s*=\s*response\.status/);
   assert.match(gameJs, /generation\s*!==\s*authGeneration/);
   assert.match(gameJs, /error\.status\s*===\s*401/);
+  assert.match(gameJs, /if\s*\(authPending\)\s*return/);
   assert.match(swCode, /'\.\/game\.html'/);
   assert.match(swCode, /'\.\/game\.js'/);
   assert.match(swCode, /'\.\/game\.css'/);

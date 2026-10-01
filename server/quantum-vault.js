@@ -12,6 +12,13 @@ const SESSION_COOKIE = 'quantum_vault_session';
 const MAX_BODY_BYTES = 16 * 1024;
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const HARVEST_COOLDOWN_MS = 700;
+const PUBLIC_ROOT_FILES = new Set([
+  'index.html', 'live.html', 'titel.html', 'converter.html', 'game.html',
+  'sendeplan.html', 'events.html', 'news.html', 'archiv.html', 'ueber-uns.html',
+  'hilfe.html', 'issue-hilfe.html', 'kontakt.html', 'datenschutz.html', 'impressum.html',
+  'app.js', 'converter.js', 'game.js', 'styles.css', 'game.css', 'sw.js',
+  'manifest.webmanifest'
+]);
 
 const UPGRADE_RULES = Object.freeze({
   resonator: { currency: 'fragments', baseCost: 20, maxLevel: 8 },
@@ -205,12 +212,15 @@ function createQuantumVaultHandler(options) {
   const authRateWindowMs = settings.authRateWindowMs || 60 * 1000;
   const maxAuthSources = settings.maxAuthSources || 10000;
   const maxPasswordJobs = settings.maxPasswordJobs || 4;
+  const maxSessions = settings.maxSessions || 10000;
+  const maxSessionsPerAccount = settings.maxSessionsPerAccount || 5;
   const sessions = new Map();
   const authAttempts = new Map();
   let store = { version: 1, accounts: [] };
   let lock = Promise.resolve();
   let passwordJobs = 0;
   let authRateChecks = 0;
+  let sessionIssues = 0;
 
   if (fs.existsSync(dataFile)) {
     const loaded = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
@@ -271,8 +281,24 @@ function createQuantumVaultHandler(options) {
   }
 
   function issueSession(accountId) {
+    const current = now();
+    sessionIssues += 1;
+    if (sessionIssues % 100 === 0 || sessions.size >= maxSessions) {
+      sessions.forEach((value, key) => {
+        if (value.expiresAt <= current) sessions.delete(key);
+      });
+    }
+    const accountSessions = Array.from(sessions.entries())
+      .filter((entry) => entry[1].accountId === accountId)
+      .sort((a, b) => a[1].createdAt - b[1].createdAt);
+    while (accountSessions.length >= maxSessionsPerAccount) {
+      sessions.delete(accountSessions.shift()[0]);
+    }
+    if (sessions.size >= maxSessions) {
+      throw new VaultError('Session service is busy. Try again shortly.', 503);
+    }
     const token = randomBytes(32).toString('base64url');
-    sessions.set(token, { accountId, expiresAt: now() + SESSION_TTL_MS });
+    sessions.set(token, { accountId, createdAt: current, expiresAt: current + SESSION_TTL_MS });
     return token;
   }
 
@@ -551,6 +577,13 @@ function createQuantumVaultServer(options) {
       const requested = decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname);
       const filePath = path.resolve(root, `.${requested}`);
       if (!filePath.startsWith(`${root}${path.sep}`)) throw new VaultError('Not found.', 404);
+      const relativePath = path.relative(root, filePath);
+      const segments = relativePath.split(path.sep);
+      const isAsset = segments[0] === 'assets' && segments.length > 1;
+      if (segments.some((segment) => !segment || segment.startsWith('.'))
+        || (!isAsset && !PUBLIC_ROOT_FILES.has(relativePath))) {
+        throw new VaultError('Not found.', 404);
+      }
       const stat = await fs.promises.stat(filePath);
       if (!stat.isFile()) throw new VaultError('Not found.', 404);
       const headers = {
