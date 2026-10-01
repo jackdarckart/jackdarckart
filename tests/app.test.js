@@ -3265,6 +3265,7 @@ async function testConverterRemoteImportFeedsExistingStudioWorkflow() {
 
   assert.equal(requestedUrl, 'https://cdn.example.com/media/remote-track.mp3', 'remote import should fetch exactly the validated URL');
   assert.equal(env.elements['converter-file-name'].textContent, 'remote-track.mp3', 'remote import should expose the resolved source name in the shared metadata grid');
+  assert.doesNotMatch(env.elements['converter-file-name'].textContent, /[/\\]/, 'derived remote source names must not contain path separators');
   assert.equal(env.elements['converter-file-format'].textContent, 'audio/mpeg', 'remote import should expose the validated content type as source format');
   assert.equal(env.elements['converter-render-button'].disabled, false, 'remote imports should unlock the existing render workflow');
   assert.equal(env.elements['converter-preview-toggle'].disabled, false, 'remote imports should unlock the existing preview workflow');

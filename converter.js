@@ -1817,15 +1817,15 @@
     if (isBlockedRemoteHostname(url.hostname)) {
       return { ok: false, reason: 'Lokale, private oder interne Ziele sind blockiert (SSRF-Schutz).' };
     }
-    return { ok: true, url };
+    return { ok: true, parsed: url };
   }
 
   function validateRemoteAudioUrl(value) {
     const inspected = inspectRemoteAudioUrl(value);
     if (!inspected.ok) {
-      return inspected;
+      return { ok: false, reason: inspected.reason };
     }
-    return { ok: true, url: resolveSunoShareUrl(inspected.url) };
+    return { ok: true, url: resolveSunoShareUrl(inspected.parsed) };
   }
 
   function normalizeRemoteContentType(contentType) {
@@ -1914,7 +1914,11 @@
       }
     } finally {
       if (typeof reader.cancel === 'function') {
-        await reader.cancel().catch(() => null);
+        try {
+          await reader.cancel();
+        } catch (cancelError) {
+          // Das Abbrechen des Streams darf den ursprünglichen Fehlergrund nicht überschreiben.
+        }
       }
     }
 
@@ -2019,7 +2023,10 @@
       } catch (error) {
         readableSegment = lastSegment;
       }
-      return readableSegment.slice(0, 120);
+      const safeSegment = readableSegment.replace(/[^a-z0-9._-]+/gi, '-').replace(/^[-.]+/, '').slice(0, 120);
+      if (safeSegment) {
+        return safeSegment;
+      }
     }
     const extension = normalizeRemoteContentType(contentType) === 'audio/wav' ? 'wav' : 'mp3';
     return 'remote-audio.' + extension;
