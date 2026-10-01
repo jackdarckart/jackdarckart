@@ -128,11 +128,43 @@ http.createServer(createRemoteAudioProxyHandler()).listen(8787);
 
 Ohne konfigurierten Proxy bleibt es bei der bisherigen Grenze: Bei blockierter CORS-Freigabe bitte die Audiodatei lokal importieren.
 
+### Dedizierter sicherer Suno-Downloader
+
+Um Suno-Audiodateien unabhängig von instabilen Browser-CORS-Restriktionen zuverlässig abzurufen, bietet der Converter einen dedizierten, streng abgesicherten **Suno-Downloader**. Er akzeptiert ausschließlich unterstützte Suno-Quellen (direkte CDN-Links auf `.mp4`, `.m4a` und `.mp3` sowie Suno-Song-Links im Format `/song/<uuid>`).
+
+```js
+window.__JACKDARCKART_CONFIG__ = {
+  converter: {
+    sunoDownloader: {
+      endpoint: '/api/suno-download'
+    }
+  }
+};
+```
+
+Sicherheitseigenschaften des Suno-Downloaders:
+- **Streng Suno-only:** Es werden ausschließlich `cdn\d*.suno.ai` und `suno.com`/`www.suno.com` mit Song-UUID akzeptiert. Nicht-Suno-Ziele, `http:`, `data:`, `blob:`, Zugangsdaten und abweichende Ports sind blockiert. Die Allow-List kann nicht durch Anfragen aufgeweicht werden.
+- **SSRF-Schutz:** Reines DNS-Pre-Flight mit Prüfung gegen private (RFC 1918), Loopback (127.0.0.0/8, ::1), Carrier-Grade NAT (100.64.0.0/10), Link-Local (169.254.0.0/16, fe80::/10), Multicast und interne Netzadressen.
+- **Payload- und Redirect-Grenzen:** Feste Obergrenze von 50 MB, 15 Sekunden Timeout und maximal 2 erneut validierte Weiterleitungen.
+- **MIME- und Container-Signaturprüfung:** Validierung von Content-Type und Container-Signaturen (`ftyp` für MP4/M4A mit gültiger Brand, `ID3` oder Frame-Sync für MP3).
+- **AudioBuffer-Pipeline-Handoff:** Das heruntergeladene Medium wird direkt als `AudioBuffer` in die bestehende Pipeline übergeben (Preview, Auto-Enhance, Mastering-Render, WAV-Export sowie MP3-Export bei vorhandenem Encoder).
+- **Statische GitHub-Pages-Grenzen:** Da GitHub Pages keine serverseitige Logik ausführt, muss der Endpunkt separat betrieben werden (Referenz: `server/suno-downloader.js`). Ist kein Endpunkt konfiguriert oder der Dienst unerreichbar, fällt der Converter transparent auf den direkten Browser-Fetch (oder lokalen Datei-Import) zurück.
+
+Referenz-Start des Downloader-Endpunkts mit Node:
+
+```js
+const http = require('node:http');
+const { createSunoDownloaderHandler } = require('./server/suno-downloader.js');
+
+http.createServer(createSunoDownloaderHandler()).listen(8788);
+```
+
 ## Technische Struktur
 
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
 - `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und Vault-Stub
+- `server/suno-downloader.js` – dedizierte, abgesicherte Node-Referenzimplementierung des Suno-Downloaders mit SSRF-Schutz und Signaturprüfung
 - `server/remote-audio-proxy.js` – optionale Node-Referenzimplementierung des Same-Origin-Resolvers für CORS-blockierte Remote-Audio-Importe
 - `assets/vendor/lame.min.js` – gebündelter lokaler MP3-Encoder (`lamejs` 1.2.1, LGPL-3.0) für privacy-first Export ohne Upload
 - `manifest.webmanifest` – PWA-Metadaten und Mehrseiten-Shortcuts

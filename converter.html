@@ -112,10 +112,11 @@
             <button class="button secondary" id="converter-browse-button" type="button">Datei auswählen</button>
             <button class="button secondary" id="converter-reset-button" type="button" disabled>Studio zurücksetzen</button>
           </div>
-          <label for="converter-remote-url">HTTPS-Audiolink, Suno-Song-Link oder direkter Suno-CDN-Link (MP3/MP4/M4A; ohne CORS-Freigabe nur mit konfiguriertem Same-Origin-Proxy)</label>
+          <label for="converter-remote-url">HTTPS-Audiolink, Suno-Song-Link oder direkter Suno-CDN-Link (MP3/MP4/M4A; kontrollierter Suno-Downloader oder Same-Origin-Proxy)</label>
           <div class="actions converter-import-actions">
             <input id="converter-remote-url" type="url" inputmode="url" placeholder="https://cdn1.suno.ai/….mp4" autocomplete="off">
             <button class="button secondary" id="converter-remote-import" type="button">URL importieren</button>
+            <button class="button secondary" id="converter-suno-download" type="button">Suno herunterladen</button>
           </div>
           <p class="share-status note" id="converter-import-status" aria-live="polite">Noch keine Datei geladen. Alle Verarbeitungsschritte bleiben lokal in diesem Browser.</p>
           <div class="converter-meta-grid" aria-label="Audio-Metadaten">
@@ -133,6 +134,7 @@
           <h2>Was exakt ist – und was bewusst als Approximation markiert wird.</h2>
           <ul class="issue-checklist converter-checklist">
             <li><strong>Exakt lokal:</strong> Import, Browser-Dekodierung, Waveform, Preview, WAV-Export, Cleanup-Timer.</li>
+            <li><strong>Suno-Downloader:</strong> Kontrollierter Same-Origin-Abruf für Suno-Links außerhalb der Browser-CORS-Grenzen; direkter Import bleibt als Fallback aktiv.</li>
             <li><strong>Best-effort:</strong> LUFS-ähnliche Loudness-Schätzung, Limiter-Ceiling und Stereo-Width im Browser-DSP.</li>
             <li><strong>Codec-Fallback:</strong> zusätzliche Zielformate erscheinen nur, wenn dein Browser einen echten Encoder anbietet.</li>
             <li><strong>Vault:</strong> Verschlüsselter Sync ist nur als Stub vorbereitet und benötigt Phase 27.3 separat.</li>

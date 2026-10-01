@@ -668,6 +668,7 @@ function createConverterEnvironment(options = {}) {
     'converter-file-input',
     'converter-remote-url',
     'converter-remote-import',
+    'converter-suno-download',
     'converter-browse-button',
     'converter-reset-button',
     'converter-dropzone-shell',
@@ -3556,6 +3557,361 @@ async function testRemoteAudioProxyHandlerResponses() {
   assert.match(JSON.parse(blocked.body).error, /nicht freigegeben/);
 }
 
+async function assertDownloaderError(promise, status, pattern) {
+  await assert.rejects(promise, (error) => {
+    assert.equal(error.status, status);
+    assert.match(error.message, pattern);
+    return true;
+  });
+}
+
+async function testSunoDownloaderBackendValidationAndFetch() {
+  const downloader = require('../server/suno-downloader.js');
+  const targetMp4 = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  const targetM4a = 'https://cdn2.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.m4a';
+  const targetMp3 = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp3';
+  const targetSong = 'https://suno.com/song/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c';
+  const targetWwwSong = 'https://www.suno.com/song/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c';
+  const mp4Bytes = '0000ftypM4A 0000';
+  const mp3Bytes = Buffer.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]);
+
+  const lookup = (hostname, options, callback) => {
+    const done = typeof options === 'function' ? options : callback;
+    if (typeof options === 'object' && options && options.all) done(null, [{ address: '203.0.113.10', family: 4 }]);
+    else done(null, '203.0.113.10', 4);
+  };
+
+  // Accepted URLs
+  for (const valid of [targetMp4, targetM4a, targetMp3, targetSong, targetWwwSong]) {
+    const parsed = downloader.validateSunoUrl(valid);
+    assert.equal(parsed.protocol, 'https:');
+  }
+  assert.equal(downloader.validateSunoUrl(targetMp4 + '#preview').href, targetMp4, 'fragments must be stripped');
+
+  // Candidate resolution
+  assert.deepEqual(
+    downloader.resolveSunoMediaCandidates(targetMp4).map((u) => u.href),
+    [targetMp4],
+    'direct CDN media candidates must resolve directly'
+  );
+  assert.deepEqual(
+    downloader.resolveSunoMediaCandidates(targetSong).map((u) => u.href),
+    [
+      'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp3',
+      'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4'
+    ],
+    'song share links must resolve to mp3 and mp4 candidate media URLs'
+  );
+
+  // Rejected URLs
+  for (const unsafe of [
+    'http://cdn1.suno.ai/a.mp4', 'data:audio/mp4,abc', 'javascript:alert(1)',
+    'blob:https://cdn1.suno.ai/a.mp4', 'https://cdn1.suno.ai:8443/a.mp4',
+    'https://localhost/a.mp4', 'https://127.0.0.1/a.mp4', 'https://192.168.1.5/a.mp4',
+    'https://[::1]/a.mp4', 'https://router.local/a.mp4',
+    'https://cdn1.suno.ai/payload.exe', 'https://evil.example/song.mp4',
+    'https://suno.com/explore', 'https://suno.com/s/short-code'
+  ]) {
+    assert.throws(() => downloader.validateSunoUrl(unsafe), /erlaubt|Ungültige|freigegeben|müssen/,
+      `${unsafe} must be rejected by the Suno downloader allow-list`);
+  }
+  assert.throws(() => downloader.validateSunoUrl('https://' + 'user:secret@' + 'cdn1.suno.ai/a.mp4'),
+    /Zugangsdaten/, 'credentialed URLs must be rejected');
+  assert.throws(() => downloader.validateSunoUrl('https://evil.example/song.mp3', {
+    allowTarget: () => true
+  }), /freigegeben/, 'the Suno downloader allow-list must not be extensible');
+
+  // IP Address blocking
+  for (const blocked of ['127.0.0.1', '10.0.0.5', '169.254.169.254', '172.16.4.4', '192.168.0.1',
+    '::1', 'fd00::1', 'fe80::1', 'ff02::1', '::ffff:127.0.0.1', 'not-an-ip']) {
+    assert.equal(downloader.isBlockedAddress(blocked), true, `${blocked} must be treated as an internal target`);
+  }
+  assert.equal(downloader.isBlockedAddress('203.0.113.10'), false);
+  await assert.rejects(new Promise((resolve, reject) => {
+    downloader.safeLookup('localhost', {}, (error, address) => (error ? reject(error) : resolve(address)));
+  }), /Interne Netzwerkziele/);
+
+  // Successful downloads
+  const downloadedMp4 = await downloader.downloadSunoAudio(targetMp4, {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, mp4Bytes))
+  });
+  assert.equal(downloadedMp4.contentType, 'video/mp4');
+  assert.equal(downloadedMp4.body.toString('latin1'), mp4Bytes);
+
+  const downloadedMp3 = await downloader.downloadSunoAudio(targetMp3, {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'audio/mpeg' }, mp3Bytes))
+  });
+  assert.equal(downloadedMp3.contentType, 'audio/mpeg');
+
+  // Song link resolution: first candidate (mp3) 404, second candidate (mp4) 200
+  const downloadedFromSong = await downloader.downloadSunoAudio(targetSong, {
+    lookup,
+    httpsModule: createFakeHttps((options) => {
+      if (options.path.endsWith('.mp3')) return createFakeProxyResponse(404, { 'content-type': 'text/plain' }, 'not found');
+      return createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, mp4Bytes);
+    })
+  });
+  assert.equal(downloadedFromSong.contentType, 'video/mp4');
+  assert.equal(downloadedFromSong.url, 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4');
+
+  // Headers check (no credentials forwarded)
+  const forwarded = createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, mp4Bytes));
+  await downloader.downloadSunoAudio(targetMp4, { lookup, httpsModule: forwarded });
+  assert.deepEqual(Object.keys(forwarded.requests[0].headers).sort(), ['accept', 'user-agent'],
+    'the downloader must not forward credentials or arbitrary client headers');
+
+  // Validation failures: MIME / signature
+  await assertDownloaderError(downloader.downloadSunoAudio(targetMp4, {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, 'not-real-mp4'))
+  }), 502, /MIME\/Dateisignatur/);
+
+  await assertDownloaderError(downloader.downloadSunoAudio(targetMp4, {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'text/html' }, mp4Bytes))
+  }), 502, /MIME\/Dateisignatur/);
+
+  // Size limit enforcement
+  await assertDownloaderError(downloader.downloadSunoAudio(targetMp4, {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, {
+      'content-type': 'video/mp4', 'content-length': String(downloader.DEFAULT_MAX_BYTES + 1)
+    }, mp4Bytes))
+  }), 413, /zu groß/);
+
+  await assertDownloaderError(downloader.downloadSunoAudio(targetMp4, {
+    lookup, maxBytes: 4,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, mp4Bytes))
+  }), 413, /zu groß/);
+
+  // Timeout enforcement
+  await assertDownloaderError(downloader.downloadSunoAudio(targetMp4, {
+    lookup, timeoutMs: 20, httpsModule: createFakeHttps(() => null)
+  }), 504, /Zeitlimit/);
+
+  // Redirect to non-Suno target
+  await assertDownloaderError(downloader.downloadSunoAudio(targetMp4, {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(302, { location: 'https://evil.example/song.mp4' }))
+  }), 403, /nicht freigegeben/);
+
+  // Max redirects limit
+  await assertDownloaderError(downloader.downloadSunoAudio(targetMp4, {
+    lookup, maxRedirects: 0,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(302, { location: 'https://cdn2.suno.ai/other.mp4' }))
+  }), 502, /Weiterleitung/);
+
+  // Valid redirect followed
+  const redirected = await downloader.downloadSunoAudio(targetMp4, {
+    lookup,
+    httpsModule: createFakeHttps((options, index) => (index === 0
+      ? createFakeProxyResponse(302, { location: 'https://cdn2.suno.ai/other.mp4' })
+      : createFakeProxyResponse(200, { 'content-type': 'audio/mp4' }, mp4Bytes)))
+  });
+  assert.equal(redirected.url, 'https://cdn2.suno.ai/other.mp4');
+
+  // HTTP Handler
+  const handler = downloader.createSunoDownloaderHandler({
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, mp4Bytes))
+  });
+  const call = async (url, method) => {
+    const result = { headers: null, status: 0, body: null };
+    await handler({ method: method || 'GET', url }, {
+      writeHead(status, headers) {
+        result.status = status;
+        result.headers = headers;
+      },
+      end(body) {
+        result.body = body;
+      }
+    });
+    return result;
+  };
+
+  const handlerSuccess = await call('/api/suno-downloader?url=' + encodeURIComponent(targetMp4));
+  assert.equal(handlerSuccess.status, 200);
+  assert.equal(handlerSuccess.headers['Content-Type'], 'video/mp4');
+  assert.equal(handlerSuccess.headers['Cache-Control'], 'no-store');
+  assert.equal(handlerSuccess.headers['X-Content-Type-Options'], 'nosniff');
+  assert.equal(handlerSuccess.headers['Referrer-Policy'], 'no-referrer');
+  assert.equal(handlerSuccess.body.toString('latin1'), mp4Bytes);
+
+  assert.equal((await call('/api/suno-downloader?url=' + encodeURIComponent(targetMp4), 'POST')).status, 405);
+  assert.equal((await call('/api/suno-downloader')).status, 400);
+  assert.equal((await call('/api/suno-downloader?url=' + encodeURIComponent('http://cdn1.suno.ai/a.mp4'))).status, 400);
+  assert.equal((await call('/api/suno-downloader?url=' + encodeURIComponent('https://127.0.0.1/a.mp4'))).status, 403);
+  assert.equal((await call('/api/suno-downloader?url=' + encodeURIComponent('https://evil.example/a.mp4'))).status, 403);
+}
+
+async function testConverterSunoDownloaderClientIntegration() {
+  const sunoMp4Url = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  const downloaderHref = '/api/suno-downloader?url=' + encodeURIComponent(sunoMp4Url);
+
+  function createTestEnvironment(config) {
+    const env = createConverterEnvironment();
+    const mp4 = Uint8Array.from(Buffer.from('0000ftypM4A 0000'));
+    const mp3 = Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]);
+    const audioBuffer = {
+      duration: 1, sampleRate: 44100, numberOfChannels: 1,
+      getChannelData() { return new Float32Array([0.2, -0.2]); }
+    };
+    const state = { downloaderFails: false, downloaderStatus: 200, decodeFails: false, corsBlocked: false };
+    const fetchCalls = [];
+    class FakeAudioContext {
+      decodeAudioData(buffer, resolve, reject) {
+        if (state.decodeFails) reject(new Error('corrupt'));
+        else resolve(audioBuffer);
+      }
+      async close() {}
+    }
+    env.window.URL = URL;
+    env.window.AudioContext = FakeAudioContext;
+    env.window.__JACKDARCKART_CONFIG__ = { converter: config };
+    env.window.fetch = async (url, options) => {
+      fetchCalls.push({ url, options });
+      const isDownloader = url.startsWith('/api/suno-downloader');
+      if (isDownloader) {
+        if (state.downloaderFails) throw new TypeError('Network error');
+        if (state.downloaderStatus !== 200) {
+          return {
+            ok: false,
+            status: state.downloaderStatus,
+            type: 'basic',
+            url: 'https://stream-musik.space' + url,
+            async json() { return { error: state.downloaderStatus === 413 ? 'Zu groß' : 'Blockiert' }; },
+            headers: { get() { return 'application/json'; } }
+          };
+        }
+        let index = 0;
+        return {
+          ok: true,
+          status: 200,
+          type: 'basic',
+          url: 'https://stream-musik.space' + url,
+          headers: { get(key) { return key === 'Content-Type' ? 'video/mp4' : null; } },
+          body: { getReader() {
+            return {
+              async read() {
+                index += 1;
+                return index === 1 ? { done: false, value: mp4 } : { done: true };
+              },
+              async cancel() {}
+            };
+          } }
+        };
+      }
+      if (state.corsBlocked) throw new TypeError('CORS failed');
+      let index = 0;
+      return {
+        ok: true, status: 200, type: 'cors', url,
+        headers: { get(key) { return key === 'Content-Type' ? 'audio/mpeg' : null; } },
+        body: { getReader() {
+          return {
+            async read() {
+              index += 1;
+              return index === 1 ? { done: false, value: mp3 } : { done: true };
+            },
+            async cancel() {}
+          };
+        } }
+      };
+    };
+    env.context.AbortController = AbortController;
+    vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+    const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+    studio.init();
+    return { env, studio, state, fetchCalls, audioBuffer };
+  }
+
+  // 1. Dedicated "Suno herunterladen" button test with Suno CDN MP4
+  const { env, studio, state, fetchCalls, audioBuffer } = createTestEnvironment({
+    sunoDownloader: { endpoint: '/api/suno-downloader' }
+  });
+  const input = env.elements['converter-remote-url'];
+  const importBtn = env.elements['converter-remote-import'];
+  const sunoBtn = env.elements['converter-suno-download'];
+  const status = env.elements['converter-import-status'];
+
+  input.value = sunoMp4Url;
+  await sunoBtn.dispatch('click');
+  assert.deepEqual(fetchCalls.map((c) => c.url), [downloaderHref],
+    'Suno downloader button must fetch from the configured Suno downloader endpoint');
+  assert.equal(fetchCalls[0].options.mode, 'same-origin');
+  assert.equal(fetchCalls[0].options.credentials, 'omit');
+  assert.equal(fetchCalls[0].options.referrerPolicy, 'no-referrer');
+  assert.match(status.textContent, /Suno-Audio über den sicheren Suno-Downloader geladen und geprüft/);
+  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich im Browser dekodiert/);
+  assert.equal(env.elements['converter-file-name'].textContent, '4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4');
+  assert.equal(env.elements['converter-render-button'].disabled, false,
+    'downloaded Suno audio must enable the render pipeline');
+  const wav = Buffer.from(await studio._encodeWavForTest(audioBuffer).arrayBuffer());
+  assert.equal(wav.toString('ascii', 0, 4), 'RIFF', 'WAV export must work after Suno download');
+
+  // 2. Suno button rejects non-Suno URLs
+  fetchCalls.length = 0;
+  input.value = 'https://public.example/song.mp3';
+  await sunoBtn.dispatch('click');
+  assert.equal(fetchCalls.length, 0, 'non-Suno URLs must be rejected by the Suno button without any fetch');
+  assert.match(status.textContent, /akzeptiert nur freigegebene Suno-Links/);
+
+  // 3. Downloader 403 error
+  fetchCalls.length = 0;
+  state.downloaderStatus = 403;
+  input.value = sunoMp4Url;
+  await sunoBtn.dispatch('click');
+  assert.match(status.textContent, /unsicher blockiert/);
+
+  // 4. Downloader 413 error
+  fetchCalls.length = 0;
+  state.downloaderStatus = 413;
+  await sunoBtn.dispatch('click');
+  assert.match(status.textContent, /Downloader-Ablehnung: Zu groß/);
+
+  // 5. Downloader network failure falls back to direct fetch
+  fetchCalls.length = 0;
+  state.downloaderStatus = 200;
+  state.downloaderFails = true;
+  await sunoBtn.dispatch('click');
+  assert.deepEqual(fetchCalls.map((c) => c.url), [downloaderHref, sunoMp4Url],
+    'downloader failure must fall back to direct fetch');
+  assert.match(status.textContent, /Fallback auf direkten Abruf durchgeführt/);
+
+  // 6. Decode failure on downloaded audio
+  fetchCalls.length = 0;
+  state.downloaderFails = false;
+  state.decodeFails = true;
+  await sunoBtn.dispatch('click');
+  assert.match(status.textContent, /nicht dekodiert/, 'decode failure must be handled cleanly');
+  state.decodeFails = false;
+
+  // 7. Standard "URL importieren" button also uses Suno downloader when configured for Suno URLs
+  fetchCalls.length = 0;
+  input.value = sunoMp4Url;
+  await importBtn.dispatch('click');
+  assert.deepEqual(fetchCalls.map((c) => c.url), [downloaderHref],
+    'URL importieren with Suno URL should route to Suno downloader when configured');
+  assert.match(status.textContent, /Suno-Downloader geladen und geprüft/);
+
+  // 8. Non-Suno URL with "URL importieren" uses direct fetch
+  fetchCalls.length = 0;
+  input.value = 'https://public.example/song.mp3';
+  await importBtn.dispatch('click');
+  assert.deepEqual(fetchCalls.map((c) => c.url), ['https://public.example/song.mp3'],
+    'non-Suno URL must use direct browser fetch');
+  assert.doesNotMatch(status.textContent, /Suno-Downloader/);
+
+  // 9. Reset studio re-enables both buttons
+  await env.elements['converter-reset-button'].dispatch('click');
+  assert.equal(sunoBtn.disabled, false);
+  assert.equal(importBtn.disabled, false);
+  assert.equal(input.value, '');
+
+  studio.destroy();
+}
+
 async function testConverterAdaptiveEnhance() {
   const env = createConverterEnvironment();
   vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
@@ -3678,6 +4034,8 @@ async function main() {
   await testConverterRemoteImportProxyFallback();
   await testRemoteAudioProxyValidatesAndFetchesAudio();
   await testRemoteAudioProxyHandlerResponses();
+  await testSunoDownloaderBackendValidationAndFetch();
+  await testConverterSunoDownloaderClientIntegration();
   await testConverterAdaptiveEnhance();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
