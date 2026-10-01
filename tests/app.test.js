@@ -2196,6 +2196,11 @@ function testConverterPageExposesStudioHooksAndLoader() {
     /\.enhance-score-track\[data-tone="alert"\]/,
     'studio styles should visualise the quality score state'
   );
+  assert.doesNotMatch(
+    converterHtmlCode,
+    /\sstyle="/,
+    'converter page must not use inline style attributes because the page CSP does not allow unsafe-inline styles'
+  );
   assert.match(
     converterJsCode,
     /CLEANUP_WINDOW_MS\s*=\s*2\s*\*\s*60\s*\*\s*1000/,
