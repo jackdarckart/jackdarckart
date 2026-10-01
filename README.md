@@ -300,3 +300,4 @@ Die Website wird direkt aus dem Repository-Root über GitHub Pages veröffentlic
 - reale Kontaktadresse und rechtlich geprüfte Impressumsangaben eintragen
 - optional Social-/Plattform-Links nur nach Verifikation ergänzen
 - optional echten Same-Origin-Proxy ergänzen, falls direkter Browserzugriff auf `api.laut.fm` in der Zielumgebung nicht möglich ist
+- optional Suno-Downloader-Backend separat betreiben und über `window.__JACKDARCKART_CONFIG__.converter.sunoDownloader.endpoint` konfigurieren (auf statischem GitHub Pages bleibt der Downloader-Button deaktiviert mit Hinweistext; das Studio nutzt dann direkten Browser-Fetch für CORS-fähige Quellen oder lokalen Datei-Import)
