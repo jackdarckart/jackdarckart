@@ -47,8 +47,21 @@
   const REMOTE_IMPORT_ERROR_PROXY_REJECTED = 'Der Proxy hat das Ziel abgelehnt.';
   const REMOTE_IMPORT_STATUS_PROXY_DIRECT = 'Über den vertrauenswürdigen Same-Origin-Proxy geladen und geprüft.';
   const REMOTE_IMPORT_ERROR_CORS = 'Remote-Audio konnte nicht geladen werden (Netzwerk oder CORS-Freigabe). Ohne konfigurierten Same-Origin-Proxy bitte die Datei lokal importieren.';
+  const SUNO_DOWNLOADER_STATUS_SUCCESS = 'Suno-Audio über den sicheren Suno-Downloader geladen und geprüft.';
+  const SUNO_DOWNLOADER_STATUS_FALLBACK = 'Suno-Downloader war nicht verfügbar; Fallback auf direkten Abruf durchgeführt.';
+  const SUNO_DOWNLOADER_ERROR_NON_SUNO = 'Der Suno-Downloader akzeptiert nur freigegebene Suno-Links (suno.com/song/… oder cdn*.suno.ai/…).';
+  const SUNO_DOWNLOADER_ERROR_BLOCKED = 'Ziel wurde vom Suno-Downloader als unsicher blockiert und nicht geladen.';
   const spectrumFftSize = 2048;
   let currentStudio = null;
+
+  function isSunoUrl(url) {
+    if (!url) return false;
+    const host = (url.hostname || '').toLowerCase().replace(/\.$/, '');
+    if (SUNO_PAGE_HOSTS.includes(host)) {
+      return SUNO_SONG_ID_PATTERN.test(url.pathname);
+    }
+    return SUNO_CDN_HOST_PATTERN.test(host) && SUNO_CDN_MEDIA_PATTERN.test(url.pathname);
+  }
 
   function validateRemoteAudioUrl(input) {
     let url;
@@ -126,20 +139,23 @@
     return endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') + 'url=' + encodeURIComponent(url.href);
   }
 
-  async function readProxyErrorMessage(response) {
+  async function readProxyErrorMessage(response, prefix) {
+    const defaultPrefix = prefix || 'Proxy-Ablehnung: ';
+    const fallbackMessage = prefix ? 'Der Downloader hat das Ziel abgelehnt.' : REMOTE_IMPORT_ERROR_PROXY_REJECTED;
     if (!response || typeof response.json !== 'function') {
-      return REMOTE_IMPORT_ERROR_PROXY_REJECTED;
+      return fallbackMessage;
     }
     try {
       const payload = await response.json();
       const detail = payload && typeof payload.error === 'string' ? payload.error.trim() : '';
-      return detail ? 'Proxy-Ablehnung: ' + detail.slice(0, 200) : REMOTE_IMPORT_ERROR_PROXY_REJECTED;
+      return detail ? defaultPrefix + detail.slice(0, 200) : fallbackMessage;
     } catch (error) {
-      return REMOTE_IMPORT_ERROR_PROXY_REJECTED;
+      return fallbackMessage;
     }
   }
 
-  async function fetchRemoteAudio(url, controller, proxyEndpoint) {
+  async function fetchRemoteAudio(url, controller, proxyEndpoint, options) {
+    const isDownloader = Boolean(options && options.isDownloader);
     const requestHref = proxyEndpoint ? buildProxyRequestUrl(proxyEndpoint, url) : url.href;
     // `response.url` ist im Browser immer absolut; relative Proxy-Pfade müssen dafür aufgelöst werden.
     const absoluteRequestHref = proxyEndpoint ? ((tryCreateUrl(requestHref) || {}).href || requestHref) : requestHref;
@@ -156,9 +172,11 @@
         // Netzwerk-/CORS-Fehler markieren eine nicht abrufbare Quelle, nicht einen inhaltlichen Fehler.
         if (error && error.name === 'AbortError') throw error;
         if (proxyEndpoint) {
-          const proxyUnavailable = new Error('Der vertrauenswürdige Proxy war nicht erreichbar.');
-          proxyUnavailable.remoteSourceUnavailable = true;
-          throw proxyUnavailable;
+          const serviceUnavailable = new Error(isDownloader
+            ? 'Der sichere Suno-Downloader war nicht erreichbar.'
+            : 'Der vertrauenswürdige Proxy war nicht erreichbar.');
+          serviceUnavailable.remoteSourceUnavailable = true;
+          throw serviceUnavailable;
         }
         if (error) {
           error.remoteSourceUnavailable = true;
@@ -167,11 +185,11 @@
         throw error;
       }
       if (proxyEndpoint && response.status >= 400) {
-        // 4xx des eigenen Proxys sind endgültige Ablehnungen; 5xx melden den Grund und dürfen weiterhin ausweichen.
+        // 4xx des eigenen Proxys bzw. Downloaders sind endgültige Ablehnungen; 5xx melden den Grund und dürfen weiterhin ausweichen.
         if (response.status === 403) {
-          throw new Error(REMOTE_IMPORT_ERROR_BLOCKED);
+          throw new Error(isDownloader ? SUNO_DOWNLOADER_ERROR_BLOCKED : REMOTE_IMPORT_ERROR_BLOCKED);
         }
-        const rejection = new Error(await readProxyErrorMessage(response));
+        const rejection = new Error(await readProxyErrorMessage(response, isDownloader ? 'Downloader-Ablehnung: ' : 'Proxy-Ablehnung: '));
         if (response.status >= 500) rejection.remoteSourceUnavailable = true;
         throw rejection;
       }
@@ -659,6 +677,7 @@
       fileInput: document.getElementById('converter-file-input'),
       remoteInput: document.getElementById('converter-remote-url'),
       remoteButton: document.getElementById('converter-remote-import'),
+      sunoButton: document.getElementById('converter-suno-download'),
       browseButton: document.getElementById('converter-browse-button'),
       resetButton: document.getElementById('converter-reset-button'),
       dropzone: document.getElementById('converter-dropzone-shell'),
@@ -727,6 +746,7 @@
       if (remoteController) remoteController.abort();
       remoteController = null;
       if (elements.remoteButton) elements.remoteButton.disabled = false;
+      if (elements.sunoButton) elements.sunoButton.disabled = false;
     }
 
     function bind(target, type, listener, options) {
@@ -751,6 +771,7 @@
       });
       bind(elements.fileInput, 'change', () => handleSelectedFiles(elements.fileInput.files));
       bind(elements.remoteButton, 'click', handleRemoteImport);
+      bind(elements.sunoButton, 'click', handleSunoDownload);
       bind(elements.remoteInput, 'keydown', (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
@@ -919,24 +940,61 @@
       }
     }
 
-    async function fetchFirstAvailableRemoteAudio(candidates, generation) {
+    async function fetchFirstAvailableRemoteAudio(candidates, generation, options) {
+      const isSunoDownloaderCall = Boolean(options && options.sunoDownloader);
       const proxy = resolveRemoteImportProxy();
+      const downloader = resolveSunoDownloader();
       let lastError = null;
       let corsBlocked = false;
+      let downloaderFellBack = false;
+
       for (let index = 0; index < candidates.length; index += 1) {
         const candidate = candidates[index];
         const isSunoCdnMedia = SUNO_CDN_HOST_PATTERN.test(candidate.hostname.toLowerCase())
           && SUNO_CDN_MEDIA_PATTERN.test(candidate.pathname);
-        const attempts = proxy.endpoint && isSunoCdnMedia ? ['', proxy.endpoint] : [''];
+        const isSunoSource = isSunoCdnMedia || isSunoUrl(candidate);
+
+        const attempts = [];
+        if (isSunoDownloaderCall) {
+          if (downloader.endpoint) {
+            attempts.push({ endpoint: downloader.endpoint, isDownloader: true });
+          }
+          attempts.push({ endpoint: '', isDownloader: false });
+          if (proxy.endpoint && isSunoCdnMedia) {
+            attempts.push({ endpoint: proxy.endpoint, isDownloader: false });
+          }
+        } else if (downloader.endpoint && isSunoSource) {
+          attempts.push({ endpoint: downloader.endpoint, isDownloader: true });
+          attempts.push({ endpoint: '', isDownloader: false });
+          if (proxy.endpoint && isSunoCdnMedia) {
+            attempts.push({ endpoint: proxy.endpoint, isDownloader: false });
+          }
+        } else if (proxy.endpoint && isSunoCdnMedia) {
+          attempts.push({ endpoint: '', isDownloader: false });
+          attempts.push({ endpoint: proxy.endpoint, isDownloader: false });
+        } else {
+          attempts.push({ endpoint: '', isDownloader: false });
+        }
+
         for (let attempt = 0; attempt < attempts.length; attempt += 1) {
-          const proxyEndpoint = attempts[attempt];
+          const { endpoint, isDownloader } = attempts[attempt];
           const controller = new AbortController();
           remoteController = controller;
           try {
-            const audio = await fetchRemoteAudio(candidate, controller, proxyEndpoint);
-            return { url: candidate, audio, viaProxy: Boolean(proxyEndpoint), corsBlocked };
+            const audio = await fetchRemoteAudio(candidate, controller, endpoint, { isDownloader });
+            return {
+              url: candidate,
+              audio,
+              viaProxy: Boolean(endpoint && !isDownloader),
+              viaDownloader: Boolean(isDownloader),
+              downloaderFellBack,
+              corsBlocked
+            };
           } catch (error) {
             if (remoteController === controller) remoteController = null;
+            if (isDownloader && error && error.remoteSourceUnavailable === true) {
+              downloaderFellBack = true;
+            }
             // Nur fehlende oder nicht abrufbare Quellen dürfen auf den Proxy bzw. den nächsten Kandidaten ausweichen;
             // Abbrüche, veraltete Importe und Inhaltsfehler werden sofort gemeldet.
             const retryable = error && error.remoteSourceUnavailable === true;
@@ -949,16 +1007,36 @@
       throw lastError || new Error('Remote-Import fehlgeschlagen.');
     }
 
-    async function handleRemoteImport() {
+    async function executeRemoteOrDownloaderImport(isDownloader) {
       cancelRemoteImport();
       const generation = importGeneration;
-      elements.remoteButton.disabled = true;
-      setRenderState('loading', 'Remote-Audio wird sicher geladen …');
-      elements.importStatus.textContent = 'Remote-Audio wird geladen und im Browser geprüft …';
+      if (elements.remoteButton) elements.remoteButton.disabled = true;
+      if (elements.sunoButton) elements.sunoButton.disabled = true;
+
+      const rawInput = (elements.remoteInput && elements.remoteInput.value || '').trim();
+      const actionLabel = isDownloader ? 'Suno-Audio' : 'Remote-Audio';
+      setRenderState('loading', `${actionLabel} wird sicher geladen …`);
+      elements.importStatus.textContent = `${actionLabel} wird geladen und im Browser geprüft …`;
+
       try {
-        const candidates = resolveRemoteAudioCandidates(elements.remoteInput.value);
-        const { url, audio, viaProxy, corsBlocked } = await fetchFirstAvailableRemoteAudio(candidates, generation);
+        if (!rawInput) {
+          throw new Error(isDownloader
+            ? 'Bitte eine vollständige Suno-URL eingeben.'
+            : 'Bitte eine vollständige HTTPS-URL eingeben.');
+        }
+
+        if (isDownloader) {
+          const parsed = validateRemoteAudioUrl(rawInput);
+          if (!isSunoUrl(parsed)) {
+            throw new Error(SUNO_DOWNLOADER_ERROR_NON_SUNO);
+          }
+        }
+
+        const candidates = resolveRemoteAudioCandidates(rawInput);
+        const { url, audio, viaProxy, viaDownloader, downloaderFellBack, corsBlocked } =
+          await fetchFirstAvailableRemoteAudio(candidates, generation, { sunoDownloader: isDownloader });
         if (generation !== importGeneration) return;
+
         const context = await ensureAudioContext();
         let buffer;
         try {
@@ -967,11 +1045,13 @@
           throw new Error('Audio konnte im Browser nicht dekodiert werden.');
         }
         if (generation !== importGeneration) return;
+
         await resetPlaybackOnly();
         if (generation !== importGeneration) return;
+
         clearRenderedAsset('Vorherige temporäre Master-Datei entfernt, weil eine neue Quelle geladen wurde.');
         loadedFile = {
-          name: url.pathname.split('/').pop() || 'Remote-Audio',
+          name: url.pathname.split('/').pop() || (viaDownloader ? 'Suno-Audio' : 'Remote-Audio'),
           size: audio.size,
           type: audio.type
         };
@@ -983,30 +1063,51 @@
         updateButtons();
         drawWaveform(loadedBuffer);
         updateAnalysisSummary();
-        setRenderState('ready', viaProxy
-          ? 'Remote-Audio über den Proxy bereit – Preview und Render bleiben lokal.'
-          : 'Remote-Audio bereit – Preview und Render bleiben lokal.');
+
+        const readyMsg = viaDownloader
+          ? 'Suno-Audio über den Downloader bereit – Preview und Render bleiben lokal.'
+          : (viaProxy
+            ? 'Remote-Audio über den Proxy bereit – Preview und Render bleiben lokal.'
+            : 'Remote-Audio bereit – Preview und Render bleiben lokal.');
+        setRenderState('ready', readyMsg);
+
         const successStatus = remoteAudioContainer(audio.type) === 'mp4'
           ? REMOTE_IMPORT_STATUS_MP4
           : REMOTE_IMPORT_STATUS_DEFAULT;
-        elements.importStatus.textContent = viaProxy
-          ? (corsBlocked ? REMOTE_IMPORT_STATUS_PROXY : REMOTE_IMPORT_STATUS_PROXY_DIRECT) + ' ' + successStatus
-          : successStatus;
+
+        if (viaDownloader) {
+          elements.importStatus.textContent = SUNO_DOWNLOADER_STATUS_SUCCESS + ' ' + successStatus;
+        } else if (downloaderFellBack) {
+          elements.importStatus.textContent = SUNO_DOWNLOADER_STATUS_FALLBACK + ' ' + successStatus;
+        } else if (viaProxy) {
+          elements.importStatus.textContent = (corsBlocked ? REMOTE_IMPORT_STATUS_PROXY : REMOTE_IMPORT_STATUS_PROXY_DIRECT) + ' ' + successStatus;
+        } else {
+          elements.importStatus.textContent = successStatus;
+        }
       } catch (error) {
         if (generation !== importGeneration) return;
         const reason = error.name === 'AbortError'
-          ? 'Remote-Import hat das Zeitlimit überschritten oder wurde abgebrochen.'
+          ? `${actionLabel} hat das Zeitlimit überschritten oder wurde abgebrochen.`
           : (error && error.remoteCorsBlocked === true) || error instanceof TypeError
             ? REMOTE_IMPORT_ERROR_CORS
-            : (error instanceof Error ? error.message : 'Remote-Import fehlgeschlagen.');
+            : (error instanceof Error ? error.message : `${actionLabel} fehlgeschlagen.`);
         setRenderState('error', reason);
         elements.importStatus.textContent = reason;
       } finally {
         if (generation === importGeneration) {
           remoteController = null;
-          elements.remoteButton.disabled = false;
+          if (elements.remoteButton) elements.remoteButton.disabled = false;
+          if (elements.sunoButton) elements.sunoButton.disabled = false;
         }
       }
+    }
+
+    function handleRemoteImport() {
+      return executeRemoteOrDownloaderImport(false);
+    }
+
+    function handleSunoDownload() {
+      return executeRemoteOrDownloaderImport(true);
     }
 
     async function ensureAudioContext() {
@@ -1506,6 +1607,8 @@
         elements.fileInput.value = '';
       }
       if (elements.remoteInput) elements.remoteInput.value = '';
+      if (elements.remoteButton) elements.remoteButton.disabled = false;
+      if (elements.sunoButton) elements.sunoButton.disabled = false;
       ['fileName', 'fileDuration', 'fileRate', 'fileSize', 'fileFormat', 'fileChannels'].forEach((key) => {
         elements[key].textContent = '–';
       });
@@ -1876,6 +1979,18 @@
     const remoteImport = config && config.remoteImport;
     // Nur ein echter Same-Origin-Endpunkt gilt als vertrauenswürdiger Resolver.
     const endpoint = resolveSameOriginEndpoint(remoteImport && remoteImport.proxyEndpoint);
+    return { endpoint };
+  }
+
+  function resolveSunoDownloader() {
+    const config = readConverterConfig();
+    const downloader = config && config.sunoDownloader;
+    const remoteImport = config && config.remoteImport;
+    const endpoint = resolveSameOriginEndpoint(
+      (downloader && (downloader.endpoint || downloader.downloaderEndpoint))
+      || (remoteImport && (remoteImport.sunoDownloaderEndpoint || remoteImport.downloaderEndpoint))
+      || (config && config.sunoDownloaderEndpoint)
+    );
     return { endpoint };
   }
 
