@@ -44,6 +44,8 @@
   const REMOTE_IMPORT_STATUS_MP4 = 'MP4/M4A-Audio erfolgreich im Browser dekodiert. Export als WAV ist verfügbar, MP3 nur bei vorhandener Encoder-Unterstützung. Keine Speicherung auf dem Server.';
   const REMOTE_IMPORT_STATUS_PROXY = 'Direkter Abruf war durch CORS blockiert; die Datei wurde über den vertrauenswürdigen Same-Origin-Proxy geladen und geprüft.';
   const REMOTE_IMPORT_ERROR_BLOCKED = 'Ziel wurde als unsicher blockiert und nicht geladen.';
+  const REMOTE_IMPORT_ERROR_PROXY_REJECTED = 'Der Proxy hat das Ziel abgelehnt.';
+  const REMOTE_IMPORT_STATUS_PROXY_DIRECT = 'Über den vertrauenswürdigen Same-Origin-Proxy geladen und geprüft.';
   const REMOTE_IMPORT_ERROR_CORS = 'Remote-Audio konnte nicht geladen werden (Netzwerk oder CORS-Freigabe). Ohne konfigurierten Same-Origin-Proxy bitte die Datei lokal importieren.';
   const spectrumFftSize = 2048;
   let currentStudio = null;
@@ -124,6 +126,19 @@
     return endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') + 'url=' + encodeURIComponent(url.href);
   }
 
+  async function readProxyErrorMessage(response) {
+    if (!response || typeof response.json !== 'function') {
+      return REMOTE_IMPORT_ERROR_PROXY_REJECTED;
+    }
+    try {
+      const payload = await response.json();
+      const detail = payload && typeof payload.error === 'string' ? payload.error.trim() : '';
+      return detail ? 'Proxy-Ablehnung: ' + detail.slice(0, 200) : REMOTE_IMPORT_ERROR_PROXY_REJECTED;
+    } catch (error) {
+      return REMOTE_IMPORT_ERROR_PROXY_REJECTED;
+    }
+  }
+
   async function fetchRemoteAudio(url, controller, proxyEndpoint) {
     const requestHref = proxyEndpoint ? buildProxyRequestUrl(proxyEndpoint, url) : url.href;
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
@@ -149,8 +164,12 @@
         }
         throw error;
       }
-      if (proxyEndpoint && response.status === 403) {
-        throw new Error(REMOTE_IMPORT_ERROR_BLOCKED);
+      if (proxyEndpoint && response.status >= 400 && response.status < 500) {
+        // 4xx des eigenen Proxys sind endgültige Ablehnungen und dürfen keinen weiteren Versuch auslösen.
+        if (response.status === 403) {
+          throw new Error(REMOTE_IMPORT_ERROR_BLOCKED);
+        }
+        throw new Error(await readProxyErrorMessage(response));
       }
       if (!response.ok || response.type === 'opaque' || response.url !== requestHref) {
         const unreachable = new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
@@ -966,7 +985,7 @@
           ? REMOTE_IMPORT_STATUS_MP4
           : REMOTE_IMPORT_STATUS_DEFAULT;
         elements.importStatus.textContent = viaProxy
-          ? (corsBlocked ? REMOTE_IMPORT_STATUS_PROXY + ' ' : 'Über den vertrauenswürdigen Same-Origin-Proxy geladen und geprüft. ') + successStatus
+          ? (corsBlocked ? REMOTE_IMPORT_STATUS_PROXY : REMOTE_IMPORT_STATUS_PROXY_DIRECT) + ' ' + successStatus
           : successStatus;
       } catch (error) {
         if (generation !== importGeneration) return;

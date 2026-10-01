@@ -3264,6 +3264,7 @@ function createProxyFallbackEnvironment(remoteImportConfig) {
       status: viaProxy ? state.proxyStatus : 200,
       type: viaProxy ? 'basic' : 'cors',
       url,
+      async json() { return { error: 'Zu groß' }; },
       headers: { get(key) { return key === 'Content-Type' ? mime : null; } },
       body: { getReader() {
         return {
@@ -3324,6 +3325,12 @@ async function testConverterRemoteImportProxyFallback() {
   await button.dispatch('click');
   assert.match(status.textContent, /unsicher blockiert/, 'targets rejected by the proxy must be reported as blocked');
   assert.equal(fetchCalls.length, 2, 'a blocked proxy target must not be retried');
+
+  fetchCalls.length = 0;
+  state.proxyStatus = 413;
+  await button.dispatch('click');
+  assert.match(status.textContent, /Proxy-Ablehnung: Zu groß/, 'proxy 4xx details must be surfaced without retrying');
+  assert.equal(fetchCalls.length, 2, 'a rejected proxy request must not be retried');
 
   fetchCalls.length = 0;
   state.proxyStatus = 200;

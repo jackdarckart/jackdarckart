@@ -97,7 +97,7 @@ function validateTargetUrl(input, options) {
 function safeLookup(hostname, lookupOptions, callback) {
   const options = typeof lookupOptions === 'function' ? {} : (lookupOptions || {});
   const done = typeof lookupOptions === 'function' ? lookupOptions : callback;
-  dns.lookup(hostname, { all: true, verbatim: true, family: options.family || 0 }, (error, addresses) => {
+  dns.lookup(hostname, Object.assign({}, options, { all: true, verbatim: true }), (error, addresses) => {
     if (error) {
       done(error);
       return;
