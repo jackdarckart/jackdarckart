@@ -7,7 +7,7 @@
   <meta name="description" content="Singularity Arcade — Quantum Vault: servergespeichertes Sci-Fi-Progressionsspiel mit Account, Upgrades, Skill-Tree und Leaderboard.">
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://vault.stream-musik.space; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/game.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Singularity Arcade — Quantum Vault">
@@ -32,7 +32,7 @@
       <div>
         <p class="kicker">ACCOUNT-LINK ERFORDERLICH</p>
         <h1 id="auth-title">Synchronisiere dich mit dem Quantum Vault.</h1>
-        <p>Melde dich an oder lege in wenigen Sekunden einen Account an. Dein Fortschritt wird auf dem Server gespeichert und ist nach dem Login auf allen deinen Geräten verfügbar.</p>
+        <p>Melde dich an oder lege in wenigen Sekunden einen Account an. Deine Sitzung läuft über ein sicheres Cloudflare-Cookie; dein Fortschritt wird auf dem Server gespeichert und ist nach dem Login auf allen deinen Geräten verfügbar.</p>
       </div>
       <div class="auth-grid">
         <form id="login-form" class="auth-form" aria-labelledby="login-title">
@@ -52,7 +52,7 @@
           <small class="field-hint" id="register-handle-hint">3–20 Zeichen: Buchstaben, Zahlen, _ oder -. Wird im Leaderboard angezeigt.</small>
           <label for="register-password">Passwort</label>
           <input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required aria-describedby="register-password-hint">
-          <small class="field-hint" id="register-password-hint">Mindestens 10 Zeichen. Wird nur verschlüsselt (scrypt) gespeichert.</small>
+          <small class="field-hint" id="register-password-hint">Mindestens 10 Zeichen. Wird serverseitig als Passwort-Hash (PBKDF2) gespeichert.</small>
           <button class="hud-button" type="submit">Account erstellen</button>
         </form>
       </div>

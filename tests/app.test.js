@@ -1978,7 +1978,10 @@ function testQuantumVaultGameIntegration() {
   assert.doesNotMatch(gameHtml, /<script[^>]*src="\.\/app\.js"/, 'game page should remain isolated from the radio shell');
   assert.doesNotMatch(gameJs, /localStorage|sessionStorage|userId|accountId/,
     'game client must not use browser persistence or submit account identifiers');
-  assert.match(gameJs, /credentials:\s*'same-origin'/);
+  assert.match(gameJs, /credentials:\s*'include'/);
+  assert.match(gameHtml, /connect-src 'self' https:\/\/vault\.stream-musik\.space/);
+  assert.match(gameHtml, /Cloudflare-Cookie/);
+  assert.match(gameHtml, /Passwort-Hash \(PBKDF2\)/);
   assert.match(gameJs, /error\.status\s*=\s*response\.status/);
   assert.match(gameJs, /generation\s*!==\s*authGeneration/);
   assert.match(gameJs, /error\.status\s*===\s*401/);
@@ -2009,6 +2012,100 @@ function testQuantumVaultGameIntegration() {
   assert.doesNotMatch(stylesCode, /Arcade|game-hero|endpoint-launcher/i,
     'shared styles should remain isolated from the dedicated game');
   assert.match(readme, /server\/quantum-vault\.js/);
+}
+
+async function testGameCloudflareCookieFlow() {
+  const gameJs = fs.readFileSync(path.join(__dirname, '..', 'game.js'), 'utf8');
+  const state = {
+    vibeScore: 0, fragments: 0, alloys: 0, revision: 0,
+    upgrades: {}, stats: { harvests: 0, forges: 0, upgrades: 0, nodes: 0, manualSaves: 0, autosaves: 0 },
+    treeNodes: [], jukebox: []
+  };
+  for (const configuredBase of [null, 'https://example.org/api/quantum-vault/', 'http://example.org/api/quantum-vault']) {
+    const base = configuredBase?.startsWith('https://')
+      ? configuredBase.slice(0, -1) : 'https://vault.stream-musik.space/api/quantum-vault';
+    const calls = [];
+    const elements = new Map();
+    const getElement = (id) => {
+      if (!elements.has(id)) elements.set(id, new MockElement(id));
+      return elements.get(id);
+    };
+    getElement('connection-status').lastChild = { textContent: '' };
+    getElement('leaderboard').replaceChildren = () => {};
+    getElement('leaderboard').append = () => {};
+    for (const id of ['login-form', 'register-form']) {
+      const form = getElement(id);
+      form.elements = { namedItem: () => null };
+      form.reset = () => {};
+    }
+    const action = getElement('action-harvest');
+    action.dataset.action = 'harvest';
+    const document = {
+      getElementById: getElement,
+      createElement: (tag) => new MockElement(tag),
+      querySelectorAll(selector) {
+        if (selector === '[data-action]') return [action];
+        if (selector === '.auth-form') return [getElement('login-form'), getElement('register-form')];
+        return [];
+      }
+    };
+    let signedIn = false;
+    const fetch = async (url, options) => {
+      calls.push({ url, options });
+      const route = url.slice(base.length);
+      let status = 200;
+      let payload = { handle: 'Pilot_One', state };
+      if (route === '/session' && !signedIn) {
+        status = 401;
+        payload = { code: 'SESSION_REQUIRED' };
+      } else if (route === '/register' || route === '/login') {
+        signedIn = true;
+      } else if (route === '/logout') {
+        signedIn = false;
+        payload = { ok: true };
+      } else if (route === '/leaderboard') {
+        payload = { leaders: [] };
+      }
+      return {
+        ok: status === 200, status,
+        headers: { get: () => 'application/json' },
+        json: async () => payload
+      };
+    };
+    const context = vm.createContext({
+      window: { __JACKDARCKART_CONFIG__: configuredBase ? { game: { apiBase: configuredBase } } : undefined,
+        setInterval: () => 1, clearInterval: () => {}, setTimeout: (callback) => callback() },
+      document, fetch,
+      FormData: class {
+        get(field) { return field === 'handle' ? 'Pilot_One' : 'correct-horse-vault'; }
+      }
+    });
+    vm.runInContext(gameJs, context, { filename: 'game.js' });
+    await flushStudioTasks();
+    assert.equal(calls[0].url, `${base}/session`);
+    assert.equal(calls[1].url, `${base}/leaderboard`);
+    await getElement('register-form').dispatch('submit');
+    await flushStudioTasks();
+    assert.equal(getElement('game-shell').hidden, false, 'registration must restore authenticated game state');
+    assert.equal((action.listeners.get('click') || []).length, 1, 'game action should be wired');
+    await action.dispatch('click');
+    await getElement('save-button').dispatch('click');
+    await getElement('logout-button').dispatch('click');
+    assert.deepEqual(calls.map(({ url }) => url.slice(base.length)),
+      ['/session', '/leaderboard', '/register', '/leaderboard', '/action', '/save', '/logout']);
+    for (const { options } of calls) {
+      assert.equal(options.credentials, 'include', 'every game request must carry the Worker session cookie');
+    }
+    assert.deepEqual(JSON.parse(calls[2].options.body), { handle: 'Pilot_One', password: 'correct-horse-vault' });
+    assert.deepEqual(JSON.parse(calls[4].options.body), { action: 'harvest' });
+    assert.deepEqual(JSON.parse(calls[5].options.body), { kind: 'manual' });
+    assert.equal(getElement('auth-shell').hidden, false, 'logout should return to the login page');
+    await getElement('login-form').dispatch('submit');
+    await flushStudioTasks();
+    assert.equal(calls[7].url, `${base}/login`);
+    assert.equal(calls[7].options.credentials, 'include');
+    assert.equal(getElement('game-shell').hidden, false, 'login should restore the game from server state');
+  }
 }
 
 function testStickyPlayerCssKeepsPlayerWithinViewport() {
@@ -4003,6 +4100,7 @@ async function main() {
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
   testQuantumVaultGameIntegration();
+  await testGameCloudflareCookieFlow();
   await testConverterMp3FormatExposureAndDefaults();
   testConverterOpusFormatExposureMatchesMimeSupport();
   await testConverterMp3FormatExposureWithBundledLocalEncoder();

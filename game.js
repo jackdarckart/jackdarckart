@@ -1,7 +1,10 @@
 'use strict';
 
 (function () {
-  const API = './api/quantum-vault';
+  const configuredApi = window.__JACKDARCKART_CONFIG__?.game?.apiBase;
+  const API = typeof configuredApi === 'string' && (configuredApi.startsWith('https://') || configuredApi.startsWith('/api/'))
+    ? configuredApi.replace(/\/+$/, '')
+    : 'https://vault.stream-musik.space/api/quantum-vault';
   const AUTO_SAVE_MS = 30000;
   const elements = {
     authShell: document.getElementById('auth-shell'),
@@ -24,7 +27,7 @@
   const MESSAGES = {
     NETWORK: 'Keine Verbindung zum Server. Prüfe deine Internetverbindung und versuche es erneut.',
     VAULT_OFFLINE: 'Der Spielserver (Quantum Vault) ist auf dieser Adresse nicht aktiv. Login und Registrierung '
-      + 'funktionieren erst, wenn der Vault-Server läuft. Betreiber: Server mit QUANTUM_VAULT_KEY und „npm start“ starten.',
+      + 'funktionieren erst, wenn die Cloudflare-API erreichbar ist. Betreiber: Worker, D1, KV und Route prüfen.',
     INVALID_CREDENTIALS: 'Handle oder Passwort ist falsch. Prüfe deine Eingabe – noch kein Account? Dann registriere dich.',
     HANDLE_TAKEN: 'Dieser Handle ist bereits vergeben. Wähle einen anderen Namen oder melde dich an, falls es dein Account ist.',
     HANDLE_INVALID: 'Der Handle muss 3–20 Zeichen lang sein und darf nur Buchstaben, Zahlen, _ oder - enthalten.',
@@ -54,7 +57,7 @@
   }
 
   async function request(route, options) {
-    const settings = Object.assign({ credentials: 'same-origin', headers: {} }, options || {});
+    const settings = Object.assign({ headers: {} }, options || {}, { credentials: 'include' });
     if (settings.body) settings.headers['Content-Type'] = 'application/json';
     let response;
     try {
