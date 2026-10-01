@@ -77,7 +77,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
-- `converter.html` – Browser-Studio für lokale Dateien und HTTPS-Audiolinks, Waveform/Spectrum, Auto-Enhance, Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
+- `converter.html` – Browser-Studio für lokale Dateien, Waveform/Spectrum, Auto-Enhance, Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
 
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
 - `events.html` – bestätigte Events und Specials oder professioneller Leerzustand
@@ -91,73 +91,6 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `impressum.html` – Impressum mit Anbieterkennzeichnung, Kontakt und Verantwortlichkeit
 
 Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrelation und passt EQ, Kompression und Lautstärkeziel an die Quelle an. Bei auffälligen Höhen, Transienten oder phasigem Stereo werden vorsichtige DSP-Korrekturen zugeschaltet. Dies sind Heuristiken, keine KI-Modell- oder Broadcast-Loudness-Messung; falls die Analyse fehlschlägt, bleibt das klassische Preset nutzbar.
-
-Remote-Import verarbeitet Audio ausschließlich im Browser: HTTPS, Hostnamen ohne offensichtliche interne Ziele oder IP-Literale, CORS-Freigabe ohne Redirect, Audio-MIME und Dateisignatur sowie maximal 50 MB sind erforderlich. Direkte Suno-CDN-Links (`https://cdn1.suno.ai/<id>.mp4`, `.m4a` oder `.mp3`) werden akzeptiert und über MIME- plus `ftyp`-Signaturprüfung als MP4/M4A-Container dekodiert; der dekodierte AudioBuffer läuft danach durch die bestehende Preview-, Auto-Enhance-, Render- und WAV-Exportkette (MP3 nur, soweit der vorhandene MP3-Exportpfad verfügbar ist). Suno-Song-Links mit UUID werden auf genau diese CDN-Medienlinks abgebildet (zuerst `.mp3`, danach `.mp4`); andere Share-Links können nicht verlässlich aufgelöst werden. Da der Browser DNS-Adressen nicht vor dem Abruf prüfen kann, ist eine Garantie gegen DNS-Rebinding ohne vertrauenswürdigen Proxy nicht möglich.
-
-### Proxy-Fallback für nicht CORS-freigegebene Quellen
-
-Wenn ein Suno-CDN-Medium keine CORS-Freigabe liefert, scheitert der direkte Browserabruf. Dafür gibt es einen optionalen, vertrauenswürdigen Same-Origin-Resolver: Der Converter versucht immer zuerst den direkten Abruf und fällt erst bei einem CORS-/Netzwerkfehler auf den Proxy zurück. Der Proxy wird ausschließlich für unterstützte Suno-CDN-Mediendateien verwendet; andere Remote-Audioquellen bleiben beim direkten Import. Lokaler Import, Preview, Auto-Enhance, Render, Cleanup und die bestehenden Exportwege bleiben unverändert.
-
-```js
-window.__JACKDARCKART_CONFIG__ = {
-  converter: {
-    remoteImport: {
-      proxyEndpoint: '/api/remote-audio'
-    }
-  }
-};
-```
-
-Nur echte Same-Origin-Endpunkte werden akzeptiert; fremde Origins, `data:`, `blob:`, `javascript:` und protokollrelative Werte werden ignoriert. Der Browser sendet dabei keine Credentials und keinen Referrer.
-
-`server/remote-audio-proxy.js` ist die dependency-freie Node-Referenzimplementierung dieses Endpunkts (GitHub Pages selbst liefert kein Backend mit). Sie ist bewusst kein offener Proxy und prüft serverseitig erneut:
-
-- nur HTTPS, Standardport, keine Zugangsdaten, keine IP-Literale
-- feste Allow-List: `cdn\d*.suno.ai` mit `.mp3`/`.mp4`/`.m4a`; sie kann nicht über Anfrageparameter erweitert werden
-- DNS-Auflösung gegen private, lokale, Link-Local- und Multicast-Adressen abgesichert
-- Content-Type plus Containersignatur (`ftyp`-Familie, RIFF/WAVE, OggS, fLaC …)
-- Größenlimit (50 MB), Timeout (15 s) und maximal zwei erneut geprüfte Weiterleitungen
-- keine Weitergabe von Client-Headern, Cookies oder Credentials; Antwort nur als validierte Audiobytes
-
-```js
-const http = require('node:http');
-const { createRemoteAudioProxyHandler } = require('./server/remote-audio-proxy.js');
-
-http.createServer(createRemoteAudioProxyHandler()).listen(8787);
-```
-
-Ohne konfigurierten Proxy bleibt es bei der bisherigen Grenze: Bei blockierter CORS-Freigabe bitte die Audiodatei lokal importieren.
-
-### Dedizierter sicherer Suno-Downloader
-
-Um Suno-Audiodateien unabhängig von instabilen Browser-CORS-Restriktionen zuverlässig abzurufen, bietet der Converter einen dedizierten, streng abgesicherten **Suno-Downloader**. Er akzeptiert ausschließlich unterstützte Suno-Quellen (direkte CDN-Links auf `.mp4`, `.m4a` und `.mp3` sowie Suno-Song-Links im Format `/song/<uuid>`).
-
-```js
-window.__JACKDARCKART_CONFIG__ = {
-  converter: {
-    sunoDownloader: {
-      endpoint: '/api/suno-download'
-    }
-  }
-};
-```
-
-Sicherheitseigenschaften des Suno-Downloaders:
-- **Streng Suno-only:** Es werden ausschließlich `cdn\d*.suno.ai` und `suno.com`/`www.suno.com` mit Song-UUID akzeptiert. Nicht-Suno-Ziele, `http:`, `data:`, `blob:`, Zugangsdaten und abweichende Ports sind blockiert. Die Allow-List kann nicht durch Anfragen aufgeweicht werden.
-- **SSRF-Schutz:** Reines DNS-Pre-Flight mit Prüfung gegen private (RFC 1918), Loopback (127.0.0.0/8, ::1), Carrier-Grade NAT (100.64.0.0/10), Link-Local (169.254.0.0/16, fe80::/10), Multicast und interne Netzadressen.
-- **Payload- und Redirect-Grenzen:** Feste Obergrenze von 50 MB, 15 Sekunden Timeout und maximal 2 erneut validierte Weiterleitungen.
-- **MIME- und Container-Signaturprüfung:** Validierung von Content-Type und Container-Signaturen (`ftyp` für MP4/M4A mit gültiger Brand, `ID3` oder Frame-Sync für MP3).
-- **AudioBuffer-Pipeline-Handoff:** Das heruntergeladene Medium wird direkt als `AudioBuffer` in die bestehende Pipeline übergeben (Preview, Auto-Enhance, Mastering-Render, WAV-Export sowie MP3-Export bei vorhandenem Encoder).
-- **Statische GitHub-Pages-Grenzen:** Da GitHub Pages keine serverseitige Logik ausführt, muss der Endpunkt separat betrieben werden (Referenz: `server/suno-downloader.js`). Ist kein Endpunkt konfiguriert oder der Dienst unerreichbar, fällt der Converter transparent auf den direkten Browser-Fetch (oder lokalen Datei-Import) zurück.
-
-Referenz-Start des Downloader-Endpunkts mit Node:
-
-```js
-const http = require('node:http');
-const { createSunoDownloaderHandler } = require('./server/suno-downloader.js');
-
-http.createServer(createSunoDownloaderHandler()).listen(8788);
-```
 
 ## Technische Struktur
 
@@ -300,4 +233,3 @@ Die Website wird direkt aus dem Repository-Root über GitHub Pages veröffentlic
 - reale Kontaktadresse und rechtlich geprüfte Impressumsangaben eintragen
 - optional Social-/Plattform-Links nur nach Verifikation ergänzen
 - optional echten Same-Origin-Proxy ergänzen, falls direkter Browserzugriff auf `api.laut.fm` in der Zielumgebung nicht möglich ist
-- optional Suno-Downloader-Backend separat betreiben und über `window.__JACKDARCKART_CONFIG__.converter.sunoDownloader.endpoint` konfigurieren (auf statischem GitHub Pages bleibt der Downloader-Button deaktiviert mit Hinweistext; das Studio nutzt dann direkten Browser-Fetch für CORS-fähige Quellen oder lokalen Datei-Import)

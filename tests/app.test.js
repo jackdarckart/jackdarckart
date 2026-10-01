@@ -666,9 +666,6 @@ function createConverterEnvironment(options = {}) {
 
   const ids = [
     'converter-file-input',
-    'converter-remote-url',
-    'converter-remote-import',
-    'converter-suno-download',
     'converter-browse-button',
     'converter-reset-button',
     'converter-dropzone-shell',
@@ -2048,6 +2045,25 @@ function testConverterPageExposesStudioHooksAndLoader() {
     );
   }
 
+  for (const removedHook of [
+    'converter-remote-url',
+    'converter-remote-import',
+    'converter-suno-download'
+  ]) {
+    const escaped = removedHook.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assert.doesNotMatch(
+      converterHtmlCode,
+      new RegExp(`id\\s*=\\s*["']${escaped}["']`),
+      `converter page should not expose removed hook ${removedHook}`
+    );
+  }
+
+  assert.doesNotMatch(
+    converterHtmlCode,
+    /Suno|URL importieren|Proxy|CORS|Downloader/i,
+    'converter page should not mention Suno, URL import, Proxy, CORS, or Downloader in HTML'
+  );
+
   assert.match(
     converterHtmlCode,
     /2-Minuten-Cleanup|2:00-Cleanup|2-Minuten-Cleanup-Phase/,
@@ -2615,232 +2631,143 @@ function testConverterDownloadClearsTemporaryAsset() {
   assert.equal(env.getRevokedUrl(), 'blob:converter-test', 'converter studio should revoke the generated blob URL after cleanup');
 }
 
-async function testConverterRemoteImport() {
+async function testConverterLocalFileWorkflowAndAbsenceOfRemoteControls() {
   const env = createConverterEnvironment();
-  const mp3 = Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]);
   const wav = Uint8Array.from(Buffer.from('RIFF0000WAVEfmt '));
   const audioBuffer = {
-    duration: 1, sampleRate: 44100, numberOfChannels: 1,
+    length: 44100,
+    duration: 1,
+    sampleRate: 44100,
+    numberOfChannels: 1,
     getChannelData() { return new Float32Array([0.2, -0.2]); }
   };
-  let decodeFails = false;
-  let fetchCalls = [];
-  let responseOptions = {};
-  let abortSignal;
-  class FakeAudioContext {
-    decodeAudioData(buffer, resolve, reject) {
-      if (decodeFails) reject(new Error('corrupt'));
-      else resolve(audioBuffer);
+  class FakeSource {
+    constructor() {
+      this.listeners = new Map();
     }
-
-    async close() {}
+    connect() {}
+    addEventListener(type, listener) {
+      this.listeners.set(type, listener);
+    }
+    start() {}
+    stop() {}
   }
+  class FakeAudioContext {
+    createBufferSource() {
+      return new FakeSource();
+    }
+    createAnalyser() {
+      return {
+        fftSize: 2048,
+        frequencyBinCount: 1024,
+        getByteFrequencyData() {},
+        connect() {}
+      };
+    }
+    createGain() {
+      return { gain: { value: 1 }, connect() {} };
+    }
+    createBiquadFilter() {
+      return { type: 'lowshelf', frequency: { value: 100 }, gain: { value: 0 }, connect() {} };
+    }
+    createDynamicsCompressor() {
+      return {
+        threshold: { value: -24 }, knee: { value: 30 }, ratio: { value: 12 },
+        attack: { value: 0.003 }, release: { value: 0.25 }, connect() {}
+      };
+    }
+    decodeAudioData(buffer, resolve) {
+      resolve(audioBuffer);
+    }
+    async resume() {}
+    async close() {
+      env.markAudioContextClosed();
+    }
+  }
+
   env.window.URL = URL;
   env.window.AudioContext = FakeAudioContext;
-  env.window.fetch = async (url, options) => {
-    fetchCalls.push({ url, options });
-    abortSignal = options.signal;
-    if ((responseOptions.failUrls || []).includes(url)) {
-      throw new TypeError('Failed to fetch');
-    }
-    const bytes = responseOptions.bytes || mp3;
-    const chunks = responseOptions.chunks || [bytes];
-    let index = 0;
-    return {
-      ok: true, type: 'cors', url: responseOptions.finalUrl || url.split('#')[0],
-      headers: { get(key) {
-        return key === 'Content-Type' ? (responseOptions.mime || 'audio/mpeg')
-          : (responseOptions.length === undefined ? null : responseOptions.length);
-      } },
-      body: { getReader() {
-        return {
-          async read() {
-            return index < chunks.length ? { done: false, value: chunks[index++] } : { done: true };
-          },
-          async cancel() {}
-        };
-      } }
-    };
-  };
-  env.context.AbortController = AbortController;
+
   vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
   const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
   studio.init();
-  const input = env.elements['converter-remote-url'];
-  const button = env.elements['converter-remote-import'];
-  const status = env.elements['converter-import-status'];
-  for (const url of [
-    'http://public.example/song.mp3', 'data:audio/mp3,abc',
-    'https://localhost/song', 'https://127.0.0.1/song',
-    'https://192.168.1.2/song', 'https://169.254.1.1/song',
-    'https://[::1]/song', 'https://router.local/song',
-    'https://user@public.example/song'
-  ]) {
-    input.value = url;
-    await button.dispatch('click');
-    assert.equal(fetchCalls.length, 0, `${url} must be rejected before fetch`);
-    assert.match(status.textContent, /HTTPS|intern|IP-Adressen|Zugangsdaten/);
-  }
 
-  input.value = 'https://suno.com/song/01234567-89ab-cdef-0123-456789abcdef';
-  await button.dispatch('click');
-  assert.equal(fetchCalls[0].url, 'https://cdn1.suno.ai/01234567-89ab-cdef-0123-456789abcdef.mp3');
-  assert.equal(fetchCalls[0].options.credentials, 'omit');
-  assert.equal(fetchCalls[0].options.redirect, 'error');
-  assert.equal(fetchCalls[0].options.referrerPolicy, 'no-referrer');
-  assert.equal(fetchCalls[0].options.cache, 'no-store');
-  assert.equal(env.elements['converter-render-button'].disabled, false);
-  assert.equal(env.elements['converter-file-size'].textContent, '12 B');
-  assert.match(status.textContent, /erfolgreich/);
-  input.value = 'https://public.example/song.mp3#playback';
-  await button.dispatch('click');
-  assert.equal(fetchCalls.at(-1).url, 'https://public.example/song.mp3', 'fragments must not reach fetch or trigger a false redirect');
-  assert.match(status.textContent, /erfolgreich/);
+  // Verify remote controls are not present in elements
+  assert.equal(env.elements['converter-remote-url'], undefined, 'remote URL input must not exist');
+  assert.equal(env.elements['converter-remote-import'], undefined, 'remote import button must not exist');
+  assert.equal(env.elements['converter-suno-download'], undefined, 'Suno download button must not exist');
 
-  const previousCalls = fetchCalls.length;
-  input.value = 'https://suno.com/s/short-id';
-  await button.dispatch('click');
-  assert.equal(fetchCalls.length, previousCalls);
-  assert.match(status.textContent, /Suno-Link konnte nicht/);
+  // Verify initial buttons state
+  assert.equal(env.elements['converter-reset-button'].disabled, true);
+  assert.equal(env.elements['converter-render-button'].disabled, true);
+  assert.equal(env.elements['converter-preview-toggle'].disabled, true);
+  assert.equal(env.elements['converter-download-button'].disabled, true);
 
-  const mp4 = Uint8Array.from(Buffer.from('0000ftypM4A 0000'));
-  const sunoMp4Url = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
-  responseOptions = { mime: 'video/mp4', bytes: mp4 };
-  input.value = sunoMp4Url;
-  await button.dispatch('click');
-  assert.equal(fetchCalls.at(-1).url, sunoMp4Url, 'direct Suno CDN MP4 links must be fetched unchanged');
-  assert.equal(fetchCalls.at(-1).options.credentials, 'omit');
-  assert.equal(fetchCalls.at(-1).options.referrerPolicy, 'no-referrer');
-  assert.equal(fetchCalls.at(-1).options.redirect, 'error');
-  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich/, 'direct Suno CDN MP4 import should report success');
-  assert.equal(env.elements['converter-render-button'].disabled, false, 'MP4 import must enable the existing render pipeline');
-  assert.equal(env.elements['converter-file-name'].textContent, '4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4');
-  const mp4Wav = Buffer.from(await studio._encodeWavForTest(audioBuffer).arrayBuffer());
-  assert.equal(mp4Wav.toString('ascii', 0, 4), 'RIFF', 'WAV export must still work after an MP4 import');
-  assert.equal(mp4Wav.toString('ascii', 8, 12), 'WAVE');
-
-  responseOptions = { mime: 'audio/x-m4a', bytes: mp4 };
-  await button.dispatch('click');
-  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich/, 'M4A MIME types should be accepted for Suno CDN media');
-  responseOptions = { mime: 'video/mp4', bytes: mp3 };
-  await button.dispatch('click');
-  assert.match(status.textContent, /MIME\/Dateisignatur/, 'MP4 MIME without an ftyp signature must be rejected');
-  responseOptions = { mime: 'video/mp4', bytes: mp4 };
-  decodeFails = true;
-  await button.dispatch('click');
-  assert.match(status.textContent, /nicht dekodiert/, 'undecodable MP4 payloads must fail cleanly');
-  decodeFails = false;
-
-  const beforeHostChecks = fetchCalls.length;
-  for (const blocked of [
-    'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c',
-    'https://cdn1.suno.ai/song/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c/',
-    'https://cdn2.suno.ai/payload.exe'
-  ]) {
-    input.value = blocked;
-    await button.dispatch('click');
-    assert.match(status.textContent, /Suno-CDN-Links/, `${blocked} must be rejected by the Suno CDN allow-list`);
-  }
-  assert.equal(fetchCalls.length, beforeHostChecks, 'blocked Suno CDN paths must not reach fetch');
-
-  fetchCalls = [];
-  responseOptions = {
-    mime: 'video/mp4',
-    bytes: mp4,
-    failUrls: ['https://cdn1.suno.ai/01234567-89ab-cdef-0123-456789abcdef.mp3']
+  // Local file import
+  const file = {
+    name: 'test-track.wav',
+    size: wav.length,
+    type: 'audio/wav',
+    async arrayBuffer() { return wav.buffer; }
   };
-  input.value = 'https://suno.com/song/01234567-89ab-cdef-0123-456789abcdef';
-  await button.dispatch('click');
-  assert.deepEqual(fetchCalls.map((call) => call.url), [
-    'https://cdn1.suno.ai/01234567-89ab-cdef-0123-456789abcdef.mp3',
-    'https://cdn1.suno.ai/01234567-89ab-cdef-0123-456789abcdef.mp4'
-  ], 'Suno song links must fall back from the MP3 object to the direct CDN MP4');
-  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich/);
-  responseOptions = {};
-
-  input.value = 'https://public.example/song.wav';
-  responseOptions = { mime: 'audio/wav', bytes: wav };
-  await button.dispatch('click');
-  assert.match(status.textContent, /erfolgreich/, 'matching WAV MIME and magic bytes should load');
-  responseOptions = { mime: 'text/html', bytes: mp3 };
-  await button.dispatch('click');
-  assert.match(status.textContent, /MIME\/Dateisignatur/);
-  responseOptions = { mime: 'audio/mpeg', bytes: Uint8Array.from(Buffer.from('<html>oops</html>')) };
-  await button.dispatch('click');
-  assert.match(status.textContent, /MIME\/Dateisignatur/);
-  responseOptions = { mime: 'audio/wav', bytes: mp3 };
-  await button.dispatch('click');
-  assert.match(status.textContent, /MIME\/Dateisignatur/, 'audio MIME must match container signature');
-  responseOptions = { finalUrl: 'https://other.example/audio.mp3' };
-  await button.dispatch('click');
-  assert.match(status.textContent, /Weiterleitung/);
-  for (const [mime, signature] of [
-    ['audio/ogg', 'OggS00000000'],
-    ['audio/flac', 'fLaC00000000'],
-    ['audio/mp4', '0000ftypM4A '],
-    ['audio/webm', '\x1a\x45\xdf\xa3' + '00000000'],
-    ['audio/aiff', 'FORM0000AIFF']
-  ]) {
-    responseOptions = { mime, bytes: Uint8Array.from(signature, (char) => char.charCodeAt(0)) };
-    await button.dispatch('click');
-    assert.match(status.textContent, /erfolgreich/, `${mime} should pass matched signature checks`);
-  }
-  responseOptions = { mime: 'audio/mpeg', length: String(50 * 1024 * 1024 + 1) };
-  await button.dispatch('click');
-  assert.match(status.textContent, /zu groß/);
-  assert.equal(abortSignal.aborted, true);
-  responseOptions = { mime: 'audio/mpeg', chunks: [new Uint8Array(50 * 1024 * 1024), mp3] };
-  await button.dispatch('click');
-  assert.match(status.textContent, /zu groß/, 'streaming quota must work without Content-Length');
-  assert.equal(abortSignal.aborted, true);
-  responseOptions = {};
-  decodeFails = true;
-  await button.dispatch('click');
-  assert.match(status.textContent, /nicht dekodiert/);
-  decodeFails = false;
-
-  const file = { name: 'local.wav', size: wav.length, type: 'audio/wav', async arrayBuffer() { return wav.buffer; } };
   env.elements['converter-file-input'].files = [file];
   await env.elements['converter-file-input'].dispatch('change');
-  assert.equal(env.elements['converter-file-name'].textContent, 'local.wav');
+
+  assert.equal(env.elements['converter-file-name'].textContent, 'test-track.wav');
+  assert.equal(env.elements['converter-file-size'].textContent, `${wav.length} B`);
   assert.equal(env.elements['converter-render-button'].disabled, false);
-  assert.match(status.textContent, /lokal geladen/);
-  const immediateFetch = env.window.fetch;
-  let releaseFetch;
-  let pendingSignal;
-  env.window.fetch = (url, options) => {
-    pendingSignal = options.signal;
-    return new Promise((resolve) => { releaseFetch = resolve; });
-  };
-  const pendingImport = button.dispatch('click');
-  await flushMicrotasks();
-  await env.elements['converter-file-input'].dispatch('change');
-  assert.equal(pendingSignal.aborted, true, 'local import should abort an in-flight remote import');
-  releaseFetch(await immediateFetch('https://public.example/song.mp3', {}));
-  await pendingImport;
-  assert.equal(env.elements['converter-file-name'].textContent, 'local.wav', 'stale remote completion must not replace local import');
-  env.window.fetch = immediateFetch;
-  let finishLocalRead;
-  env.elements['converter-file-input'].files = [{
-    ...file, arrayBuffer() { return new Promise((resolve) => { finishLocalRead = resolve; }); }
-  }];
-  const pendingLocal = env.elements['converter-file-input'].dispatch('change');
-  await flushMicrotasks();
-  input.value = 'https://public.example/newer.mp3';
-  await button.dispatch('click');
-  finishLocalRead(wav.buffer);
-  await pendingLocal;
-  assert.equal(env.elements['converter-file-name'].textContent, 'newer.mp3', 'stale local decode must not replace a newer remote import');
-  const exported = await studio._encodeWavForTest(audioBuffer).arrayBuffer();
-  assert.equal(Buffer.from(exported).toString('ascii', 0, 4), 'RIFF');
-  assert.equal(Buffer.from(exported).toString('ascii', 8, 12), 'WAVE');
+  assert.equal(env.elements['converter-reset-button'].disabled, false);
+  assert.equal(env.elements['converter-preview-toggle'].disabled, false);
+  assert.match(env.elements['converter-import-status'].textContent, /lokal/i);
+  assert.doesNotMatch(env.elements['converter-import-status'].textContent, /Suno|Proxy|CORS|Downloader|Remote/i);
+
+  // WAV export from decoded audio buffer
+  const wavBlob = studio._encodeWavForTest(audioBuffer);
+  const wavBytes = Buffer.from(await wavBlob.arrayBuffer());
+  assert.equal(wavBytes.toString('ascii', 0, 4), 'RIFF', 'WAV export must generate a valid RIFF file');
+
+  // Store rendered master asset
   studio._seedRenderedAssetForTest({
-    blob: new Blob([wav], { type: 'audio/wav' }), filename: 'local-master.wav',
-    report: { outputApproxLufs: -12, peakAfter: 0.2 }, sampleRate: 44100, format: { id: 'wav' }
+    blob: wavBlob,
+    filename: 'test-track-master.wav',
+    report: { outputApproxLufs: -12, peakAfter: 0.5 },
+    format: { id: 'wav', extension: 'wav' },
+    sampleRate: 44100
   });
-  env.runTimersByDelay(120000);
+  assert.equal(studio._hasRenderedAssetForTest(), true, 'rendering must store a temporary master asset');
+  assert.equal(env.elements['converter-download-button'].disabled, false);
+  assert.equal(env.elements['converter-clear-render'].disabled, false);
+
+  // Download rendered master
+  studio._downloadRenderedFileForTest();
+  env.runTimersByDelay(250);
+  assert.equal(env.getClickedDownloads(), 1, 'downloading should trigger one click');
+  assert.equal(studio._hasRenderedAssetForTest(), false, 'downloading should immediately clear temporary asset');
+  assert.equal(env.getRevokedUrl(), 'blob:converter-test', 'downloading should revoke the object URL');
+
+  // Reset studio
+  await env.elements['converter-file-input'].dispatch('change');
+  assert.equal(env.elements['converter-file-name'].textContent, 'test-track.wav');
+  await env.elements['converter-reset-button'].dispatch('click');
+  assert.equal(env.elements['converter-file-name'].textContent, '–');
+  assert.equal(env.elements['converter-render-button'].disabled, true);
+  assert.equal(env.elements['converter-reset-button'].disabled, true);
+  assert.equal(env.elements['converter-preview-toggle'].disabled, true);
   assert.equal(studio._hasRenderedAssetForTest(), false);
-  assert.equal(env.getRevokedUrl(), 'blob:converter-test');
+  assert.match(env.elements['converter-import-status'].textContent, /zurückgesetzt/i);
+
+  // 2-minute cleanup timer regression check
+  studio._seedRenderedAssetForTest({
+    blob: wavBlob,
+    filename: 'test-track-master.wav',
+    report: { outputApproxLufs: -12, peakAfter: 0.5 },
+    format: { id: 'wav', extension: 'wav' },
+    sampleRate: 44100
+  });
+  assert.equal(studio._hasRenderedAssetForTest(), true);
+  env.runTimersByDelay(120000);
+  assert.equal(studio._hasRenderedAssetForTest(), false, 'cleanup timer must discard rendered asset after 2 minutes');
+
   studio.destroy();
 }
 
@@ -3230,158 +3157,6 @@ function testIssueHelpPageAndTemplatesArePresent() {
   }
 }
 
-function createProxyFallbackEnvironment(remoteImportConfig) {
-  const env = createConverterEnvironment();
-  const mp3 = Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]);
-  const mp4 = Uint8Array.from(Buffer.from('0000ftypM4A 0000'));
-  const audioBuffer = {
-    duration: 1, sampleRate: 44100, numberOfChannels: 1,
-    getChannelData() { return new Float32Array([0.2, -0.2]); }
-  };
-  const state = { corsBlocked: false, proxyFails: false, proxyStatus: 200, decodeFails: false };
-  const fetchCalls = [];
-  class FakeAudioContext {
-    decodeAudioData(buffer, resolve, reject) {
-      if (state.decodeFails) reject(new Error('corrupt'));
-      else resolve(audioBuffer);
-    }
-
-    async close() {}
-  }
-  env.window.URL = URL;
-  env.window.AudioContext = FakeAudioContext;
-  env.window.__JACKDARCKART_CONFIG__ = { converter: { remoteImport: remoteImportConfig } };
-  env.window.fetch = async (url, options) => {
-    fetchCalls.push({ url, options });
-    const viaProxy = url.startsWith('/api/remote-audio');
-    if (viaProxy ? state.proxyFails : state.corsBlocked) {
-      throw new TypeError('Failed to fetch');
-    }
-    const bytes = viaProxy ? mp4 : mp3;
-    const mime = viaProxy ? 'video/mp4' : 'audio/mpeg';
-    let index = 0;
-    return {
-      ok: viaProxy ? state.proxyStatus === 200 : true,
-      status: viaProxy ? state.proxyStatus : 200,
-      type: viaProxy ? 'basic' : 'cors',
-      url: viaProxy ? 'https://stream-musik.space' + url : url,
-      async json() { return { error: 'Zu groß' }; },
-      headers: { get(key) { return key === 'Content-Type' ? mime : null; } },
-      body: { getReader() {
-        return {
-          async read() {
-            index += 1;
-            return index === 1 ? { done: false, value: bytes } : { done: true };
-          },
-          async cancel() {}
-        };
-      } }
-    };
-  };
-  env.context.AbortController = AbortController;
-  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
-  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
-  studio.init();
-  return { env, studio, state, fetchCalls, audioBuffer };
-}
-
-async function testConverterRemoteImportProxyFallback() {
-  const sunoMp4Url = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
-  const proxyHref = '/api/remote-audio?url=' + encodeURIComponent(sunoMp4Url);
-  const { env, studio, state, fetchCalls, audioBuffer } = createProxyFallbackEnvironment({
-    proxyEndpoint: '/api/remote-audio'
-  });
-  const input = env.elements['converter-remote-url'];
-  const button = env.elements['converter-remote-import'];
-  const status = env.elements['converter-import-status'];
-
-  input.value = 'https://public.example/song.mp3';
-  await button.dispatch('click');
-  assert.deepEqual(fetchCalls.map((call) => call.url), ['https://public.example/song.mp3'],
-    'CORS-enabled sources must still load through the direct browser fetch');
-  assert.match(status.textContent, /erfolgreich/);
-  assert.doesNotMatch(status.textContent, /Proxy/, 'successful direct fetches must not claim a proxy fallback');
-
-  fetchCalls.length = 0;
-  state.corsBlocked = true;
-  input.value = 'https://public.example/song.mp3';
-  await button.dispatch('click');
-  assert.deepEqual(fetchCalls.map((call) => call.url), ['https://public.example/song.mp3'],
-    'blocked non-Suno sources must never be sent to the Suno-only proxy');
-
-  fetchCalls.length = 0;
-  input.value = sunoMp4Url;
-  await button.dispatch('click');
-  assert.deepEqual(fetchCalls.map((call) => call.url), [sunoMp4Url, proxyHref],
-    'a CORS-blocked Suno CDN MP4 must fall back to the same-origin proxy');
-  assert.equal(fetchCalls[1].options.mode, 'same-origin');
-  assert.equal(fetchCalls[1].options.credentials, 'omit');
-  assert.equal(fetchCalls[1].options.referrerPolicy, 'no-referrer');
-  assert.equal(fetchCalls[1].options.redirect, 'error');
-  assert.match(status.textContent, /Proxy/, 'proxy recovery must be reported to the user');
-  assert.match(status.textContent, /CORS/, 'the recovered CORS failure must be explained');
-  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich/);
-  assert.equal(env.elements['converter-file-name'].textContent, '4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4');
-  assert.equal(env.elements['converter-render-button'].disabled, false,
-    'proxy imports must feed the existing render pipeline');
-  const wav = Buffer.from(await studio._encodeWavForTest(audioBuffer).arrayBuffer());
-  assert.equal(wav.toString('ascii', 0, 4), 'RIFF', 'WAV export must work after a proxy import');
-
-  fetchCalls.length = 0;
-  state.proxyStatus = 403;
-  await button.dispatch('click');
-  assert.match(status.textContent, /unsicher blockiert/, 'targets rejected by the proxy must be reported as blocked');
-  assert.equal(fetchCalls.length, 2, 'a blocked proxy target must not be retried');
-
-  fetchCalls.length = 0;
-  state.proxyStatus = 413;
-  await button.dispatch('click');
-  assert.match(status.textContent, /Proxy-Ablehnung: Zu groß/, 'proxy 4xx details must be surfaced without retrying');
-  assert.equal(fetchCalls.length, 2, 'a rejected proxy request must not be retried');
-
-  fetchCalls.length = 0;
-  state.proxyStatus = 502;
-  await button.dispatch('click');
-  assert.match(status.textContent, /Proxy-Ablehnung: Zu groß/, 'proxy 5xx details must be surfaced as well');
-
-  fetchCalls.length = 0;
-  state.proxyStatus = 200;
-  state.proxyFails = true;
-  await button.dispatch('click');
-  assert.match(status.textContent, /Proxy war nicht erreichbar/);
-
-  fetchCalls.length = 0;
-  state.proxyFails = false;
-  state.decodeFails = true;
-  await button.dispatch('click');
-  assert.match(status.textContent, /nicht dekodiert/, 'decode failures after a proxy fetch must stay clean');
-  state.decodeFails = false;
-
-  fetchCalls.length = 0;
-  input.value = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.exe';
-  await button.dispatch('click');
-  assert.equal(fetchCalls.length, 0, 'unsafe targets must never reach the proxy');
-  assert.match(status.textContent, /Suno-CDN-Links/);
-  studio.destroy();
-
-  const preferred = createProxyFallbackEnvironment({ proxyEndpoint: '/api/remote-audio', preferProxy: true });
-  preferred.state.corsBlocked = true;
-  preferred.env.elements['converter-remote-url'].value = sunoMp4Url;
-  await preferred.env.elements['converter-remote-import'].dispatch('click');
-  assert.deepEqual(preferred.fetchCalls.map((call) => call.url), [sunoMp4Url, proxyHref],
-    'direct fetch must remain first even when obsolete preferProxy configuration is present');
-  assert.match(preferred.env.elements['converter-import-status'].textContent, /Proxy/);
-  preferred.studio.destroy();
-
-  const unsafeEndpoint = createProxyFallbackEnvironment({ proxyEndpoint: 'https://evil.example/proxy' });
-  unsafeEndpoint.state.corsBlocked = true;
-  unsafeEndpoint.env.elements['converter-remote-url'].value = sunoMp4Url;
-  await unsafeEndpoint.env.elements['converter-remote-import'].dispatch('click');
-  assert.deepEqual(unsafeEndpoint.fetchCalls.map((call) => call.url), [sunoMp4Url],
-    'cross-origin proxy endpoints must be ignored');
-  unsafeEndpoint.studio.destroy();
-}
-
 function createFakeHttps(responder) {
   const requests = [];
   return {
@@ -3755,376 +3530,6 @@ async function testSunoDownloaderBackendValidationAndFetch() {
   assert.match(probeHead.headers['Content-Type'], /^application\/json/);
 }
 
-async function testConverterSunoDownloaderClientIntegration() {
-  const sunoMp4Url = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
-  const downloaderHref = '/api/suno-downloader?url=' + encodeURIComponent(sunoMp4Url);
-
-  async function createTestEnvironment(config) {
-    const env = createConverterEnvironment();
-    const mp4 = Uint8Array.from(Buffer.from('0000ftypM4A 0000'));
-    const mp3 = Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]);
-    const audioBuffer = {
-      duration: 1, sampleRate: 44100, numberOfChannels: 1,
-      getChannelData() { return new Float32Array([0.2, -0.2]); }
-    };
-    const state = { downloaderFails: false, downloaderStatus: 200, decodeFails: false, corsBlocked: false };
-    const fetchCalls = [];
-    class FakeAudioContext {
-      decodeAudioData(buffer, resolve, reject) {
-        if (state.decodeFails) reject(new Error('corrupt'));
-        else resolve(audioBuffer);
-      }
-      async close() {}
-    }
-    env.window.URL = URL;
-    env.window.AudioContext = FakeAudioContext;
-    env.window.__JACKDARCKART_CONFIG__ = { converter: config };
-    env.window.fetch = async (url, options) => {
-      fetchCalls.push({ url, options });
-      const isDownloader = url.startsWith('/api/suno-downloader');
-      if (isDownloader) {
-        if (state.downloaderFails) throw new TypeError('Network error');
-        if (url.includes('probe=1')) {
-          return {
-            ok: true,
-            status: 200,
-            type: 'basic',
-            url: 'https://stream-musik.space' + url,
-            headers: { get(key) { return key.toLowerCase() === 'content-type' ? 'application/json' : null; } },
-            async json() { return { status: 'ok', service: 'suno-downloader' }; }
-          };
-        }
-        if (state.downloaderStatus !== 200) {
-          return {
-            ok: false,
-            status: state.downloaderStatus,
-            type: 'basic',
-            url: 'https://stream-musik.space' + url,
-            async json() { return { error: state.downloaderStatus === 413 ? 'Zu groß' : 'Blockiert' }; },
-            headers: { get() { return 'application/json'; } }
-          };
-        }
-        let index = 0;
-        return {
-          ok: true,
-          status: 200,
-          type: 'basic',
-          url: 'https://stream-musik.space' + url,
-          headers: { get(key) { return key === 'Content-Type' ? 'video/mp4' : null; } },
-          body: { getReader() {
-            return {
-              async read() {
-                index += 1;
-                return index === 1 ? { done: false, value: mp4 } : { done: true };
-              },
-              async cancel() {}
-            };
-          } }
-        };
-      }
-      if (state.corsBlocked) throw new TypeError('CORS failed');
-      let index = 0;
-      return {
-        ok: true, status: 200, type: 'cors', url,
-        headers: { get(key) { return key === 'Content-Type' ? 'audio/mpeg' : null; } },
-        body: { getReader() {
-          return {
-            async read() {
-              index += 1;
-              return index === 1 ? { done: false, value: mp3 } : { done: true };
-            },
-            async cancel() {}
-          };
-        } }
-      };
-    };
-    env.context.AbortController = AbortController;
-    vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
-    const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
-    studio.init();
-    await studio._checkDownloaderCapabilityForTest();
-    return { env, studio, state, fetchCalls, audioBuffer };
-  }
-
-  // 1. Dedicated "Suno herunterladen" button test with Suno CDN MP4
-  const { env, studio, state, fetchCalls, audioBuffer } = await createTestEnvironment({
-    sunoDownloader: { endpoint: '/api/suno-downloader' }
-  });
-  const input = env.elements['converter-remote-url'];
-  const importBtn = env.elements['converter-remote-import'];
-  const sunoBtn = env.elements['converter-suno-download'];
-  const status = env.elements['converter-import-status'];
-
-  assert.equal(sunoBtn.disabled, false, 'Suno button should be enabled when probe succeeds');
-  fetchCalls.length = 0;
-
-  input.value = sunoMp4Url;
-  await sunoBtn.dispatch('click');
-  assert.deepEqual(fetchCalls.map((c) => c.url), [downloaderHref],
-    'Suno downloader button must fetch from the configured Suno downloader endpoint');
-  assert.equal(fetchCalls[0].options.mode, 'same-origin');
-  assert.equal(fetchCalls[0].options.credentials, 'omit');
-  assert.equal(fetchCalls[0].options.referrerPolicy, 'no-referrer');
-  assert.match(status.textContent, /Suno-Audio über den sicheren Suno-Downloader geladen und geprüft/);
-  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich im Browser dekodiert/);
-  assert.equal(env.elements['converter-file-name'].textContent, '4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4');
-  assert.equal(env.elements['converter-render-button'].disabled, false,
-    'downloaded Suno audio must enable the render pipeline');
-  const wav = Buffer.from(await studio._encodeWavForTest(audioBuffer).arrayBuffer());
-  assert.equal(wav.toString('ascii', 0, 4), 'RIFF', 'WAV export must work after Suno download');
-
-  // 2. Suno button rejects non-Suno URLs
-  fetchCalls.length = 0;
-  input.value = 'https://public.example/song.mp3';
-  await sunoBtn.dispatch('click');
-  assert.equal(fetchCalls.length, 0, 'non-Suno URLs must be rejected by the Suno button without any fetch');
-  assert.match(status.textContent, /akzeptiert nur freigegebene Suno-Links/);
-
-  // 3. Downloader 403 error
-  fetchCalls.length = 0;
-  state.downloaderStatus = 403;
-  input.value = sunoMp4Url;
-  await sunoBtn.dispatch('click');
-  assert.match(status.textContent, /unsicher blockiert/);
-
-  // 4. Downloader 413 error
-  fetchCalls.length = 0;
-  state.downloaderStatus = 413;
-  await sunoBtn.dispatch('click');
-  assert.match(status.textContent, /Downloader-Ablehnung: Zu groß/);
-
-  // 5. Downloader network failure falls back to direct fetch
-  fetchCalls.length = 0;
-  state.downloaderStatus = 200;
-  state.downloaderFails = true;
-  await sunoBtn.dispatch('click');
-  assert.deepEqual(fetchCalls.map((c) => c.url), [downloaderHref, sunoMp4Url],
-    'downloader failure must fall back to direct fetch');
-  assert.match(status.textContent, /Fallback auf direkten Abruf durchgeführt/);
-
-  // 6. Decode failure on downloaded audio
-  fetchCalls.length = 0;
-  state.downloaderFails = false;
-  state.decodeFails = true;
-  await sunoBtn.dispatch('click');
-  assert.match(status.textContent, /nicht dekodiert/, 'decode failure must be handled cleanly');
-  state.decodeFails = false;
-
-  // 7. Standard "URL importieren" button also uses Suno downloader when configured for Suno URLs
-  fetchCalls.length = 0;
-  input.value = sunoMp4Url;
-  await importBtn.dispatch('click');
-  assert.deepEqual(fetchCalls.map((c) => c.url), [downloaderHref],
-    'URL importieren with Suno URL should route to Suno downloader when configured');
-  assert.match(status.textContent, /Suno-Downloader geladen und geprüft/);
-
-  // 8. Non-Suno URL with "URL importieren" uses direct fetch
-  fetchCalls.length = 0;
-  input.value = 'https://public.example/song.mp3';
-  await importBtn.dispatch('click');
-  assert.deepEqual(fetchCalls.map((c) => c.url), ['https://public.example/song.mp3'],
-    'non-Suno URL must use direct browser fetch');
-  assert.doesNotMatch(status.textContent, /Suno-Downloader/);
-
-  // 9. Reset studio re-enables both buttons
-  await env.elements['converter-reset-button'].dispatch('click');
-  assert.equal(sunoBtn.disabled, false);
-  assert.equal(importBtn.disabled, false);
-  assert.equal(input.value, '');
-
-  studio.destroy();
-}
-
-async function testConverterSunoDownloaderStaticHostingMode() {
-  const env = createConverterEnvironment();
-  const audioBuffer = {
-    duration: 1, sampleRate: 44100, numberOfChannels: 1,
-    getChannelData() { return new Float32Array([0.1, -0.1]); }
-  };
-  class FakeAudioContext {
-    decodeAudioData(buffer, resolve) { resolve(audioBuffer); }
-    async close() {}
-  }
-  const fetchCalls = [];
-  env.window.URL = URL;
-  env.window.AudioContext = FakeAudioContext;
-  delete env.window.__JACKDARCKART_CONFIG__;
-  env.window.fetch = async (url, options) => {
-    fetchCalls.push({ url, options });
-    return {
-      ok: true, status: 200, type: 'cors', url,
-      headers: { get(key) { return key === 'Content-Type' ? 'audio/mpeg' : null; } },
-      body: { getReader() {
-        let index = 0;
-        return {
-          async read() {
-            index += 1;
-            return index === 1 ? { done: false, value: Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]) } : { done: true };
-          },
-          async cancel() {}
-        };
-      } }
-    };
-  };
-  env.context.AbortController = AbortController;
-  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
-  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
-  studio.init();
-
-  const sunoBtn = env.elements['converter-suno-download'];
-  const importBtn = env.elements['converter-remote-import'];
-  const input = env.elements['converter-remote-url'];
-  const status = env.elements['converter-import-status'];
-
-  // Static hosting default: no backend configured
-  assert.equal(sunoBtn.disabled, true, 'Suno downloader button must be disabled by default in static hosting');
-  assert.equal(sunoBtn.getAttribute('aria-disabled'), 'true');
-  assert.match(sunoBtn.title, /statischen Umgebung|ohne Backend|nicht eingerichtet|nicht verfügbar/, 'Suno button title must explain static hosting reality');
-
-  // Clicking disabled Suno button shows clear error without making any network call
-  input.value = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
-  await sunoBtn.dispatch('click');
-  assert.equal(fetchCalls.length, 0, 'No fetch should be made when downloader is not configured');
-  assert.match(status.textContent, /nicht konfiguriert/);
-
-  // App stays fully functional: direct URL import for CORS-enabled audio works
-  input.value = 'https://public.example/song.mp3';
-  await importBtn.dispatch('click');
-  assert.equal(fetchCalls.length, 1);
-  assert.equal(fetchCalls[0].url, 'https://public.example/song.mp3');
-  assert.match(status.textContent, /Remote-Audio erfolgreich im Browser geladen/);
-  assert.equal(env.elements['converter-render-button'].disabled, false, 'Audio render must be enabled after direct import');
-
-  // Resetting studio preserves disabled state of Suno button when no backend configured
-  await env.elements['converter-reset-button'].dispatch('click');
-  assert.equal(sunoBtn.disabled, true, 'Suno button must stay disabled on reset when no backend configured');
-  assert.equal(importBtn.disabled, false);
-
-  studio.destroy();
-}
-
-async function testConverterSunoDownloaderUnreachableEndpointFallback() {
-  const env = createConverterEnvironment();
-  const audioBuffer = {
-    duration: 1, sampleRate: 44100, numberOfChannels: 1,
-    getChannelData() { return new Float32Array([0.1, -0.1]); }
-  };
-  class FakeAudioContext {
-    decodeAudioData(buffer, resolve) { resolve(audioBuffer); }
-    async close() {}
-  }
-  const fetchCalls = [];
-  let corsFails = false;
-  env.window.URL = URL;
-  env.window.AudioContext = FakeAudioContext;
-  env.window.__JACKDARCKART_CONFIG__ = {
-    converter: { sunoDownloader: { endpoint: '/api/suno-downloader' } }
-  };
-  env.window.fetch = async (url, options) => {
-    fetchCalls.push({ url, options });
-    if (url.startsWith('/api/suno-downloader')) {
-      // Downloader endpoint returns 404 (e.g. GitHub Pages static server where endpoint is not deployed)
-      return {
-        ok: false, status: 404, type: 'basic', url: 'https://stream-musik.space' + url,
-        headers: { get() { return 'text/html'; } },
-        async text() { return '404 Not Found'; }
-      };
-    }
-    if (corsFails) throw new TypeError('Failed to fetch due to CORS restrictions');
-    return {
-      ok: true, status: 200, type: 'cors', url,
-      headers: { get(key) { return key === 'Content-Type' ? 'audio/mpeg' : null; } },
-      body: { getReader() {
-        let index = 0;
-        return {
-          async read() {
-            index += 1;
-            return index === 1 ? { done: false, value: Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]) } : { done: true };
-          },
-          async cancel() {}
-        };
-      } }
-    };
-  };
-  env.context.AbortController = AbortController;
-  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
-  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
-  studio.init();
-  await studio._checkDownloaderCapabilityForTest();
-
-  const sunoBtn = env.elements['converter-suno-download'];
-  const importBtn = env.elements['converter-remote-import'];
-  const input = env.elements['converter-remote-url'];
-  const status = env.elements['converter-import-status'];
-
-  // Endpoint probe returned 404 -> button disabled and annotated
-  assert.equal(sunoBtn.disabled, true, 'Suno button must be disabled when endpoint probe fails with 404');
-  assert.match(sunoBtn.title, /nicht erreichbar/, 'Suno button title must reflect unreachable endpoint');
-
-  // Case 1: Import with Suno URL where direct fetch is CORS-blocked
-  corsFails = true;
-  fetchCalls.length = 0;
-  input.value = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
-  await importBtn.dispatch('click');
-  // Downloader was tried, returned 404; direct fetch fallback was tried, threw CORS TypeError
-  assert.match(status.textContent, /nicht erreichbar und der direkte Abruf ist durch CORS blockiert/,
-    'must show clear error distinguishing unreachable downloader and CORS blockage');
-
-  // Case 2: Import with Suno URL where direct fetch succeeds (CORS allowed)
-  corsFails = false;
-  fetchCalls.length = 0;
-  input.value = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
-  await importBtn.dispatch('click');
-  assert.match(status.textContent, /Remote-Audio erfolgreich im Browser geladen/,
-    'direct fetch fallback must succeed when CORS allows it');
-
-  studio.destroy();
-}
-
-async function testConverterSunoDownloaderClientUrlSafety() {
-  const env = createConverterEnvironment();
-  env.window.URL = URL;
-  env.window.__JACKDARCKART_CONFIG__ = {
-    converter: { sunoDownloader: { endpoint: '/api/suno-downloader' } }
-  };
-  const fetchCalls = [];
-  env.window.fetch = async (url, options) => {
-    fetchCalls.push({ url, options });
-    return {
-      ok: true, status: 200,
-      headers: { get(key) { return key.toLowerCase() === 'content-type' ? 'application/json' : null; } },
-      async json() { return { status: 'ok', service: 'suno-downloader' }; }
-    };
-  };
-  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
-  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
-  studio.init();
-  await studio._checkDownloaderCapabilityForTest();
-
-  const sunoBtn = env.elements['converter-suno-download'];
-  const input = env.elements['converter-remote-url'];
-  const status = env.elements['converter-import-status'];
-
-  const unsafeUrls = [
-    'http://cdn1.suno.ai/test.mp4',
-    'https://attacker.com/song.mp4',
-    'https://cdn1.suno.ai.attacker.com/test.mp4',
-    'javascript:alert(1)',
-    'data:audio/mp3;base64,AAA=',
-    'https://suno.com/about'
-  ];
-
-  for (const unsafe of unsafeUrls) {
-    fetchCalls.length = 0;
-    input.value = unsafe;
-    await sunoBtn.dispatch('click');
-    assert.equal(fetchCalls.length, 0, `Unsafe URL ${unsafe} must not trigger any fetch`);
-    assert.match(status.textContent, /akzeptiert nur freigegebene Suno-Links|Ungültige URL|Nur HTTPS-URLs sind erlaubt|müssen direkt auf/);
-  }
-
-  studio.destroy();
-}
-
 async function testConverterAdaptiveEnhance() {
   const env = createConverterEnvironment();
   vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
@@ -4243,15 +3648,10 @@ async function main() {
   await testConverterFormatRefreshClearsUnavailableSelection();
   await testConverterMp3CompressedExportPath();
   testConverterDownloadClearsTemporaryAsset();
-  await testConverterRemoteImport();
-  await testConverterRemoteImportProxyFallback();
+  await testConverterLocalFileWorkflowAndAbsenceOfRemoteControls();
   await testRemoteAudioProxyValidatesAndFetchesAudio();
   await testRemoteAudioProxyHandlerResponses();
   await testSunoDownloaderBackendValidationAndFetch();
-  await testConverterSunoDownloaderClientIntegration();
-  await testConverterSunoDownloaderStaticHostingMode();
-  await testConverterSunoDownloaderUnreachableEndpointFallback();
-  await testConverterSunoDownloaderClientUrlSafety();
   await testConverterAdaptiveEnhance();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
