@@ -3,6 +3,7 @@
 (function () {
   const MODULE_KEY = '__JACKDARCKART_CONVERTER__';
   const CLEANUP_WINDOW_MS = 2 * 60 * 1000;
+  const ENHANCE_PREFERENCES_KEY = 'jackdarckart:studio:enhance';
   const DEFAULT_COMPRESSED_BITRATE = '192000';
   const PREFERRED_MP3_BITRATE = DEFAULT_COMPRESSED_BITRATE;
   const MP3_MIME_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/mpeg;codecs=mp3'];
@@ -130,23 +131,127 @@
       };
     }
 
-    chooseEnhancement(profile) {
+    chooseEnhancement(profile, options) {
       const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+      const strength = clamp(Number((options && options.strength) ?? 1) || 1, 0.5, 1.5);
+      const blend = (neutral, value) => neutral + (value - neutral) * strength;
       const loud = profile.loudnessDb;
       const compressed = profile.crestDb < 9 || profile.clippingRatio > 0.001;
+      const cleaner = profile.harshness || profile.phasey || profile.brittle
+        ? {
+          presenceCut: blend(0, profile.harshness ? -2.5 : 0),
+          highCut: blend(0, profile.brittle || profile.harshness ? -1.5 : 0),
+          softenTransients: profile.brittle
+        }
+        : null;
       return {
-        eqLow: clamp((2 - profile.bassTiltDb) * 0.25, -3, 3),
-        eqMid: clamp(-profile.presenceTiltDb * 0.2, -2.5, 2),
-        eqHigh: clamp((-12 - profile.trebleTiltDb) * 0.2, -3, 2),
-        compThreshold: compressed ? -12 : -20,
-        compRatio: compressed ? 1.5 : 2.5,
+        eqLow: blend(0, clamp((2 - profile.bassTiltDb) * 0.25, -3, 3)),
+        eqMid: blend(0, clamp(-profile.presenceTiltDb * 0.2, -2.5, 2)),
+        eqHigh: blend(0, clamp((-12 - profile.trebleTiltDb) * 0.2, -3, 2)),
+        compThreshold: blend(-18, compressed ? -12 : -20),
+        compRatio: blend(1, compressed ? 1.5 : 2.5),
         limiterCeiling: profile.clippingRatio > 0.001 ? -2 : -1,
-        stereoWidth: profile.phasey ? 65 : 100,
-        targetLufs: compressed || loud > -12 ? -14 : -12,
-        artifactCleaner: profile.harshness || profile.phasey || profile.brittle
-          ? { presenceCut: profile.harshness ? -2.5 : 0, highCut: profile.brittle || profile.harshness ? -1.5 : 0, softenTransients: profile.brittle }
-          : null
+        stereoWidth: blend(100, profile.phasey ? 65 : 100),
+        targetLufs: blend(-12, compressed || loud > -12 ? -14 : -12),
+        artifactCleaner: cleaner
       };
+    }
+
+    scoreProfile(profile) {
+      if (!profile) {
+        return null;
+      }
+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+      let score = 100;
+      score -= clamp(profile.clippingRatio * 4000, 0, 32);
+      if (profile.crestDb < 9) {
+        score -= clamp((9 - profile.crestDb) * 3.5, 0, 22);
+      }
+      if (profile.harshness) {
+        score -= 12;
+      }
+      if (profile.brittle) {
+        score -= 8;
+      }
+      if (profile.phasey) {
+        score -= 16;
+      }
+      if (Number.isFinite(profile.loudnessDb)) {
+        score -= clamp(Math.abs(profile.loudnessDb + 14) * 1.6, 0, 16);
+      } else {
+        score -= 30;
+      }
+      score -= clamp(Math.abs(profile.bassTiltDb - 2) * 0.6, 0, 10);
+      return Math.round(clamp(score, 0, 100));
+    }
+
+    describeProfile(profile) {
+      if (!profile) {
+        return [{
+          id: 'unavailable',
+          tone: 'warn',
+          label: 'Analyse nicht verfügbar',
+          detail: 'Die Quelle konnte nicht vollständig vermessen werden. Es greift ein neutrales Standard-Preset.'
+        }];
+      }
+      const findings = [];
+      const dB = (value) => (value > 0 ? '+' : '') + value.toFixed(1) + ' dB';
+      findings.push(profile.clippingRatio > 0.001
+        ? { id: 'clipping', tone: 'alert', label: 'Clipping erkannt', detail: (profile.clippingRatio * 100).toFixed(2) + ' % der Samples liegen am Anschlag. Limiter-Ceiling wird abgesenkt.' }
+        : { id: 'clipping', tone: 'good', label: 'Kein Clipping', detail: 'Die Spitzenpegel der Quelle bleiben unterhalb der Übersteuerungsgrenze.' });
+      findings.push(profile.crestDb < 9
+        ? { id: 'dynamics', tone: 'warn', label: 'Dynamik stark komprimiert', detail: 'Crest-Faktor ' + profile.crestDb.toFixed(1) + ' dB. Die Kompression wird bewusst schonend eingestellt.' }
+        : { id: 'dynamics', tone: 'good', label: 'Dynamik in Ordnung', detail: 'Crest-Faktor ' + profile.crestDb.toFixed(1) + ' dB bietet genug Spielraum für sauberes Mastering.' });
+      findings.push(profile.harshness || profile.brittle
+        ? { id: 'harshness', tone: 'warn', label: 'Harsche Höhen', detail: 'Präsenz ' + dB(profile.presenceTiltDb) + ' · Höhen ' + dB(profile.trebleTiltDb) + '. Artefakt-Reinigung wird aktiviert.' }
+        : { id: 'harshness', tone: 'good', label: 'Höhen ausgewogen', detail: 'Präsenz ' + dB(profile.presenceTiltDb) + ' · Höhen ' + dB(profile.trebleTiltDb) + '.' });
+      findings.push(profile.phasey
+        ? { id: 'stereo', tone: 'alert', label: 'Phasiges Stereobild', detail: 'Korrelation ' + profile.stereoCorrelation.toFixed(2) + '. Die Stereobreite wird für Mono-Kompatibilität reduziert.' }
+        : { id: 'stereo', tone: 'good', label: 'Stereobild stabil', detail: 'Korrelation ' + profile.stereoCorrelation.toFixed(2) + ' bleibt mono-kompatibel.' });
+      findings.push({
+        id: 'tonality',
+        tone: Math.abs(profile.bassTiltDb - 2) > 6 ? 'warn' : 'good',
+        label: Math.abs(profile.bassTiltDb - 2) > 6 ? (profile.bassTiltDb > 2 ? 'Bassbetonte Quelle' : 'Bassarme Quelle') : 'Tonale Balance in Ordnung',
+        detail: 'Bass-Tilt ' + dB(profile.bassTiltDb) + ' gegenüber den unteren Mitten.'
+      });
+      findings.push({
+        id: 'loudness',
+        tone: Number.isFinite(profile.loudnessDb) && Math.abs(profile.loudnessDb + 14) > 6 ? 'warn' : 'good',
+        label: Number.isFinite(profile.loudnessDb)
+          ? (profile.loudnessDb > -8 ? 'Sehr laute Quelle' : (profile.loudnessDb < -20 ? 'Sehr leise Quelle' : 'Lautheit im Zielbereich'))
+          : 'Lautheit nicht bestimmbar',
+        detail: Number.isFinite(profile.loudnessDb)
+          ? 'approx. ' + profile.loudnessDb.toFixed(1) + ' LUFS vor dem Mastering.'
+          : 'Für diese Quelle liess sich keine Lautheit schätzen.'
+      });
+      return findings;
+    }
+
+    summarizeEnhancement(settings) {
+      if (!settings) {
+        return [];
+      }
+      const dB = (value) => (value > 0 ? '+' : '') + Number(value).toFixed(1) + ' dB';
+      const steps = [
+        'EQ: Bass ' + dB(settings.eqLow) + ' · Präsenz ' + dB(settings.eqMid) + ' · Höhen ' + dB(settings.eqHigh),
+        'Kompressor: Threshold ' + Number(settings.compThreshold).toFixed(1) + ' dB bei ' + Number(settings.compRatio).toFixed(1) + ':1',
+        'Limiter-Ceiling ' + Number(settings.limiterCeiling).toFixed(1) + ' dBFS · Ziel ' + Number(settings.targetLufs).toFixed(1) + ' LUFS approx.',
+        'Stereobreite ' + Math.round(Number(settings.stereoWidth)) + ' %'
+      ];
+      if (settings.artifactCleaner) {
+        const parts = [];
+        if (settings.artifactCleaner.presenceCut) {
+          parts.push('Ringing-Cut bei 4.4 kHz ' + dB(settings.artifactCleaner.presenceCut));
+        }
+        if (settings.artifactCleaner.highCut) {
+          parts.push('Höhen-Glättung ' + dB(settings.artifactCleaner.highCut));
+        }
+        if (settings.artifactCleaner.softenTransients) {
+          parts.push('schnellere Transienten-Kontrolle');
+        }
+        steps.push('Artefakt-Reinigung: ' + (parts.length ? parts.join(' · ') : 'aktiv'));
+      }
+      return steps;
     }
 
     createPreviewChain(context, settings, analyser, sourceChannelCount) {
@@ -476,6 +581,15 @@
       fileFormat: document.getElementById('converter-file-format'),
       fileChannels: document.getElementById('converter-file-channels'),
       autoEnhance: document.getElementById('converter-auto-enhance'),
+      autoEnhanceUndo: document.getElementById('converter-auto-enhance-undo'),
+      autoEnhanceToggle: document.getElementById('converter-auto-enhance-toggle'),
+      autoEnhanceStrength: document.getElementById('converter-auto-enhance-strength'),
+      enhanceStatus: document.getElementById('converter-enhance-status'),
+      enhanceFindings: document.getElementById('converter-enhance-findings'),
+      enhanceSteps: document.getElementById('converter-enhance-steps'),
+      enhanceScore: document.getElementById('converter-enhance-score'),
+      enhanceScoreBar: document.getElementById('converter-enhance-score-bar'),
+      enhanceScoreNote: document.getElementById('converter-enhance-score-note'),
       previewToggle: document.getElementById('converter-preview-toggle'),
       previewStop: document.getElementById('converter-preview-stop'),
       renderButton: document.getElementById('converter-render-button'),
@@ -508,6 +622,17 @@
       'converter-target-lufs'
     ];
 
+    const controlRanges = {
+      'converter-eq-low': { min: -12, max: 12, step: 0.5 },
+      'converter-eq-mid': { min: -12, max: 12, step: 0.5 },
+      'converter-eq-high': { min: -12, max: 12, step: 0.5 },
+      'converter-comp-threshold': { min: -36, max: 0, step: 1 },
+      'converter-comp-ratio': { min: 1, max: 8, step: 0.1 },
+      'converter-limiter-ceiling': { min: -6, max: 0, step: 0.1 },
+      'converter-stereo-width': { min: 0, max: 200, step: 1 },
+      'converter-target-lufs': { min: -18, max: -8, step: 0.5 }
+    };
+
     const controls = Object.fromEntries(controlKeys.map((id) => [id, document.getElementById(id)]));
     const outputs = Object.fromEntries(controlKeys.map((id) => [id + '-value', document.getElementById(id + '-value')]));
     const listeners = [];
@@ -516,6 +641,9 @@
     let loadedBuffer = null;
     let sourceProfile = null;
     let artifactCleaner = null;
+    let enhanceSnapshot = null;
+    let enhanceState = 'idle';
+    let appliedEnhancement = null;
     let previewSource = null;
     let previewAnalyser = null;
     let previewStartAt = 0;
@@ -537,10 +665,12 @@
 
     function init() {
       syncExportFormatOptions();
+      restoreEnhancePreferences();
       updateControlOutputs();
       drawWaveformIdle();
       drawSpectrumIdle();
       updateButtons();
+      renderEnhancePanel();
 
       bind(elements.browseButton, 'click', () => {
         if (elements.fileInput) {
@@ -549,7 +679,20 @@
       });
       bind(elements.fileInput, 'change', () => handleSelectedFiles(elements.fileInput.files));
       bind(elements.resetButton, 'click', resetStudio);
-      bind(elements.autoEnhance, 'click', applyAutoEnhance);
+      bind(elements.autoEnhance, 'click', () => applyAutoEnhance({ trigger: 'manual' }));
+      bind(elements.autoEnhanceUndo, 'click', undoAutoEnhance);
+      bind(elements.autoEnhanceToggle, 'change', () => {
+        storeEnhancePreferences();
+        renderEnhancePanel();
+      });
+      bind(elements.autoEnhanceStrength, 'change', () => {
+        storeEnhancePreferences();
+        if (loadedBuffer && isAutoEnhanceEnabled()) {
+          applyAutoEnhance({ trigger: 'strength' });
+        } else {
+          renderEnhancePanel();
+        }
+      });
       bind(elements.previewToggle, 'click', togglePreview);
       bind(elements.previewStop, 'click', () => stopPreview(true));
       bind(elements.renderButton, 'click', renderMaster);
@@ -582,6 +725,10 @@
       Object.values(controls).forEach((control) => {
         bind(control, 'input', () => {
           updateControlOutputs();
+          if (enhanceState === 'applied') {
+            enhanceState = 'manual';
+            renderEnhancePanel();
+          }
           if (loadedBuffer) {
             elements.renderStatus.textContent = 'Regler aktualisiert. Preview neu starten oder direkt neu rendern.';
           }
@@ -691,6 +838,9 @@
         loadedBuffer = buffer;
         sourceProfile = analyzeLoadedSource();
         artifactCleaner = null;
+        appliedEnhancement = null;
+        enhanceSnapshot = null;
+        enhanceState = 'idle';
         previewOffset = 0;
         updateMetadata(file, loadedBuffer);
         updateButtons();
@@ -698,12 +848,21 @@
         updateAnalysisSummary();
         setRenderState('ready', 'Datei bereit – Preview und Render sind lokal verfügbar.');
         elements.importStatus.textContent = 'Datei erfolgreich lokal geladen. Alle Mastering-Schritte bleiben im Browser.';
+        if (isAutoEnhanceEnabled()) {
+          applyAutoEnhance({ trigger: 'import' });
+        } else {
+          renderEnhancePanel();
+        }
       } catch (error) {
         if (generation !== importGeneration) return;
         loadedBuffer = null;
         sourceProfile = null;
         artifactCleaner = null;
+        appliedEnhancement = null;
+        enhanceSnapshot = null;
+        enhanceState = 'idle';
         updateButtons();
+        renderEnhancePanel();
         drawWaveformIdle();
         setRenderState('error', 'Datei konnte lokal nicht dekodiert werden.');
         elements.importStatus.textContent = 'Die Datei konnte im aktuellen Browser nicht dekodiert werden. Bitte ein unterstütztes Audioformat testen.';
@@ -747,6 +906,14 @@
       elements.renderButton.disabled = !hasBuffer;
       elements.downloadButton.disabled = !renderedAsset;
       elements.clearRender.disabled = !renderedAsset;
+      if (elements.autoEnhanceUndo) {
+        elements.autoEnhanceUndo.disabled = !enhanceSnapshot || enhanceState !== 'applied';
+      }
+      if (elements.autoEnhance) {
+        elements.autoEnhance.textContent = enhanceState === 'applied'
+          ? 'Qualität erneut analysieren'
+          : 'Qualität automatisch verbessern';
+      }
     }
 
     function updateControlOutputs() {
@@ -786,6 +953,89 @@
       };
     }
 
+    const ENHANCE_CONTROL_NAMES = {
+      eqLow: 'converter-eq-low', eqMid: 'converter-eq-mid', eqHigh: 'converter-eq-high',
+      compThreshold: 'converter-comp-threshold', compRatio: 'converter-comp-ratio',
+      limiterCeiling: 'converter-limiter-ceiling', stereoWidth: 'converter-stereo-width',
+      targetLufs: 'converter-target-lufs'
+    };
+
+    const ENHANCE_STRENGTHS = {
+      gentle: { factor: 0.6, label: 'sanft' },
+      balanced: { factor: 1, label: 'ausgewogen' },
+      strong: { factor: 1.4, label: 'kräftig' }
+    };
+
+    function isAutoEnhanceEnabled() {
+      return elements.autoEnhanceToggle ? Boolean(elements.autoEnhanceToggle.checked) : true;
+    }
+
+    function getEnhanceStrength() {
+      const key = (elements.autoEnhanceStrength && elements.autoEnhanceStrength.value) || 'balanced';
+      return ENHANCE_STRENGTHS[key] || ENHANCE_STRENGTHS.balanced;
+    }
+
+    function snapControlValue(controlId, value) {
+      const range = controlRanges[controlId];
+      const numeric = Number(value);
+      if (!range || !Number.isFinite(numeric)) {
+        return numeric;
+      }
+      const snapped = Math.round(numeric / range.step) * range.step;
+      const bounded = Math.max(range.min, Math.min(range.max, snapped));
+      return Number(bounded.toFixed(2));
+    }
+
+    function readControlSnapshot() {
+      return Object.fromEntries(Object.values(ENHANCE_CONTROL_NAMES)
+        .filter((id) => controls[id])
+        .map((id) => [id, controls[id].value]));
+    }
+
+    function applyControlSnapshot(snapshot) {
+      Object.keys(snapshot || {}).forEach((id) => {
+        if (controls[id]) {
+          controls[id].value = snapshot[id];
+        }
+      });
+    }
+
+    function readEnhancePreferences() {
+      try {
+        const raw = window.localStorage && window.localStorage.getItem(ENHANCE_PREFERENCES_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function restoreEnhancePreferences() {
+      const stored = readEnhancePreferences();
+      if (!stored) {
+        return;
+      }
+      if (elements.autoEnhanceToggle && typeof stored.auto === 'boolean') {
+        elements.autoEnhanceToggle.checked = stored.auto;
+      }
+      if (elements.autoEnhanceStrength && ENHANCE_STRENGTHS[stored.strength]) {
+        elements.autoEnhanceStrength.value = stored.strength;
+      }
+    }
+
+    function storeEnhancePreferences() {
+      try {
+        if (!window.localStorage) {
+          return;
+        }
+        window.localStorage.setItem(ENHANCE_PREFERENCES_KEY, JSON.stringify({
+          auto: isAutoEnhanceEnabled(),
+          strength: (elements.autoEnhanceStrength && elements.autoEnhanceStrength.value) || 'balanced'
+        }));
+      } catch (error) {
+        /* Komfortspeicher ist optional. */
+      }
+    }
+
     function analyzeLoadedSource() {
       try {
         return core.analyzeSource(loadedBuffer);
@@ -794,13 +1044,15 @@
       }
     }
 
-    function applyAutoEnhance() {
+    function applyAutoEnhance(options) {
       if (!loadedBuffer) {
         return;
       }
+      const trigger = (options && options.trigger) || 'manual';
+      const strength = getEnhanceStrength();
       let settings;
       try {
-        settings = core.chooseEnhancement(sourceProfile || core.analyzeSource(loadedBuffer));
+        settings = core.chooseEnhancement(sourceProfile || core.analyzeSource(loadedBuffer), { strength: strength.factor });
       } catch (error) {
         settings = {
           eqLow: 1.5, eqMid: 2.5, eqHigh: 2, compThreshold: -20,
@@ -808,18 +1060,128 @@
           artifactCleaner: null
         };
       }
-      const names = {
-        eqLow: 'converter-eq-low', eqMid: 'converter-eq-mid', eqHigh: 'converter-eq-high',
-        compThreshold: 'converter-comp-threshold', compRatio: 'converter-comp-ratio',
-        limiterCeiling: 'converter-limiter-ceiling', stereoWidth: 'converter-stereo-width',
-        targetLufs: 'converter-target-lufs'
-      };
-      Object.keys(names).forEach((key) => { controls[names[key]].value = String(settings[key]); });
+      if (enhanceState !== 'applied') {
+        enhanceSnapshot = readControlSnapshot();
+      }
+      Object.keys(ENHANCE_CONTROL_NAMES).forEach((key) => {
+        const controlId = ENHANCE_CONTROL_NAMES[key];
+        if (controls[controlId]) {
+          controls[controlId].value = String(snapControlValue(controlId, settings[key]));
+        }
+      });
       artifactCleaner = settings.artifactCleaner;
+      appliedEnhancement = readSettings();
+      enhanceState = 'applied';
       updateControlOutputs();
       elements.renderStatus.textContent = sourceProfile
         ? 'Auto-Enhance quellenabhängig gesetzt' + (artifactCleaner ? ' · Artefakt-Reinigung aktiv.' : '.')
         : 'Analyse nicht verfügbar: klassisches Auto-Enhance-Preset gesetzt.';
+      renderEnhancePanel({ trigger, strength });
+    }
+
+    function undoAutoEnhance() {
+      if (!enhanceSnapshot) {
+        return;
+      }
+      applyControlSnapshot(enhanceSnapshot);
+      enhanceSnapshot = null;
+      artifactCleaner = null;
+      appliedEnhancement = null;
+      enhanceState = 'reverted';
+      updateControlOutputs();
+      elements.renderStatus.textContent = 'Auto-Enhance zurückgenommen. Die Regler stehen wieder auf den vorherigen Werten.';
+      renderEnhancePanel();
+    }
+
+    function renderEnhancePanel(context) {
+      updateButtons();
+      const strength = (context && context.strength) || getEnhanceStrength();
+      const trigger = context && context.trigger;
+      if (elements.enhanceScore || elements.enhanceScoreBar || elements.enhanceScoreNote) {
+        const score = loadedBuffer ? core.scoreProfile(sourceProfile) : null;
+        if (elements.enhanceScore) {
+          elements.enhanceScore.textContent = Number.isFinite(score) ? String(score) : '–';
+        }
+        if (elements.enhanceScoreBar) {
+          elements.enhanceScoreBar.style.width = (Number.isFinite(score) ? score : 0) + '%';
+          if (elements.enhanceScoreBar.parentElement && elements.enhanceScoreBar.parentElement.dataset) {
+            elements.enhanceScoreBar.parentElement.dataset.tone = describeScoreTone(score);
+          }
+          elements.enhanceScoreBar.setAttribute('aria-valuenow', Number.isFinite(score) ? String(score) : '0');
+        }
+        if (elements.enhanceScoreNote) {
+          elements.enhanceScoreNote.textContent = !loadedBuffer
+            ? 'Der Qualitäts-Check startet automatisch, sobald du eine Datei lädst.'
+            : (Number.isFinite(score)
+              ? describeScoreNote(score)
+              : 'Die Quelle liess sich nicht vollständig vermessen. Es greift ein neutrales Standard-Preset.');
+        }
+      }
+
+      if (elements.enhanceFindings) {
+        elements.enhanceFindings.innerHTML = loadedBuffer
+          ? core.describeProfile(sourceProfile).map((finding) => (
+            '<li class="enhance-finding" data-tone="' + escapeHtml(finding.tone) + '">'
+            + '<strong>' + escapeHtml(finding.label) + '</strong>'
+            + '<span>' + escapeHtml(finding.detail) + '</span>'
+            + '</li>'
+          )).join('')
+          : '<li class="enhance-finding" data-tone="idle"><strong>Noch keine Analyse</strong><span>Lade eine Datei, dann prüft das Studio Clipping, Dynamik, Höhen, Stereobild und Lautheit automatisch.</span></li>';
+      }
+
+      if (elements.enhanceSteps) {
+        const steps = enhanceState === 'applied' ? core.summarizeEnhancement(appliedEnhancement) : [];
+        elements.enhanceSteps.innerHTML = steps.length
+          ? steps.map((step) => '<li>' + escapeHtml(step) + '</li>').join('')
+          : '<li class="is-placeholder">Noch keine automatische Korrektur angewendet. Die Regler bleiben unverändert, bis du Auto-Enhance startest.</li>';
+      }
+
+      if (elements.enhanceStatus) {
+        elements.enhanceStatus.textContent = buildEnhanceStatusText(trigger, strength);
+      }
+    }
+
+    function buildEnhanceStatusText(trigger, strength) {
+      if (!loadedBuffer) {
+        return isAutoEnhanceEnabled()
+          ? 'Automatik ist aktiv: Direkt nach dem Laden wird die Quelle analysiert und die Verbesserung in Stärke „' + strength.label + '“ angewendet.'
+          : 'Automatik ist deaktiviert: Du startest die Verbesserung nach dem Laden manuell über „Qualität automatisch verbessern“.';
+      }
+      if (enhanceState === 'applied') {
+        const origin = trigger === 'import'
+          ? 'Automatisch nach dem Import angewendet'
+          : (trigger === 'strength' ? 'Mit neuer Stärke neu berechnet' : 'Manuell angewendet');
+        return origin + ' · Stärke „' + strength.label + '“'
+          + (sourceProfile ? ' · auf Basis der Quellenanalyse.' : ' · neutrales Standard-Preset, weil keine Analyse möglich war.')
+          + ' Mit „Rückgängig“ stellst du die vorherigen Reglerwerte wieder her.';
+      }
+      if (enhanceState === 'manual') {
+        return 'Regler manuell angepasst. Die automatische Verbesserung kann jederzeit erneut angewendet werden.';
+      }
+      if (enhanceState === 'reverted') {
+        return 'Automatische Verbesserung zurückgenommen. Die Regler entsprechen wieder dem Stand vor Auto-Enhance.';
+      }
+      return 'Analyse abgeschlossen. Starte die automatische Verbesserung oder justiere die Regler manuell.';
+    }
+
+    function describeScoreTone(score) {
+      if (!Number.isFinite(score)) {
+        return 'idle';
+      }
+      if (score >= 80) {
+        return 'good';
+      }
+      return score >= 55 ? 'warn' : 'alert';
+    }
+
+    function describeScoreNote(score) {
+      if (score >= 80) {
+        return 'Die Quelle ist bereits sauber. Auto-Enhance arbeitet entsprechend zurückhaltend.';
+      }
+      if (score >= 55) {
+        return 'Die Quelle zeigt hörbare Schwächen. Auto-Enhance korrigiert gezielt die markierten Punkte.';
+      }
+      return 'Die Quelle hat deutliche Probleme. Auto-Enhance greift stärker ein und aktiviert die Artefakt-Reinigung.';
     }
 
     async function togglePreview() {
@@ -1202,6 +1564,9 @@
       loadedBuffer = null;
       sourceProfile = null;
       artifactCleaner = null;
+      appliedEnhancement = null;
+      enhanceSnapshot = null;
+      enhanceState = 'idle';
       previewOffset = 0;
       if (elements.fileInput) {
         elements.fileInput.value = '';
@@ -1210,6 +1575,7 @@
         elements[key].textContent = '–';
       });
       updateButtons();
+      renderEnhancePanel();
       drawWaveformIdle();
       drawSpectrumIdle();
       updateAnalysisSummary();
@@ -1367,7 +1733,13 @@
         return core.encodeWav(buffer);
       },
       _coreForTest: core,
-      _settingsForTest: readSettings
+      _settingsForTest: readSettings,
+      _enhanceStateForTest() {
+        return enhanceState;
+      },
+      _undoAutoEnhanceForTest() {
+        undoAutoEnhance();
+      }
     };
   }
 

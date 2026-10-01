@@ -77,7 +77,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
-- `converter.html` – Browser-Studio für lokale Dateien, Waveform/Spectrum, Auto-Enhance, Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
+- `converter.html` – Browser-Studio für lokale Dateien, Waveform/Spectrum, automatische Song-Qualitätsverbesserung (Qualitäts-Score, Befundliste, drei Stärken, Auto-Anwendung nach dem Import, Rückgängig), Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
 - `game.html` – eigenständiges „Singularity Arcade — Quantum Vault“ mit Account, servervalidierter Progression und Leaderboard
 
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
@@ -97,7 +97,7 @@ Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrel
 
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
-- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und Vault-Stub
+- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive Quellenanalyse mit Qualitäts-Score und Befunden, Auto-Enhance in den Stärken sanft/ausgewogen/kräftig, lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und Vault-Stub
 - `game.js` / `game.css` – eigenständige Spieloberfläche und responsives Sci-Fi/HUD-Design
 - `server/quantum-vault.js` – Pure-Node-Server mit scrypt-Accounts, HttpOnly-Sessions, verschlüsselter Vault-Persistenz und serverseitigen Spielregeln
 - `server/suno-downloader.js` – dedizierte, abgesicherte Node-Referenzimplementierung des Suno-Downloaders mit SSRF-Schutz und Signaturprüfung
