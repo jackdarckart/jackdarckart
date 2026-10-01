@@ -50,7 +50,7 @@ Das Converter-Studio (`converter.html`) nutzt denselben Account und dieselbe Ses
 Preset-Sync. Der Worker übernimmt ausschließlich die Regler `eqLow`, `eqMid`, `eqHigh`,
 `compThreshold`, `compRatio`, `limiterCeiling`, `stereoWidth`, `targetLufs` (serverseitig auf
 Reglerbereich und Schrittweite begrenzt) sowie `enhance.auto` und `enhance.strength`
-(`gentle`, `balanced`, `strong`). Unbekannte Felder werden verworfen; Audiodaten werden weder
+(`subtle`, `gentle`, `balanced`, `strong`, `intense`, `maximum`). Unbekannte Felder werden verworfen; Audiodaten werden weder
 angenommen noch gespeichert. Aktivierung im Frontend über
 `window.__JACKDARCKART_CONFIG__.converter.cloudSync.apiBase`.
 

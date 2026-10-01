@@ -90,7 +90,7 @@
           <ol class="timeline-flow converter-signal-flow">
             <li><strong>Import:</strong> lokale Datei per Drag &amp; Drop oder Dateidialog.</li>
             <li><strong>Qualitäts-Check:</strong> automatische Bewertung von Clipping, Dynamik, Höhen, Stereobild und Lautheit.</li>
-            <li><strong>Auto-Enhance:</strong> passende Korrektur inklusive Artefakt-Reinigung, in drei Stärken und mit Rückgängig.</li>
+            <li><strong>Auto-Enhance:</strong> passende Korrektur inklusive Artefakt-Reinigung, in sechs Stärken von „dezent“ bis „maximal“ und mit Rückgängig.</li>
             <li><strong>Feinschliff:</strong> EQ, Kompressor, Limiter, Stereo-Width und Loudness-Ziel manuell justieren.</li>
             <li><strong>Export:</strong> lokale Renderdatei mit sichtbarer 2:00-Cleanup-Phase.</li>
           </ol>
@@ -150,7 +150,7 @@
             </div>
             <span class="subpanel-label">läuft lokal · direkt nach dem Import</span>
           </div>
-          <p class="enhance-intro">Sobald eine Datei geladen ist, misst das Studio die Quelle und bewertet sie. Die automatische Verbesserung gewichtet jeden Befund nach Schweregrad und setzt daraus EQ, Kompressor, Limiter und Stereobreite – kräftiger bei schwachen Quellen, behutsam bei sauberen – inklusive Artefakt-Reinigung bei harschen Höhen, Clipping, phasigem Stereobild oder Rumpeln. Jede Korrektur wird unten einzeln aufgelistet und lässt sich mit einem Klick zurücknehmen.</p>
+          <p class="enhance-intro">Sobald eine Datei geladen ist, misst das Studio die Quelle und bewertet sie. Die automatische Verbesserung gewichtet jeden Befund nach Schweregrad und setzt daraus EQ, Kompressor, Limiter und Stereobreite – deutlich kräftiger bei schwachen Quellen, behutsam bei sauberen – inklusive Artefakt-Reinigung bei harschen Höhen, Clipping, phasigem Stereobild oder Rumpeln sowie automatischem Kanalausgleich bei unausgewogenen Stereoquellen. Sechs Stärken von „dezent“ bis „maximal“ stehen zur Wahl; die hohen Stufen greifen nur so weit, wie die Quelle es wirklich braucht. Jede Korrektur wird unten einzeln aufgelistet und lässt sich mit einem Klick zurücknehmen.</p>
 
           <div class="enhance-score-shell" data-tone="idle">
             <div class="enhance-score-head">
@@ -174,10 +174,14 @@
             <label class="field-group" for="converter-auto-enhance-strength">
               <span>Stärke der Verbesserung</span>
               <select id="converter-auto-enhance-strength" aria-describedby="converter-enhance-status">
+                <option value="subtle">Dezent – nur Feinschliff</option>
                 <option value="gentle">Sanft – minimale Eingriffe</option>
                 <option value="balanced" selected>Ausgewogen – empfohlen</option>
                 <option value="strong">Kräftig – deutliche Korrektur</option>
+                <option value="intense">Intensiv – für schwache Quellen</option>
+                <option value="maximum">Maximal – stärkste Qualitätsrettung</option>
               </select>
+              <small id="converter-auto-enhance-strength-hint">Stärke „ausgewogen“: Empfohlen – deutliche, aber natürliche Verbesserung.</small>
             </label>
           </div>
 

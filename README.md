@@ -77,7 +77,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
-- `converter.html` – Browser-Studio für lokale Dateien, Waveform/Spectrum, automatische Song-Qualitätsverbesserung (Qualitäts-Score, Befundliste, drei Stärken, Auto-Anwendung nach dem Import, Rückgängig), Mastering-Regler, WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup sowie optionalem Cloud-Sync für Studio-Presets über das Cloudflare-Backend
+- `converter.html` – Browser-Studio für lokale Dateien, Waveform/Spectrum, automatische Song-Qualitätsverbesserung (Qualitäts-Score, Befundliste, sechs Stärken von dezent bis maximal, Auto-Anwendung nach dem Import, Rückgängig), Mastering-Regler, WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup sowie optionalem Cloud-Sync für Studio-Presets über das Cloudflare-Backend
 - `game.html` – eigenständiges „Singularity Arcade — Quantum Vault“ mit Account, servervalidierter Progression und Leaderboard
 
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
@@ -91,13 +91,13 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `datenschutz.html` – sachliche Datenschutz- und Sicherheitsinformationen
 - `impressum.html` – Impressum mit Anbieterkennzeichnung, Kontakt und Verantwortlichkeit
 
-Auto-Enhance schätzt lokal in einem schnellen Durchlauf Frequenzbalance, Dynamik (Crest-Faktor und Lautheitsumfang), gegatete Lautheit, Clipping, Stereo-Korrelation, Kanalbalance sowie Rumpeln/DC-Versatz. Jeder Befund wird nach Schweregrad gewichtet: Daraus entstehen der Qualitäts-Score, eine Prognose nach dem Mastering und die Korrekturintensität – schwache Quellen werden deutlich kräftiger korrigiert, saubere Quellen nur behutsam. Bei auffälligen Höhen, Transienten, phasigem Stereo oder Rumpeln werden gezielte DSP-Korrekturen (Ringing-Cut, Höhen-Glättung, Transienten-Kontrolle, Rumpel-Filter) zugeschaltet. Dies sind Heuristiken, keine KI-Modell- oder Broadcast-Loudness-Messung; falls die Analyse fehlschlägt, bleibt das klassische Preset nutzbar.
+Auto-Enhance schätzt lokal in einem schnellen Durchlauf Frequenzbalance, Dynamik (Crest-Faktor und Lautheitsumfang), gegatete Lautheit, Clipping, Stereo-Korrelation, Kanalbalance sowie Rumpeln/DC-Versatz. Jeder Befund wird nach Schweregrad gewichtet: Daraus entstehen der Qualitäts-Score, eine Prognose nach dem Mastering und die Korrekturintensität – schwache Quellen werden deutlich kräftiger korrigiert, saubere Quellen nur behutsam. Sechs Stärken (dezent, sanft, ausgewogen, kräftig, intensiv, maximal) stehen zur Wahl; oberhalb von „ausgewogen“ wird der zusätzliche Schub nach Bedarf der Quelle dosiert, sodass auch „maximal“ saubere Quellen nicht überbearbeitet. Bei auffälligen Höhen, Clipping, Transienten, phasigem Stereo, Kanal-Ungleichgewicht oder Rumpeln werden gezielte DSP-Korrekturen (Ringing-Cut, Höhen-/Clipping-Glättung, Transienten-Kontrolle, Kanalausgleich, Rumpel-Filter) zugeschaltet. Analyse, Befunde und berechnete Einstellungen werden pro Quelle zwischengespeichert, sodass Stärkewechsel, erneutes Anwenden und Rückgängig die Datei nicht erneut scannen. Dies sind Heuristiken, keine KI-Modell- oder Broadcast-Loudness-Messung; falls die Analyse fehlschlägt, bleibt das klassische Preset nutzbar.
 
 ## Technische Struktur
 
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
-- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive Quellenanalyse mit Qualitäts-Score und Befunden, Auto-Enhance in den Stärken sanft/ausgewogen/kräftig, lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und `CloudflareStudioSyncAdapter` für Studio-Presets
+- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive Quellenanalyse mit Qualitäts-Score und Befunden, Auto-Enhance in den Stärken dezent/sanft/ausgewogen/kräftig/intensiv/maximal, lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und `CloudflareStudioSyncAdapter` für Studio-Presets
 - `game.js` / `game.css` – eigenständige Spieloberfläche und responsives Sci-Fi/HUD-Design
 - `server/quantum-vault.js` – Pure-Node-Server mit scrypt-Accounts, HttpOnly-Sessions, verschlüsselter Vault-Persistenz und serverseitigen Spielregeln
 - `server/suno-downloader.js` – dedizierte, abgesicherte Node-Referenzimplementierung des Suno-Downloaders mit SSRF-Schutz und Signaturprüfung

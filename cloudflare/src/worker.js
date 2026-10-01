@@ -45,7 +45,7 @@ export const STUDIO_PRESET_RULES = Object.freeze({
   stereoWidth: { min: 0, max: 200, step: 1 },
   targetLufs: { min: -18, max: -8, step: 0.5 }
 });
-export const STUDIO_ENHANCE_STRENGTHS = Object.freeze(['gentle', 'balanced', 'strong']);
+export const STUDIO_ENHANCE_STRENGTHS = Object.freeze(['subtle', 'gentle', 'balanced', 'strong', 'intense', 'maximum']);
 
 export class VaultError extends Error {
   constructor(message, status, code) {

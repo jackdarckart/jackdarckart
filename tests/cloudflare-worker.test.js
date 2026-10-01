@@ -331,6 +331,23 @@ async function main() {
   assert.ok(!JSON.stringify(Array.from(env.DB.studioPresets.values())).includes('audio'),
     'studio presets must never persist audio payloads');
 
+  for (const strength of ['subtle', 'intense', 'maximum']) {
+    const finerPreset = await call(worker, env, '/studio-preset', {
+      method: 'POST',
+      cookie,
+      json: { preset: { settings: savedPreset.payload.preset.settings, enhance: { auto: true, strength } } }
+    });
+    assert.equal(finerPreset.response.status, 200, JSON.stringify(finerPreset.payload));
+    assert.equal(finerPreset.payload.preset.enhance.strength, strength, 'finer enhance strengths must sync: ' + strength);
+  }
+  const unknownStrength = await call(worker, env, '/studio-preset', {
+    method: 'POST',
+    cookie,
+    json: { preset: { settings: savedPreset.payload.preset.settings, enhance: { auto: true, strength: 'ultra' } } }
+  });
+  assert.equal(unknownStrength.payload.preset.enhance.strength, 'balanced', 'unknown strengths must fall back to balanced');
+  await call(worker, env, '/studio-preset', { method: 'POST', cookie, json: { preset: savedPreset.payload.preset } });
+
   const loadedPreset = await call(worker, env, '/studio-preset', { cookie });
   assert.equal(loadedPreset.response.status, 200);
   assert.deepEqual(loadedPreset.payload.preset, savedPreset.payload.preset);
