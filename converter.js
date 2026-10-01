@@ -28,14 +28,124 @@
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
-  class VaultSyncAdapterStub {
-    isAvailable() {
-      return false;
+  const CLOUD_SYNC_MESSAGES = {
+    NOT_CONFIGURED: 'Cloud-Sync ist auf dieser Website noch nicht eingerichtet. Regler und Auto-Enhance-Einstellungen bleiben lokal in diesem Browser.',
+    NETWORK: 'Keine Verbindung zum Cloudflare-Backend. Prüfe deine Internetverbindung und versuche es erneut.',
+    OFFLINE: 'Das Cloudflare-Backend antwortet unter der konfigurierten Adresse nicht. Bitte später erneut versuchen.',
+    SESSION_REQUIRED: 'Bitte melde dich an, um Studio-Presets in der Cloud zu speichern oder zu laden.',
+    INVALID_CREDENTIALS: 'Handle oder Passwort ist falsch.',
+    HANDLE_TAKEN: 'Dieser Handle ist bereits vergeben. Melde dich an, falls es dein Account ist.',
+    HANDLE_INVALID: 'Der Handle muss 3–20 Zeichen lang sein und darf nur Buchstaben, Zahlen, _ oder - enthalten.',
+    PASSWORD_INVALID: 'Das Passwort muss 10 bis 128 Zeichen lang sein.',
+    CROSS_ORIGIN: 'Diese Website ist im Cloudflare-Backend nicht als erlaubte Origin freigegeben.',
+    NOT_FOUND: 'Das Cloudflare-Backend kennt die Studio-Preset-Route noch nicht. Bitte den Worker aktualisieren.',
+    STUDIO_PRESET_INVALID: 'Das Preset enthält ungültige Werte und wurde nicht gespeichert.',
+    DB_UNAVAILABLE: 'Die Cloudflare-Datenbank (D1) ist nicht verbunden. Bitte später erneut versuchen.',
+    SESSIONS_UNAVAILABLE: 'Der Cloudflare-Sitzungsspeicher (KV) ist nicht verbunden. Bitte später erneut versuchen.',
+    INTERNAL_ERROR: 'Das Cloudflare-Backend konnte die Anfrage nicht verarbeiten. Bitte später erneut versuchen.'
+  };
+
+  function resolveCloudSyncBase(value) {
+    if (typeof value !== 'string') {
+      return '';
+    }
+    const trimmed = value.trim().replace(/\/+$/, '');
+    if (/^https:\/\/[^\s/?#@]+(\/[^\s?#]*)?$/i.test(trimmed)) {
+      return trimmed;
+    }
+    if (/^(\.\/|\/(?!\/))[^\s?#]*$/.test(trimmed)) {
+      return trimmed;
+    }
+    return '';
+  }
+
+  /**
+   * Talks to the Cloudflare Worker backend (cloudflare/src/worker.js).
+   * Only slider values and Auto-Enhance preferences are synchronised; audio
+   * files and rendered masters never leave the browser. Sessions are HttpOnly
+   * cookies issued by the Worker, so no credentials are stored client-side.
+   */
+  class CloudflareStudioSyncAdapter {
+    constructor(config) {
+      const settings = config && typeof config === 'object' ? config : {};
+      this.apiBase = resolveCloudSyncBase(settings.apiBase);
     }
 
-    async save() {
-      throw new Error('Kein verschlüsselter Vault verfügbar. Die Phase-27.3-Implementierung muss separat ergänzt werden.');
+    isConfigured() {
+      return Boolean(this.apiBase);
     }
+
+    async request(route, options) {
+      if (!this.isConfigured()) {
+        throw createCloudSyncError('NOT_CONFIGURED');
+      }
+      const fetchImplementation = (window && typeof window.fetch === 'function')
+        ? window.fetch.bind(window)
+        : (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : null);
+      if (!fetchImplementation) {
+        throw createCloudSyncError('NETWORK');
+      }
+      const settings = { method: 'GET', credentials: 'include', headers: { Accept: 'application/json' } };
+      if (options && options.body !== undefined) {
+        settings.method = 'POST';
+        settings.headers['Content-Type'] = 'application/json';
+        settings.body = JSON.stringify(options.body);
+      }
+      let response;
+      try {
+        response = await fetchImplementation(this.apiBase + route, settings);
+      } catch (error) {
+        throw createCloudSyncError('NETWORK');
+      }
+      const contentType = response && response.headers && typeof response.headers.get === 'function'
+        ? String(response.headers.get('Content-Type') || '')
+        : '';
+      let payload = null;
+      if (/application\/json/i.test(contentType)) {
+        try {
+          payload = await response.json();
+        } catch (error) {
+          payload = null;
+        }
+      }
+      if (!payload || typeof payload !== 'object') {
+        throw createCloudSyncError('OFFLINE');
+      }
+      if (!response.ok) {
+        throw createCloudSyncError(payload.code || 'INTERNAL_ERROR');
+      }
+      return payload;
+    }
+
+    session() {
+      return this.request('/session');
+    }
+
+    login(handle, password) {
+      return this.request('/login', { body: { handle, password } });
+    }
+
+    register(handle, password) {
+      return this.request('/register', { body: { handle, password } });
+    }
+
+    logout() {
+      return this.request('/logout', { body: {} });
+    }
+
+    loadPreset() {
+      return this.request('/studio-preset');
+    }
+
+    savePreset(preset) {
+      return this.request('/studio-preset', { body: { preset } });
+    }
+  }
+
+  function createCloudSyncError(code) {
+    const error = new Error(CLOUD_SYNC_MESSAGES[code] || CLOUD_SYNC_MESSAGES.INTERNAL_ERROR);
+    error.code = code;
+    return error;
   }
 
   class BrowserAudioMasteringCore {
@@ -567,7 +677,7 @@
 
   function createStudio() {
     const core = new BrowserAudioMasteringCore();
-    const vaultAdapter = new VaultSyncAdapterStub();
+    const cloudSync = new CloudflareStudioSyncAdapter((readConverterConfig() || {}).cloudSync);
     const elements = {
       fileInput: document.getElementById('converter-file-input'),
       browseButton: document.getElementById('converter-browse-button'),
@@ -607,8 +717,15 @@
       analysisSummary: document.getElementById('converter-analysis-summary'),
       waveform: document.getElementById('converter-waveform'),
       spectrum: document.getElementById('converter-spectrum'),
-      vaultButton: document.getElementById('converter-vault-button'),
-      vaultStatus: document.getElementById('converter-vault-status')
+      cloudForm: document.getElementById('converter-cloud-auth-form'),
+      cloudHandle: document.getElementById('converter-cloud-handle'),
+      cloudPassword: document.getElementById('converter-cloud-password'),
+      cloudRegister: document.getElementById('converter-cloud-register'),
+      cloudLogout: document.getElementById('converter-cloud-logout'),
+      cloudAccount: document.getElementById('converter-cloud-account'),
+      cloudSave: document.getElementById('converter-cloud-save'),
+      cloudLoad: document.getElementById('converter-cloud-load'),
+      cloudStatus: document.getElementById('converter-cloud-status')
     };
 
     const controlKeys = [
@@ -654,6 +771,8 @@
     let renderedAsset = null;
     let isPreviewStopping = false;
     let importGeneration = 0;
+    let cloudHandle = '';
+    let cloudPending = false;
 
     function bind(target, type, listener, options) {
       if (!target || typeof target.addEventListener !== 'function') {
@@ -671,6 +790,8 @@
       drawSpectrumIdle();
       updateButtons();
       renderEnhancePanel();
+      renderCloudPanel();
+      refreshCloudSession();
 
       bind(elements.browseButton, 'click', () => {
         if (elements.fileInput) {
@@ -698,7 +819,14 @@
       bind(elements.renderButton, 'click', renderMaster);
       bind(elements.downloadButton, 'click', downloadRenderedFile);
       bind(elements.clearRender, 'click', () => clearRenderedAsset('Temporäre Master-Datei manuell aus dem Speicher gelöscht.'));
-      bind(elements.vaultButton, 'click', handleVaultAction);
+      bind(elements.cloudForm, 'submit', (event) => {
+        event.preventDefault();
+        return authenticateCloud('login');
+      });
+      bind(elements.cloudRegister, 'click', () => authenticateCloud('register'));
+      bind(elements.cloudLogout, 'click', logoutCloud);
+      bind(elements.cloudSave, 'click', saveCloudPreset);
+      bind(elements.cloudLoad, 'click', loadCloudPreset);
       bind(window, 'resize', handleResize);
 
       bind(elements.dropzone, 'dragenter', (event) => {
@@ -1548,12 +1676,174 @@
       elements.analysisSummary.innerHTML = output.join('');
     }
 
-    async function handleVaultAction() {
-      try {
-        await vaultAdapter.save();
-      } catch (error) {
-        elements.vaultStatus.textContent = error.message;
+    function setCloudStatus(message, isError) {
+      if (!elements.cloudStatus) {
+        return;
       }
+      elements.cloudStatus.textContent = message;
+      if (elements.cloudStatus.classList) {
+        elements.cloudStatus.classList.toggle('error', Boolean(isError));
+      }
+    }
+
+    function renderCloudPanel() {
+      const configured = cloudSync.isConfigured();
+      const signedIn = configured && Boolean(cloudHandle);
+      if (elements.cloudForm) {
+        elements.cloudForm.hidden = !configured || signedIn;
+      }
+      [elements.cloudHandle, elements.cloudPassword, elements.cloudRegister].forEach((control) => {
+        if (control) {
+          control.disabled = !configured || cloudPending;
+        }
+      });
+      if (elements.cloudLogout) {
+        elements.cloudLogout.hidden = !signedIn;
+        elements.cloudLogout.disabled = cloudPending;
+      }
+      if (elements.cloudSave) {
+        elements.cloudSave.disabled = !signedIn || cloudPending;
+      }
+      if (elements.cloudLoad) {
+        elements.cloudLoad.disabled = !signedIn || cloudPending;
+      }
+      if (elements.cloudAccount) {
+        elements.cloudAccount.textContent = !configured
+          ? 'nicht eingerichtet'
+          : (signedIn ? 'angemeldet als ' + cloudHandle : 'nicht angemeldet');
+      }
+      if (!configured) {
+        setCloudStatus(CLOUD_SYNC_MESSAGES.NOT_CONFIGURED, false);
+      }
+    }
+
+    async function runCloudTask(task) {
+      if (!cloudSync.isConfigured() || cloudPending) {
+        renderCloudPanel();
+        return;
+      }
+      cloudPending = true;
+      renderCloudPanel();
+      try {
+        await task();
+      } catch (error) {
+        if (error && error.code === 'SESSION_REQUIRED') {
+          cloudHandle = '';
+        }
+        setCloudStatus((error && error.message) || CLOUD_SYNC_MESSAGES.INTERNAL_ERROR, true);
+      } finally {
+        cloudPending = false;
+        renderCloudPanel();
+      }
+    }
+
+    function refreshCloudSession() {
+      return runCloudTask(async () => {
+        try {
+          const payload = await cloudSync.session();
+          cloudHandle = String(payload.handle || '');
+          setCloudStatus('Angemeldet als ' + cloudHandle + '. Presets können jetzt in der Cloud gespeichert und geladen werden.', false);
+        } catch (error) {
+          if (error && error.code === 'SESSION_REQUIRED') {
+            cloudHandle = '';
+            setCloudStatus('Cloud-Sync ist verfügbar. Melde dich an, um Studio-Presets zwischen Geräten zu synchronisieren.', false);
+            return;
+          }
+          throw error;
+        }
+      });
+    }
+
+    function authenticateCloud(mode) {
+      const handle = elements.cloudHandle ? String(elements.cloudHandle.value || '').trim() : '';
+      const password = elements.cloudPassword ? String(elements.cloudPassword.value || '') : '';
+      return runCloudTask(async () => {
+        const payload = mode === 'register'
+          ? await cloudSync.register(handle, password)
+          : await cloudSync.login(handle, password);
+        cloudHandle = String(payload.handle || handle);
+        if (elements.cloudPassword) {
+          elements.cloudPassword.value = '';
+        }
+        setCloudStatus((mode === 'register' ? 'Account erstellt. ' : '') + 'Angemeldet als ' + cloudHandle + '.', false);
+      });
+    }
+
+    function logoutCloud() {
+      return runCloudTask(async () => {
+        try {
+          await cloudSync.logout();
+        } catch (error) {
+          if (!error || error.code !== 'SESSION_REQUIRED') {
+            throw error;
+          }
+        }
+        cloudHandle = '';
+        setCloudStatus('Abgemeldet. Die Sitzung wurde im Cloudflare-Backend beendet.', false);
+      });
+    }
+
+    function buildCloudPreset() {
+      const values = readSettings();
+      const settings = {};
+      Object.keys(ENHANCE_CONTROL_NAMES).forEach((key) => {
+        settings[key] = values[key];
+      });
+      return {
+        settings,
+        enhance: {
+          auto: isAutoEnhanceEnabled(),
+          strength: (elements.autoEnhanceStrength && elements.autoEnhanceStrength.value) || 'balanced'
+        }
+      };
+    }
+
+    function applyCloudPreset(preset) {
+      const settings = (preset && preset.settings) || {};
+      Object.keys(ENHANCE_CONTROL_NAMES).forEach((key) => {
+        const controlId = ENHANCE_CONTROL_NAMES[key];
+        const value = snapControlValue(controlId, settings[key]);
+        if (controls[controlId] && Number.isFinite(value)) {
+          controls[controlId].value = String(value);
+        }
+      });
+      const enhance = (preset && preset.enhance) || {};
+      if (elements.autoEnhanceToggle && typeof enhance.auto === 'boolean') {
+        elements.autoEnhanceToggle.checked = enhance.auto;
+      }
+      if (elements.autoEnhanceStrength && ENHANCE_STRENGTHS[enhance.strength]) {
+        elements.autoEnhanceStrength.value = enhance.strength;
+      }
+      storeEnhancePreferences();
+      if (enhanceState === 'applied') {
+        enhanceState = 'manual';
+      }
+      enhanceSnapshot = null;
+      updateControlOutputs();
+      updateButtons();
+      renderEnhancePanel();
+      if (loadedBuffer && elements.renderStatus) {
+        elements.renderStatus.textContent = 'Cloud-Preset übernommen. Preview neu starten oder direkt neu rendern.';
+      }
+    }
+
+    function saveCloudPreset() {
+      return runCloudTask(async () => {
+        await cloudSync.savePreset(buildCloudPreset());
+        setCloudStatus('Preset in der Cloud gespeichert: Regler und Auto-Enhance-Einstellungen. Audiodateien wurden nicht hochgeladen.', false);
+      });
+    }
+
+    function loadCloudPreset() {
+      return runCloudTask(async () => {
+        const payload = await cloudSync.loadPreset();
+        if (!payload.preset) {
+          setCloudStatus('Für diesen Account ist noch kein Studio-Preset in der Cloud gespeichert.', false);
+          return;
+        }
+        applyCloudPreset(payload.preset);
+        setCloudStatus('Cloud-Preset geladen und auf die Regler angewendet.', false);
+      });
     }
 
     function resetStudio() {

@@ -77,7 +77,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
-- `converter.html` – Browser-Studio für lokale Dateien, Waveform/Spectrum, automatische Song-Qualitätsverbesserung (Qualitäts-Score, Befundliste, drei Stärken, Auto-Anwendung nach dem Import, Rückgängig), Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
+- `converter.html` – Browser-Studio für lokale Dateien, Waveform/Spectrum, automatische Song-Qualitätsverbesserung (Qualitäts-Score, Befundliste, drei Stärken, Auto-Anwendung nach dem Import, Rückgängig), Mastering-Regler, WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup sowie optionalem Cloud-Sync für Studio-Presets über das Cloudflare-Backend
 - `game.html` – eigenständiges „Singularity Arcade — Quantum Vault“ mit Account, servervalidierter Progression und Leaderboard
 
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
@@ -97,7 +97,7 @@ Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrel
 
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
-- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive Quellenanalyse mit Qualitäts-Score und Befunden, Auto-Enhance in den Stärken sanft/ausgewogen/kräftig, lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und Vault-Stub
+- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive Quellenanalyse mit Qualitäts-Score und Befunden, Auto-Enhance in den Stärken sanft/ausgewogen/kräftig, lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und `CloudflareStudioSyncAdapter` für Studio-Presets
 - `game.js` / `game.css` – eigenständige Spieloberfläche und responsives Sci-Fi/HUD-Design
 - `server/quantum-vault.js` – Pure-Node-Server mit scrypt-Accounts, HttpOnly-Sessions, verschlüsselter Vault-Persistenz und serverseitigen Spielregeln
 - `server/suno-downloader.js` – dedizierte, abgesicherte Node-Referenzimplementierung des Suno-Downloaders mit SSRF-Schutz und Signaturprüfung
@@ -109,6 +109,22 @@ Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrel
 - `tests/quantum-vault.test.js` – fokussierte Account-, Session-, Vault- und Manipulationsschutz-Tests
 - `cloudflare/` – wiederverwendbares Cloudflare-Backend-Starterpaket (Workers + D1 + KV) für künftige Integrationen, siehe [`cloudflare/README.md`](cloudflare/README.md)
 - `tests/cloudflare-worker.test.js` – Worker-Tests mit In-Memory-Doubles für D1 und KV
+
+## Studio-Cloud-Sync über Cloudflare
+
+Das Converter-Studio speichert Presets nicht mehr über einen Platzhalter, sondern über das Cloudflare-Backend in [`cloudflare/`](cloudflare/README.md) (Workers + D1 + KV). Synchronisiert werden ausschließlich die Regler (EQ, Kompressor, Limiter, Stereo-Width, Loudness-Ziel) sowie Modus und Stärke der automatischen Qualitätsverbesserung – Audiodateien und Renders verlassen den Browser nie.
+
+Aktiviert wird der Sync, indem die Worker-Adresse konfiguriert wird (HTTPS oder Same-Origin-Pfad):
+
+```js
+window.__JACKDARCKART_CONFIG__ = {
+  converter: {
+    cloudSync: { apiBase: 'https://vault.stream-musik.space/api/quantum-vault' }
+  }
+};
+```
+
+Ohne Konfiguration zeigt das Studio ehrlich „Cloud-Sync ist auf dieser Website noch nicht eingerichtet“ und kontaktiert kein Backend. Mit Konfiguration können sich Nutzer im Studio anmelden oder einen Account erstellen; Anfragen laufen mit `credentials: 'include'` über das HttpOnly-Session-Cookie des Workers (`GET`/`POST /studio-preset`). Die Website-Origin muss in `ALLOWED_ORIGINS` des Workers stehen, und die Migration `cloudflare/migrations/0002_studio_presets.sql` muss angewendet sein.
 
 ## Quantum Vault lokal starten
 

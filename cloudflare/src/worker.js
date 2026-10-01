@@ -33,6 +33,20 @@ const JUKEBOX_RULES = Object.freeze({
   'zero-point': 900
 });
 
+// Studio presets only contain mastering slider values and Auto-Enhance
+// preferences. Audio files and renders never leave the browser.
+export const STUDIO_PRESET_RULES = Object.freeze({
+  eqLow: { min: -12, max: 12, step: 0.5 },
+  eqMid: { min: -12, max: 12, step: 0.5 },
+  eqHigh: { min: -12, max: 12, step: 0.5 },
+  compThreshold: { min: -36, max: 0, step: 1 },
+  compRatio: { min: 1, max: 8, step: 0.1 },
+  limiterCeiling: { min: -6, max: 0, step: 0.1 },
+  stereoWidth: { min: 0, max: 200, step: 1 },
+  targetLufs: { min: -18, max: -8, step: 0.5 }
+});
+export const STUDIO_ENHANCE_STRENGTHS = Object.freeze(['gentle', 'balanced', 'strong']);
+
 export class VaultError extends Error {
   constructor(message, status, code) {
     super(message);
@@ -308,6 +322,47 @@ export function applyAction(state, body, options) {
   return state;
 }
 
+/**
+ * Builds a clean Studio preset from untrusted input. Only whitelisted numeric
+ * slider values (clamped and snapped to the slider step) and the Auto-Enhance
+ * preferences are kept; everything else is dropped.
+ */
+export function normalizeStudioPreset(input) {
+  const source = input && typeof input === 'object' && !Array.isArray(input) ? input : null;
+  const settingsInput = source && source.settings && typeof source.settings === 'object' && !Array.isArray(source.settings)
+    ? source.settings
+    : null;
+  if (!settingsInput) {
+    throw new VaultError('Studio preset must contain a settings object.', 400, 'STUDIO_PRESET_INVALID');
+  }
+  const settings = {};
+  Object.keys(STUDIO_PRESET_RULES).forEach((key) => {
+    const rule = STUDIO_PRESET_RULES[key];
+    const value = Number(settingsInput[key]);
+    if (settingsInput[key] === null || settingsInput[key] === '' || !Number.isFinite(value)) {
+      throw new VaultError(`Studio preset value ${key} must be a number.`, 400, 'STUDIO_PRESET_INVALID');
+    }
+    const snapped = Math.round(value / rule.step) * rule.step;
+    settings[key] = Number(Math.max(rule.min, Math.min(rule.max, snapped)).toFixed(2));
+  });
+  const enhanceInput = source.enhance && typeof source.enhance === 'object' ? source.enhance : {};
+  const enhance = {
+    auto: typeof enhanceInput.auto === 'boolean' ? enhanceInput.auto : true,
+    strength: STUDIO_ENHANCE_STRENGTHS.includes(enhanceInput.strength) ? enhanceInput.strength : 'balanced'
+  };
+  return { settings, enhance };
+}
+
+async function loadStudioPreset(env, userId) {
+  const row = await env.DB.prepare('SELECT preset_json, updated_at FROM studio_presets WHERE user_id = ?').bind(userId).first();
+  if (!row) return { preset: null, updatedAt: null };
+  try {
+    return { preset: normalizeStudioPreset(JSON.parse(row.preset_json)), updatedAt: row.updated_at };
+  } catch (error) {
+    return { preset: null, updatedAt: null };
+  }
+}
+
 function requireBindings(env) {
   if (!env || !env.DB) throw new VaultError('Vault database binding is missing.', 500, 'DB_UNAVAILABLE');
   if (!env.SESSIONS) throw new VaultError('Session store binding is missing.', 500, 'SESSIONS_UNAVAILABLE');
@@ -484,6 +539,25 @@ export async function handleRequest(request, env) {
       state.revision += 1;
       await persistState(env, authenticated.user, state);
       return json({ handle: authenticated.user.handle, state: publicState(state) }, 200, cors);
+    }
+
+    if (route === '/studio-preset' && request.method === 'GET') {
+      const authenticated = await authenticate(request, env);
+      const stored = await loadStudioPreset(env, authenticated.user.id);
+      return json({ handle: authenticated.user.handle, preset: stored.preset, updatedAt: stored.updatedAt }, 200, cors);
+    }
+
+    if (route === '/studio-preset' && request.method === 'POST') {
+      const body = await readJsonBody(request);
+      const preset = normalizeStudioPreset(body.preset);
+      const authenticated = await authenticate(request, env);
+      const timestamp = new Date().toISOString();
+      await env.DB
+        .prepare('INSERT INTO studio_presets (user_id, preset_json, updated_at) VALUES (?, ?, ?) '
+          + 'ON CONFLICT(user_id) DO UPDATE SET preset_json = excluded.preset_json, updated_at = excluded.updated_at')
+        .bind(authenticated.user.id, JSON.stringify(preset), timestamp)
+        .run();
+      return json({ handle: authenticated.user.handle, preset, updatedAt: timestamp }, 200, cors);
     }
 
     throw new VaultError('Quantum Vault endpoint not found.', 404, 'NOT_FOUND');

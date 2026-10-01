@@ -2,12 +2,13 @@
 
 Wiederverwendbares, produktionsnahes Integrationspaket für künftige Projekte: ein
 serverautoritatives API-Backend auf Cloudflare Workers mit D1 (Accounts, Spielstand,
-Leaderboard) und KV (Sessions). Das Paket ist eigenständig – die bestehende Website
+Leaderboard, Converter-Studio-Presets) und KV (Sessions). Das Paket ist eigenständig – die bestehende Website
 und `server/quantum-vault.js` bleiben unverändert nutzbar.
 
 ```
 cloudflare/
 ├── migrations/0001_init.sql   D1-Schema (users, vault_state, leaderboard, optional sessions)
+├── migrations/0002_studio_presets.sql  D1-Tabelle für Converter-Studio-Presets
 ├── src/worker.js              Worker mit vollständiger API-Oberfläche
 ├── package.json               nur `"type": "module"`, keine Laufzeitabhängigkeiten
 └── wrangler.toml              Template mit Platzhaltern (keine Secrets)
@@ -27,6 +28,8 @@ Alle Routen liegen unter dem Präfix `/api/quantum-vault`:
 | `POST`  | `/action`      | Spielaktion serverseitig berechnen (`harvest`, `forge`, `upgrade`, `tree`, `jukebox`) |
 | `POST`  | `/save`        | Save-Zähler erhöhen (`kind`: `manual` oder `auto`)           |
 | `GET`   | `/leaderboard` | Top 25 nach Vibe-Score                                       |
+| `GET`   | `/studio-preset` | Gespeichertes Converter-Studio-Preset des Accounts laden (`preset` ist `null`, falls keines existiert) |
+| `POST`  | `/studio-preset` | Studio-Preset speichern (`{ "preset": { "settings": {…}, "enhance": {…} } }`) |
 
 Fehlerantworten sind immer JSON mit stabilem Code und Klartextmeldung:
 
@@ -39,7 +42,17 @@ Codes: `HANDLE_INVALID`, `PASSWORD_INVALID`, `HANDLE_TAKEN`, `INVALID_CREDENTIAL
 `UNKNOWN_ACTION`, `UNKNOWN_UPGRADE`, `UNKNOWN_NODE`, `UNKNOWN_TRACK`, `ACTION_COOLDOWN`,
 `INSUFFICIENT_RESOURCES`, `UPGRADE_MAXED`, `NODE_LOCKED`, `NODE_UNLOCKED`, `TRACK_DECODED`,
 `NOT_FOUND`, `DB_UNAVAILABLE`, `SESSIONS_UNAVAILABLE`, `VAULT_STATE_MISSING`,
-`VAULT_STATE_INVALID`, `INTERNAL_ERROR`.
+`VAULT_STATE_INVALID`, `STUDIO_PRESET_INVALID`, `INTERNAL_ERROR`.
+
+### Converter-Studio-Presets
+
+Das Converter-Studio (`converter.html`) nutzt denselben Account und dieselbe Session für den
+Preset-Sync. Der Worker übernimmt ausschließlich die Regler `eqLow`, `eqMid`, `eqHigh`,
+`compThreshold`, `compRatio`, `limiterCeiling`, `stereoWidth`, `targetLufs` (serverseitig auf
+Reglerbereich und Schrittweite begrenzt) sowie `enhance.auto` und `enhance.strength`
+(`gentle`, `balanced`, `strong`). Unbekannte Felder werden verworfen; Audiodaten werden weder
+angenommen noch gespeichert. Aktivierung im Frontend über
+`window.__JACKDARCKART_CONFIG__.converter.cloudSync.apiBase`.
 
 ## Sicherheitsarchitektur
 
@@ -79,6 +92,7 @@ und dabei die Spaltenwerte migrieren.
 - `users` – `id` (UUID), `handle`, `handle_key` (kleingeschrieben, `UNIQUE`), `pw_hash`, `pw_salt`, `created_at`
 - `vault_state` – `user_id` (PK), `state_json`, `updated_at`
 - `leaderboard` – `user_id` (PK), `handle`, `vibe_score`, `updated_at`
+- `studio_presets` – `user_id` (PK), `preset_json`, `updated_at` (nur Reglerwerte und Auto-Enhance-Einstellungen)
 - `sessions` – optionale D1-Alternative zu KV (`token`, `user_id`, `created_at`, `expires_at`).
   Wird sie genutzt, ersetzen `SELECT`/`INSERT`/`DELETE` auf dieser Tabelle die KV-Aufrufe
   (`issueSession`, `authenticate`, `/logout`) und ein Cron-Trigger räumt abgelaufene Zeilen auf.
@@ -91,7 +105,7 @@ und dabei die Spaltenwerte migrieren.
 - Session-Tokens sind kurzlebig (7 Tage TTL) und werden bei `/logout` sofort gelöscht.
 - `vault_state.state_json` enthält nur Spielfortschritt, keine personenbezogenen Daten.
 - Account-Löschung: `DELETE FROM users WHERE handle_key = ?` entfernt per `ON DELETE CASCADE`
-  auch Spielstand, Leaderboard-Eintrag und D1-Sessions; KV-Sessions laufen über die TTL aus.
+  auch Spielstand, Leaderboard-Eintrag, Studio-Presets und D1-Sessions; KV-Sessions laufen über die TTL aus.
 - Backups: `wrangler d1 export quantum-vault-db --remote --output backup.sql` (Backups
   verschlüsselt und außerhalb des Repositories ablegen).
 

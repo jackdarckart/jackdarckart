@@ -78,6 +78,7 @@
             <li>Automatische Qualitätsanalyse</li>
             <li>Auto-Enhance mit Rückgängig-Funktion</li>
             <li>Waveform + Echtzeit-Spektrum</li>
+            <li>Optionaler Cloud-Sync für Presets</li>
             <li>2-Minuten-Cleanup nach Render</li>
           </ul>
         </div>
@@ -133,7 +134,7 @@
             <li><strong>Exakt lokal:</strong> Import, Browser-Dekodierung, Waveform, Preview, WAV-Export, Cleanup-Timer.</li>
             <li><strong>Best-effort:</strong> LUFS-ähnliche Loudness-Schätzung, Limiter-Ceiling, Stereo-Width und der automatische Qualitäts-Score im Browser-DSP.</li>
             <li><strong>Codec-Fallback:</strong> zusätzliche Zielformate erscheinen nur, wenn dein Browser einen echten Encoder anbietet.</li>
-            <li><strong>Vault:</strong> Verschlüsselter Sync ist nur als Stub vorbereitet und benötigt Phase 27.3 separat.</li>
+            <li><strong>Cloud-Sync (optional):</strong> Nach Anmeldung speichert das Cloudflare-Backend (Workers + D1 + KV) nur Regler-Presets und Auto-Enhance-Einstellungen. Audiodateien und Renders werden nie hochgeladen.</li>
           </ul>
         </aside>
       </div>
@@ -334,16 +335,33 @@
 
     <section class="section section-muted" data-reveal>
       <div class="wrap converter-layout">
-        <article class="panel content-panel">
+        <article class="panel content-panel converter-cloud-panel" id="converter-cloud-panel">
           <div class="subpanel-head">
-            <h2>Vault-Sync Placeholder</h2>
-            <span class="subpanel-label">Phase 27.3 separat erforderlich</span>
+            <h2>Cloud-Sync für Studio-Presets</h2>
+            <span class="subpanel-label">Cloudflare Workers · D1 · KV</span>
           </div>
-          <p>Die dauerhafte Speicherung in einem verschlüsselten Vault wird hier bewusst nicht vorgetäuscht. Dieses Studio enthält nur einen Adapterpunkt für eine spätere, echte Phase-27.3-Integration mit separater E2EE-, Schlüssel- und Sync-Implementierung.</p>
+          <p>Speichere deine Regler und die Einstellungen der automatischen Qualitätsverbesserung in deinem Account und lade sie auf jedem Gerät wieder. Synchronisiert werden ausschließlich EQ, Kompressor, Limiter, Stereo-Width, Loudness-Ziel sowie Auto-Enhance-Modus und -Stärke – deine Audiodateien und fertigen Renders bleiben immer lokal in diesem Browser.</p>
+          <p class="note">Account: <strong id="converter-cloud-account">wird geprüft …</strong></p>
+          <form class="converter-cloud-form" id="converter-cloud-auth-form" novalidate>
+            <label class="field-group" for="converter-cloud-handle">
+              <span>Handle</span>
+              <input id="converter-cloud-handle" type="text" maxlength="20" autocomplete="username" spellcheck="false">
+            </label>
+            <label class="field-group" for="converter-cloud-password">
+              <span>Passwort</span>
+              <input id="converter-cloud-password" type="password" maxlength="128" autocomplete="current-password">
+            </label>
+            <div class="actions">
+              <button class="button primary" type="submit">Anmelden</button>
+              <button class="button secondary" id="converter-cloud-register" type="button">Account erstellen</button>
+            </div>
+          </form>
           <div class="actions">
-            <button class="button secondary" id="converter-vault-button" type="button">Vault-Sync prüfen</button>
+            <button class="button secondary" id="converter-cloud-save" type="button" disabled>Preset in Cloud speichern</button>
+            <button class="button secondary" id="converter-cloud-load" type="button" disabled>Preset aus Cloud laden</button>
+            <button class="button secondary" id="converter-cloud-logout" type="button" hidden>Abmelden</button>
           </div>
-          <p class="share-status note" id="converter-vault-status" aria-live="polite">Kein Vault erkannt. Für E2EE-Sync wird die separate Phase-27.3-Implementierung benötigt.</p>
+          <p class="share-status note converter-cloud-status" id="converter-cloud-status" aria-live="polite">Cloud-Sync wird geprüft …</p>
         </article>
         <article class="panel editorial-module">
           <span class="eyebrow">Studio-Hinweis</span>
