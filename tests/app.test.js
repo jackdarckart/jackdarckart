@@ -683,6 +683,15 @@ function createConverterEnvironment(options = {}) {
     'converter-file-format',
     'converter-file-channels',
     'converter-auto-enhance',
+    'converter-auto-enhance-undo',
+    'converter-auto-enhance-toggle',
+    'converter-auto-enhance-strength',
+    'converter-enhance-status',
+    'converter-enhance-findings',
+    'converter-enhance-steps',
+    'converter-enhance-score',
+    'converter-enhance-score-bar',
+    'converter-enhance-score-note',
     'converter-preview-toggle',
     'converter-preview-stop',
     'converter-render-button',
@@ -726,6 +735,8 @@ function createConverterEnvironment(options = {}) {
     elements[id].clientHeight = 180;
     elements[id].getContext = () => createCanvasContextStub();
   }
+  elements['converter-auto-enhance-toggle'].checked = true;
+  elements['converter-auto-enhance-strength'].value = 'balanced';
   elements['converter-format-select'].value = 'wav';
   elements['converter-bitrate-select'].value = '192000';
   elements['converter-samplerate-select'].value = 'source';
@@ -2097,7 +2108,16 @@ function testConverterPageExposesStudioHooksAndLoader() {
     'converter-waveform',
     'converter-spectrum',
     'converter-vault-button',
-    'converter-vault-status'
+    'converter-vault-status',
+    'converter-auto-enhance-undo',
+    'converter-auto-enhance-toggle',
+    'converter-auto-enhance-strength',
+    'converter-enhance-status',
+    'converter-enhance-findings',
+    'converter-enhance-steps',
+    'converter-enhance-score',
+    'converter-enhance-score-bar',
+    'converter-enhance-score-note'
   ]) {
     const escapedHook = hook.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     assert.match(
@@ -2150,6 +2170,36 @@ function testConverterPageExposesStudioHooksAndLoader() {
     converterHtmlCode,
     /Phase 27\.3/i,
     'converter page should clearly label the vault integration as a Phase 27.3 dependency'
+  );
+  assert.match(
+    converterHtmlCode,
+    /Qualitäts-Check und automatische Verbesserung/,
+    'converter page should present the automatic song quality improvement as its own prominent section'
+  );
+  assert.match(
+    converterHtmlCode,
+    /id="converter-auto-enhance-toggle"[\s\S]*Automatisch nach dem Laden anwenden/,
+    'converter page should explain and expose the automatic-on-import control'
+  );
+  assert.match(
+    converterJsCode,
+    /ENHANCE_STRENGTHS\s*=\s*\{[\s\S]*gentle[\s\S]*balanced[\s\S]*strong/,
+    'converter studio should offer three documented strengths for the automatic quality improvement'
+  );
+  assert.match(
+    converterJsCode,
+    /describeProfile\(profile\)/,
+    'converter studio should translate the source analysis into readable findings'
+  );
+  assert.match(
+    stylesCode,
+    /\.enhance-score-track\[data-tone="alert"\]/,
+    'studio styles should visualise the quality score state'
+  );
+  assert.doesNotMatch(
+    converterHtmlCode,
+    /\sstyle="/,
+    'converter page must not use inline style attributes because the page CSP does not allow unsafe-inline styles'
   );
   assert.match(
     converterJsCode,
@@ -3693,6 +3743,102 @@ async function testConverterAdaptiveEnhance() {
   assert.equal(studio._settingsForTest().artifactCleaner, null);
 }
 
+async function testConverterAutomaticQualityWorkflow() {
+  const env = createConverterEnvironment();
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  assert.match(
+    env.elements['converter-enhance-status'].textContent,
+    /Automatik ist aktiv/,
+    'idle status should explain that the improvement runs automatically after loading'
+  );
+  assert.equal(env.elements['converter-auto-enhance-undo'].disabled, true, 'undo must stay disabled before any enhancement');
+  assert.equal(env.elements['converter-enhance-score'].textContent, '–');
+
+  const sampleRate = 44100;
+  const length = sampleRate;
+  const harsh = Float32Array.from({ length }, (_, i) => Math.sin(2 * Math.PI * 5000 * i / sampleRate) * 0.4);
+  const source = {
+    length,
+    sampleRate,
+    duration: 1,
+    numberOfChannels: 1,
+    getChannelData() { return harsh; }
+  };
+  env.window.AudioContext = class FakeAudioContext {
+    decodeAudioData(data, resolve) { resolve(source); }
+    async close() {}
+  };
+
+  const file = { name: 'harsh.wav', size: 10, type: 'audio/wav', async arrayBuffer() { return new ArrayBuffer(10); } };
+  env.elements['converter-file-input'].files = [file];
+  await env.elements['converter-file-input'].dispatch('change');
+
+  assert.equal(studio._enhanceStateForTest(), 'applied', 'import should trigger the automatic quality improvement');
+  assert.match(
+    env.elements['converter-enhance-status'].textContent,
+    /Automatisch nach dem Import angewendet/,
+    'status should state that the improvement ran automatically after import'
+  );
+  assert.match(env.elements['converter-enhance-findings'].innerHTML, /Clipping|Höhen|Stereobild/);
+  assert.match(env.elements['converter-enhance-steps'].innerHTML, /Limiter-Ceiling/);
+  assert.match(env.elements['converter-enhance-score-note'].textContent, /Auto-Enhance/);
+  const score = Number(env.elements['converter-enhance-score'].textContent);
+  assert.ok(Number.isFinite(score) && score >= 0 && score <= 100, 'quality score should be reported as a value between 0 and 100');
+  assert.equal(env.elements['converter-auto-enhance-undo'].disabled, false, 'undo must be available after an automatic enhancement');
+
+  const balancedLow = Number(env.elements['converter-eq-low'].value);
+  for (const controlId of [
+    'converter-eq-low',
+    'converter-eq-mid',
+    'converter-eq-high',
+    'converter-comp-ratio',
+    'converter-stereo-width',
+    'converter-target-lufs'
+  ]) {
+    const value = Number(env.elements[controlId].value);
+    assert.ok(Number.isFinite(value), controlId + ' should receive a finite value');
+    assert.equal(value, Math.round(value * 100) / 100, controlId + ' should be snapped to a representable slider value');
+  }
+
+  env.elements['converter-auto-enhance-strength'].value = 'strong';
+  await env.elements['converter-auto-enhance-strength'].dispatch('change');
+  assert.match(
+    env.elements['converter-enhance-status'].textContent,
+    /Mit neuer Stärke neu berechnet.*kräftig/,
+    'changing the strength should recompute and explain the new setting'
+  );
+  assert.ok(
+    Math.abs(Number(env.elements['converter-eq-low'].value)) >= Math.abs(balancedLow),
+    'a stronger setting should not reduce the corrective EQ move'
+  );
+
+  studio._undoAutoEnhanceForTest();
+  assert.equal(studio._enhanceStateForTest(), 'reverted');
+  assert.equal(env.elements['converter-eq-low'].value, '0', 'undo should restore the slider values from before the enhancement');
+  assert.equal(studio._settingsForTest().artifactCleaner, null, 'undo should also drop the artifact cleaner');
+  assert.equal(env.elements['converter-auto-enhance-undo'].disabled, true, 'undo should disable itself after restoring');
+  assert.match(env.elements['converter-enhance-status'].textContent, /zurückgenommen/);
+
+  env.elements['converter-auto-enhance-toggle'].checked = false;
+  await env.elements['converter-auto-enhance-toggle'].dispatch('change');
+  await env.elements['converter-file-input'].dispatch('change');
+  assert.equal(studio._enhanceStateForTest(), 'idle', 'disabling the automation must keep the sliders untouched after import');
+  assert.match(env.elements['converter-enhance-status'].textContent, /Analyse abgeschlossen/);
+
+  await env.elements['converter-auto-enhance'].dispatch('click');
+  assert.equal(studio._enhanceStateForTest(), 'applied');
+  assert.match(env.elements['converter-enhance-status'].textContent, /Manuell angewendet/);
+
+  await env.elements['converter-eq-low'].dispatch('input');
+  assert.equal(studio._enhanceStateForTest(), 'manual', 'manual slider changes should be reflected in the enhancement state');
+  assert.match(env.elements['converter-enhance-status'].textContent, /manuell angepasst/i);
+
+  studio.destroy();
+}
+
 async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
@@ -3715,6 +3861,7 @@ async function main() {
   await testRemoteAudioProxyHandlerResponses();
   await testSunoDownloaderBackendValidationAndFetch();
   await testConverterAdaptiveEnhance();
+  await testConverterAutomaticQualityWorkflow();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();

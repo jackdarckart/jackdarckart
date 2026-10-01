@@ -66,15 +66,17 @@
             </ol>
           </nav>
           <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Converter Studio · Cyber-Audio Mastering &amp; Transcoding Studio</span>
-          <h1>Lokales Audio-Mastering im Browser – dunkel, modular und kompromisslos privacy-first.</h1>
-          <p>Das Studio verarbeitet Audiodateien ausschließlich client-seitig. Upload, Analyse, Vorschau, Mastering und Export bleiben lokal in deinem Browser. Wo Browser-DSP nur best-effort arbeiten kann, wird das klar markiert – inklusive vorbereitetem Adapterpunkt für spätere WASM-/Vault-Upgrades.</p>
+          <h1>Songs automatisch verbessern – lokal im Browser, ohne Upload.</h1>
+          <p>Lade einen Track und das Studio analysiert ihn sofort: Clipping, Dynamik, harsche Höhen, Stereobild und Lautheit werden bewertet. Die automatische Qualitätsverbesserung setzt daraufhin EQ, Kompressor, Limiter und Stereobreite passend zur Quelle – nachvollziehbar aufgelistet und jederzeit rückgängig zu machen. Jeder Schritt bleibt client-seitig in deinem Browser.</p>
           <div class="actions">
             <a class="button primary" href="#converter-dropzone">Datei laden</a>
+            <a class="button secondary" href="#converter-enhance-panel">Automatische Qualitätsverbesserung</a>
             <a class="button secondary" href="#converter-export-panel">Zum Export</a>
           </div>
           <ul class="converter-badges" aria-label="Studio-Eigenschaften">
             <li>Lokal im Browser</li>
-            <li>Auto-Enhance + manuelle Regler</li>
+            <li>Automatische Qualitätsanalyse</li>
+            <li>Auto-Enhance mit Rückgängig-Funktion</li>
             <li>Waveform + Echtzeit-Spektrum</li>
             <li>2-Minuten-Cleanup nach Render</li>
           </ul>
@@ -86,8 +88,9 @@
           </div>
           <ol class="timeline-flow converter-signal-flow">
             <li><strong>Import:</strong> lokale Datei per Drag &amp; Drop oder Dateidialog.</li>
-            <li><strong>Analyse:</strong> Metadaten, Wellenform und Spektrum im Browser.</li>
-            <li><strong>Mastering:</strong> EQ, Kompressor, Limiter, Stereo-Width und Loudness-Ziel.</li>
+            <li><strong>Qualitäts-Check:</strong> automatische Bewertung von Clipping, Dynamik, Höhen, Stereobild und Lautheit.</li>
+            <li><strong>Auto-Enhance:</strong> passende Korrektur inklusive Artefakt-Reinigung, in drei Stärken und mit Rückgängig.</li>
+            <li><strong>Feinschliff:</strong> EQ, Kompressor, Limiter, Stereo-Width und Loudness-Ziel manuell justieren.</li>
             <li><strong>Export:</strong> lokale Renderdatei mit sichtbarer 2:00-Cleanup-Phase.</li>
           </ol>
           <p class="note">LUFS-Normierung und Limiter arbeiten hier best-effort approximativ auf Browser-Basis. Ein zukünftiger WASM-/DSP-Core kann über denselben Adapter eingebunden werden.</p>
@@ -128,7 +131,7 @@
           <h2>Was exakt ist – und was bewusst als Approximation markiert wird.</h2>
           <ul class="issue-checklist converter-checklist">
             <li><strong>Exakt lokal:</strong> Import, Browser-Dekodierung, Waveform, Preview, WAV-Export, Cleanup-Timer.</li>
-            <li><strong>Best-effort:</strong> LUFS-ähnliche Loudness-Schätzung, Limiter-Ceiling und Stereo-Width im Browser-DSP.</li>
+            <li><strong>Best-effort:</strong> LUFS-ähnliche Loudness-Schätzung, Limiter-Ceiling, Stereo-Width und der automatische Qualitäts-Score im Browser-DSP.</li>
             <li><strong>Codec-Fallback:</strong> zusätzliche Zielformate erscheinen nur, wenn dein Browser einen echten Encoder anbietet.</li>
             <li><strong>Vault:</strong> Verschlüsselter Sync ist nur als Stub vorbereitet und benötigt Phase 27.3 separat.</li>
           </ul>
@@ -136,15 +139,80 @@
       </div>
     </section>
 
+    <section class="section converter-enhance-section" data-reveal>
+      <div class="wrap">
+        <article class="panel content-panel converter-enhance-panel" id="converter-enhance-panel">
+          <div class="subpanel-head enhance-head">
+            <div>
+              <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Automatische Song-Qualität</span>
+              <h2>Qualitäts-Check und automatische Verbesserung</h2>
+            </div>
+            <span class="subpanel-label">läuft lokal · direkt nach dem Import</span>
+          </div>
+          <p class="enhance-intro">Sobald eine Datei geladen ist, misst das Studio die Quelle und bewertet sie. Die automatische Verbesserung setzt daraus EQ, Kompressor, Limiter und Stereobreite – inklusive Artefakt-Reinigung bei harschen Höhen, Clipping oder phasigem Stereobild. Jede Korrektur wird unten einzeln aufgelistet und lässt sich mit einem Klick zurücknehmen.</p>
+
+          <div class="enhance-score-shell" data-tone="idle">
+            <div class="enhance-score-head">
+              <span class="meta-label">Qualitäts-Score der Quelle</span>
+              <strong id="converter-enhance-score">–</strong>
+            </div>
+            <div class="enhance-score-track" data-tone="idle" role="img" aria-label="Qualitäts-Score der geladenen Quelle">
+              <span class="enhance-score-bar" id="converter-enhance-score-bar"></span>
+            </div>
+            <p class="note compact-note" id="converter-enhance-score-note">Der Qualitäts-Check startet automatisch, sobald du eine Datei lädst.</p>
+          </div>
+
+          <div class="enhance-controls">
+            <label class="studio-switch" for="converter-auto-enhance-toggle">
+              <input id="converter-auto-enhance-toggle" type="checkbox" checked>
+              <span>
+                <strong>Automatisch nach dem Laden anwenden</strong>
+                <small>Analyse und Verbesserung starten ohne weiteren Klick, sobald eine Datei dekodiert wurde.</small>
+              </span>
+            </label>
+            <label class="field-group" for="converter-auto-enhance-strength">
+              <span>Stärke der Verbesserung</span>
+              <select id="converter-auto-enhance-strength" aria-describedby="converter-enhance-status">
+                <option value="gentle">Sanft – minimale Eingriffe</option>
+                <option value="balanced" selected>Ausgewogen – empfohlen</option>
+                <option value="strong">Kräftig – deutliche Korrektur</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="actions enhance-actions">
+            <button class="button primary" id="converter-auto-enhance" type="button" disabled>Qualität automatisch verbessern</button>
+            <button class="button secondary" id="converter-auto-enhance-undo" type="button" disabled>Rückgängig</button>
+          </div>
+          <p class="share-status note" id="converter-enhance-status" aria-live="polite">Automatik ist aktiv: Direkt nach dem Laden wird die Quelle analysiert und die Verbesserung in Stärke „ausgewogen“ angewendet.</p>
+
+          <div class="enhance-result-grid">
+            <section class="enhance-block" aria-labelledby="converter-enhance-findings-title">
+              <h3 id="converter-enhance-findings-title">Was die Analyse gefunden hat</h3>
+              <ul class="enhance-findings" id="converter-enhance-findings" aria-live="polite">
+                <li class="enhance-finding" data-tone="idle"><strong>Noch keine Analyse</strong><span>Lade eine Datei, dann prüft das Studio Clipping, Dynamik, Höhen, Stereobild und Lautheit automatisch.</span></li>
+              </ul>
+            </section>
+            <section class="enhance-block" aria-labelledby="converter-enhance-steps-title">
+              <h3 id="converter-enhance-steps-title">Was automatisch gesetzt wurde</h3>
+              <ul class="enhance-steps" id="converter-enhance-steps" aria-live="polite">
+                <li class="is-placeholder">Noch keine automatische Korrektur angewendet. Die Regler bleiben unverändert, bis du Auto-Enhance startest.</li>
+              </ul>
+              <p class="note compact-note">Alle Werte landen direkt in den Mastering-Reglern darunter und gelten für Preview und Render gleichermaßen. Die Lautheitsangaben bleiben browserseitige Näherungen.</p>
+            </section>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section class="section section-muted" data-reveal>
       <div class="wrap converter-console-grid">
         <article class="panel content-panel converter-controls-panel">
           <div class="subpanel-head">
-            <h2>Mastering-Regler</h2>
-            <span class="subpanel-label">Preset + granularer Feinschliff</span>
+            <h2>Manueller Feinschliff</h2>
+            <span class="subpanel-label">übernimmt die Auto-Enhance-Werte</span>
           </div>
           <div class="actions converter-console-actions">
-            <button class="button primary" id="converter-auto-enhance" type="button" disabled>Auto-Enhance anwenden</button>
             <button class="button secondary" id="converter-preview-toggle" type="button" disabled>Preview starten</button>
             <button class="button secondary" id="converter-preview-stop" type="button" disabled>Preview stoppen</button>
           </div>
@@ -182,7 +250,7 @@
               <input id="converter-target-lufs" type="range" min="-18" max="-8" step="0.5" value="-12">
             </label>
           </div>
-          <p class="note" id="converter-settings-note">Änderungen wirken auf Render und auf neue Preview-Starts. Die Loudness-Anzeige ist eine browserseitige Best-Effort-Schätzung, keine volle Broadcast-Messung.</p>
+          <p class="note" id="converter-settings-note">Diese Regler zeigen die aktuell aktiven Werte – nach Auto-Enhance also das automatisch gesetzte Ergebnis. Änderungen wirken auf Render und auf neue Preview-Starts. Die Loudness-Anzeige ist eine browserseitige Best-Effort-Schätzung, keine volle Broadcast-Messung.</p>
         </article>
 
         <article class="panel content-panel converter-export-panel" id="converter-export-panel">
