@@ -2629,6 +2629,7 @@ async function testConverterRemoteImport() {
       if (decodeFails) reject(new Error('corrupt'));
       else resolve(audioBuffer);
     }
+
     async close() {}
   }
   env.window.URL = URL;
@@ -3168,6 +3169,81 @@ function testIssueHelpPageAndTemplatesArePresent() {
   }
 }
 
+async function testConverterAdaptiveEnhance() {
+  const env = createConverterEnvironment();
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  const core = studio._coreForTest;
+  const sampleRate = 44100;
+  const length = sampleRate;
+  const tone = (frequency, amplitude) => Float32Array.from({ length }, (_, i) =>
+    Math.sin(2 * Math.PI * frequency * i / sampleRate) * amplitude);
+  const buffer = (left, right) => ({
+    length, sampleRate, duration: 1, numberOfChannels: right ? 2 : 1,
+    getChannelData(index) { return index ? right : left; }
+  });
+  const bass = core.analyzeSource(buffer(tone(120, 0.4)));
+  const bright = core.analyzeSource(buffer(tone(5000, 0.4)));
+  assert.ok(bass.bassTiltDb > bright.bassTiltDb, 'bass and bright material need different spectral profiles');
+  assert.ok(bright.brightnessDb > bass.brightnessDb);
+  assert.ok(bright.harshness, 'upper-mid energy should trigger artifact cleaning');
+  assert.ok(core.chooseEnhancement(bright).artifactCleaner.presenceCut < 0);
+  assert.ok(core.chooseEnhancement(bright).eqHigh < core.chooseEnhancement(bass).eqHigh);
+  assert.ok(core.chooseEnhancement(bright).eqLow > core.chooseEnhancement(bass).eqLow);
+  const clipping = core.analyzeSource(buffer(tone(120, 1)));
+  assert.ok(clipping.clippingRatio > 0.001);
+  assert.equal(core.chooseEnhancement(clipping).compRatio, 1.5);
+  assert.equal(core.chooseEnhancement(clipping).limiterCeiling, -2);
+  const left = tone(5000, 0.4);
+  const phasey = core.analyzeSource(buffer(left, left.map((value) => -value)));
+  assert.ok(phasey.phasey);
+  assert.equal(core.chooseEnhancement(phasey).stereoWidth, 90);
+  const silent = core.analyzeSource(buffer(new Float32Array(length)));
+  assert.equal(silent.harshness, false);
+  assert.equal(silent.clippingRatio, 0);
+
+  const created = [];
+  const node = () => {
+    const item = { frequency: {}, gain: {}, Q: {}, threshold: {}, knee: {}, ratio: {},
+      attack: {}, release: {}, connect() {} };
+    created.push(item);
+    return item;
+  };
+  const context = {
+    createGain: node, createBiquadFilter: node, createDynamicsCompressor: node,
+    createWaveShaper: node, createAnalyser: node
+  };
+  core.createPreviewChain(context, core.chooseEnhancement(bright), node(), 1);
+  assert.ok(created.some((item) => item.type === 'peaking' && item.frequency.value === 4400 && item.gain.value < 0),
+    'preview/render chain should insert a distinct ringing cut when indicated');
+  created.length = 0;
+  core.createPreviewChain(context, core.chooseEnhancement(bass), node(), 1);
+  assert.equal(created.some((item) => item.frequency.value === 4400), false);
+
+  const source = buffer(left);
+  env.window.AudioContext = class FakeAudioContext {
+    decodeAudioData(data, resolve) { resolve(source); }
+    async close() {}
+  };
+  const file = { name: 'bright.wav', size: 10, type: 'audio/wav', async arrayBuffer() { return new ArrayBuffer(10); } };
+  env.elements['converter-file-input'].files = [file];
+  await env.elements['converter-file-input'].dispatch('change');
+  await env.elements['converter-auto-enhance'].dispatch('click');
+  assert.match(env.elements['converter-render-status'].textContent, /quellenabhängig.*Artefakt/);
+  assert.ok(studio._settingsForTest().artifactCleaner, 'cleaner must be shared by preview and render');
+  assert.match(env.elements['converter-analysis-summary'].innerHTML, /Quellenprofil/);
+  core.analyzeSource = () => { throw new Error('analysis failed'); };
+  await env.elements['converter-file-input'].dispatch('change');
+  await env.elements['converter-auto-enhance'].dispatch('click');
+  assert.match(env.elements['converter-render-status'].textContent, /klassisches/);
+  assert.equal(studio._settingsForTest().artifactCleaner, null);
+  assert.equal(env.elements['converter-eq-low'].value, '1.5');
+  assert.equal(env.elements['converter-render-button'].disabled, false, 'analysis errors must not disable import/render');
+  await env.elements['converter-reset-button'].dispatch('click');
+  assert.equal(studio._settingsForTest().artifactCleaner, null);
+}
+
 async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
@@ -3185,6 +3261,7 @@ async function main() {
   await testConverterMp3CompressedExportPath();
   testConverterDownloadClearsTemporaryAsset();
   await testConverterRemoteImport();
+  await testConverterAdaptiveEnhance();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
