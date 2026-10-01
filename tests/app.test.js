@@ -84,7 +84,12 @@ class MockElement {
     if (!this.listeners.has(type)) {
       this.listeners.set(type, []);
     }
+
     this.listeners.get(type).push(listener);
+  }
+
+  removeEventListener(type, listener) {
+    this.listeners.set(type, (this.listeners.get(type) || []).filter((entry) => entry !== listener));
   }
 
   async dispatch(type, event = {}) {
@@ -659,6 +664,8 @@ function createConverterEnvironment(options = {}) {
 
   const ids = [
     'converter-file-input',
+    'converter-remote-url',
+    'converter-remote-import',
     'converter-browse-button',
     'converter-reset-button',
     'converter-dropzone-shell',
@@ -2605,6 +2612,161 @@ function testConverterDownloadClearsTemporaryAsset() {
   assert.equal(env.getRevokedUrl(), 'blob:converter-test', 'converter studio should revoke the generated blob URL after cleanup');
 }
 
+async function testConverterRemoteImport() {
+  const env = createConverterEnvironment();
+  const mp3 = Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]);
+  const wav = Uint8Array.from(Buffer.from('RIFF0000WAVEfmt '));
+  const audioBuffer = {
+    duration: 1, sampleRate: 44100, numberOfChannels: 1,
+    getChannelData() { return new Float32Array([0.2, -0.2]); }
+  };
+  let decodeFails = false;
+  let fetchCalls = [];
+  let responseOptions = {};
+  let abortSignal;
+  class FakeAudioContext {
+    decodeAudioData(buffer, resolve, reject) {
+      if (decodeFails) reject(new Error('corrupt'));
+      else resolve(audioBuffer);
+    }
+    async close() {}
+  }
+  env.window.URL = URL;
+  env.window.AudioContext = FakeAudioContext;
+  env.window.fetch = async (url, options) => {
+    fetchCalls.push({ url, options });
+    abortSignal = options.signal;
+    const bytes = responseOptions.bytes || mp3;
+    const chunks = responseOptions.chunks || [bytes];
+    let index = 0;
+    return {
+      ok: true, type: 'cors', url: responseOptions.finalUrl || url,
+      headers: { get(key) {
+        return key === 'Content-Type' ? (responseOptions.mime || 'audio/mpeg')
+          : (responseOptions.length === undefined ? null : responseOptions.length);
+      } },
+      body: { getReader() {
+        return {
+          async read() {
+            return index < chunks.length ? { done: false, value: chunks[index++] } : { done: true };
+          },
+          async cancel() {}
+        };
+      } }
+    };
+  };
+  env.context.AbortController = AbortController;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  const input = env.elements['converter-remote-url'];
+  const button = env.elements['converter-remote-import'];
+  const status = env.elements['converter-import-status'];
+  for (const url of [
+    'http://public.example/song.mp3', 'data:audio/mp3,abc',
+    'https://localhost/song', 'https://127.0.0.1/song',
+    'https://192.168.1.2/song', 'https://169.254.1.1/song',
+    'https://[::1]/song', 'https://router.local/song',
+    'https://user@public.example/song'
+  ]) {
+    input.value = url;
+    await button.dispatch('click');
+    assert.equal(fetchCalls.length, 0, `${url} must be rejected before fetch`);
+    assert.match(status.textContent, /HTTPS|intern|IP-Adressen|Zugangsdaten/);
+  }
+
+  input.value = 'https://suno.com/song/01234567-89ab-cdef-0123-456789abcdef';
+  await button.dispatch('click');
+  assert.equal(fetchCalls[0].url, 'https://cdn1.suno.ai/01234567-89ab-cdef-0123-456789abcdef.mp3');
+  assert.equal(fetchCalls[0].options.credentials, 'omit');
+  assert.equal(fetchCalls[0].options.redirect, 'error');
+  assert.equal(fetchCalls[0].options.referrerPolicy, 'no-referrer');
+  assert.equal(fetchCalls[0].options.cache, 'no-store');
+  assert.equal(env.elements['converter-render-button'].disabled, false);
+  assert.equal(env.elements['converter-file-size'].textContent, '12 B');
+  assert.match(status.textContent, /erfolgreich/);
+
+  const previousCalls = fetchCalls.length;
+  input.value = 'https://suno.com/s/short-id';
+  await button.dispatch('click');
+  assert.equal(fetchCalls.length, previousCalls);
+  assert.match(status.textContent, /Suno-Link konnte nicht/);
+
+  input.value = 'https://public.example/song.wav';
+  responseOptions = { mime: 'audio/wav', bytes: wav };
+  await button.dispatch('click');
+  assert.match(status.textContent, /erfolgreich/, 'matching WAV MIME and magic bytes should load');
+  responseOptions = { mime: 'text/html', bytes: mp3 };
+  await button.dispatch('click');
+  assert.match(status.textContent, /MIME\/Dateisignatur/);
+  responseOptions = { mime: 'audio/mpeg', bytes: Uint8Array.from(Buffer.from('<html>oops</html>')) };
+  await button.dispatch('click');
+  assert.match(status.textContent, /MIME\/Dateisignatur/);
+  responseOptions = { mime: 'audio/wav', bytes: mp3 };
+  await button.dispatch('click');
+  assert.match(status.textContent, /MIME\/Dateisignatur/, 'audio MIME must match container signature');
+  responseOptions = { finalUrl: 'https://other.example/audio.mp3' };
+  await button.dispatch('click');
+  assert.match(status.textContent, /Weiterleitung/);
+  for (const [mime, signature] of [
+    ['audio/ogg', 'OggS00000000'],
+    ['audio/flac', 'fLaC00000000'],
+    ['audio/mp4', '0000ftypM4A '],
+    ['audio/webm', '\x1a\x45\xdf\xa3' + '00000000'],
+    ['audio/aiff', 'FORM0000AIFF']
+  ]) {
+    responseOptions = { mime, bytes: Uint8Array.from(signature, (char) => char.charCodeAt(0)) };
+    await button.dispatch('click');
+    assert.match(status.textContent, /erfolgreich/, `${mime} should pass matched signature checks`);
+  }
+  responseOptions = { mime: 'audio/mpeg', length: String(50 * 1024 * 1024 + 1) };
+  await button.dispatch('click');
+  assert.match(status.textContent, /zu groß/);
+  assert.equal(abortSignal.aborted, true);
+  responseOptions = { mime: 'audio/mpeg', chunks: [new Uint8Array(50 * 1024 * 1024), mp3] };
+  await button.dispatch('click');
+  assert.match(status.textContent, /zu groß/, 'streaming quota must work without Content-Length');
+  assert.equal(abortSignal.aborted, true);
+  responseOptions = {};
+  decodeFails = true;
+  await button.dispatch('click');
+  assert.match(status.textContent, /nicht dekodiert/);
+  decodeFails = false;
+
+  const file = { name: 'local.wav', size: wav.length, type: 'audio/wav', async arrayBuffer() { return wav.buffer; } };
+  env.elements['converter-file-input'].files = [file];
+  await env.elements['converter-file-input'].dispatch('change');
+  assert.equal(env.elements['converter-file-name'].textContent, 'local.wav');
+  assert.equal(env.elements['converter-render-button'].disabled, false);
+  assert.match(status.textContent, /lokal geladen/);
+  const immediateFetch = env.window.fetch;
+  let releaseFetch;
+  let pendingSignal;
+  env.window.fetch = (url, options) => {
+    pendingSignal = options.signal;
+    return new Promise((resolve) => { releaseFetch = resolve; });
+  };
+  const pendingImport = button.dispatch('click');
+  await flushMicrotasks();
+  await env.elements['converter-file-input'].dispatch('change');
+  assert.equal(pendingSignal.aborted, true, 'local import should abort an in-flight remote import');
+  releaseFetch(await immediateFetch('https://public.example/song.mp3', {}));
+  await pendingImport;
+  assert.equal(env.elements['converter-file-name'].textContent, 'local.wav', 'stale remote completion must not replace local import');
+  env.window.fetch = immediateFetch;
+  const exported = await studio._encodeWavForTest(audioBuffer).arrayBuffer();
+  assert.equal(Buffer.from(exported).toString('ascii', 0, 4), 'RIFF');
+  assert.equal(Buffer.from(exported).toString('ascii', 8, 12), 'WAVE');
+  studio._seedRenderedAssetForTest({
+    blob: new Blob([wav], { type: 'audio/wav' }), filename: 'local-master.wav',
+    report: { outputApproxLufs: -12, peakAfter: 0.2 }, sampleRate: 44100, format: { id: 'wav' }
+  });
+  env.runTimersByDelay(120000);
+  assert.equal(studio._hasRenderedAssetForTest(), false);
+  assert.equal(env.getRevokedUrl(), 'blob:converter-test');
+  studio.destroy();
+}
+
 async function testConverterCompressedExportPath() {
   const env = createConverterEnvironment();
 
@@ -3007,6 +3169,7 @@ async function main() {
   await testConverterFormatRefreshClearsUnavailableSelection();
   await testConverterMp3CompressedExportPath();
   testConverterDownloadClearsTemporaryAsset();
+  await testConverterRemoteImport();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();

@@ -3,6 +3,8 @@
 (function () {
   const MODULE_KEY = '__JACKDARCKART_CONVERTER__';
   const CLEANUP_WINDOW_MS = 2 * 60 * 1000;
+  const REMOTE_LIMIT_BYTES = 50 * 1024 * 1024;
+  const REMOTE_TIMEOUT_MS = 15000;
   const DEFAULT_COMPRESSED_BITRATE = '192000';
   const PREFERRED_MP3_BITRATE = DEFAULT_COMPRESSED_BITRATE;
   const MP3_MIME_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/mpeg;codecs=mp3'];
@@ -26,6 +28,123 @@
   ];
   const spectrumFftSize = 2048;
   let currentStudio = null;
+
+  function validateRemoteAudioUrl(input) {
+    let url;
+    try {
+      url = new (window.URL || globalThis.URL)(String(input).trim());
+    } catch (error) {
+      throw new Error('Bitte eine vollständige HTTPS-URL eingeben.');
+    }
+    if (url.protocol !== 'https:') {
+      throw new Error('Nur HTTPS-URLs sind erlaubt.');
+    }
+    if (url.username || url.password) {
+      throw new Error('URLs mit Zugangsdaten sind nicht erlaubt.');
+    }
+    const host = url.hostname.toLowerCase().replace(/\.$/, '');
+    // IP literals (including alternate IPv4 spellings normalized by URL) cannot be trusted as public destinations.
+    if (!host || !host.includes('.') || host.includes(':') || /^\d+\.\d+\.\d+\.\d+$/.test(host)
+      || /(?:^|\.)(?:localhost|local|internal|lan|home|test|invalid)$/.test(host)) {
+      throw new Error('Lokale oder interne Ziele und IP-Adressen sind nicht erlaubt.');
+    }
+    if (url.port && url.port !== '443') {
+      throw new Error('Nur der Standard-HTTPS-Port ist erlaubt.');
+    }
+    return url;
+  }
+
+  function resolveRemoteAudioUrl(input) {
+    const url = validateRemoteAudioUrl(input);
+    if (!['suno.com', 'www.suno.com'].includes(url.hostname.toLowerCase().replace(/\.$/, ''))) {
+      return url;
+    }
+    const match = url.pathname.match(/^\/song\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i);
+    if (!match) {
+      throw new Error('Suno-Link konnte nicht sicher aufgelöst werden. Bitte einen direkten HTTPS-Audiolink verwenden.');
+    }
+    return validateRemoteAudioUrl('https://cdn1.suno.ai/' + match[1] + '.mp3');
+  }
+
+  function sniffRemoteAudio(bytes) {
+    const ascii = (start, length) => String.fromCharCode(...bytes.subarray(start, start + length));
+    if (bytes.length < 12) return '';
+    if (ascii(0, 3) === 'ID3' || (bytes[0] === 0xff && (bytes[1] & 0xe6) === 0xe2)) return 'mp3';
+    if (ascii(0, 4) === 'RIFF' && ascii(8, 4) === 'WAVE') return 'wav';
+    if (ascii(0, 4) === 'OggS') return 'ogg';
+    if (ascii(0, 4) === 'fLaC') return 'flac';
+    if (ascii(4, 4) === 'ftyp' && /^[\x20-\x7e]{4}$/.test(ascii(8, 4))) return 'mp4';
+    if (ascii(0, 4) === 'FORM' && ['AIFF', 'AIFC'].includes(ascii(8, 4))) return 'aiff';
+    if (bytes[0] === 0x1a && bytes[1] === 0x45 && bytes[2] === 0xdf && bytes[3] === 0xa3) return 'webm';
+    return '';
+  }
+
+  function remoteAudioFormat(contentType, bytes) {
+    const mime = (contentType || '').split(';')[0].trim().toLowerCase();
+    const allowed = {
+      'audio/mpeg': 'mp3', 'audio/mp3': 'mp3',
+      'audio/wav': 'wav', 'audio/wave': 'wav', 'audio/x-wav': 'wav',
+      'audio/ogg': 'ogg', 'application/ogg': 'ogg',
+      'audio/flac': 'flac', 'audio/x-flac': 'flac',
+      'audio/mp4': 'mp4', 'audio/x-m4a': 'mp4', 'audio/m4a': 'mp4',
+      'audio/webm': 'webm',
+      'audio/aiff': 'aiff', 'audio/x-aiff': 'aiff'
+    };
+    if (!allowed[mime] || (bytes && sniffRemoteAudio(bytes) !== allowed[mime])) {
+      throw new Error('Die Antwort ist kein unterstütztes Audioformat (MIME/Dateisignatur).');
+    }
+    return mime;
+  }
+
+  async function fetchRemoteAudio(url, controller) {
+    const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
+    let reader;
+    try {
+      const response = await window.fetch(url.href, {
+        mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
+        redirect: 'error', cache: 'no-store', signal: controller.signal
+      });
+      if (!response.ok || response.type === 'opaque' || response.url !== url.href) {
+        throw new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
+      }
+      const contentType = response.headers.get('Content-Type');
+      // Fail closed before allocating a buffer, even if the server omits Content-Length.
+      remoteAudioFormat(contentType);
+      const length = response.headers.get('Content-Length');
+      if (length !== null && (!/^\d+$/.test(length) || Number(length) > REMOTE_LIMIT_BYTES)) {
+        throw new Error('Die Datei ist zu groß für den sicheren Import (max. 50 MB).');
+      }
+      if (!response.body || typeof response.body.getReader !== 'function') {
+        throw new Error('Diese Audioquelle unterstützt keinen sicheren Streaming-Import.');
+      }
+      reader = response.body.getReader();
+      const chunks = [];
+      let size = 0;
+      while (true) {
+        const part = await reader.read();
+        if (part.done) break;
+        size += part.value.byteLength;
+        if (size > REMOTE_LIMIT_BYTES) {
+          throw new Error('Die Datei ist zu groß für den sicheren Import (max. 50 MB).');
+        }
+        chunks.push(part.value);
+      }
+      const bytes = new Uint8Array(size);
+      let offset = 0;
+      chunks.forEach((chunk) => {
+        bytes.set(chunk, offset);
+        offset += chunk.byteLength;
+      });
+      remoteAudioFormat(contentType, bytes);
+      return { buffer: bytes.buffer, type: remoteAudioFormat(contentType), size };
+    } catch (error) {
+      controller.abort();
+      if (reader) await reader.cancel().catch(() => null);
+      throw error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
 
   class VaultSyncAdapterStub {
     isAvailable() {
@@ -371,6 +490,8 @@
     const vaultAdapter = new VaultSyncAdapterStub();
     const elements = {
       fileInput: document.getElementById('converter-file-input'),
+      remoteInput: document.getElementById('converter-remote-url'),
+      remoteButton: document.getElementById('converter-remote-import'),
       browseButton: document.getElementById('converter-browse-button'),
       resetButton: document.getElementById('converter-reset-button'),
       dropzone: document.getElementById('converter-dropzone-shell'),
@@ -429,6 +550,15 @@
     let cleanupInterval = 0;
     let renderedAsset = null;
     let isPreviewStopping = false;
+    let remoteController = null;
+    let importGeneration = 0;
+
+    function cancelRemoteImport() {
+      importGeneration += 1;
+      if (remoteController) remoteController.abort();
+      remoteController = null;
+      if (elements.remoteButton) elements.remoteButton.disabled = false;
+    }
 
     function bind(target, type, listener, options) {
       if (!target || typeof target.addEventListener !== 'function') {
@@ -451,6 +581,13 @@
         }
       });
       bind(elements.fileInput, 'change', () => handleSelectedFiles(elements.fileInput.files));
+      bind(elements.remoteButton, 'click', handleRemoteImport);
+      bind(elements.remoteInput, 'keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleRemoteImport();
+        }
+      });
       bind(elements.resetButton, 'click', resetStudio);
       bind(elements.autoEnhance, 'click', applyAutoEnhance);
       bind(elements.previewToggle, 'click', togglePreview);
@@ -578,6 +715,7 @@
         return;
       }
 
+      cancelRemoteImport();
       await resetPlaybackOnly();
       clearRenderedAsset('Vorherige temporäre Master-Datei entfernt, weil eine neue Quelldatei geladen wurde.');
       loadedFile = file;
@@ -600,6 +738,59 @@
         drawWaveformIdle();
         setRenderState('error', 'Datei konnte lokal nicht dekodiert werden.');
         elements.importStatus.textContent = 'Die Datei konnte im aktuellen Browser nicht dekodiert werden. Bitte ein unterstütztes Audioformat testen.';
+      }
+    }
+
+    async function handleRemoteImport() {
+      cancelRemoteImport();
+      const generation = importGeneration;
+      const controller = new AbortController();
+      remoteController = controller;
+      elements.remoteButton.disabled = true;
+      setRenderState('loading', 'Remote-Audio wird sicher geladen …');
+      elements.importStatus.textContent = 'Remote-Audio wird geladen und im Browser geprüft …';
+      try {
+        const url = resolveRemoteAudioUrl(elements.remoteInput.value);
+        const audio = await fetchRemoteAudio(url, controller);
+        if (generation !== importGeneration) return;
+        const context = await ensureAudioContext();
+        let buffer;
+        try {
+          buffer = await decodeAudioBuffer(context, audio.buffer);
+        } catch (error) {
+          throw new Error('Audio konnte im Browser nicht dekodiert werden.');
+        }
+        if (generation !== importGeneration) return;
+        await resetPlaybackOnly();
+        if (generation !== importGeneration) return;
+        clearRenderedAsset('Vorherige temporäre Master-Datei entfernt, weil eine neue Quelle geladen wurde.');
+        loadedFile = {
+          name: url.pathname.split('/').pop() || 'Remote-Audio',
+          size: audio.size,
+          type: audio.type
+        };
+        loadedBuffer = buffer;
+        previewOffset = 0;
+        updateMetadata(loadedFile, loadedBuffer);
+        updateButtons();
+        drawWaveform(loadedBuffer);
+        updateAnalysisSummary();
+        setRenderState('ready', 'Remote-Audio bereit – Preview und Render bleiben lokal.');
+        elements.importStatus.textContent = 'Remote-Audio erfolgreich im Browser geladen. Keine Speicherung auf dem Server.';
+      } catch (error) {
+        if (generation !== importGeneration) return;
+        const reason = error.name === 'AbortError'
+          ? 'Remote-Import hat das Zeitlimit überschritten oder wurde abgebrochen.'
+          : error instanceof TypeError
+            ? 'Remote-Audio konnte nicht geladen werden (Netzwerk oder CORS-Freigabe).'
+            : (error instanceof Error ? error.message : 'Remote-Import fehlgeschlagen.');
+        setRenderState('error', reason);
+        elements.importStatus.textContent = reason;
+      } finally {
+        if (generation === importGeneration) {
+          remoteController = null;
+          elements.remoteButton.disabled = false;
+        }
       }
     }
 
@@ -1064,6 +1255,7 @@
     }
 
     function resetStudio() {
+      cancelRemoteImport();
       stopPreview(true);
       clearRenderedAsset('Temporäre Master-Datei entfernt, weil das Studio zurückgesetzt wurde.');
       loadedFile = null;
@@ -1072,6 +1264,7 @@
       if (elements.fileInput) {
         elements.fileInput.value = '';
       }
+      if (elements.remoteInput) elements.remoteInput.value = '';
       ['fileName', 'fileDuration', 'fileRate', 'fileSize', 'fileFormat', 'fileChannels'].forEach((key) => {
         elements[key].textContent = '–';
       });
@@ -1190,6 +1383,7 @@
     }
 
     function destroyStudio() {
+      cancelRemoteImport();
       stopPreview(true);
       clearRenderedAsset('Temporäre Master-Datei bei Seitenwechsel bereinigt.');
       if (audioContext && audioContext.state !== 'closed') {
@@ -1225,6 +1419,9 @@
       },
       _refreshExportFormatsForTest() {
         syncExportFormatOptions();
+      },
+      _encodeWavForTest(buffer) {
+        return core.encodeWav(buffer);
       }
     };
   }

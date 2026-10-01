@@ -7,7 +7,7 @@
   <meta name="description" content="Cyber-Audio Mastering & Transcoding Studio auf stream-musik.space für lokale Browser-Audioverarbeitung, Analyse, Preview und privacy-first Export ohne Server-Uploads.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="dark light">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' blob: https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm https://api.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' blob: https://jackdarckart.stream.laut.fm; connect-src 'self' https:; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/converter.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
@@ -85,7 +85,7 @@
             <span class="subpanel-label">Web Audio API · modularer DSP-Wrapper</span>
           </div>
           <ol class="timeline-flow converter-signal-flow">
-            <li><strong>Import:</strong> lokale Datei per Drag &amp; Drop oder Dateidialog.</li>
+            <li><strong>Import:</strong> lokale Datei per Drag &amp; Drop oder Dateidialog; HTTPS-Audiolink mit CORS-Freigabe.</li>
             <li><strong>Analyse:</strong> Metadaten, Wellenform und Spektrum im Browser.</li>
             <li><strong>Mastering:</strong> EQ, Kompressor, Limiter, Stereo-Width und Loudness-Ziel.</li>
             <li><strong>Export:</strong> lokale Renderdatei mit sichtbarer 2:00-Cleanup-Phase.</li>
@@ -100,7 +100,7 @@
         <article class="panel content-panel converter-import-panel">
           <div class="subpanel-head">
             <h2 id="converter-dropzone">Import &amp; Datei-Metadaten</h2>
-            <span class="subpanel-label">nur lokal · kein Upload</span>
+            <span class="subpanel-label">Verarbeitung lokal · kein Upload</span>
           </div>
           <label class="studio-dropzone" id="converter-dropzone-shell" for="converter-file-input" tabindex="0">
             <input id="converter-file-input" type="file" accept="audio/*" hidden>
@@ -111,6 +111,11 @@
           <div class="actions converter-import-actions">
             <button class="button secondary" id="converter-browse-button" type="button">Datei auswählen</button>
             <button class="button secondary" id="converter-reset-button" type="button" disabled>Studio zurücksetzen</button>
+          </div>
+          <label for="converter-remote-url">HTTPS-Audiolink oder Suno-Song-Link (nur CORS-freigegebene Quellen)</label>
+          <div class="actions converter-import-actions">
+            <input id="converter-remote-url" type="url" inputmode="url" placeholder="https://…" autocomplete="off">
+            <button class="button secondary" id="converter-remote-import" type="button">URL importieren</button>
           </div>
           <p class="share-status note" id="converter-import-status" aria-live="polite">Noch keine Datei geladen. Alle Verarbeitungsschritte bleiben lokal in diesem Browser.</p>
           <div class="converter-meta-grid" aria-label="Audio-Metadaten">
