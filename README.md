@@ -107,6 +107,8 @@ Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrel
 - `sw.js` – App-Shell-Cache für alle HTML-Seiten und statischen Assets, ohne Stream-Caching
 - `tests/app.test.js` – Node-basierte Regressionstests für kritische UI-/Player- und Strukturregeln
 - `tests/quantum-vault.test.js` – fokussierte Account-, Session-, Vault- und Manipulationsschutz-Tests
+- `cloudflare/` – wiederverwendbares Cloudflare-Backend-Starterpaket (Workers + D1 + KV) für künftige Integrationen, siehe [`cloudflare/README.md`](cloudflare/README.md)
+- `tests/cloudflare-worker.test.js` – Worker-Tests mit In-Memory-Doubles für D1 und KV
 
 ## Quantum Vault lokal starten
 

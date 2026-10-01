@@ -1,0 +1,7 @@
+{
+  "name": "quantum-vault-cloudflare",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reusable Cloudflare Workers + D1 + KV backend template (no runtime dependencies)."
+}
