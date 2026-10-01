@@ -203,12 +203,14 @@ function createQuantumVaultHandler(options) {
   const secureCookie = settings.secureCookie !== undefined ? settings.secureCookie : true;
   const authRateLimit = settings.authRateLimit || 10;
   const authRateWindowMs = settings.authRateWindowMs || 60 * 1000;
+  const maxAuthSources = settings.maxAuthSources || 10000;
   const maxPasswordJobs = settings.maxPasswordJobs || 4;
   const sessions = new Map();
   const authAttempts = new Map();
   let store = { version: 1, accounts: [] };
   let lock = Promise.resolve();
   let passwordJobs = 0;
+  let authRateChecks = 0;
 
   if (fs.existsSync(dataFile)) {
     const loaded = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
@@ -229,6 +231,15 @@ function createQuantumVaultHandler(options) {
       ? request.socket.remoteAddress
       : 'unknown';
     const current = now();
+    authRateChecks += 1;
+    if (authRateChecks % 100 === 0 || authAttempts.size >= maxAuthSources) {
+      authAttempts.forEach((value, key) => {
+        if (current - value.startedAt >= authRateWindowMs) authAttempts.delete(key);
+      });
+    }
+    if (!authAttempts.has(address) && authAttempts.size >= maxAuthSources) {
+      throw new VaultError('Too many authentication attempts. Try again later.', 429);
+    }
     const attempt = authAttempts.get(address);
     if (!attempt || current - attempt.startedAt >= authRateWindowMs) {
       authAttempts.set(address, { count: 1, startedAt: current });
@@ -511,7 +522,10 @@ function createQuantumVaultHandler(options) {
     }
   }
 
-  handle.close = () => sessions.clear();
+  handle.close = () => {
+    sessions.clear();
+    authAttempts.clear();
+  };
   return handle;
 }
 

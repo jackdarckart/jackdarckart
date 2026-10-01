@@ -111,6 +111,7 @@
       setMessage(elements.gameMessage, 'Quantum Vault synchronisiert.', false);
       loadLeaderboard();
     } catch (error) {
+      if (generation !== authGeneration) return;
       setConnection('offline', 'Vault-Link fehlgeschlagen');
       setMessage(elements.authMessage, error.message, true);
     }
@@ -130,6 +131,7 @@
       elements.saveState.textContent = 'Autosave ausstehend';
       setMessage(elements.gameMessage, 'Aktion bestätigt und im Vault persistiert.', false);
     } catch (error) {
+      if (generation !== authGeneration) return;
       if (error.status === 401) {
         showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
         setConnection('offline', 'Session abgelaufen');
@@ -158,6 +160,7 @@
       dirty = false;
       elements.saveState.textContent = kind === 'auto' ? 'Autosave abgeschlossen' : 'Manuell gespeichert';
     } catch (error) {
+      if (generation !== authGeneration) return;
       if (error.status === 401) {
         showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
         setConnection('offline', 'Session abgelaufen');
@@ -219,6 +222,7 @@
     try {
       await request('/logout', { method: 'POST', body: '{}' });
     } catch (error) {
+      if (generation !== authGeneration) return;
       if (error.status === 401) {
         showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
         setConnection('offline', 'Session abgelaufen');
