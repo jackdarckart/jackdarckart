@@ -884,6 +884,7 @@
         try {
           return { url: candidates[index], audio: await fetchRemoteAudio(candidates[index], controller) };
         } catch (error) {
+          if (remoteController === controller) remoteController = null;
           // Nur fehlende oder nicht abrufbare Quellen dürfen auf den nächsten Kandidaten ausweichen;
           // Abbrüche, veraltete Importe und Inhaltsfehler werden sofort gemeldet.
           const retryable = error && error.remoteSourceUnavailable === true;
