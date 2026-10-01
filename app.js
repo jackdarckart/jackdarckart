@@ -227,7 +227,6 @@
     const merged = {
       theme: typeof overrides.theme === 'string' ? overrides.theme : defaultConfig.theme,
     lautFm: Object.assign({}, defaultConfig.lautFm, overrides.lautFm || {}),
-    game: Object.assign({}, defaultConfig.game, overrides.game || {}),
     content: {
         events: Array.isArray(overrides.content && overrides.content.events) ? overrides.content.events : defaultConfig.content.events,
         news: Array.isArray(overrides.content && overrides.content.news) ? overrides.content.news : defaultConfig.content.news,

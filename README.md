@@ -78,6 +78,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
 - `converter.html` – Browser-Studio für lokale Dateien, Waveform/Spectrum, Auto-Enhance, Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
+- `game.html` – eigenständiges „Singularity Arcade — Quantum Vault“ mit Account, servervalidierter Progression und Leaderboard
 
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
 - `events.html` – bestätigte Events und Specials oder professioneller Leerzustand
@@ -97,12 +98,26 @@ Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrel
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
 - `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und Vault-Stub
+- `game.js` / `game.css` – eigenständige Spieloberfläche und responsives Sci-Fi/HUD-Design
+- `server/quantum-vault.js` – Pure-Node-Server mit scrypt-Accounts, HttpOnly-Sessions, verschlüsselter Vault-Persistenz und serverseitigen Spielregeln
 - `server/suno-downloader.js` – dedizierte, abgesicherte Node-Referenzimplementierung des Suno-Downloaders mit SSRF-Schutz und Signaturprüfung
 - `server/remote-audio-proxy.js` – optionale Node-Referenzimplementierung des Same-Origin-Resolvers für CORS-blockierte Remote-Audio-Importe
 - `assets/vendor/lame.min.js` – gebündelter lokaler MP3-Encoder (`lamejs` 1.2.1, LGPL-3.0) für privacy-first Export ohne Upload
 - `manifest.webmanifest` – PWA-Metadaten und Mehrseiten-Shortcuts
 - `sw.js` – App-Shell-Cache für alle HTML-Seiten und statischen Assets, ohne Stream-Caching
 - `tests/app.test.js` – Node-basierte Regressionstests für kritische UI-/Player- und Strukturregeln
+- `tests/quantum-vault.test.js` – fokussierte Account-, Session-, Vault- und Manipulationsschutz-Tests
+
+## Quantum Vault lokal starten
+
+Der Vault benötigt einen ausschließlich serverseitigen 32-Byte-Schlüssel. Es wird kein Schlüssel im Repository mitgeliefert:
+
+```bash
+export QUANTUM_VAULT_KEY="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+npm start
+```
+
+Anschließend ist das Spiel unter `http://localhost:8080/game.html` erreichbar. Accounts und verschlüsselte Spielstände werden standardmäßig in `data/quantum-vault.json` gespeichert; dieser Pfad ist von Git ausgeschlossen. Für persistente Deployments kann `QUANTUM_VAULT_DATA_FILE` auf einen privaten, dauerhaften Datenträger zeigen. Der Browser sendet niemals Account-IDs oder vollständige Spielstände: Aktionen werden im Server berechnet, private Antworten tragen `Cache-Control: no-store, private`.
 
 ## Live-Daten aus der offiziellen laut.fm-API
 
