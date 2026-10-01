@@ -2207,11 +2207,6 @@ html[data-theme="light"] .sticky-player {
   margin-top: 1.1rem;
 }
 
-#converter-remote-url {
-  flex: 1 1 14rem;
-  min-width: 0;
-}
-
 .converter-meta-grid,
 .converter-control-grid,
 .converter-export-grid {
