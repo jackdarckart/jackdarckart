@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'stream-musik-space-v5';
+const CACHE_NAME = 'stream-musik-space-v6';
 const OFFLINE_FALLBACK_URL = new URL('./index.html', self.location.href).href;
 const APP_SHELL = [
   './',
@@ -8,6 +8,7 @@ const APP_SHELL = [
   './live.html',
   './titel.html',
   './converter.html',
+  './game.html',
   './sendeplan.html',
   './events.html',
   './news.html',
@@ -21,6 +22,8 @@ const APP_SHELL = [
   './styles.css',
   './app.js',
   './converter.js',
+  './game.js',
+  './game.css',
   './assets/vendor/lame.min.js',
   './manifest.webmanifest',
   './assets/app-icon-192.png',
@@ -86,6 +89,9 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) {
+    return;
+  }
+  if (url.pathname.startsWith(new URL('./api/quantum-vault', self.location.href).pathname)) {
     return;
   }
 

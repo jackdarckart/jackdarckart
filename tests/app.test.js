@@ -1925,7 +1925,12 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
     assert.match(siteNavMatch[1], /href="\.\/converter\.html"/, `${file} should expose the shared converter-studio entry in the main navigation`);
     assert.match(footerNavMatch[1], /href="\.\/issue-hilfe\.html"/, `${file} should expose the shared issue-help entry in the footer navigation`);
     assert.match(footerNavMatch[1], /href="\.\/converter\.html"/, `${file} should expose the shared converter-studio entry in the footer navigation`);
-    assert.doesNotMatch(html, /href=["']\.\/game\.html["']|Singularity Arcade|Arcade Game/i, `${file} should not contain Arcade navigation or content`);
+    if (file === 'index.html') {
+      assert.match(html, /href=["']\.\/game\.html["']/, 'homepage should expose the dedicated Quantum Vault entry point');
+    } else {
+      assert.doesNotMatch(html, /href=["']\.\/game\.html["']|Singularity Arcade|Arcade Game/i,
+        `${file} should remain independent from the dedicated game`);
+    }
     assert.equal((siteNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the main navigation`);
     assert.equal((footerNavMatch[1].match(/aria-current="page"/g) || []).length, 1, `${file} should mark exactly one active link in the footer navigation`);
     assert.match(siteNavMatch[1], new RegExp(`<a href="${escapeRegExp(expectedHref)}"[^>]*aria-current="page"`), `${file} should mark its own page link as active in the main navigation`);
@@ -1936,13 +1941,38 @@ function testAllHtmlPagesExposeSharedNavigationAndMetadata() {
   }
 }
 
-function testArcadePageAndIntegrationAreRemoved() {
-  assert.equal(fs.existsSync(path.join(__dirname, '..', 'game.html')), false, 'game.html should be deleted');
-  assert.doesNotMatch(appCode, /initGameGateway|APP_CONFIG\.game|game\.stream-musik\.space/i, 'app.js should not retain Arcade gateway configuration or handlers');
-  assert.doesNotMatch(swCode, /game\.html/i, 'service worker should not precache the removed game page');
-  assert.doesNotMatch(stylesCode, /Arcade|game-hero|endpoint-launcher/i, 'styles should not retain unused Arcade gateway rules');
+function testQuantumVaultGameIntegration() {
+  const gameHtml = fs.readFileSync(path.join(__dirname, '..', 'game.html'), 'utf8');
+  const gameJs = fs.readFileSync(path.join(__dirname, '..', 'game.js'), 'utf8');
   const readme = fs.readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
-  assert.doesNotMatch(readme, /game\.html|Singularity Arcade|Quantum Vault/i, 'README should not document the removed Arcade integration');
+  assert.match(gameHtml, /<title>Singularity Arcade — Quantum Vault<\/title>/);
+  assert.match(gameHtml, /id="login-form"/);
+  assert.match(gameHtml, /id="register-form"/);
+  assert.match(gameHtml, /id="save-button"/);
+  assert.match(gameHtml, /id="leaderboard"/);
+  assert.match(gameHtml, /data-action="harvest"/);
+  assert.match(gameHtml, /data-upgrade="resonator"/);
+  assert.match(gameHtml, /data-node="singularity"/);
+  assert.match(gameHtml, /data-track="zero-point"/);
+  assert.match(gameHtml, /<script src="\.\/game\.js" defer><\/script>/);
+  assert.doesNotMatch(gameHtml, /<script[^>]*src="\.\/app\.js"/, 'game page should remain isolated from the radio shell');
+  assert.doesNotMatch(gameJs, /localStorage|sessionStorage|userId|accountId/,
+    'game client must not use browser persistence or submit account identifiers');
+  assert.match(gameJs, /credentials:\s*'same-origin'/);
+  assert.match(gameJs, /error\.status\s*=\s*response\.status/);
+  assert.match(gameJs, /generation\s*!==\s*authGeneration/);
+  assert.match(gameJs, /error\.status\s*===\s*401/);
+  assert.match(gameJs, /if\s*\(authPending\)\s*return/);
+  assert.match(swCode, /'\.\/game\.html'/);
+  assert.match(swCode, /'\.\/game\.js'/);
+  assert.match(swCode, /'\.\/game\.css'/);
+  assert.match(swCode, /url\.pathname\.startsWith\(new URL\('\.\/api\/quantum-vault'/,
+    'service worker must bypass private vault APIs');
+  assert.doesNotMatch(appCode, /initGameGateway|APP_CONFIG\.game|game\.stream-musik\.space/i,
+    'shared radio app should not contain a parallel game implementation');
+  assert.doesNotMatch(stylesCode, /Arcade|game-hero|endpoint-launcher/i,
+    'shared styles should remain isolated from the dedicated game');
+  assert.match(readme, /server\/quantum-vault\.js/);
 }
 
 function testStickyPlayerCssKeepsPlayerWithinViewport() {
@@ -3651,7 +3681,7 @@ async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
   testConverterPageExposesStudioHooksAndLoader();
-  testArcadePageAndIntegrationAreRemoved();
+  testQuantumVaultGameIntegration();
   await testConverterMp3FormatExposureAndDefaults();
   testConverterOpusFormatExposureMatchesMimeSupport();
   await testConverterMp3FormatExposureWithBundledLocalEncoder();
