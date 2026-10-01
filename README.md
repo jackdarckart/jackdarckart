@@ -78,6 +78,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
 - `converter.html` – Browser-Studio für lokale Dateien und HTTPS-Audiolinks, Waveform/Spectrum, Auto-Enhance, Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
+
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
 - `events.html` – bestätigte Events und Specials oder professioneller Leerzustand
 - `news.html` – Sender-/Website-Neuigkeiten oder redaktioneller Leerzustand
@@ -88,6 +89,8 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `kontakt.html` – Songwünsche, Feedback, technische Fehler und Sicherheitsmeldungen
 - `datenschutz.html` – sachliche Datenschutz- und Sicherheitsinformationen
 - `impressum.html` – Impressum mit Anbieterkennzeichnung, Kontakt und Verantwortlichkeit
+
+Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrelation und passt EQ, Kompression und Lautstärkeziel an die Quelle an. Bei auffälligen Höhen, Transienten oder phasigem Stereo werden vorsichtige DSP-Korrekturen zugeschaltet. Dies sind Heuristiken, keine KI-Modell- oder Broadcast-Loudness-Messung; falls die Analyse fehlschlägt, bleibt das klassische Preset nutzbar.
 
 Remote-Import verarbeitet Audio ausschließlich im Browser: HTTPS, Hostnamen ohne offensichtliche interne Ziele oder IP-Literale, CORS-Freigabe ohne Redirect, Audio-MIME und Dateisignatur sowie maximal 50 MB sind erforderlich. Suno-Song-Links mit UUID werden direkt auf den Suno-CDN-Audiolink abgebildet; andere Share-Links können nicht verlässlich aufgelöst werden. Da der Browser DNS-Adressen nicht vor dem Abruf prüfen kann, ist eine Garantie gegen DNS-Rebinding ohne vertrauenswürdigen Proxy nicht möglich. Bei blockierter CORS-Freigabe bitte die Audiodatei lokal importieren.
 

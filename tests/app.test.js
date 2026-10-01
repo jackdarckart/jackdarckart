@@ -3198,7 +3198,9 @@ async function testConverterAdaptiveEnhance() {
   const left = tone(5000, 0.4);
   const phasey = core.analyzeSource(buffer(left, left.map((value) => -value)));
   assert.ok(phasey.phasey);
-  assert.equal(core.chooseEnhancement(phasey).stereoWidth, 90);
+  assert.equal(core.chooseEnhancement(phasey).stereoWidth, 65);
+  const brittle = core.chooseEnhancement({ ...bright, brittle: true, crestDb: 18 });
+  assert.equal(brittle.artifactCleaner.softenTransients, true);
   const silent = core.analyzeSource(buffer(new Float32Array(length)));
   assert.equal(silent.harshness, false);
   assert.equal(silent.clippingRatio, 0);
@@ -3218,6 +3220,10 @@ async function testConverterAdaptiveEnhance() {
   assert.ok(created.some((item) => item.type === 'peaking' && item.frequency.value === 4400 && item.gain.value < 0),
     'preview/render chain should insert a distinct ringing cut when indicated');
   created.length = 0;
+  core.createPreviewChain(context, brittle, node(), 1);
+  assert.ok(created.some((item) => item.attack.value === 0.003),
+    'brittle transients should receive faster compression');
+  created.length = 0;
   core.createPreviewChain(context, core.chooseEnhancement(bass), node(), 1);
   assert.equal(created.some((item) => item.frequency.value === 4400), false);
 
@@ -3233,6 +3239,27 @@ async function testConverterAdaptiveEnhance() {
   assert.match(env.elements['converter-render-status'].textContent, /quellenabhängig.*Artefakt/);
   assert.ok(studio._settingsForTest().artifactCleaner, 'cleaner must be shared by preview and render');
   assert.match(env.elements['converter-analysis-summary'].innerHTML, /Quellenprofil/);
+  core.createOfflineContext = () => ({
+    ...context,
+    destination: node(),
+    createBufferSource() { return { connect() {}, start() {} }; },
+    createBuffer(channels, size, rate) {
+      const data = Array.from({ length: channels }, () => new Float32Array(size));
+      return {
+        numberOfChannels: channels, length: size, sampleRate: rate,
+        getChannelData(index) { return data[index]; },
+        copyToChannel(values, index) { data[index].set(values); }
+      };
+    },
+    async startRendering() { return source; }
+  });
+  created.length = 0;
+  await env.elements['converter-render-button'].dispatch('click');
+  assert.ok(studio._hasRenderedAssetForTest(), 'adaptive render should produce a WAV asset');
+  assert.ok(created.some((item) => item.frequency.value === 4400),
+    'offline render must use the same artifact cleaner as preview');
+  await env.elements['converter-clear-render'].dispatch('click');
+  assert.equal(studio._hasRenderedAssetForTest(), false);
   core.analyzeSource = () => { throw new Error('analysis failed'); };
   await env.elements['converter-file-input'].dispatch('change');
   await env.elements['converter-auto-enhance'].dispatch('click');

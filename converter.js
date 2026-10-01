@@ -261,7 +261,7 @@
         compThreshold: compressed ? -12 : -20,
         compRatio: compressed ? 1.5 : 2.5,
         limiterCeiling: profile.clippingRatio > 0.001 ? -2 : -1,
-        stereoWidth: profile.phasey ? 90 : 100,
+        stereoWidth: profile.phasey ? 65 : 100,
         targetLufs: compressed || loud > -12 ? -14 : -12,
         artifactCleaner: profile.harshness || profile.phasey || profile.brittle
           ? { presenceCut: profile.harshness ? -2.5 : 0, highCut: profile.brittle || profile.harshness ? -1.5 : 0, softenTransients: profile.brittle }
