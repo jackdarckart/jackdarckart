@@ -32,23 +32,31 @@
       <div>
         <p class="kicker">ACCOUNT-LINK ERFORDERLICH</p>
         <h1 id="auth-title">Synchronisiere dich mit dem Quantum Vault.</h1>
-        <p>Dein Fortschritt bleibt verschlüsselt auf dem Server an deinen Account gebunden und ist nach dem Login auf deinen Geräten verfügbar.</p>
+        <p>Melde dich an oder lege in wenigen Sekunden einen Account an. Dein Fortschritt wird auf dem Server gespeichert und ist nach dem Login auf allen deinen Geräten verfügbar.</p>
       </div>
       <div class="auth-grid">
-        <form id="login-form" class="auth-form">
-          <h2>Login</h2>
-          <label>Handle<input name="handle" autocomplete="username" minlength="3" maxlength="20" required></label>
-          <label>Passwort<input name="password" type="password" autocomplete="current-password" minlength="10" maxlength="128" required></label>
-          <button class="hud-button primary" type="submit">Vault öffnen</button>
+        <form id="login-form" class="auth-form" aria-labelledby="login-title">
+          <h2 id="login-title">Anmelden</h2>
+          <p class="form-intro">Du hast schon einen Account?</p>
+          <label for="login-handle">Handle</label>
+          <input id="login-handle" name="handle" autocomplete="username" autocapitalize="none" spellcheck="false" pattern="[A-Za-z0-9_\-]{3,20}" minlength="3" maxlength="20" required>
+          <label for="login-password">Passwort</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" minlength="10" maxlength="128" required>
+          <button class="hud-button primary" type="submit">Anmelden</button>
         </form>
-        <form id="register-form" class="auth-form">
-          <h2>Registrieren</h2>
-          <label>Handle<input name="handle" autocomplete="username" pattern="[A-Za-z0-9_-]{3,20}" minlength="3" maxlength="20" required></label>
-          <label>Passwort<input name="password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required></label>
-          <button class="hud-button" type="submit">Account erzeugen</button>
+        <form id="register-form" class="auth-form" aria-labelledby="register-title">
+          <h2 id="register-title">Neu registrieren</h2>
+          <p class="form-intro">Neu hier? Wähle einen Spielernamen und ein Passwort.</p>
+          <label for="register-handle">Handle (Spielername)</label>
+          <input id="register-handle" name="handle" autocomplete="username" autocapitalize="none" spellcheck="false" pattern="[A-Za-z0-9_\-]{3,20}" minlength="3" maxlength="20" required aria-describedby="register-handle-hint">
+          <small class="field-hint" id="register-handle-hint">3–20 Zeichen: Buchstaben, Zahlen, _ oder -. Wird im Leaderboard angezeigt.</small>
+          <label for="register-password">Passwort</label>
+          <input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required aria-describedby="register-password-hint">
+          <small class="field-hint" id="register-password-hint">Mindestens 10 Zeichen. Wird nur verschlüsselt (scrypt) gespeichert.</small>
+          <button class="hud-button" type="submit">Account erstellen</button>
         </form>
       </div>
-      <p class="system-message" id="auth-message" aria-live="polite"></p>
+      <p class="system-message" id="auth-message" role="status" aria-live="polite"></p>
     </section>
 
     <section class="game-shell" id="game-shell" hidden>

@@ -20,22 +20,71 @@
   let authGeneration = 0;
   let authPending = false;
 
+  const SESSION_EXPIRED = 'Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.';
+  const MESSAGES = {
+    NETWORK: 'Keine Verbindung zum Server. Prüfe deine Internetverbindung und versuche es erneut.',
+    VAULT_OFFLINE: 'Der Spielserver (Quantum Vault) ist auf dieser Adresse nicht aktiv. Login und Registrierung '
+      + 'funktionieren erst, wenn der Vault-Server läuft. Betreiber: Server mit QUANTUM_VAULT_KEY und „npm start“ starten.',
+    INVALID_CREDENTIALS: 'Handle oder Passwort ist falsch. Prüfe deine Eingabe – noch kein Account? Dann registriere dich.',
+    HANDLE_TAKEN: 'Dieser Handle ist bereits vergeben. Wähle einen anderen Namen oder melde dich an, falls es dein Account ist.',
+    HANDLE_INVALID: 'Der Handle muss 3–20 Zeichen lang sein und darf nur Buchstaben, Zahlen, _ oder - enthalten.',
+    PASSWORD_INVALID: 'Das Passwort muss 10 bis 128 Zeichen lang sein.',
+    RATE_LIMITED: 'Zu viele Versuche. Bitte warte etwa eine Minute und versuche es dann erneut.',
+    SERVICE_BUSY: 'Der Server ist gerade ausgelastet. Bitte versuche es in ein paar Sekunden erneut.',
+    SESSION_REQUIRED: SESSION_EXPIRED,
+    CROSS_ORIGIN: 'Die Anfrage wurde aus Sicherheitsgründen blockiert. Öffne das Spiel direkt über diese Website und lade die Seite neu.',
+    BODY_TOO_LARGE: 'Die Eingabe ist zu lang. Bitte kürze Handle oder Passwort.',
+    INVALID_JSON: 'Die Anfrage war ungültig. Bitte lade die Seite neu und versuche es erneut.',
+    VAULT_DATA_INVALID: 'Der Quantum Vault ist falsch konfiguriert (Schlüssel oder Datendatei). Bitte später erneut versuchen.',
+    INTERNAL_ERROR: 'Interner Serverfehler im Quantum Vault. Bitte versuche es später erneut.',
+    ACTION_COOLDOWN: 'Der Harvester lädt noch – warte einen Moment.'
+  };
+  const FIELD_FOR_CODE = {
+    HANDLE_INVALID: 'handle',
+    HANDLE_TAKEN: 'handle',
+    PASSWORD_INVALID: 'password',
+    INVALID_CREDENTIALS: 'password'
+  };
+
+  function vaultError(code, serverMessage) {
+    const error = new Error(MESSAGES[code] || serverMessage || MESSAGES.INTERNAL_ERROR);
+    error.code = code;
+    error.status = 0;
+    return error;
+  }
+
   async function request(route, options) {
     const settings = Object.assign({ credentials: 'same-origin', headers: {} }, options || {});
     if (settings.body) settings.headers['Content-Type'] = 'application/json';
-    const response = await fetch(`${API}${route}`, settings);
-    let payload = {};
+    let response;
     try {
-      payload = await response.json();
-    } catch (error) {
-      payload = {};
+      response = await fetch(`${API}${route}`, settings);
+    } catch (networkError) {
+      throw vaultError('NETWORK');
     }
-    if (!response.ok) {
-      const error = new Error(payload.error || 'Vault ist nicht erreichbar.');
+    const isJson = /application\/json/i.test(response.headers.get('Content-Type') || '');
+    let payload = null;
+    if (isJson) {
+      try {
+        payload = await response.json();
+      } catch (parseError) {
+        payload = null;
+      }
+    }
+    // HTML/plain responses mean no Vault server answered (e.g. static hosting or a proxy error).
+    const offline = !payload || typeof payload !== 'object';
+    if (offline || !response.ok) {
+      const error = offline
+        ? vaultError('VAULT_OFFLINE')
+        : vaultError(payload.code || 'INTERNAL_ERROR', payload.error);
       error.status = response.status;
       throw error;
     }
     return payload;
+  }
+
+  function isOffline(error) {
+    return error.code === 'NETWORK' || error.code === 'VAULT_OFFLINE';
   }
 
   function setMessage(target, message, isError) {
@@ -43,9 +92,30 @@
     target.classList.toggle('error', Boolean(isError));
   }
 
-  function setConnection(state, message) {
+  function setConnection(state, message, hint) {
     elements.connection.className = `connection ${state}`;
     elements.connection.lastChild.textContent = message;
+    elements.connection.title = hint || message;
+  }
+
+  function setOfflineConnection(error) {
+    if (error.code === 'NETWORK') setConnection('offline', 'Keine Verbindung – Internet prüfen', error.message);
+    else setConnection('offline', 'Vault-Server offline', error.message);
+  }
+
+  function markField(form, field) {
+    form.querySelectorAll('input').forEach((input) => {
+      input.removeAttribute('aria-invalid');
+    });
+    const input = field && form.elements.namedItem(field);
+    if (!input) return;
+    input.setAttribute('aria-invalid', 'true');
+    input.focus();
+  }
+
+  function sessionExpired() {
+    showAuth(SESSION_EXPIRED);
+    setConnection('', 'Session abgelaufen – bitte neu anmelden');
   }
 
   function setText(id, value) {
@@ -104,22 +174,29 @@
     });
     const generation = ++authGeneration;
     const data = new FormData(form);
-    setMessage(elements.authMessage, 'Authentifizierung läuft …', false);
+    markField(form, null);
+    setMessage(elements.authMessage, route === '/register' ? 'Account wird erstellt …' : 'Anmeldung läuft …', false);
     try {
       const payload = await request(route, {
         method: 'POST',
         body: JSON.stringify({ handle: data.get('handle'), password: data.get('password') })
       });
       if (generation !== authGeneration) return;
-      form.reset();
+      document.querySelectorAll('.auth-form').forEach((authForm) => {
+        authForm.reset();
+        markField(authForm, null);
+      });
       render(payload);
       startAutosave();
       setMessage(elements.gameMessage, 'Quantum Vault synchronisiert.', false);
       loadLeaderboard();
     } catch (error) {
       if (generation !== authGeneration) return;
-      setConnection('offline', 'Vault-Link fehlgeschlagen');
+      if (isOffline(error)) setOfflineConnection(error);
+      else if (error.status >= 500) setConnection('offline', 'Vault-Fehler – später erneut versuchen', error.message);
+      else setConnection('', 'Vault online – bitte anmelden');
       setMessage(elements.authMessage, error.message, true);
+      markField(form, FIELD_FOR_CODE[error.code]);
     } finally {
       if (generation === authGeneration) {
         authPending = false;
@@ -146,10 +223,10 @@
     } catch (error) {
       if (generation !== authGeneration) return;
       if (error.status === 401) {
-        showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
-        setConnection('offline', 'Session abgelaufen');
+        sessionExpired();
         return;
       }
+      if (isOffline(error)) setOfflineConnection(error);
       setMessage(elements.gameMessage, error.message, true);
     } finally {
       const cooldown = body.action === 'harvest' ? 720 : 0;
@@ -175,11 +252,11 @@
     } catch (error) {
       if (generation !== authGeneration) return;
       if (error.status === 401) {
-        showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
-        setConnection('offline', 'Session abgelaufen');
+        sessionExpired();
         return;
       }
-      elements.saveState.textContent = 'Speichern fehlgeschlagen';
+      if (isOffline(error)) setOfflineConnection(error);
+      elements.saveState.textContent = 'Speichern fehlgeschlagen – erneut versuchen';
       setMessage(elements.gameMessage, error.message, true);
     } finally {
       button.disabled = false;
@@ -204,7 +281,11 @@
         elements.leaderboard.append(empty);
       }
     } catch (error) {
-      elements.leaderboard.textContent = 'Leaderboard nicht erreichbar.';
+      const item = document.createElement('li');
+      const text = document.createElement('span');
+      text.textContent = isOffline(error) ? 'Leaderboard nicht verfügbar – Vault-Server offline' : 'Leaderboard konnte nicht geladen werden';
+      item.append(text);
+      elements.leaderboard.replaceChildren(item);
     }
   }
 
@@ -237,8 +318,7 @@
     } catch (error) {
       if (generation !== authGeneration) return;
       if (error.status === 401) {
-        showAuth('Deine Session ist abgelaufen. Bitte melde dich erneut an.');
-        setConnection('offline', 'Session abgelaufen');
+        sessionExpired();
         return;
       }
       setMessage(elements.gameMessage, error.message, true);
@@ -246,20 +326,30 @@
     }
     if (generation !== authGeneration) return;
     showAuth('Session beendet. Dein Fortschritt bleibt im Vault.');
-    setConnection('', 'Bereit für Login');
+    setConnection('', 'Vault online – bitte anmelden');
   });
 
-  const bootstrapGeneration = authGeneration;
+  let bootstrapGeneration = authGeneration;
+  let bootstrapError = null;
   Promise.all([
     request('/session').then((payload) => {
       if (bootstrapGeneration !== authGeneration) return;
       render(payload);
       startAutosave();
-    }).catch(() => {
-      if (bootstrapGeneration === authGeneration) showAuth();
+    }).catch((error) => {
+      if (bootstrapGeneration !== authGeneration) return;
+      showAuth();
+      bootstrapGeneration = authGeneration;
+      if (error.code !== 'SESSION_REQUIRED') {
+        bootstrapError = error;
+        setMessage(elements.authMessage, error.message, true);
+      }
     }),
     loadLeaderboard()
   ]).finally(() => {
-    if (!currentState) setConnection('', 'Bereit für Login');
+    if (currentState || bootstrapGeneration !== authGeneration) return;
+    if (bootstrapError && isOffline(bootstrapError)) setOfflineConnection(bootstrapError);
+    else if (bootstrapError) setConnection('offline', 'Vault-Fehler – später erneut versuchen', bootstrapError.message);
+    else setConnection('', 'Vault online – bitte anmelden');
   });
 }());

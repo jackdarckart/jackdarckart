@@ -1963,6 +1963,22 @@ function testQuantumVaultGameIntegration() {
   assert.match(gameJs, /generation\s*!==\s*authGeneration/);
   assert.match(gameJs, /error\.status\s*===\s*401/);
   assert.match(gameJs, /if\s*\(authPending\)\s*return/);
+  ['INVALID_CREDENTIALS', 'HANDLE_TAKEN', 'HANDLE_INVALID', 'PASSWORD_INVALID', 'RATE_LIMITED',
+    'SESSION_REQUIRED', 'VAULT_OFFLINE', 'NETWORK', 'INTERNAL_ERROR'].forEach((code) => {
+    assert.match(gameJs, new RegExp(`\\b${code}:\\s*('|SESSION_EXPIRED)`), `game client should map ${code} to a German message`);
+  });
+  assert.doesNotMatch(gameJs, /Vault ist nicht erreichbar\./,
+    'game client should replace the generic vault error with actionable guidance');
+  assert.match(gameJs, /payload\.code/, 'game client should read structured server error codes');
+  assert.match(gameJs, /application\\\/json/, 'non-JSON responses should be treated as an offline vault server');
+  ['register-handle-hint', 'register-password-hint'].forEach((id) => {
+    assert.match(gameHtml, new RegExp(`aria-describedby="${id}"`), `${id} should describe its register input`);
+    assert.match(gameHtml, new RegExp(`id="${id}"`), `${id} should exist`);
+  });
+  ['login-handle', 'login-password', 'register-handle', 'register-password'].forEach((id) => {
+    assert.match(gameHtml, new RegExp(`<label for="${id}">`), `${id} should have an explicit label`);
+  });
+  assert.match(gameHtml, /id="auth-message" role="status" aria-live="polite"/);
   assert.match(swCode, /'\.\/game\.html'/);
   assert.match(swCode, /'\.\/game\.js'/);
   assert.match(swCode, /'\.\/game\.css'/);
