@@ -2209,6 +2209,18 @@ html[data-theme="light"] .sticky-player {
   margin-top: 1.1rem;
 }
 
+.converter-render-progress {
+  display: block;
+  width: 100%;
+  height: 0.5rem;
+  margin-top: 0.9rem;
+  accent-color: rgba(77, 220, 255, 0.85);
+}
+
+.converter-render-progress[hidden] {
+  display: none;
+}
+
 .converter-meta-grid,
 .converter-control-grid,
 .converter-export-grid {

@@ -705,6 +705,7 @@ function createConverterEnvironment(options = {}) {
     'converter-render-state',
     'converter-render-state-text',
     'converter-render-status',
+    'converter-render-progress',
     'converter-cleanup-timer',
     'converter-cleanup-state',
     'converter-analysis-summary',
@@ -1981,7 +1982,7 @@ function testQuantumVaultGameIntegration() {
     'game client must not use browser persistence or submit account identifiers');
   assert.match(gameJs, /credentials:\s*'include'/);
   assert.match(gameHtml, /connect-src 'self' https:\/\/vault\.stream-musik\.space/);
-  assert.match(swCode, /stream-musik-space-v8/, 'cache version bump must invalidate cached game and converter scripts');
+  assert.match(swCode, /stream-musik-space-v9/, 'cache version bump must invalidate cached game and converter scripts');
   assert.match(gameHtml, /Cloudflare-Cookie/);
   assert.match(gameHtml, /Passwort-Hash \(PBKDF2\)/);
   assert.match(gameJs, /error\.status\s*=\s*response\.status/);
@@ -4281,6 +4282,332 @@ async function testConverterCloudSyncUsesCloudflareWorker() {
   studio.destroy();
 }
 
+function createTestAudioBuffer(channels, sampleRate) {
+  return {
+    sampleRate,
+    numberOfChannels: channels.length,
+    length: channels[0].length,
+    duration: channels[0].length / sampleRate,
+    getChannelData(index) {
+      return channels[index];
+    }
+  };
+}
+
+function testConverterRenderFinishMatchesPreviewAndLimitsCleanly() {
+  const env = createConverterEnvironment();
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  const core = studio._coreForTest;
+  const sampleRate = 44100;
+  const length = sampleRate;
+  const left = Float32Array.from({ length }, (_, i) => Math.sin(2 * Math.PI * 220 * i / sampleRate) * 0.2);
+  const right = Float32Array.from(left, (value) => value * 0.5);
+  const settings = { limiterCeiling: -1, targetLufs: -20, stereoWidth: 200 };
+  const result = core.finalizeRenderedBuffer(createTestAudioBuffer([left, right], sampleRate), settings);
+  const outLeft = result.buffer.getChannelData(0);
+  const outRight = result.buffer.getChannelData(1);
+  for (const index of [100, 5000, 30000]) {
+    assert.ok(Math.abs(outRight[index] - outLeft[index] * 0.5) < 1e-6,
+      'the finish stage must not apply stereo width a second time – the export has to match the preview chain');
+  }
+  assert.ok(Math.abs(result.report.outputApproxLufs - -20) < 0.2, 'quiet material should be normalised exactly to the loudness target');
+  assert.equal(result.report.limiterReductionDb, 0, 'no limiting should happen when the peaks stay below the ceiling');
+
+  // Sparse transients: the old static gain dropped the whole song to fit the
+  // spike, the lookahead limiter catches the spike and keeps the target.
+  const ceiling = Math.pow(10, -1 / 20);
+  const spiky = Float32Array.from({ length }, (_, i) => Math.sin(2 * Math.PI * 330 * i / sampleRate) * 0.1);
+  spiky[20000] = 0.4;
+  spiky[20001] = -0.4;
+  spiky[100] = Number.NaN;
+  const loud = core.finalizeRenderedBuffer(createTestAudioBuffer([spiky], sampleRate), { limiterCeiling: -1, targetLufs: -10, stereoWidth: 100 });
+  const output = loud.buffer.getChannelData(0);
+  let peak = 0;
+  let finite = true;
+  for (const value of output) {
+    finite = finite && Number.isFinite(value);
+    peak = Math.max(peak, Math.abs(value));
+  }
+  assert.ok(finite, 'non-finite DSP samples must be sanitised before export');
+  assert.equal(loud.report.sanitizedSamples, 1, 'the finish report should count sanitised samples');
+  assert.ok(peak <= ceiling + 1e-6, 'the lookahead limiter must keep every sample at or below the ceiling');
+  assert.ok(loud.report.limiterReductionDb > 0.5 && loud.report.limiterReductionDb <= 4.01,
+    'the limiter should reduce spikes by at most the configured 4 dB');
+  const legacyStaticLoudness = 20 * Math.log10(0.1 / Math.sqrt(2) * ceiling / 0.4);
+  assert.ok(loud.report.outputApproxLufs > legacyStaticLoudness + 3,
+    'the limiter should keep the master clearly louder than a static peak-normalisation');
+  const windowPeak = (from, to) => output.slice(from, to).reduce((max, value) => Math.max(max, Math.abs(value)), 0);
+  assert.ok(Math.abs(windowPeak(5000, 19500) - windowPeak(40000, 43000)) < 1e-3 && windowPeak(5000, 19500) > 0.25,
+    'material away from the spike must not be ducked');
+  assert.equal(Math.abs(output[length - 1]), 0, 'the anti-click fade must bring the last sample to silence');
+
+  const silent = core.finalizeRenderedBuffer(createTestAudioBuffer([new Float32Array(4096)], sampleRate), settings);
+  assert.equal(silent.report.loudnessShortfallDb, 0, 'silent renders must not report a loudness shortfall');
+  assert.ok(silent.buffer.getChannelData(0).every((value) => value === 0), 'silence must stay silent');
+}
+
+async function testConverterWavEncoderWritesDitheredPcm() {
+  const env = createConverterEnvironment();
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  const left = new Float32Array([0, 0.5, -0.5, 1.2, -1.2, 0]);
+  const right = new Float32Array([0, -0.25, 0.25, 0, 0, 0]);
+  const blob = studio._encodeWavForTest(createTestAudioBuffer([left, right], 48000));
+  const bytes = Buffer.from(await blob.arrayBuffer());
+  assert.equal(blob.type, 'audio/wav');
+  assert.equal(bytes.length, 44 + 6 * 2 * 2, 'the WAV file should contain exactly header plus 16-bit stereo frames');
+  assert.equal(bytes.toString('ascii', 0, 4), 'RIFF');
+  assert.equal(bytes.readUInt32LE(4), 36 + 24);
+  assert.equal(bytes.readUInt16LE(20), 1, 'WAV export must be PCM');
+  assert.equal(bytes.readUInt16LE(22), 2);
+  assert.equal(bytes.readUInt32LE(24), 48000, 'the WAV header must carry the rendered sample rate');
+  assert.equal(bytes.readUInt32LE(28), 48000 * 4);
+  assert.equal(bytes.readUInt16LE(32), 4);
+  assert.equal(bytes.readUInt16LE(34), 16);
+  assert.equal(bytes.readUInt32LE(40), 24);
+  const samples = Array.from({ length: 12 }, (_, i) => bytes.readInt16LE(44 + i * 2));
+  assert.equal(samples[0], 0, 'digital silence must stay exactly zero (no dither noise floor)');
+  assert.equal(samples[1], 0);
+  assert.ok(Math.abs(samples[2] - 16384) <= 1, 'dithered samples should stay within one LSB of the exact value');
+  assert.ok(Math.abs(samples[3] - -8192) <= 1, 'channels must be interleaved left/right');
+  assert.ok(Math.abs(samples[4] - -16384) <= 1);
+  assert.ok(Math.abs(samples[5] - 8192) <= 1);
+  assert.equal(samples[6], 32767, 'overs must clamp to full scale instead of wrapping');
+  assert.equal(samples[8], -32768);
+  assert.equal(samples[11], 0);
+}
+
+async function testConverterLocalMp3EncodesInChunksWithProgress() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder {
+      static isTypeSupported() {
+        return false;
+      }
+    }
+  });
+  loadBundledMp3Encoder(env);
+  let encodeCalls = 0;
+  const OriginalMp3Encoder = env.context.lamejs.Mp3Encoder;
+  env.context.lamejs.Mp3Encoder = function CountingMp3Encoder(...args) {
+    const encoder = new OriginalMp3Encoder(...args);
+    const encodeBuffer = encoder.encodeBuffer.bind(encoder);
+    encoder.encodeBuffer = (...buffers) => {
+      encodeCalls += 1;
+      return encodeBuffer(...buffers);
+    };
+    return encoder;
+  };
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  const sampleRate = 44100;
+  const length = 1152 * 80;
+  const tone = Float32Array.from({ length }, (_, i) => Math.sin(2 * Math.PI * 440 * i / sampleRate) * 0.3);
+  const progress = [];
+  const blob = await studio._renderMp3ExportForTest(createTestAudioBuffer([tone, tone], sampleRate), 192000, {
+    onProgress(fraction) {
+      progress.push(fraction);
+    }
+  });
+  assert.equal(blob.type, 'audio/mpeg');
+  assert.ok(blob.size > 1000, 'chunked local MP3 encoding should produce a complete file');
+  assert.equal(encodeCalls, 3, 'local MP3 encoding should use large chunks instead of one call per 1152-sample frame');
+  assert.ok(progress.length >= 2, 'local MP3 encoding should report progress');
+  assert.equal(progress[progress.length - 1], 1, 'progress must end at 100 %');
+  assert.ok(progress.every((value, index) => index === 0 || value >= progress[index - 1]), 'progress must be monotonic');
+}
+
+async function testConverterRealtimeExportWatchdogAndEmptyOutput() {
+  const env = createConverterEnvironment();
+  class SilentSource {
+    connect() {}
+    addEventListener() {}
+    start() {}
+  }
+  class FakeAudioContext {
+    constructor() { this.currentTime = 0; }
+    createBufferSource() { return new SilentSource(); }
+    createMediaStreamDestination() { return { stream: {} }; }
+    async resume() {}
+    async close() { env.markAudioContextClosed(); }
+  }
+  class StalledMediaRecorder {
+    static isTypeSupported(mimeType) { return mimeType === 'audio/webm;codecs=opus'; }
+    constructor(stream, options) {
+      this.state = 'inactive';
+      this.options = options;
+      this.listeners = new Map();
+    }
+    addEventListener(type, listener) { this.listeners.set(type, listener); }
+    start(timeslice) {
+      this.timeslice = timeslice;
+      this.state = 'recording';
+      env.startedRecorder = this;
+    }
+    stop() { this.state = 'inactive'; }
+  }
+  env.window.AudioContext = FakeAudioContext;
+  env.window.MediaRecorder = StalledMediaRecorder;
+  env.context.MediaRecorder = StalledMediaRecorder;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+
+  const format = { id: 'webm-opus', mimeType: 'audio/webm;codecs=opus', extension: 'webm' };
+  const pending = studio._recordCompressedExportForTest({ sampleRate: 48000, duration: 2, length: 96000 }, format, 192000);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(env.startedRecorder.timeslice, 1000, 'realtime exports should collect data in 1 s slices');
+  env.runTimersByDelay(2 * 1500 + 15000);
+  await assert.rejects(pending, /nicht rechtzeitig/, 'a stalled realtime encoder must fail with a clear message instead of hanging');
+  assert.equal(env.getClosedAudioContexts(), 1, 'the watchdog must close the temporary audio context');
+
+  class EmptyMediaRecorder extends StalledMediaRecorder {
+    stop() {
+      this.state = 'inactive';
+      this.listeners.get('stop')();
+    }
+  }
+  class EndingSource {
+    addEventListener(type, listener) { this.listener = listener; }
+    connect() {}
+    start() { this.listener(); }
+  }
+  FakeAudioContext.prototype.createBufferSource = () => new EndingSource();
+  env.window.MediaRecorder = EmptyMediaRecorder;
+  env.context.MediaRecorder = EmptyMediaRecorder;
+  await assert.rejects(
+    studio._recordCompressedExportForTest({ sampleRate: 48000 }, format, 192000),
+    /leere Datei/,
+    'an empty recording must be reported instead of offering a broken download'
+  );
+}
+
+async function testConverterServerMp3ErrorsAreExplicit() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder { static isTypeSupported() { return false; } },
+    config: { converter: { mp3Export: { serverEndpoint: '/api/converter/mp3' } } }
+  });
+  env.context.__JACKDARCKART_CONFIG__ = env.window.__JACKDARCKART_CONFIG__;
+  let mode = 'status';
+  env.window.fetch = async () => {
+    if (mode === 'network') {
+      throw new Error('offline');
+    }
+    if (mode === 'empty') {
+      return { ok: true, async blob() { return new Blob([], { type: 'audio/mpeg' }); } };
+    }
+    return { ok: false, status: 503 };
+  };
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  const buffer = createTestAudioBuffer([new Float32Array([0, 0.1, -0.1, 0])], 44100);
+  await assert.rejects(studio._renderMp3ExportForTest(buffer, 192000), /HTTP 503/, 'server errors should include the HTTP status');
+  mode = 'network';
+  await assert.rejects(studio._renderMp3ExportForTest(buffer, 192000), /nicht erreichbar/, 'network failures should be explained');
+  mode = 'empty';
+  await assert.rejects(studio._renderMp3ExportForTest(buffer, 192000), /leere Datei/, 'empty MP3 responses must be rejected');
+}
+
+async function testConverterRenderFlowProgressGuardsAndSummary() {
+  const env = createConverterEnvironment({
+    AudioContext: function FakeAudioContext() {},
+    MediaRecorder: class FakeMediaRecorder { static isTypeSupported() { return false; } }
+  });
+  loadBundledMp3Encoder(env);
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  const sampleRate = 44100;
+  const tone = Float32Array.from({ length: sampleRate }, (_, i) => Math.sin(2 * Math.PI * 440 * i / sampleRate) * 0.3);
+  const source = createTestAudioBuffer([tone, tone], sampleRate);
+  env.window.AudioContext = class FakeAudioContext {
+    decodeAudioData(data, resolve) { resolve(source); }
+    async close() {}
+  };
+  env.elements['converter-auto-enhance-toggle'].checked = false;
+  const file = { name: 'Song Final.wav', size: 10, type: 'audio/wav', async arrayBuffer() { return new ArrayBuffer(10); } };
+  env.elements['converter-file-input'].files = [file];
+  await env.elements['converter-file-input'].dispatch('change');
+
+  const core = studio._coreForTest;
+  const renderCalls = [];
+  const statusDuringRender = [];
+  let releaseRender = null;
+  core.render = async function (buffer, settings, rate, options) {
+    renderCalls.push({ rate, settings });
+    statusDuringRender.push(env.elements['converter-render-status'].textContent);
+    assert.equal(env.elements['converter-render-button'].disabled, true, 'the render button must be locked while rendering');
+    assert.equal(env.elements['converter-render-button'].textContent, 'Rendert …');
+    assert.equal(env.elements['converter-format-select'].disabled, true, 'export settings must be locked during a render');
+    assert.equal(env.elements['converter-render-progress'].hidden, false, 'the progress bar should be visible while rendering');
+    await new Promise((resolve) => { releaseRender = resolve; });
+    await options.onStage('finish');
+    statusDuringRender.push(env.elements['converter-render-status'].textContent);
+    const rendered = createTestAudioBuffer([new Float32Array(tone), new Float32Array(tone)], rate);
+    return this.finalizeRenderedBuffer(rendered, settings);
+  };
+
+  // WAV: two clicks during one render must start exactly one render.
+  const first = env.elements['converter-render-button'].dispatch('click');
+  await new Promise((resolve) => setImmediate(resolve));
+  await env.elements['converter-render-button'].dispatch('click');
+  assert.equal(renderCalls.length, 1, 'double clicks must not start parallel renders');
+  releaseRender();
+  await first;
+  assert.match(statusDuringRender[0], /^Schritt 1\/3: Mastering-Kette/, 'the first step should be explained to the user');
+  assert.match(statusDuringRender[1], /^Schritt 2\/3: Mastering-Finish.*Lookahead-Limiter/, 'the finish step should be explained');
+  const status = env.elements['converter-render-status'].textContent;
+  assert.match(status, /^Render erfolgreich in .*: WAV · 16 Bit PCM · 44\.1 kHz · Stereo · 0:01 · \d+ KB\./, 'success text should summarise the export');
+  assert.match(status, /maximal 2:00/);
+  assert.equal(studio._hasRenderedAssetForTest(), true);
+  assert.match(env.elements['converter-download-button'].textContent, /^Master herunterladen \(WAV · \d+ KB\)$/, 'download button should show format and size');
+  assert.match(env.elements['converter-analysis-summary'].innerHTML, /<strong>Export:<\/strong> WAV · 16 Bit PCM/);
+  assert.equal(env.elements['converter-render-progress'].hidden, true, 'the progress bar should hide after rendering');
+  assert.equal(env.elements['converter-render-button'].textContent, 'Master rendern');
+  assert.equal(env.elements['converter-render-button'].disabled, false);
+  assert.equal(env.elements['converter-format-select'].disabled, false);
+
+  // MP3 at 96 kHz renders at an MP3-compatible rate and keeps the chosen bitrate.
+  env.elements['converter-format-select'].value = 'mp3';
+  await env.elements['converter-format-select'].dispatch('change');
+  env.elements['converter-bitrate-select'].value = '320000';
+  studio._refreshExportFormatsForTest();
+  assert.equal(env.elements['converter-bitrate-select'].value, '320000', 'capability refreshes must keep the user-selected bitrate');
+  env.elements['converter-samplerate-select'].value = '96000';
+  const mp3Render = env.elements['converter-render-button'].dispatch('click');
+  await new Promise((resolve) => setImmediate(resolve));
+  releaseRender();
+  await mp3Render;
+  assert.equal(renderCalls[1].rate, 48000, 'MP3 renders must target an MP3-compatible sample rate');
+  assert.match(env.elements['converter-render-status'].textContent, /MP3 · 320 kbps · 48\.0 kHz/, 'the summary should show the effective MP3 settings');
+  assert.match(env.elements['converter-render-status'].textContent, /Samplerate für MP3 auf 48\.0 kHz angepasst/, 'the rate adaptation should be disclosed');
+  assert.match(env.elements['converter-download-button'].textContent, /^Master herunterladen \(MP3 · /);
+
+  // A reset during a render must discard the stale result.
+  env.elements['converter-samplerate-select'].value = 'source';
+  const staleRender = env.elements['converter-render-button'].dispatch('click');
+  await new Promise((resolve) => setImmediate(resolve));
+  await env.elements['converter-reset-button'].dispatch('click');
+  releaseRender();
+  await staleRender;
+  assert.equal(studio._hasRenderedAssetForTest(), false, 'renders finished after a reset must not store an asset');
+  assert.match(env.elements['converter-import-status'].textContent, /zurückgesetzt/);
+  assert.equal(env.elements['converter-render-button'].disabled, true, 'without a source the render button stays disabled');
+
+  // Errors are mapped to actionable messages.
+  await env.elements['converter-file-input'].dispatch('change');
+  core.render = async () => {
+    throw new RangeError('Array buffer allocation failed');
+  };
+  await env.elements['converter-render-button'].dispatch('click');
+  assert.equal(env.elements['converter-render-state'].dataset.state, 'error');
+  assert.match(env.elements['converter-render-status'].textContent, /Nicht genug Arbeitsspeicher.*niedrigere Samplerate/);
+  assert.equal(env.elements['converter-render-button'].disabled, false, 'the render button must be usable again after an error');
+}
+
 async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
@@ -4298,6 +4625,12 @@ async function main() {
   await testConverterNativeMp3MimeDetectionSupportsAlternateMimeTypes();
   await testConverterFormatRefreshClearsUnavailableSelection();
   await testConverterMp3CompressedExportPath();
+  testConverterRenderFinishMatchesPreviewAndLimitsCleanly();
+  await testConverterWavEncoderWritesDitheredPcm();
+  await testConverterLocalMp3EncodesInChunksWithProgress();
+  await testConverterRealtimeExportWatchdogAndEmptyOutput();
+  await testConverterServerMp3ErrorsAreExplicit();
+  await testConverterRenderFlowProgressGuardsAndSummary();
   testConverterDownloadClearsTemporaryAsset();
   await testConverterCloudSyncWithoutConfigurationIsHonest();
   await testConverterCloudSyncUsesCloudflareWorker();

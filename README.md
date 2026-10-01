@@ -97,7 +97,7 @@ Auto-Enhance schätzt lokal in einem schnellen Durchlauf Frequenzbalance, Dynami
 
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
-- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive Quellenanalyse mit Qualitäts-Score und Befunden, Auto-Enhance in den Stärken dezent/sanft/ausgewogen/kräftig/intensiv/maximal, lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und `CloudflareStudioSyncAdapter` für Studio-Presets
+- `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive Quellenanalyse mit Qualitäts-Score und Befunden, Auto-Enhance in den Stärken dezent/sanft/ausgewogen/kräftig/intensiv/maximal, lokaler Preview, Waveform/Spectrum, dreistufigem Render (Offline-Render identisch zur Preview → Lautheits-Finish mit Lookahead-Limiter → Kodierung mit TPDF-Dither) mit Fortschrittsanzeige, MP3/WAV-Export, Cleanup-Timer und `CloudflareStudioSyncAdapter` für Studio-Presets
 - `game.js` / `game.css` – eigenständige Spieloberfläche und responsives Sci-Fi/HUD-Design
 - `server/quantum-vault.js` – Pure-Node-Server mit scrypt-Accounts, HttpOnly-Sessions, verschlüsselter Vault-Persistenz und serverseitigen Spielregeln
 - `server/suno-downloader.js` – dedizierte, abgesicherte Node-Referenzimplementierung des Suno-Downloaders mit SSRF-Schutz und Signaturprüfung

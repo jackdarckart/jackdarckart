@@ -92,7 +92,7 @@
             <li><strong>Qualitäts-Check:</strong> automatische Bewertung von Clipping, Dynamik, Höhen, Stereobild und Lautheit.</li>
             <li><strong>Auto-Enhance:</strong> passende Korrektur inklusive Artefakt-Reinigung, in sechs Stärken von „dezent“ bis „maximal“ und mit Rückgängig.</li>
             <li><strong>Feinschliff:</strong> EQ, Kompressor, Limiter, Stereo-Width und Loudness-Ziel manuell justieren.</li>
-            <li><strong>Export:</strong> lokale Renderdatei mit sichtbarer 2:00-Cleanup-Phase.</li>
+            <li><strong>Export:</strong> Offline-Render, Lautheits-Finish mit Lookahead-Limiter und Dither, danach lokale Renderdatei mit sichtbarer 2:00-Cleanup-Phase.</li>
           </ol>
           <p class="note">LUFS-Normierung und Limiter arbeiten hier best-effort approximativ auf Browser-Basis. Ein zukünftiger WASM-/DSP-Core kann über denselben Adapter eingebunden werden.</p>
         </aside>
@@ -287,6 +287,7 @@
               </select>
             </label>
           </div>
+          <p class="note compact-note">Ablauf in drei Schritten: <strong>1.</strong> Offline-Render der Mastering-Kette (identisch zur Preview), <strong>2.</strong> Lautheits-Finish mit Lookahead-Limiter auf das eingestellte Ceiling, <strong>3.</strong> Kodierung ins Zielformat (16-Bit-WAV und lokales MP3 mit Dither). MP3 nutzt automatisch eine passende Samplerate (max. 48 kHz), Opus arbeitet immer mit 48 kHz.</p>
           <p class="note compact-note" id="converter-format-note">WAV ist immer verlustfrei verfügbar. MP3 steht standardmäßig lokal im Browser bereit; WebM/Opus und Ogg/Opus bleiben browserabhängig und werden nur bei nativer Unterstützung angeboten.</p>
           <div class="actions converter-export-actions">
             <button class="button primary" id="converter-render-button" type="button" disabled>Master rendern</button>
@@ -297,6 +298,7 @@
             <span class="status-dot" aria-hidden="true"></span>
             <span id="converter-render-state-text">Bereit – nach dem Laden einer Datei kann lokal gerendert werden.</span>
           </div>
+          <progress class="converter-render-progress" id="converter-render-progress" max="100" value="0" aria-label="Render-Fortschritt" hidden></progress>
           <p class="share-status note" id="converter-render-status" aria-live="polite">Noch keine temporäre Master-Datei im Speicher.</p>
           <div class="converter-cleanup-shell" aria-live="polite">
             <p class="meta-label">Privacy-First Cleanup</p>
