@@ -682,7 +682,13 @@
     }
 
     async function adoptDecodedSource(source, arrayBuffer) {
-      const context = await ensureAudioContext();
+      let context = null;
+      try {
+        context = await ensureAudioContext();
+      } catch (error) {
+        throw new Error('Die Web Audio API steht in diesem Browser nicht zur Verfügung.');
+      }
+
       let buffer = null;
       try {
         buffer = await decodeAudioBuffer(context, arrayBuffer);
@@ -1765,14 +1771,14 @@
     if (ipv4) {
       return isBlockedIpv4Address(ipv4);
     }
+    if (/^(?:0x[0-9a-f]+|\d+)(?:\.(?:0x[0-9a-f]+|\d+))*$/.test(host)) {
+      return true;
+    }
     const labels = host.split('.');
     if (labels.length < 2) {
       return true;
     }
-    if (/^(?:0x[0-9a-f]+|\d+)(?:\.(?:0x[0-9a-f]+|\d+))*$/.test(host)) {
-      return true;
-    }
-    if (!/^[a-z]{2,}$/.test(labels[labels.length - 1])) {
+    if (!/^(?:[a-z]{2,}|xn--[a-z0-9-]{2,})$/.test(labels[labels.length - 1])) {
       return true;
     }
     return labels.some((label) => !/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(label));
@@ -1790,7 +1796,7 @@
     return 'https://cdn1.suno.ai/' + match[1] + '.mp3';
   }
 
-  function validateRemoteAudioUrl(value) {
+  function inspectRemoteAudioUrl(value) {
     const trimmed = typeof value === 'string' ? value.trim() : '';
     if (!trimmed) {
       return { ok: false, reason: 'Bitte zuerst eine HTTPS-Audio-URL oder einen Suno-Share-Link einfügen.' };
@@ -1811,7 +1817,15 @@
     if (isBlockedRemoteHostname(url.hostname)) {
       return { ok: false, reason: 'Lokale, private oder interne Ziele sind blockiert (SSRF-Schutz).' };
     }
-    return { ok: true, url: resolveSunoShareUrl(url) };
+    return { ok: true, url };
+  }
+
+  function validateRemoteAudioUrl(value) {
+    const inspected = inspectRemoteAudioUrl(value);
+    if (!inspected.ok) {
+      return inspected;
+    }
+    return { ok: true, url: resolveSunoShareUrl(inspected.url) };
   }
 
   function normalizeRemoteContentType(contentType) {
@@ -1840,7 +1854,13 @@
       return true;
     }
     if (bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0) {
-      return true;
+      const isReservedVersion = (bytes[1] & 0x18) === 0x08;
+      const layer = bytes[1] & 0x06;
+      const isAdtsAac = (bytes[1] & 0xf0) === 0xf0 && layer === 0x00;
+      const hasValidMpegBitrate = (bytes[2] & 0xf0) !== 0xf0;
+      if (!isReservedVersion && (isAdtsAac || (layer !== 0x00 && hasValidMpegBitrate))) {
+        return true;
+      }
     }
     if (head === 'RIFF' && ascii(8, 4) === 'WAVE') {
       return true;
@@ -1858,6 +1878,53 @@
       return true;
     }
     return false;
+  }
+
+  function createRemoteQuotaError() {
+    const error = new Error('Die Remote-Datei überschreitet das Speicherlimit von ' + formatBytes(REMOTE_IMPORT_MAX_BYTES) + '.');
+    error.quotaExceeded = true;
+    return error;
+  }
+
+  async function readRemoteBodyWithQuota(response) {
+    const body = response.body;
+    if (!body || typeof body.getReader !== 'function') {
+      return response.arrayBuffer();
+    }
+
+    const reader = body.getReader();
+    const chunks = [];
+    let totalLength = 0;
+
+    try {
+      for (;;) {
+        const chunk = await reader.read();
+        if (chunk.done) {
+          break;
+        }
+        const value = chunk.value;
+        if (!value || !value.length) {
+          continue;
+        }
+        totalLength += value.length;
+        if (totalLength > REMOTE_IMPORT_MAX_BYTES) {
+          throw createRemoteQuotaError();
+        }
+        chunks.push(value);
+      }
+    } finally {
+      if (typeof reader.cancel === 'function') {
+        await reader.cancel().catch(() => null);
+      }
+    }
+
+    const merged = new Uint8Array(totalLength);
+    let offset = 0;
+    for (let index = 0; index < chunks.length; index += 1) {
+      merged.set(chunks[index], offset);
+      offset += chunks[index].length;
+    }
+    return merged.buffer;
   }
 
   function resolveFetchImplementation(override) {
@@ -1899,7 +1966,8 @@
       throw new Error('Die Remote-Quelle lieferte eine undurchsichtige Antwort ohne CORS-Freigabe und wurde blockiert.');
     }
 
-    if (typeof response.url === 'string' && response.url && !validateRemoteAudioUrl(response.url).ok) {
+    const finalUrl = typeof response.url === 'string' && response.url ? response.url : href;
+    if (!inspectRemoteAudioUrl(finalUrl).ok) {
       throw new Error('Die Remote-Quelle leitete auf ein unsicheres Ziel weiter und wurde blockiert.');
     }
 
@@ -1914,13 +1982,16 @@
       ? Number(declaredLengthHeader)
       : NaN;
     if (Number.isFinite(declaredLength) && declaredLength > REMOTE_IMPORT_MAX_BYTES) {
-      throw new Error('Die Remote-Datei überschreitet das Speicherlimit von ' + formatBytes(REMOTE_IMPORT_MAX_BYTES) + '.');
+      throw createRemoteQuotaError();
     }
 
     let arrayBuffer = null;
     try {
-      arrayBuffer = await response.arrayBuffer();
+      arrayBuffer = await readRemoteBodyWithQuota(response);
     } catch (error) {
+      if (error && error.quotaExceeded) {
+        throw error;
+      }
       throw new Error('Die Remote-Daten konnten nicht vollständig in den Browser-Speicher gelesen werden.');
     }
 
@@ -1928,13 +1999,13 @@
       throw new Error('Die Remote-Quelle lieferte keine Audiodaten.');
     }
     if (arrayBuffer.byteLength > REMOTE_IMPORT_MAX_BYTES) {
-      throw new Error('Die Remote-Datei überschreitet das Speicherlimit von ' + formatBytes(REMOTE_IMPORT_MAX_BYTES) + '.');
+      throw createRemoteQuotaError();
     }
     if (!hasSupportedAudioMagicBytes(arrayBuffer)) {
       throw new Error('Die geladenen Daten besitzen keine gültige Audio-Signatur und wurden verworfen.');
     }
 
-    return { arrayBuffer, contentType: normalizeRemoteContentType(contentType), url: href };
+    return { arrayBuffer, contentType: normalizeRemoteContentType(contentType), url: finalUrl };
   }
 
   function buildRemoteSourceName(href, contentType) {

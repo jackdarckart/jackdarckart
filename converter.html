@@ -7,6 +7,7 @@
   <meta name="description" content="Cyber-Audio Mastering & Transcoding Studio auf stream-musik.space für lokale Browser-Audioverarbeitung, Analyse, Preview und privacy-first Export ohne Server-Uploads.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="dark light">
+  <!-- connect-src erlaubt hier bewusst beliebige HTTPS-Ziele, weil der Remote-Import nutzerdefinierte HTTPS-Audio-URLs laedt. Die Ziel-Pruefung (HTTPS, SSRF, MIME, Magic Bytes, Quota) erfolgt in converter.js. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' blob: https://jackdarckart.stream.laut.fm; connect-src 'self' https:; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/converter.html">
   <meta property="og:type" content="website">

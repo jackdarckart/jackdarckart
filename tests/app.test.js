@@ -3155,6 +3155,31 @@ async function testConverterRemoteFetchGuardsMimeMagicBytesAndQuota() {
     'opaque responses without CORS clearance should be blocked'
   );
 
+  let streamCancelled = false;
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => {
+        const response = createRemoteResponse({ headers: { 'content-type': 'audio/mpeg' } });
+        response.body = {
+          getReader() {
+            return {
+              async read() {
+                return { done: false, value: new Uint8Array(maxBytes) };
+              },
+              async cancel() {
+                streamCancelled = true;
+              }
+            };
+          }
+        };
+        return response;
+      }
+    }),
+    /Speicherlimit/i,
+    'streamed payloads should abort as soon as the quota guard is exceeded'
+  );
+  assert.equal(streamCancelled, true, 'the quota guard should cancel the response stream instead of buffering the whole payload');
+
   await assert.rejects(
     fetchPayload('https://cdn.example.com/track.mp3', {
       fetch: async () => createRemoteResponse({ ok: false, status: 404, headers: { 'content-type': 'audio/mpeg' } })
@@ -3228,7 +3253,7 @@ async function testConverterRemoteImportFeedsExistingStudioWorkflow() {
   let requestedUrl = '';
   env.window.fetch = async (href) => {
     requestedUrl = href;
-    return createRemoteResponse({ headers: { 'content-type': 'audio/mpeg', 'content-length': '64' } });
+    return createRemoteResponse({ url: href, headers: { 'content-type': 'audio/mpeg', 'content-length': '64' } });
   };
 
   const converter = loadConverterModule(env);
