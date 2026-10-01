@@ -40,6 +40,8 @@
     'audio/webm': 'webm',
     'audio/aiff': 'aiff', 'audio/x-aiff': 'aiff'
   });
+  const REMOTE_IMPORT_STATUS_DEFAULT = 'Remote-Audio erfolgreich im Browser geladen. Keine Speicherung auf dem Server.';
+  const REMOTE_IMPORT_STATUS_MP4 = 'MP4/M4A-Audio erfolgreich im Browser dekodiert. Export als WAV ist verfügbar, MP3 nur bei vorhandener Encoder-Unterstützung. Keine Speicherung auf dem Server.';
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -119,10 +121,17 @@
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
     let reader;
     try {
-      const response = await window.fetch(url.href, {
-        mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
-        redirect: 'error', cache: 'no-store', signal: controller.signal
-      });
+      let response;
+      try {
+        response = await window.fetch(url.href, {
+          mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
+          redirect: 'error', cache: 'no-store', signal: controller.signal
+        });
+      } catch (error) {
+        // Netzwerk-/CORS-Fehler markieren eine nicht abrufbare Quelle, nicht einen inhaltlichen Fehler.
+        if (error && error.name !== 'AbortError') error.remoteSourceUnavailable = true;
+        throw error;
+      }
       if (!response.ok || response.type === 'opaque' || response.url !== url.href) {
         const unreachable = new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
         unreachable.remoteSourceUnavailable = true;
@@ -877,7 +886,7 @@
         } catch (error) {
           // Nur fehlende oder nicht abrufbare Quellen dürfen auf den nächsten Kandidaten ausweichen;
           // Abbrüche, veraltete Importe und Inhaltsfehler werden sofort gemeldet.
-          const retryable = error.name === 'TypeError' || error.remoteSourceUnavailable === true;
+          const retryable = error && error.remoteSourceUnavailable === true;
           if (generation !== importGeneration || !retryable) throw error;
           lastError = error;
         }
@@ -921,8 +930,8 @@
         updateAnalysisSummary();
         setRenderState('ready', 'Remote-Audio bereit – Preview und Render bleiben lokal.');
         elements.importStatus.textContent = remoteAudioContainer(audio.type) === 'mp4'
-          ? 'MP4/M4A-Audio erfolgreich im Browser dekodiert. Export als WAV ist verfügbar, MP3 nur bei vorhandener Encoder-Unterstützung. Keine Speicherung auf dem Server.'
-          : 'Remote-Audio erfolgreich im Browser geladen. Keine Speicherung auf dem Server.';
+          ? REMOTE_IMPORT_STATUS_MP4
+          : REMOTE_IMPORT_STATUS_DEFAULT;
       } catch (error) {
         if (generation !== importGeneration) return;
         const reason = error.name === 'AbortError'
