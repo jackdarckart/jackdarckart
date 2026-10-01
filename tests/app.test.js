@@ -3303,6 +3303,12 @@ async function testConverterRemoteImportProxyFallback() {
 
   fetchCalls.length = 0;
   state.corsBlocked = true;
+  input.value = 'https://public.example/song.mp3';
+  await button.dispatch('click');
+  assert.deepEqual(fetchCalls.map((call) => call.url), ['https://public.example/song.mp3'],
+    'blocked non-Suno sources must never be sent to the Suno-only proxy');
+
+  fetchCalls.length = 0;
   input.value = sunoMp4Url;
   await button.dispatch('click');
   assert.deepEqual(fetchCalls.map((call) => call.url), [sunoMp4Url, proxyHref],
@@ -3358,9 +3364,11 @@ async function testConverterRemoteImportProxyFallback() {
   studio.destroy();
 
   const preferred = createProxyFallbackEnvironment({ proxyEndpoint: '/api/remote-audio', preferProxy: true });
+  preferred.state.corsBlocked = true;
   preferred.env.elements['converter-remote-url'].value = sunoMp4Url;
   await preferred.env.elements['converter-remote-import'].dispatch('click');
-  assert.equal(preferred.fetchCalls[0].url, proxyHref, 'preferProxy must try the proxy before the direct fetch');
+  assert.deepEqual(preferred.fetchCalls.map((call) => call.url), [sunoMp4Url, proxyHref],
+    'direct fetch must remain first even when obsolete preferProxy configuration is present');
   assert.match(preferred.env.elements['converter-import-status'].textContent, /Proxy/);
   preferred.studio.destroy();
 
@@ -3433,6 +3441,9 @@ async function testRemoteAudioProxyValidatesAndFetchesAudio() {
   assert.equal(proxy.validateTargetUrl(target + '#fragment').href, target, 'fragments must be stripped');
   assert.throws(() => proxy.validateTargetUrl('https://' + 'user:secret@' + 'cdn1.suno.ai/a.mp4'),
     /Zugangsdaten/, 'credentialed URLs must be rejected');
+  assert.throws(() => proxy.validateTargetUrl('https://evil.example/song.mp3', {
+    allowTarget: () => true
+  }), /freigegeben/, 'the Suno-only proxy allow-list must not be extensible');
 
   for (const blocked of ['127.0.0.1', '10.0.0.5', '169.254.169.254', '172.16.4.4', '192.168.0.1',
     '::1', 'fd00::1', 'fe80::1', 'ff02::1', '::ffff:127.0.0.1', 'not-an-ip']) {

@@ -921,19 +921,20 @@
 
     async function fetchFirstAvailableRemoteAudio(candidates, generation) {
       const proxy = resolveRemoteImportProxy();
-      const attempts = proxy.endpoint
-        ? (proxy.preferProxy ? [proxy.endpoint, ''] : ['', proxy.endpoint])
-        : [''];
       let lastError = null;
       let corsBlocked = false;
       for (let index = 0; index < candidates.length; index += 1) {
+        const candidate = candidates[index];
+        const isSunoCdnMedia = SUNO_CDN_HOST_PATTERN.test(candidate.hostname.toLowerCase())
+          && SUNO_CDN_MEDIA_PATTERN.test(candidate.pathname);
+        const attempts = proxy.endpoint && isSunoCdnMedia ? ['', proxy.endpoint] : [''];
         for (let attempt = 0; attempt < attempts.length; attempt += 1) {
           const proxyEndpoint = attempts[attempt];
           const controller = new AbortController();
           remoteController = controller;
           try {
-            const audio = await fetchRemoteAudio(candidates[index], controller, proxyEndpoint);
-            return { url: candidates[index], audio, viaProxy: Boolean(proxyEndpoint), corsBlocked };
+            const audio = await fetchRemoteAudio(candidate, controller, proxyEndpoint);
+            return { url: candidate, audio, viaProxy: Boolean(proxyEndpoint), corsBlocked };
           } catch (error) {
             if (remoteController === controller) remoteController = null;
             // Nur fehlende oder nicht abrufbare Quellen dürfen auf den Proxy bzw. den nächsten Kandidaten ausweichen;
@@ -1875,7 +1876,7 @@
     const remoteImport = config && config.remoteImport;
     // Nur ein echter Same-Origin-Endpunkt gilt als vertrauenswürdiger Resolver.
     const endpoint = resolveSameOriginEndpoint(remoteImport && remoteImport.proxyEndpoint);
-    return { endpoint, preferProxy: Boolean(endpoint && remoteImport && remoteImport.preferProxy) };
+    return { endpoint };
   }
 
   function getWindowOrigin() {
