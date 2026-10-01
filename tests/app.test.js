@@ -686,6 +686,7 @@ function createConverterEnvironment(options = {}) {
     'converter-auto-enhance-undo',
     'converter-auto-enhance-toggle',
     'converter-auto-enhance-strength',
+    'converter-auto-enhance-strength-hint',
     'converter-enhance-status',
     'converter-enhance-findings',
     'converter-enhance-steps',
@@ -2242,6 +2243,7 @@ function testConverterPageExposesStudioHooksAndLoader() {
     'converter-auto-enhance-undo',
     'converter-auto-enhance-toggle',
     'converter-auto-enhance-strength',
+    'converter-auto-enhance-strength-hint',
     'converter-enhance-status',
     'converter-enhance-findings',
     'converter-enhance-steps',
@@ -2325,8 +2327,23 @@ function testConverterPageExposesStudioHooksAndLoader() {
   );
   assert.match(
     converterJsCode,
-    /ENHANCE_STRENGTHS\s*=\s*\{[\s\S]*gentle[\s\S]*balanced[\s\S]*strong/,
-    'converter studio should offer three documented strengths for the automatic quality improvement'
+    /ENHANCE_STRENGTHS\s*=\s*\{[\s\S]*subtle[\s\S]*gentle[\s\S]*balanced[\s\S]*strong[\s\S]*intense[\s\S]*maximum/,
+    'converter studio should offer six documented strengths for the automatic quality improvement'
+  );
+  for (const [value, label] of [
+    ['subtle', 'Dezent'], ['gentle', 'Sanft'], ['balanced', 'Ausgewogen'],
+    ['strong', 'Kräftig'], ['intense', 'Intensiv'], ['maximum', 'Maximal']
+  ]) {
+    assert.match(
+      converterHtmlCode,
+      new RegExp('<option value="' + value + '"[^>]*>' + label + ' – '),
+      'converter page should offer the "' + label + '" enhancement strength with a short explanation'
+    );
+  }
+  assert.match(
+    converterHtmlCode,
+    /id="converter-auto-enhance-strength-hint"/,
+    'converter page should explain the selected enhancement strength'
   );
   assert.match(
     converterJsCode,
@@ -3855,6 +3872,33 @@ async function testConverterAdaptiveEnhance() {
   assert.ok(strongBright.artifactCleaner.presenceCut < brightSettings.artifactCleaner.presenceCut,
     'a higher strength should deepen the ringing cut');
   assert.ok(brightSettings.artifactCleaner.presenceCut <= -2.5, 'harsh sources need a clearly audible ringing cut');
+  // Finer and stronger strengths: weak sources scale up to "maximal", clean
+  // sources stay conservative even at the highest setting.
+  const strengthFactors = [0.35, 0.6, 1, 1.4, 1.75, 2.1];
+  const brightAmounts = strengthFactors.map((factor) => core.chooseEnhancement(bright, { strength: factor }).insight.intensity);
+  brightAmounts.slice(1).forEach((value, index) => {
+    assert.ok(value > brightAmounts[index], 'every higher strength must correct a weak source more strongly');
+  });
+  const maxBright = core.chooseEnhancement(bright, { strength: 2.1 });
+  assert.ok(maxBright.artifactCleaner.presenceCut <= -7, 'maximal strength must apply a deep ringing cut on harsh sources');
+  assert.ok(maxBright.insight.intensity >= 2, 'maximal strength must clearly exceed the balanced correction on weak sources');
+  const maxClean = core.chooseEnhancement(clean, { strength: 2.1 });
+  assert.ok(maxClean.insight.intensity < 1, 'even maximal strength must stay conservative on clean sources');
+  assert.ok(maxClean.insight.intensity - cleanSettings.insight.intensity
+    < maxBright.insight.intensity - brightSettings.insight.intensity,
+  'the extra push of high strengths must depend on how much the source needs it');
+  assert.equal(maxClean.artifactCleaner, null, 'clean sources must not get artifact cleaning at any strength');
+  assert.ok(brightSettings.insight.intensity > 1.1, 'balanced must correct harsh sources noticeably');
+  assert.ok(clippingSettings.insight.intensity > 1.3, 'balanced must correct clipped sources clearly');
+  assert.ok(clippingSettings.artifactCleaner && clippingSettings.artifactCleaner.highCut < 0,
+    'heavy clipping should smooth the distorted top end');
+  assert.ok(clippingSettings.eqHigh < core.chooseEnhancement(bass).eqHigh,
+    'clipped sources must not receive the full air lift');
+  assert.deepEqual(core.chooseEnhancement(bright), brightSettings, 'enhancements must be deterministic and cached');
+  assert.notStrictEqual(core.chooseEnhancement(bright), brightSettings, 'cached enhancements must be returned as copies');
+  const mutated = core.chooseEnhancement(bright);
+  mutated.artifactCleaner.presenceCut = 0;
+  assert.ok(core.chooseEnhancement(bright).artifactCleaner.presenceCut < 0, 'callers must not be able to corrupt the cache');
   const dynamic = core.chooseEnhancement({ ...clean, loudnessRangeDb: 22 });
   assert.ok(dynamic.compRatio > cleanSettings.compRatio, 'very dynamic sources should be compressed harder');
   assert.ok(core.describeProfile({ ...clean, loudnessRangeDb: 22 }).some((finding) => finding.label === 'Sehr große Dynamik'));
@@ -3863,9 +3907,20 @@ async function testConverterAdaptiveEnhance() {
   assert.ok(unbalanced.balanceDb > 9, 'channel imbalance should be measured');
   assert.ok(core.scoreProfile(unbalanced) < core.scoreProfile(clean));
   assert.equal(core.describeProfile(unbalanced).find((finding) => finding.id === 'balance').tone, 'alert');
+  const unbalancedSettings = core.chooseEnhancement(unbalanced);
+  assert.ok(unbalancedSettings.artifactCleaner.balanceTrim > 3, 'a louder left channel must be trimmed towards the right');
+  assert.ok(unbalancedSettings.insight.projectedScore > core.scoreProfile(unbalanced), 'balance correction should improve the projection');
+  assert.match(core.summarizeEnhancement(unbalancedSettings).join(' '), /Kanalausgleich \d+\.\d dB zugunsten rechts/);
+  const widthGains = [];
+  const gainNode = () => { const item = { gain: {}, connect() {} }; widthGains.push(item); return item; };
+  core.createStereoWidthStage({ createChannelSplitter: gainNode, createChannelMerger: gainNode, createGain: gainNode }, 100, 2, 6);
+  const [, , leftDirect, rightDirect] = widthGains;
+  assert.ok(leftDirect.gain.value < 1 && rightDirect.gain.value > 1, 'balance trim must be applied inside the width stage');
   const rumbling = core.analyzeSource(buffer(Float32Array.from(cleanMix, (value, i) => value + 0.08 + 0.2 * Math.sin(2 * Math.PI * 15 * i / sampleRate))));
   assert.equal(rumbling.rumble, true, 'DC offset and sub-sonic energy should be detected');
   assert.equal(core.chooseEnhancement(rumbling).artifactCleaner.rumbleCut, 30);
+  const maxRumble = core.chooseEnhancement(rumbling, { strength: 2.1 }).artifactCleaner.rumbleCut;
+  assert.ok(maxRumble > 30 && maxRumble <= 40, 'higher strengths should tighten the rumble filter within safe limits');
   assert.ok(core.describeProfile(rumbling).some((finding) => finding.id === 'rumble'));
   assert.match(core.summarizeEnhancement(core.chooseEnhancement(rumbling)).join(' '), /Rumpel-Filter unter 30 Hz/);
 
@@ -3942,6 +3997,11 @@ async function testConverterAdaptiveEnhance() {
 
 async function testConverterAutomaticQualityWorkflow() {
   const env = createConverterEnvironment();
+  const storedPreferences = new Map();
+  env.window.localStorage = {
+    getItem(key) { return storedPreferences.has(key) ? storedPreferences.get(key) : null; },
+    setItem(key, value) { storedPreferences.set(key, String(value)); }
+  };
   vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
   const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
   studio.init();
@@ -3969,7 +4029,19 @@ async function testConverterAutomaticQualityWorkflow() {
     async close() {}
   };
 
+  assert.match(
+    env.elements['converter-auto-enhance-strength-hint'].textContent,
+    /Stärke „ausgewogen“: Empfohlen/,
+    'the selected strength should be explained before any import'
+  );
+
   const core = studio._coreForTest;
+  const originalDescribeProfile = core.describeProfile;
+  let describeRuns = 0;
+  core.describeProfile = function (...args) {
+    describeRuns += 1;
+    return originalDescribeProfile.apply(this, args);
+  };
   const originalAnalyzeSource = core.analyzeSource;
   let analysisRuns = 0;
   core.analyzeSource = function (...args) {
@@ -4031,6 +4103,26 @@ async function testConverterAutomaticQualityWorkflow() {
     'a stronger setting should not reduce the corrective EQ move'
   );
   assert.equal(analysisRuns, 1, 'changing the strength must reuse the cached source analysis');
+
+  const strongIntensity = Number(env.elements['converter-enhance-steps'].innerHTML.match(/Korrekturintensität (\d+) %/)[1]);
+  env.elements['converter-auto-enhance-strength'].value = 'maximum';
+  await env.elements['converter-auto-enhance-strength'].dispatch('change');
+  assert.match(env.elements['converter-enhance-status'].textContent, /Mit neuer Stärke neu berechnet.*maximal/);
+  assert.match(env.elements['converter-auto-enhance-strength-hint'].textContent, /Stärke „maximal“: Stärkste Rettung/);
+  const maximumIntensity = Number(env.elements['converter-enhance-steps'].innerHTML.match(/Korrekturintensität (\d+) %/)[1]);
+  assert.ok(maximumIntensity > strongIntensity, 'maximal must correct a weak source more strongly than kräftig');
+  assert.ok(Number(env.elements['converter-eq-high'].value) <= -3, 'maximal must apply a clearly audible high-frequency correction on a harsh source');
+  assert.equal(JSON.parse(env.window.localStorage.getItem('jackdarckart:studio:enhance')).strength, 'maximum',
+    'the new strength choices must be remembered locally');
+  env.elements['converter-auto-enhance-strength'].value = 'subtle';
+  await env.elements['converter-auto-enhance-strength'].dispatch('change');
+  const subtleIntensity = Number(env.elements['converter-enhance-steps'].innerHTML.match(/Korrekturintensität (\d+) %/)[1]);
+  assert.ok(subtleIntensity < strongIntensity, 'dezent must stay well below kräftig');
+  assert.match(env.elements['converter-enhance-status'].textContent, /dezent/);
+  env.elements['converter-auto-enhance-strength'].value = 'strong';
+  await env.elements['converter-auto-enhance-strength'].dispatch('change');
+  assert.equal(analysisRuns, 1, 'all strength changes must reuse the cached source analysis');
+  assert.equal(describeRuns, 1, 'the findings list must be built once per import and reused on strength changes');
 
   studio._undoAutoEnhanceForTest();
   assert.equal(studio._enhanceStateForTest(), 'reverted');

@@ -154,10 +154,19 @@
   };
   // Share of each penalty the mastering chain can realistically repair.
   const QUALITY_FIX_RATES = {
-    clipping: 0.35, squashed: 0.2, wide: 0.6, harshness: 0.75, brittle: 0.6, dull: 0.6,
-    phase: 0.8, balance: 0, loudness: 0.9, tonality: 0.65, rumble: 0.85
+    clipping: 0.45, squashed: 0.2, wide: 0.65, harshness: 0.8, brittle: 0.65, dull: 0.7,
+    phase: 0.8, balance: 0.85, loudness: 0.9, tonality: 0.7, rumble: 0.9
   };
   const assessmentCache = new WeakMap();
+  const enhancementCache = new WeakMap();
+
+  function copyEnhancement(settings) {
+    return {
+      ...settings,
+      artifactCleaner: settings.artifactCleaner ? { ...settings.artifactCleaner } : null,
+      insight: { ...settings.insight }
+    };
+  }
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -401,10 +410,18 @@
         score -= penalties[key];
       });
       score = Math.round(clamp(score, 0, 100));
-      // Poor sources receive noticeably stronger corrections, clean sources
+      const deficit = (100 - score) / 100;
+      const worst = Math.max(...Object.values(severities));
+      // A single severe problem lifts the intensity even if the overall score
+      // still looks acceptable; mild findings on clean sources do not.
+      const urgency = clamp((worst - 0.4) / 0.6, 0, 1);
+      // Poor sources receive clearly stronger corrections, clean sources
       // are only nudged so the master does not get over-processed.
-      const intensity = clamp(0.55 + (100 - score) / 100, 0.55, 1.45);
-      const assessment = { severities, penalties, score, intensity, loudnessDb: loudness };
+      const intensity = clamp(0.5 + 1.25 * deficit + 0.15 * urgency, 0.5, 1.75);
+      // How much of a strength above "ausgewogen" may be used: clean sources
+      // only receive a fraction of the extra push, weak sources all of it.
+      const need = clamp(0.3 + 1.4 * deficit + 0.4 * urgency, 0.3, 1);
+      const assessment = { severities, penalties, score, intensity, need, loudnessDb: loudness };
       assessmentCache.set(profile, assessment);
       return assessment;
     }
@@ -414,9 +431,25 @@
       if (!assessment) {
         throw new Error('Kein Quellenprofil verfügbar.');
       }
+      const strength = clamp(Number((options && options.strength) ?? 1) || 1, 0.3, 2.2);
+      let cached = enhancementCache.get(profile);
+      if (!cached) {
+        cached = new Map();
+        enhancementCache.set(profile, cached);
+      }
+      const hit = cached.get(strength);
+      if (hit) {
+        return copyEnhancement(hit);
+      }
+      const settings = this.computeEnhancement(profile, assessment, strength);
+      cached.set(strength, settings);
+      return copyEnhancement(settings);
+    }
+
+    computeEnhancement(profile, assessment, strength) {
       const s = assessment.severities;
-      const strength = clamp(Number((options && options.strength) ?? 1) || 1, 0.5, 1.5);
-      const amount = clamp(strength * assessment.intensity, 0.3, 2);
+      const effectiveStrength = strength <= 1 ? strength : 1 + (strength - 1) * assessment.need;
+      const amount = clamp(effectiveStrength * assessment.intensity, 0.2, 2.6);
       const blend = (neutral, value) => neutral + (value - neutral) * amount;
       const loud = assessment.loudnessDb;
       const squash = Math.max(s.squashed, s.clipping);
@@ -424,8 +457,8 @@
       const brittle = Boolean(profile.brittle);
       const harsh = Boolean(profile.harshness);
 
-      let ratio = 2.2 + 1.4 * s.wide;
-      let threshold = -20 - 4 * s.wide;
+      let ratio = 2.2 + 1.8 * s.wide;
+      let threshold = -20 - 5 * s.wide;
       if (compressed) {
         ratio = 1.6 - 0.4 * squash;
         threshold = -12 + 2 * squash;
@@ -445,18 +478,31 @@
         target = -13;
       }
 
-      const cleaner = harsh || profile.phasey || brittle || profile.rumble
+      const clipped = s.clipping >= 0.3;
+      const unbalanced = profile.channelCount === 2 && s.balance > 0;
+      const cleaner = harsh || profile.phasey || brittle || profile.rumble || clipped || unbalanced
         ? {
-          presenceCut: harsh ? clamp(blend(0, -(1.5 + 2 * s.harshness)), -6, 0) : 0,
-          highCut: harsh || brittle ? clamp(blend(0, -(1 + 1.2 * Math.max(s.harshness, s.brittle))), -5, 0) : 0,
+          presenceCut: harsh ? clamp(blend(0, -(2 + 2.5 * s.harshness)), -8, 0) : 0,
+          highCut: harsh || brittle || clipped
+            ? clamp(blend(0, -(1.2 + 1.6 * Math.max(s.harshness, s.brittle, 0.8 * s.clipping))), -6, 0)
+            : 0,
           softenTransients: brittle,
-          rumbleCut: profile.rumble ? 30 : 0
+          rumbleCut: profile.rumble ? Math.round(30 + 10 * clamp(amount - 1, 0, 1) * s.rumble) : 0,
+          // Positive values lift the right channel, negative ones the left.
+          balanceTrim: unbalanced
+            ? Number(clamp(Number(profile.balanceDb) * clamp(amount * 0.85, 0, 1), -6, 6).toFixed(2))
+            : 0
         }
         : null;
+      const airLift = clamp((-12 - profile.trebleTiltDb) * 0.22, -3.5, 3) + 1.2 * s.dull;
+      // Lifting the air band of a clipped source would only expose the
+      // distortion, so the lift is scaled back by the clipping severity.
+      const airMove = (airLift > 0 ? airLift * (1 - 0.8 * s.clipping) : airLift)
+        - 0.8 * s.harshness - 0.5 * s.brittle;
       const settings = {
         eqLow: clamp(blend(0, clamp((2 - profile.bassTiltDb) * 0.3, -4, 4) - 0.5 * s.rumble), -6, 6),
         eqMid: clamp(blend(0, clamp(-profile.presenceTiltDb * 0.22, -3, 2.5) - 0.8 * s.harshness), -6, 4),
-        eqHigh: clamp(blend(0, clamp((-12 - profile.trebleTiltDb) * 0.22, -3.5, 3) - 0.8 * s.harshness - 0.5 * s.brittle + 0.5 * s.dull), -6, 5),
+        eqHigh: clamp(blend(0, airMove), -6, 6),
         compThreshold: blend(-18, threshold),
         compRatio: clamp(blend(1, ratio), 1, 5),
         limiterCeiling: s.clipping > 0 ? -1 - 1.5 * s.clipping : -1,
@@ -466,6 +512,7 @@
       };
       settings.insight = {
         score: assessment.score,
+        strength,
         intensity: amount,
         projectedScore: this.projectScore(assessment, amount)
       };
@@ -576,6 +623,10 @@
         if (settings.artifactCleaner.rumbleCut) {
           parts.push('Rumpel-Filter unter ' + Math.round(settings.artifactCleaner.rumbleCut) + ' Hz');
         }
+        if (settings.artifactCleaner.balanceTrim) {
+          parts.push('Kanalausgleich ' + Math.abs(settings.artifactCleaner.balanceTrim).toFixed(1) + ' dB zugunsten '
+            + (settings.artifactCleaner.balanceTrim > 0 ? 'rechts' : 'links'));
+        }
         steps.push('Artefakt-Reinigung: ' + (parts.length ? parts.join(' · ') : 'aktiv'));
       }
       const insight = settings.insight;
@@ -634,7 +685,8 @@
       const makeup = context.createGain();
       makeup.gain.value = this.getMakeupGain(settings);
 
-      const widthStage = this.createStereoWidthStage(context, settings.stereoWidth, sourceChannelCount);
+      const widthStage = this.createStereoWidthStage(context, settings.stereoWidth, sourceChannelCount,
+        cleaner && cleaner.balanceTrim ? cleaner.balanceTrim : 0);
       const limiter = context.createWaveShaper();
       limiter.curve = this.createLimiterCurve(this.dbToLinear(settings.limiterCeiling));
       limiter.oversample = '4x';
@@ -777,7 +829,7 @@
       return Math.max(0.5, Math.min(1.9, this.dbToLinear((eqBoost * 0.18) + ratioPush)));
     }
 
-    createStereoWidthStage(context, stereoWidthPercent, sourceChannelCount) {
+    createStereoWidthStage(context, stereoWidthPercent, sourceChannelCount, balanceTrimDb) {
       if (sourceChannelCount < 2) {
         const passthrough = context.createGain();
         return { input: passthrough, output: passthrough };
@@ -791,10 +843,15 @@
       const leftCross = context.createGain();
       const rightCross = context.createGain();
 
-      leftDirect.gain.value = (1 + width) * 0.5;
-      rightDirect.gain.value = (1 + width) * 0.5;
-      leftCross.gain.value = (1 - width) * 0.5;
-      rightCross.gain.value = (1 - width) * 0.5;
+      // Channel balance correction is folded into the width matrix, so it
+      // costs no extra nodes in preview or offline render.
+      const trim = Number.isFinite(balanceTrimDb) ? balanceTrimDb : 0;
+      const leftGain = this.dbToLinear(-trim / 2);
+      const rightGain = this.dbToLinear(trim / 2);
+      leftDirect.gain.value = (1 + width) * 0.5 * leftGain;
+      rightDirect.gain.value = (1 + width) * 0.5 * rightGain;
+      leftCross.gain.value = (1 - width) * 0.5 * rightGain;
+      rightCross.gain.value = (1 - width) * 0.5 * leftGain;
 
       input.connect(leftDirect, 0);
       input.connect(rightCross, 0);
@@ -927,6 +984,7 @@
       autoEnhanceUndo: document.getElementById('converter-auto-enhance-undo'),
       autoEnhanceToggle: document.getElementById('converter-auto-enhance-toggle'),
       autoEnhanceStrength: document.getElementById('converter-auto-enhance-strength'),
+      autoEnhanceStrengthHint: document.getElementById('converter-auto-enhance-strength-hint'),
       enhanceStatus: document.getElementById('converter-enhance-status'),
       enhanceFindings: document.getElementById('converter-enhance-findings'),
       enhanceSteps: document.getElementById('converter-enhance-steps'),
@@ -996,6 +1054,7 @@
     let enhanceSnapshot = null;
     let enhanceState = 'idle';
     let appliedEnhancement = null;
+    const findingsCache = { profile: null, markup: null };
     let previewSource = null;
     let previewAnalyser = null;
     let previewStartAt = 0;
@@ -1323,10 +1382,15 @@
       targetLufs: 'converter-target-lufs'
     };
 
+    // Above "ausgewogen" the extra push is gated by the source quality in the
+    // core, so even "maximal" stays restrained on already clean material.
     const ENHANCE_STRENGTHS = {
-      gentle: { factor: 0.6, label: 'sanft' },
-      balanced: { factor: 1, label: 'ausgewogen' },
-      strong: { factor: 1.4, label: 'kräftig' }
+      subtle: { factor: 0.35, label: 'dezent', hint: 'Nur Feinschliff – die Quelle bleibt nahezu unverändert.' },
+      gentle: { factor: 0.6, label: 'sanft', hint: 'Behutsame Korrektur mit minimalen Eingriffen.' },
+      balanced: { factor: 1, label: 'ausgewogen', hint: 'Empfohlen – deutliche, aber natürliche Verbesserung.' },
+      strong: { factor: 1.4, label: 'kräftig', hint: 'Deutlich hörbare Korrektur für Quellen mit sichtbaren Schwächen.' },
+      intense: { factor: 1.75, label: 'intensiv', hint: 'Sehr starke Korrektur für schwache Quellen – saubere Quellen bleiben geschont.' },
+      maximum: { factor: 2.1, label: 'maximal', hint: 'Stärkste Rettung für schlechte Quellen: tiefe Artefakt-Reinigung, Kanalausgleich und volle Korrektur.' }
     };
 
     function isAutoEnhanceEnabled() {
@@ -1483,14 +1547,13 @@
         }
       }
 
+      if (elements.autoEnhanceStrengthHint) {
+        elements.autoEnhanceStrengthHint.textContent = 'Stärke „' + strength.label + '“: ' + strength.hint;
+      }
+
       if (elements.enhanceFindings) {
         elements.enhanceFindings.innerHTML = loadedBuffer
-          ? core.describeProfile(sourceProfile).map((finding) => (
-            '<li class="enhance-finding" data-tone="' + escapeHtml(finding.tone) + '">'
-            + '<strong>' + escapeHtml(finding.label) + '</strong>'
-            + '<span>' + escapeHtml(finding.detail) + '</span>'
-            + '</li>'
-          )).join('')
+          ? getFindingsMarkup()
           : '<li class="enhance-finding" data-tone="idle"><strong>Noch keine Analyse</strong><span>Lade eine Datei, dann prüft das Studio Clipping, Dynamik, Höhen, Stereobild, Kanalbalance und Lautheit automatisch.</span></li>';
       }
 
@@ -1504,6 +1567,21 @@
       if (elements.enhanceStatus) {
         elements.enhanceStatus.textContent = buildEnhanceStatusText(trigger, strength);
       }
+    }
+
+    // Findings only depend on the source profile, so the markup is built once
+    // per import and reused for strength changes, re-applies and undo.
+    function getFindingsMarkup() {
+      if (findingsCache.profile !== sourceProfile || findingsCache.markup === null) {
+        findingsCache.profile = sourceProfile;
+        findingsCache.markup = core.describeProfile(sourceProfile).map((finding) => (
+          '<li class="enhance-finding" data-tone="' + escapeHtml(finding.tone) + '">'
+          + '<strong>' + escapeHtml(finding.label) + '</strong>'
+          + '<span>' + escapeHtml(finding.detail) + '</span>'
+          + '</li>'
+        )).join('');
+      }
+      return findingsCache.markup;
     }
 
     function buildEnhanceStatusText(trigger, strength) {

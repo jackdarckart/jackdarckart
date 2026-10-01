@@ -2452,7 +2452,8 @@ html[data-theme="light"] .sticky-player {
   font-size: 1rem;
 }
 
-.studio-switch small {
+.studio-switch small,
+#converter-auto-enhance-strength-hint {
   display: block;
   margin-top: 0.25rem;
   color: var(--muted);
