@@ -41,6 +41,7 @@ function isBlockedIpv4(address) {
   if (a === 0 || a === 10 || a === 127 || a >= 224) return true;
   if (a === 169 && b === 254) return true;
   if (a === 172 && b >= 16 && b <= 31) return true;
+  // 192.0.0.0/16 wird bewusst komplett blockiert (deckt 192.0.0.0/24 und TEST-NET-1 192.0.2.0/24 ab).
   if (a === 192 && (b === 168 || b === 0)) return true;
   if (a === 100 && b >= 64 && b <= 127) return true;
   if (a === 198 && (b === 18 || b === 19)) return true;
@@ -97,7 +98,7 @@ function validateTargetUrl(input, options) {
 function safeLookup(hostname, lookupOptions, callback) {
   const options = typeof lookupOptions === 'function' ? {} : (lookupOptions || {});
   const done = typeof lookupOptions === 'function' ? lookupOptions : callback;
-  dns.lookup(hostname, Object.assign({}, options, { all: true, verbatim: true }), (error, addresses) => {
+  dns.lookup(hostname, Object.assign({ verbatim: true }, options, { all: true }), (error, addresses) => {
     if (error) {
       done(error);
       return;
@@ -179,7 +180,7 @@ async function fetchRemoteAudio(target, options) {
   try {
     let url = target;
     for (let redirect = 0; redirect <= maxRedirects; redirect += 1) {
-      const response = await requestOnce(url, Object.assign({ register }, settings));
+      const response = await requestOnce(url, Object.assign({}, settings, { register }));
       const status = response.statusCode || 0;
       if (status >= 300 && status < 400) {
         response.resume();

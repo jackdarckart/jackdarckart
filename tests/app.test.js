@@ -3263,7 +3263,7 @@ function createProxyFallbackEnvironment(remoteImportConfig) {
       ok: viaProxy ? state.proxyStatus === 200 : true,
       status: viaProxy ? state.proxyStatus : 200,
       type: viaProxy ? 'basic' : 'cors',
-      url,
+      url: viaProxy ? 'https://stream-musik.space' + url : url,
       async json() { return { error: 'Zu groß' }; },
       headers: { get(key) { return key === 'Content-Type' ? mime : null; } },
       body: { getReader() {

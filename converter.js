@@ -141,6 +141,8 @@
 
   async function fetchRemoteAudio(url, controller, proxyEndpoint) {
     const requestHref = proxyEndpoint ? buildProxyRequestUrl(proxyEndpoint, url) : url.href;
+    // `response.url` ist im Browser immer absolut; relative Proxy-Pfade müssen dafür aufgelöst werden.
+    const absoluteRequestHref = proxyEndpoint ? ((tryCreateUrl(requestHref) || {}).href || requestHref) : requestHref;
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
     let reader;
     try {
@@ -171,7 +173,7 @@
         }
         throw new Error(await readProxyErrorMessage(response));
       }
-      if (!response.ok || response.type === 'opaque' || response.url !== requestHref) {
+      if (!response.ok || response.type === 'opaque' || response.url !== absoluteRequestHref) {
         const unreachable = new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
         unreachable.remoteSourceUnavailable = true;
         throw unreachable;
