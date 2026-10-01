@@ -660,6 +660,9 @@ function createConverterEnvironment(options = {}) {
   const ids = [
     'converter-file-input',
     'converter-browse-button',
+    'converter-remote-url',
+    'converter-remote-import',
+    'converter-remote-status',
     'converter-reset-button',
     'converter-dropzone-shell',
     'converter-import-status',
@@ -757,20 +760,21 @@ function createConverterEnvironment(options = {}) {
     removeEventListener() {}
   };
 
-  const urlApi = {
-    createObjectURL() {
+  class UrlApi extends URL {
+    static createObjectURL() {
       return 'blob:converter-test';
-    },
-    revokeObjectURL(url) {
+    }
+
+    static revokeObjectURL(url) {
       revokedUrl = url;
     }
-  };
+  }
 
   const context = vm.createContext({
     window: windowObject,
     document,
     console,
-    URL: urlApi,
+    URL: UrlApi,
     Blob,
     MediaRecorder: options.MediaRecorder,
     Math,
@@ -782,6 +786,11 @@ function createConverterEnvironment(options = {}) {
     Boolean,
     Array,
     Object,
+    ArrayBuffer,
+    Uint8Array,
+    Int16Array,
+    Float32Array,
+    DataView,
     globalThis: null,
     setTimeout: windowObject.setTimeout,
     clearTimeout: windowObject.clearTimeout,
@@ -791,7 +800,7 @@ function createConverterEnvironment(options = {}) {
     cancelAnimationFrame() {}
   });
   context.globalThis = context;
-  windowObject.URL = urlApi;
+  windowObject.URL = UrlApi;
 
   return {
     context,
@@ -2020,6 +2029,9 @@ function testLivePageExposesEnhancedModulesAndHooks() {
 function testConverterPageExposesStudioHooksAndLoader() {
   for (const hook of [
     'converter-file-input',
+    'converter-remote-url',
+    'converter-remote-import',
+    'converter-remote-status',
     'converter-auto-enhance',
     'converter-preview-toggle',
     'converter-render-button',
@@ -2991,6 +3003,341 @@ function testIssueHelpPageAndTemplatesArePresent() {
   }
 }
 
+function createMp3PayloadBytes(byteLength = 64) {
+  const bytes = new Uint8Array(byteLength);
+  bytes[0] = 0x49;
+  bytes[1] = 0x44;
+  bytes[2] = 0x33;
+  bytes[3] = 0x03;
+  return bytes;
+}
+
+function createRemoteResponse(options = {}) {
+  const headers = new Map(Object.entries(options.headers || {}));
+  const body = options.body || createMp3PayloadBytes();
+  return {
+    ok: options.ok !== false,
+    status: options.status || 200,
+    url: options.url || 'https://cdn.example.com/track.mp3',
+    headers: {
+      get(name) {
+        const value = headers.get(String(name).toLowerCase());
+        return value === undefined ? null : value;
+      }
+    },
+    async arrayBuffer() {
+      if (options.arrayBufferError) {
+        throw new Error('stream aborted');
+      }
+      return body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength);
+    }
+  };
+}
+
+function loadConverterModule(env) {
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  return env.window.__JACKDARCKART_CONVERTER__;
+}
+
+function testConverterRemoteUrlValidationEnforcesHttpsAndBlocksInternalTargets() {
+  const env = createConverterEnvironment();
+  const converter = loadConverterModule(env);
+  const validate = converter._validateRemoteAudioUrlForTest;
+
+  assert.equal(validate('https://cdn.example.com/track.mp3').ok, true, 'plain HTTPS audio URLs should be accepted');
+
+  for (const unsafe of [
+    'http://cdn.example.com/track.mp3',
+    'data:audio/mpeg;base64,AAAA',
+    'blob:https://cdn.example.com/abc',
+    'javascript:alert(1)',
+    'ftp://cdn.example.com/track.mp3',
+    ''
+  ]) {
+    assert.equal(validate(unsafe).ok, false, `remote import should reject the unsafe source ${unsafe || '(empty)'}`);
+  }
+
+  assert.match(validate('http://cdn.example.com/track.mp3').reason, /HTTPS/i, 'HTTP rejection should explain the HTTPS-only rule');
+
+  for (const blocked of [
+    'https://localhost/track.mp3',
+    'https://127.0.0.1/track.mp3',
+    'https://10.0.0.5/track.mp3',
+    'https://172.16.4.9/track.mp3',
+    'https://192.168.1.10/track.mp3',
+    'https://169.254.169.254/latest/meta-data',
+    'https://100.64.0.1/track.mp3',
+    'https://[::1]/track.mp3',
+    'https://router.local/track.mp3',
+    'https://intranet/track.mp3',
+    'https://0177.0.0.1/track.mp3',
+    'https://2130706433/track.mp3',
+    'https://0x7f.0x0.0x0.0x1/track.mp3'
+  ]) {
+    const result = validate(blocked);
+    assert.equal(result.ok, false, `remote import should block the internal destination ${blocked}`);
+    assert.match(result.reason, /intern|privat|SSRF/i, `blocked destination ${blocked} should explain the SSRF protection`);
+  }
+
+  assert.equal(validate('https://' + 'demo-user' + ':' + 'demo-token' + '@cdn.example.com/track.mp3').ok, false, 'URLs with embedded credentials should be rejected');
+  assert.equal(validate('https://cdn.example.com:8443/track.mp3').ok, false, 'non-standard HTTPS ports should be rejected');
+
+  const suno = validate('https://suno.com/song/abcdefgh-1234-5678-9012-abcdefabcdef');
+  assert.equal(suno.ok, true, 'Suno share links should be accepted');
+  assert.equal(suno.url, 'https://cdn1.suno.ai/abcdefgh-1234-5678-9012-abcdefabcdef.mp3', 'Suno share links should resolve to the public CDN media URL');
+}
+
+async function testConverterRemoteFetchGuardsMimeMagicBytesAndQuota() {
+  const env = createConverterEnvironment();
+  const converter = loadConverterModule(env);
+  const fetchPayload = converter._fetchRemoteAudioPayloadForTest;
+  const maxBytes = converter._remoteImportMaxBytesForTest;
+
+  assert.equal(converter._isAllowedRemoteAudioMimeTypeForTest('audio/mpeg; charset=utf-8'), true, 'audio mime types with parameters should still be accepted');
+  assert.equal(converter._isAllowedRemoteAudioMimeTypeForTest('text/html'), false, 'non-audio mime types should be rejected');
+  assert.equal(converter._hasSupportedAudioMagicBytesForTest(new Uint8Array(4).buffer), false, 'payloads without a valid audio signature should be rejected');
+
+  const payload = await fetchPayload('https://cdn.example.com/track.mp3', {
+    fetch: async () => createRemoteResponse({ headers: { 'content-type': 'audio/mpeg', 'content-length': '64' } })
+  });
+  assert.equal(payload.contentType, 'audio/mpeg', 'successful remote imports should report the validated content type');
+  assert.equal(payload.arrayBuffer.byteLength, 64, 'successful remote imports should keep the fetched payload in memory');
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => createRemoteResponse({ headers: { 'content-type': 'text/html' } })
+    }),
+    /kein erlaubter Audio-Typ/i,
+    'non-audio content types should be rejected with a clear error'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => createRemoteResponse({
+        headers: { 'content-type': 'audio/mpeg', 'content-length': String(maxBytes + 1) }
+      })
+    }),
+    /Speicherlimit/i,
+    'declared payloads beyond the quota guard should be rejected before download'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => createRemoteResponse({
+        headers: { 'content-type': 'audio/mpeg' },
+        body: new Uint8Array(32)
+      })
+    }),
+    /Audio-Signatur/i,
+    'payloads without valid magic bytes should be rejected'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => createRemoteResponse({
+        headers: { 'content-type': 'audio/mpeg' },
+        body: createMp3PayloadBytes(maxBytes + 16)
+      })
+    }),
+    /Speicherlimit/i,
+    'oversized bodies should be rejected even when no content-length header is declared'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => {
+        const response = createRemoteResponse({ headers: { 'content-type': 'audio/mpeg' } });
+        response.type = 'opaque';
+        return response;
+      }
+    }),
+    /CORS/i,
+    'opaque responses without CORS clearance should be blocked'
+  );
+
+  let streamCancelled = false;
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => {
+        const response = createRemoteResponse({ headers: { 'content-type': 'audio/mpeg' } });
+        response.body = {
+          getReader() {
+            return {
+              async read() {
+                return { done: false, value: new Uint8Array(maxBytes) };
+              },
+              async cancel() {
+                streamCancelled = true;
+              }
+            };
+          }
+        };
+        return response;
+      }
+    }),
+    /Speicherlimit/i,
+    'streamed payloads should abort as soon as the quota guard is exceeded'
+  );
+  assert.equal(streamCancelled, true, 'the quota guard should cancel the response stream instead of buffering the whole payload');
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => createRemoteResponse({ ok: false, status: 404, headers: { 'content-type': 'audio/mpeg' } })
+    }),
+    /HTTP-Status 404/,
+    'failed HTTP responses should surface a clear error'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => createRemoteResponse({
+        url: 'http://127.0.0.1/internal.mp3',
+        headers: { 'content-type': 'audio/mpeg' }
+      })
+    }),
+    /unsicheres Ziel/i,
+    'redirects to unsafe destinations should be blocked'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', {
+      fetch: async () => {
+        throw new Error('network down');
+      }
+    }),
+    /CORS|Netzwerk/i,
+    'network and CORS failures should surface a user-friendly error'
+  );
+
+  await assert.rejects(
+    fetchPayload('https://cdn.example.com/track.mp3', { fetch: null }),
+    /nicht unterstützt/i,
+    'remote import should fail cleanly when fetch is unavailable'
+  );
+}
+
+function createDecodingConverterEnvironment(options = {}) {
+  const env = createConverterEnvironment();
+  const buffer = {
+    duration: 12,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    length: 4,
+    getChannelData: () => new Float32Array([0, 0.25, -0.25, 0])
+  };
+
+  class FakeAudioContext {
+    constructor() {
+      this.state = 'running';
+    }
+
+    decodeAudioData(data, resolve, reject) {
+      if (options.decodeFails) {
+        reject(new Error('decode failed'));
+        return;
+      }
+      resolve(buffer);
+    }
+
+    async close() {
+      env.markAudioContextClosed();
+    }
+  }
+
+  env.window.AudioContext = FakeAudioContext;
+  return env;
+}
+
+async function testConverterRemoteImportFeedsExistingStudioWorkflow() {
+  const env = createDecodingConverterEnvironment();
+  let requestedUrl = '';
+  env.window.fetch = async (href) => {
+    requestedUrl = href;
+    return createRemoteResponse({ url: href, headers: { 'content-type': 'audio/mpeg', 'content-length': '64' } });
+  };
+
+  const converter = loadConverterModule(env);
+  const studio = converter._createStudioForTest();
+  studio.init();
+
+  env.elements['converter-remote-url'].value = 'https://cdn.example.com/media/remote-track.mp3';
+  await env.elements['converter-remote-import'].dispatch('click');
+
+  assert.equal(requestedUrl, 'https://cdn.example.com/media/remote-track.mp3', 'remote import should fetch exactly the validated URL');
+  assert.equal(env.elements['converter-file-name'].textContent, 'remote-track.mp3', 'remote import should expose the resolved source name in the shared metadata grid');
+  assert.doesNotMatch(env.elements['converter-file-name'].textContent, /[/\\]/, 'derived remote source names must not contain path separators');
+  assert.equal(env.elements['converter-file-format'].textContent, 'audio/mpeg', 'remote import should expose the validated content type as source format');
+  assert.equal(env.elements['converter-render-button'].disabled, false, 'remote imports should unlock the existing render workflow');
+  assert.equal(env.elements['converter-preview-toggle'].disabled, false, 'remote imports should unlock the existing preview workflow');
+  assert.equal(env.elements['converter-render-state'].dataset.state, 'ready', 'successful remote imports should report a ready render state');
+  assert.match(env.elements['converter-remote-status'].textContent, /erfolgreich/i, 'successful remote imports should confirm the import in the remote status line');
+  assert.equal(env.elements['converter-remote-status'].dataset.state, 'ok', 'successful remote imports should not flag the status line as an error');
+}
+
+async function testConverterRemoteImportRejectsUnsafeUrlsWithoutFetching() {
+  const env = createDecodingConverterEnvironment();
+  let fetchCalls = 0;
+  env.window.fetch = async () => {
+    fetchCalls += 1;
+    return createRemoteResponse({ headers: { 'content-type': 'audio/mpeg' } });
+  };
+
+  const converter = loadConverterModule(env);
+  const studio = converter._createStudioForTest();
+  studio.init();
+
+  env.elements['converter-remote-url'].value = 'http://127.0.0.1/track.mp3';
+  await env.elements['converter-remote-import'].dispatch('click');
+
+  assert.equal(fetchCalls, 0, 'unsafe URLs should never trigger a network request');
+  assert.equal(env.elements['converter-remote-status'].dataset.state, 'error', 'rejected URLs should mark the remote status line as an error');
+  assert.match(env.elements['converter-remote-status'].textContent, /HTTPS/i, 'rejected URLs should explain the HTTPS-only rule');
+  assert.equal(env.elements['converter-render-button'].disabled, true, 'rejected URLs must not unlock the render workflow');
+}
+
+async function testConverterRemoteImportHandlesDecodeFailures() {
+  const env = createDecodingConverterEnvironment({ decodeFails: true });
+  env.window.fetch = async () => createRemoteResponse({ headers: { 'content-type': 'audio/mpeg', 'content-length': '64' } });
+
+  const converter = loadConverterModule(env);
+  const studio = converter._createStudioForTest();
+  studio.init();
+
+  env.elements['converter-remote-url'].value = 'https://cdn.example.com/track.mp3';
+  await env.elements['converter-remote-import'].dispatch('click');
+
+  assert.equal(env.elements['converter-render-state'].dataset.state, 'error', 'decode failures should surface an error render state');
+  assert.equal(env.elements['converter-render-button'].disabled, true, 'decode failures must keep the render workflow locked');
+  assert.match(env.elements['converter-remote-status'].textContent, /dekodiert/i, 'decode failures should surface a user-friendly message');
+  assert.equal(env.elements['converter-remote-import'].disabled, false, 'the remote import control should stay usable after a failed import');
+}
+
+async function testConverterLocalFileImportStaysUnchangedAlongsideRemoteImport() {
+  const env = createDecodingConverterEnvironment();
+  const converter = loadConverterModule(env);
+  const studio = converter._createStudioForTest();
+  studio.init();
+
+  const file = {
+    name: 'demo-track.wav',
+    size: 2048,
+    type: 'audio/wav',
+    async arrayBuffer() {
+      return new Uint8Array(16).buffer;
+    }
+  };
+
+  env.elements['converter-file-input'].files = [file];
+  await env.elements['converter-file-input'].dispatch('change');
+
+  assert.equal(env.elements['converter-file-name'].textContent, 'demo-track.wav', 'local file import should keep populating the metadata grid');
+  assert.equal(env.elements['converter-file-format'].textContent, 'audio/wav', 'local file import should keep reporting the local file type');
+  assert.equal(env.elements['converter-render-button'].disabled, false, 'local file import should keep unlocking the render workflow');
+  assert.match(env.elements['converter-import-status'].textContent, /lokal geladen/i, 'local file import should keep its local-only status message');
+  assert.equal(studio._buildRenderedFilenameForTest(file, { id: 'wav', extension: 'wav' }), 'demo-track-master.wav', 'WAV export filenames should stay unchanged');
+}
+
+
 async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
@@ -3009,6 +3356,12 @@ async function main() {
   testConverterDownloadClearsTemporaryAsset();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
+  testConverterRemoteUrlValidationEnforcesHttpsAndBlocksInternalTargets();
+  await testConverterRemoteFetchGuardsMimeMagicBytesAndQuota();
+  await testConverterRemoteImportFeedsExistingStudioWorkflow();
+  await testConverterRemoteImportRejectsUnsafeUrlsWithoutFetching();
+  await testConverterRemoteImportHandlesDecodeFailures();
+  await testConverterLocalFileImportStaysUnchangedAlongsideRemoteImport();
   testAllHtmlPagesExposeSharedNavigationAndMetadata();
   testServiceWorkerCachesAllHtmlPages();
   await testServiceWorkerServesCachedStaticPageRequestsOffline();

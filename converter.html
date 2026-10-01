@@ -7,7 +7,8 @@
   <meta name="description" content="Cyber-Audio Mastering & Transcoding Studio auf stream-musik.space für lokale Browser-Audioverarbeitung, Analyse, Preview und privacy-first Export ohne Server-Uploads.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="dark light">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' blob: https://jackdarckart.stream.laut.fm; connect-src 'self' https://jackdarckart.stream.laut.fm https://api.laut.fm; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
+  <!-- connect-src erlaubt hier bewusst beliebige HTTPS-Ziele, weil der Remote-Import nutzerdefinierte HTTPS-Audio-URLs laedt. Die Ziel-Pruefung (HTTPS, SSRF, MIME, Magic Bytes, Quota) erfolgt in converter.js. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https://assets.laut.fm https://api.laut.fm; font-src 'self'; media-src 'self' blob: https://jackdarckart.stream.laut.fm; connect-src 'self' https:; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests">
   <link rel="canonical" href="https://stream-musik.space/converter.html">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
@@ -112,6 +113,16 @@
             <button class="button secondary" id="converter-browse-button" type="button">Datei auswählen</button>
             <button class="button secondary" id="converter-reset-button" type="button" disabled>Studio zurücksetzen</button>
           </div>
+          <div class="converter-remote-import">
+            <label class="field-group" for="converter-remote-url">
+              <span>Remote-Import (HTTPS / Suno-Share-Link)</span>
+              <input id="converter-remote-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://…/track.mp3">
+            </label>
+            <div class="actions converter-remote-actions">
+              <button class="button secondary" id="converter-remote-import" type="button">Remote-Audio laden</button>
+            </div>
+            <p class="share-status note" id="converter-remote-status" aria-live="polite">Noch keine Remote-Quelle geladen. Es werden ausschließlich HTTPS-Audio-Quellen akzeptiert.</p>
+          </div>
           <p class="share-status note" id="converter-import-status" aria-live="polite">Noch keine Datei geladen. Alle Verarbeitungsschritte bleiben lokal in diesem Browser.</p>
           <div class="converter-meta-grid" aria-label="Audio-Metadaten">
             <article class="studio-stat"><span>Datei</span><strong id="converter-file-name">–</strong></article>
@@ -130,6 +141,7 @@
             <li><strong>Exakt lokal:</strong> Import, Browser-Dekodierung, Waveform, Preview, WAV-Export, Cleanup-Timer.</li>
             <li><strong>Best-effort:</strong> LUFS-ähnliche Loudness-Schätzung, Limiter-Ceiling und Stereo-Width im Browser-DSP.</li>
             <li><strong>Codec-Fallback:</strong> zusätzliche Zielformate erscheinen nur, wenn dein Browser einen echten Encoder anbietet.</li>
+            <li><strong>Remote-Import:</strong> nur HTTPS, Blockade interner Ziele, MIME- und Magic-Byte-Prüfung, hartes Speicherlimit, kein Upload.</li>
             <li><strong>Vault:</strong> Verschlüsselter Sync ist nur als Stub vorbereitet und benötigt Phase 27.3 separat.</li>
           </ul>
         </aside>

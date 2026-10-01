@@ -2205,6 +2205,20 @@ html[data-theme="light"] .sticky-player {
   margin-top: 1.1rem;
 }
 
+.converter-remote-import {
+  margin-top: 1.4rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.converter-remote-actions {
+  margin-top: 0;
+}
+
+#converter-remote-status[data-state="error"] {
+  color: var(--red);
+}
+
 .converter-meta-grid,
 .converter-control-grid,
 .converter-export-grid {

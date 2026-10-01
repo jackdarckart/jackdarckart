@@ -24,6 +24,28 @@
       approximate: true
     }
   ];
+  const REMOTE_IMPORT_MAX_BYTES = 80 * 1024 * 1024;
+  const REMOTE_AUDIO_MIME_TYPES = [
+    'audio/mpeg',
+    'audio/mp3',
+    'audio/wav',
+    'audio/wave',
+    'audio/x-wav',
+    'audio/vnd.wave',
+    'audio/ogg',
+    'audio/opus',
+    'audio/webm',
+    'audio/flac',
+    'audio/x-flac',
+    'audio/aac',
+    'audio/mp4',
+    'audio/x-m4a',
+    'audio/aiff',
+    'audio/x-aiff',
+    'application/ogg'
+  ];
+  const BLOCKED_REMOTE_HOST_SUFFIXES = ['.local', '.localhost', '.internal', '.intranet', '.lan', '.home.arpa'];
+  const SUNO_SHARE_HOSTS = ['suno.com', 'www.suno.com', 'app.suno.ai', 'suno.ai', 'www.suno.ai'];
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -372,6 +394,9 @@
     const elements = {
       fileInput: document.getElementById('converter-file-input'),
       browseButton: document.getElementById('converter-browse-button'),
+      remoteUrl: document.getElementById('converter-remote-url'),
+      remoteImport: document.getElementById('converter-remote-import'),
+      remoteStatus: document.getElementById('converter-remote-status'),
       resetButton: document.getElementById('converter-reset-button'),
       dropzone: document.getElementById('converter-dropzone-shell'),
       importStatus: document.getElementById('converter-import-status'),
@@ -429,6 +454,7 @@
     let cleanupInterval = 0;
     let renderedAsset = null;
     let isPreviewStopping = false;
+    let remoteImportPending = false;
 
     function bind(target, type, listener, options) {
       if (!target || typeof target.addEventListener !== 'function') {
@@ -451,6 +477,13 @@
         }
       });
       bind(elements.fileInput, 'change', () => handleSelectedFiles(elements.fileInput.files));
+      bind(elements.remoteImport, 'click', handleRemoteImport);
+      bind(elements.remoteUrl, 'keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleRemoteImport();
+        }
+      });
       bind(elements.resetButton, 'click', resetStudio);
       bind(elements.autoEnhance, 'click', applyAutoEnhance);
       bind(elements.previewToggle, 'click', togglePreview);
@@ -578,29 +611,106 @@
         return;
       }
 
-      await resetPlaybackOnly();
-      clearRenderedAsset('Vorherige temporäre Master-Datei entfernt, weil eine neue Quelldatei geladen wurde.');
-      loadedFile = file;
-      setRenderState('loading', 'Datei wird lokal dekodiert …');
-      elements.importStatus.textContent = 'Datei wird lokal verarbeitet. Es findet kein Upload statt.';
+      await prepareImportSlot('Datei wird lokal dekodiert …', 'Datei wird lokal verarbeitet. Es findet kein Upload statt.');
       try {
-        const context = await ensureAudioContext();
         const arrayBuffer = await file.arrayBuffer();
-        loadedBuffer = await decodeAudioBuffer(context, arrayBuffer);
-        previewOffset = 0;
-        updateMetadata(file, loadedBuffer);
-        updateButtons();
-        drawWaveform(loadedBuffer);
-        updateAnalysisSummary();
+        await adoptDecodedSource(file, arrayBuffer);
         setRenderState('ready', 'Datei bereit – Preview und Render sind lokal verfügbar.');
         elements.importStatus.textContent = 'Datei erfolgreich lokal geladen. Alle Mastering-Schritte bleiben im Browser.';
       } catch (error) {
-        loadedBuffer = null;
-        updateButtons();
-        drawWaveformIdle();
-        setRenderState('error', 'Datei konnte lokal nicht dekodiert werden.');
-        elements.importStatus.textContent = 'Die Datei konnte im aktuellen Browser nicht dekodiert werden. Bitte ein unterstütztes Audioformat testen.';
+        failImport(
+          'Datei konnte lokal nicht dekodiert werden.',
+          'Die Datei konnte im aktuellen Browser nicht dekodiert werden. Bitte ein unterstütztes Audioformat testen.'
+        );
       }
+    }
+
+    async function handleRemoteImport() {
+      if (!elements.remoteUrl || remoteImportPending) {
+        return;
+      }
+
+      const validation = validateRemoteAudioUrl(elements.remoteUrl.value);
+      if (!validation.ok) {
+        setRemoteStatus(validation.reason, true);
+        return;
+      }
+
+      remoteImportPending = true;
+      updateButtons();
+      setRemoteStatus('Remote-Quelle wird zero-trust geprüft und direkt im Browser geladen …', false);
+      await prepareImportSlot(
+        'Remote-Audio wird geprüft und lokal dekodiert …',
+        'Remote-Quelle wird geprüft. Die Daten bleiben ausschließlich im Browser-Speicher.'
+      );
+
+      try {
+        const payload = await fetchRemoteAudioPayload(validation.url);
+        await adoptDecodedSource({
+          name: buildRemoteSourceName(payload.url, payload.contentType),
+          size: payload.arrayBuffer.byteLength,
+          type: payload.contentType
+        }, payload.arrayBuffer);
+        setRenderState('ready', 'Remote-Audio bereit – Preview und Render sind lokal verfügbar.');
+        elements.importStatus.textContent = 'Remote-Audio erfolgreich im Browser geladen. Es wurde nichts hochgeladen oder serverseitig gespeichert.';
+        setRemoteStatus('Remote-Import erfolgreich. Die Quelle liegt nur im Arbeitsspeicher dieses Browsers.', false);
+      } catch (error) {
+        const message = (error && error.message) || 'Remote-Import fehlgeschlagen.';
+        failImport('Remote-Audio konnte nicht geladen werden.', message);
+        setRemoteStatus(message, true);
+      } finally {
+        remoteImportPending = false;
+        updateButtons();
+      }
+    }
+
+    function setRemoteStatus(message, isError) {
+      if (!elements.remoteStatus) {
+        return;
+      }
+      elements.remoteStatus.textContent = message;
+      if (elements.remoteStatus.dataset) {
+        elements.remoteStatus.dataset.state = isError ? 'error' : 'ok';
+      }
+    }
+
+    async function prepareImportSlot(renderStateText, importStatusText) {
+      await resetPlaybackOnly();
+      clearRenderedAsset('Vorherige temporäre Master-Datei entfernt, weil eine neue Quelldatei geladen wurde.');
+      setRenderState('loading', renderStateText);
+      elements.importStatus.textContent = importStatusText;
+    }
+
+    async function adoptDecodedSource(source, arrayBuffer) {
+      let context = null;
+      try {
+        context = await ensureAudioContext();
+      } catch (error) {
+        throw new Error('Die Web Audio API steht in diesem Browser nicht zur Verfügung.');
+      }
+
+      let buffer = null;
+      try {
+        buffer = await decodeAudioBuffer(context, arrayBuffer);
+      } catch (error) {
+        throw new Error('Die Audiodaten konnten im aktuellen Browser nicht dekodiert werden.');
+      }
+
+      loadedFile = source;
+      loadedBuffer = buffer;
+      previewOffset = 0;
+      updateMetadata(source, buffer);
+      updateButtons();
+      drawWaveform(buffer);
+      updateAnalysisSummary();
+    }
+
+    function failImport(renderStateText, importStatusText) {
+      loadedBuffer = null;
+      updateButtons();
+      drawWaveformIdle();
+      setRenderState('error', renderStateText);
+      elements.importStatus.textContent = importStatusText;
     }
 
     async function ensureAudioContext() {
@@ -640,6 +750,12 @@
       elements.renderButton.disabled = !hasBuffer;
       elements.downloadButton.disabled = !renderedAsset;
       elements.clearRender.disabled = !renderedAsset;
+      if (elements.remoteImport) {
+        elements.remoteImport.disabled = remoteImportPending;
+      }
+      if (elements.remoteUrl) {
+        elements.remoteUrl.disabled = remoteImportPending;
+      }
     }
 
     function updateControlOutputs() {
@@ -1072,6 +1188,10 @@
       if (elements.fileInput) {
         elements.fileInput.value = '';
       }
+      if (elements.remoteUrl) {
+        elements.remoteUrl.value = '';
+      }
+      setRemoteStatus('Noch keine Remote-Quelle geladen. Es werden ausschließlich HTTPS-Audio-Quellen akzeptiert.', false);
       ['fileName', 'fileDuration', 'fileRate', 'fileSize', 'fileFormat', 'fileChannels'].forEach((key) => {
         elements[key].textContent = '–';
       });
@@ -1601,6 +1721,317 @@
     }
   }
 
+  function parseIpv4Address(host) {
+    const match = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
+    if (!match) {
+      return null;
+    }
+    const parts = [Number(match[1]), Number(match[2]), Number(match[3]), Number(match[4])];
+    return parts.some((part) => !Number.isFinite(part) || part > 255) ? null : parts;
+  }
+
+  // Blocks this-network, RFC1918, loopback, link-local, CGNAT, IETF protocol assignments,
+  // benchmarking ranges plus multicast and reserved space to prevent SSRF against internal targets.
+  function isBlockedIpv4Address(parts) {
+    const first = parts[0];
+    const second = parts[1];
+    if (first === 0 || first === 10 || first === 127 || first >= 224) {
+      return true;
+    }
+    if (first === 169 && second === 254) {
+      return true;
+    }
+    if (first === 172 && second >= 16 && second <= 31) {
+      return true;
+    }
+    if (first === 192 && (second === 168 || second === 0)) {
+      return true;
+    }
+    if (first === 198 && (second === 18 || second === 19)) {
+      return true;
+    }
+    if (first === 100 && second >= 64 && second <= 127) {
+      return true;
+    }
+    return false;
+  }
+
+  function isBlockedRemoteHostname(hostname) {
+    const host = String(hostname || '').trim().toLowerCase().replace(/\.$/, '');
+    if (!host) {
+      return true;
+    }
+    if (host === 'localhost' || BLOCKED_REMOTE_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix))) {
+      return true;
+    }
+    if (host.charAt(0) === '[' || host.indexOf(':') !== -1) {
+      return true;
+    }
+    const ipv4 = parseIpv4Address(host);
+    if (ipv4) {
+      return isBlockedIpv4Address(ipv4);
+    }
+    if (/^(?:0x[0-9a-f]+|\d+)(?:\.(?:0x[0-9a-f]+|\d+))*$/.test(host)) {
+      return true;
+    }
+    const labels = host.split('.');
+    if (labels.length < 2) {
+      return true;
+    }
+    if (!/^(?:[a-z]{2,}|xn--[a-z0-9-]{2,})$/.test(labels[labels.length - 1])) {
+      return true;
+    }
+    return labels.some((label) => !/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(label));
+  }
+
+  function resolveSunoShareUrl(url) {
+    const host = String(url.hostname || '').toLowerCase();
+    if (SUNO_SHARE_HOSTS.indexOf(host) === -1) {
+      return url.href;
+    }
+    const match = /^\/(?:song|s|embed)\/([a-z0-9-]{8,64})\/?$/i.exec(String(url.pathname || ''));
+    if (!match) {
+      return url.href;
+    }
+    return 'https://cdn1.suno.ai/' + match[1] + '.mp3';
+  }
+
+  function inspectRemoteAudioUrl(value) {
+    const trimmed = typeof value === 'string' ? value.trim() : '';
+    if (!trimmed) {
+      return { ok: false, reason: 'Bitte zuerst eine HTTPS-Audio-URL oder einen Suno-Share-Link einfügen.' };
+    }
+    if (!/^https:\/\//i.test(trimmed)) {
+      return { ok: false, reason: 'Nur HTTPS-Quellen sind erlaubt. HTTP-, data-, blob- und javascript-URLs werden blockiert.' };
+    }
+    const url = tryCreateUrl(trimmed);
+    if (!url || url.protocol !== 'https:') {
+      return { ok: false, reason: 'Nur HTTPS-Quellen sind erlaubt. HTTP-, data-, blob- und javascript-URLs werden blockiert.' };
+    }
+    if (url.username || url.password) {
+      return { ok: false, reason: 'URLs mit eingebetteten Zugangsdaten werden aus Sicherheitsgründen abgelehnt.' };
+    }
+    if (url.port && url.port !== '443') {
+      return { ok: false, reason: 'Nur der Standard-HTTPS-Port 443 ist erlaubt.' };
+    }
+    if (isBlockedRemoteHostname(url.hostname)) {
+      return { ok: false, reason: 'Lokale, private oder interne Ziele sind blockiert (SSRF-Schutz).' };
+    }
+    return { ok: true, parsed: url };
+  }
+
+  function validateRemoteAudioUrl(value) {
+    const inspected = inspectRemoteAudioUrl(value);
+    if (!inspected.ok) {
+      return { ok: false, reason: inspected.reason };
+    }
+    return { ok: true, url: resolveSunoShareUrl(inspected.parsed) };
+  }
+
+  function normalizeRemoteContentType(contentType) {
+    return String(contentType || '').split(';')[0].trim().toLowerCase();
+  }
+
+  function isAllowedRemoteAudioMimeType(contentType) {
+    return REMOTE_AUDIO_MIME_TYPES.indexOf(normalizeRemoteContentType(contentType)) !== -1;
+  }
+
+  function hasSupportedAudioMagicBytes(arrayBuffer) {
+    if (!arrayBuffer || arrayBuffer.byteLength < 12) {
+      return false;
+    }
+    const bytes = new Uint8Array(arrayBuffer, 0, 12);
+    const ascii = (offset, length) => {
+      let text = '';
+      for (let index = offset; index < offset + length; index += 1) {
+        text += String.fromCharCode(bytes[index]);
+      }
+      return text;
+    };
+
+    const head = ascii(0, 4);
+    if (ascii(0, 3) === 'ID3') {
+      return true;
+    }
+    if (bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0) {
+      const isReservedVersion = (bytes[1] & 0x18) === 0x08;
+      const layer = bytes[1] & 0x06;
+      const isAdtsAac = (bytes[1] & 0xf0) === 0xf0 && layer === 0x00;
+      const hasValidMpegBitrate = (bytes[2] & 0xf0) !== 0xf0;
+      if (!isReservedVersion && (isAdtsAac || (layer !== 0x00 && hasValidMpegBitrate))) {
+        return true;
+      }
+    }
+    if (head === 'RIFF' && ascii(8, 4) === 'WAVE') {
+      return true;
+    }
+    if (head === 'FORM' && (ascii(8, 4) === 'AIFF' || ascii(8, 4) === 'AIFC')) {
+      return true;
+    }
+    if (head === 'OggS' || head === 'fLaC') {
+      return true;
+    }
+    if (ascii(4, 4) === 'ftyp') {
+      return true;
+    }
+    if (bytes[0] === 0x1a && bytes[1] === 0x45 && bytes[2] === 0xdf && bytes[3] === 0xa3) {
+      return true;
+    }
+    return false;
+  }
+
+  function createRemoteQuotaError() {
+    const error = new Error('Die Remote-Datei überschreitet das Speicherlimit von ' + formatBytes(REMOTE_IMPORT_MAX_BYTES) + '.');
+    error.quotaExceeded = true;
+    return error;
+  }
+
+  async function readRemoteBodyWithQuota(response) {
+    const body = response.body;
+    if (!body || typeof body.getReader !== 'function') {
+      return response.arrayBuffer();
+    }
+
+    const reader = body.getReader();
+    const chunks = [];
+    let totalLength = 0;
+
+    try {
+      for (;;) {
+        const chunk = await reader.read();
+        if (chunk.done) {
+          break;
+        }
+        const value = chunk.value;
+        if (!value || !value.length) {
+          continue;
+        }
+        totalLength += value.length;
+        if (totalLength > REMOTE_IMPORT_MAX_BYTES) {
+          throw createRemoteQuotaError();
+        }
+        chunks.push(value);
+      }
+    } finally {
+      if (typeof reader.cancel === 'function') {
+        try {
+          await reader.cancel();
+        } catch (cancelError) {
+          // Das Abbrechen des Streams darf den ursprünglichen Fehlergrund nicht überschreiben.
+        }
+      }
+    }
+
+    const merged = new Uint8Array(totalLength);
+    let offset = 0;
+    for (let index = 0; index < chunks.length; index += 1) {
+      merged.set(chunks[index], offset);
+      offset += chunks[index].length;
+    }
+    return merged.buffer;
+  }
+
+  function resolveFetchImplementation(override) {
+    if (typeof override === 'function') {
+      return override;
+    }
+    if (window && typeof window.fetch === 'function') {
+      return window.fetch.bind(window);
+    }
+    return null;
+  }
+
+  async function fetchRemoteAudioPayload(href, options) {
+    const fetchImplementation = resolveFetchImplementation(options && options.fetch);
+    if (!fetchImplementation) {
+      throw new Error('Remote-Import wird in diesem Browser nicht unterstützt.');
+    }
+
+    let response = null;
+    try {
+      response = await fetchImplementation(href, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'no-store',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+      });
+    } catch (error) {
+      throw new Error('Die Remote-Quelle konnte nicht geladen werden. Netzwerk oder CORS-Richtlinie blockiert den Abruf.');
+    }
+
+    if (!response || !response.ok) {
+      const status = response && response.status ? String(response.status) : 'unbekannt';
+      throw new Error('Die Remote-Quelle antwortete nicht gültig (HTTP-Status ' + status + ').');
+    }
+
+    if (response.type === 'opaque' || response.type === 'opaqueredirect') {
+      throw new Error('Die Remote-Quelle lieferte eine undurchsichtige Antwort ohne CORS-Freigabe und wurde blockiert.');
+    }
+
+    const finalUrl = typeof response.url === 'string' && response.url ? response.url : href;
+    if (!inspectRemoteAudioUrl(finalUrl).ok) {
+      throw new Error('Die Remote-Quelle leitete auf ein unsicheres Ziel weiter und wurde blockiert.');
+    }
+
+    const headers = response.headers;
+    const contentType = headers && typeof headers.get === 'function' ? headers.get('content-type') : '';
+    if (!isAllowedRemoteAudioMimeType(contentType)) {
+      throw new Error('Die Antwort ist kein erlaubter Audio-Typ (' + (normalizeRemoteContentType(contentType) || 'unbekannt') + ').');
+    }
+
+    const declaredLengthHeader = headers && typeof headers.get === 'function' ? headers.get('content-length') : null;
+    const declaredLength = typeof declaredLengthHeader === 'string' && declaredLengthHeader.trim()
+      ? Number(declaredLengthHeader)
+      : NaN;
+    if (Number.isFinite(declaredLength) && declaredLength > REMOTE_IMPORT_MAX_BYTES) {
+      throw createRemoteQuotaError();
+    }
+
+    let arrayBuffer = null;
+    try {
+      arrayBuffer = await readRemoteBodyWithQuota(response);
+    } catch (error) {
+      if (error && error.quotaExceeded) {
+        throw error;
+      }
+      throw new Error('Die Remote-Daten konnten nicht vollständig in den Browser-Speicher gelesen werden.');
+    }
+
+    if (!arrayBuffer || !arrayBuffer.byteLength) {
+      throw new Error('Die Remote-Quelle lieferte keine Audiodaten.');
+    }
+    if (arrayBuffer.byteLength > REMOTE_IMPORT_MAX_BYTES) {
+      throw createRemoteQuotaError();
+    }
+    if (!hasSupportedAudioMagicBytes(arrayBuffer)) {
+      throw new Error('Die geladenen Daten besitzen keine gültige Audio-Signatur und wurden verworfen.');
+    }
+
+    return { arrayBuffer, contentType: normalizeRemoteContentType(contentType), url: finalUrl };
+  }
+
+  function buildRemoteSourceName(href, contentType) {
+    const url = tryCreateUrl(href);
+    const pathname = url ? String(url.pathname || '') : '';
+    const lastSegment = pathname.split('/').filter(Boolean).pop() || '';
+    if (lastSegment) {
+      let readableSegment = lastSegment;
+      try {
+        readableSegment = decodeURIComponent(lastSegment);
+      } catch (error) {
+        readableSegment = lastSegment;
+      }
+      const safeSegment = readableSegment.replace(/[^a-z0-9._-]+/gi, '-').replace(/^[-.]+/, '').slice(0, 120);
+      if (safeSegment) {
+        return safeSegment;
+      }
+    }
+    const extension = normalizeRemoteContentType(contentType) === 'audio/wav' ? 'wav' : 'mp3';
+    return 'remote-audio.' + extension;
+  }
+
   function escapeHtml(value) {
     return String(value)
       .replace(/&/g, '&amp;')
@@ -1613,7 +2044,12 @@
   window[MODULE_KEY] = {
     bootstrap,
     destroy,
-    _createStudioForTest: createStudio
+    _createStudioForTest: createStudio,
+    _validateRemoteAudioUrlForTest: validateRemoteAudioUrl,
+    _isAllowedRemoteAudioMimeTypeForTest: isAllowedRemoteAudioMimeType,
+    _hasSupportedAudioMagicBytesForTest: hasSupportedAudioMagicBytes,
+    _fetchRemoteAudioPayloadForTest: fetchRemoteAudioPayload,
+    _remoteImportMaxBytesForTest: REMOTE_IMPORT_MAX_BYTES
   };
 }());
  
