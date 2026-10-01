@@ -38,24 +38,51 @@ const JUKEBOX_RULES = Object.freeze({
   'zero-point': 900
 });
 
+const STATUS_CODES = Object.freeze({
+  400: 'BAD_REQUEST',
+  401: 'SESSION_REQUIRED',
+  403: 'FORBIDDEN',
+  404: 'NOT_FOUND',
+  405: 'METHOD_NOT_ALLOWED',
+  409: 'CONFLICT',
+  413: 'BODY_TOO_LARGE',
+  429: 'RATE_LIMITED',
+  500: 'INTERNAL_ERROR',
+  503: 'SERVICE_BUSY'
+});
+
 class VaultError extends Error {
-  constructor(message, status) {
+  constructor(message, status, code) {
     super(message);
     this.name = 'VaultError';
     this.status = status || 400;
+    this.code = code || STATUS_CODES[this.status] || 'VAULT_ERROR';
   }
+}
+
+function keyError(message, code) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
 }
 
 function parseVaultKey(value) {
   const input = String(value || '').trim();
+  if (!input) {
+    throw keyError('QUANTUM_VAULT_KEY is not set. Provide a 32-byte key (64 hex characters or base64).',
+      'VAULT_KEY_MISSING');
+  }
   let key;
   if (/^[a-f0-9]{64}$/i.test(input)) {
     key = Buffer.from(input, 'hex');
-  } else {
+  } else if (/^[A-Za-z0-9+/_-]+={0,2}$/.test(input)) {
     key = Buffer.from(input, 'base64');
+  } else {
+    key = Buffer.alloc(0);
   }
   if (key.length !== 32) {
-    throw new Error('QUANTUM_VAULT_KEY must contain exactly 32 bytes (64 hex characters or base64).');
+    throw keyError('QUANTUM_VAULT_KEY must contain exactly 32 bytes (64 hex characters or base64).',
+      'VAULT_KEY_INVALID');
   }
   return key;
 }
@@ -118,14 +145,14 @@ function decryptState(payload, key) {
     ]);
     return JSON.parse(plaintext.toString('utf8'));
   } catch (error) {
-    throw new VaultError('Vault data could not be authenticated.', 500);
+    throw new VaultError('Vault data could not be authenticated.', 500, 'VAULT_DATA_INVALID');
   }
 }
 
 function normalizeHandle(value) {
   const handle = String(value || '').trim();
   if (!/^[A-Za-z0-9_-]{3,20}$/.test(handle)) {
-    throw new VaultError('Handle must be 3–20 characters using letters, numbers, _ or -.', 400);
+    throw new VaultError('Handle must be 3–20 characters using letters, numbers, _ or -.', 400, 'HANDLE_INVALID');
   }
   return { display: handle, key: handle.toLowerCase() };
 }
@@ -133,7 +160,7 @@ function normalizeHandle(value) {
 function validatePassword(value) {
   const password = String(value || '');
   if (password.length < 10 || password.length > 128) {
-    throw new VaultError('Password must be between 10 and 128 characters.', 400);
+    throw new VaultError('Password must be between 10 and 128 characters.', 400, 'PASSWORD_INVALID');
   }
   return password;
 }
@@ -170,7 +197,7 @@ function readJsonBody(request) {
       if (size > MAX_BODY_BYTES) {
         tooLarge = true;
         chunks.length = 0;
-        reject(new VaultError('Request body is too large.', 413));
+        reject(new VaultError('Request body is too large.', 413, 'BODY_TOO_LARGE'));
         return;
       }
       chunks.push(chunk);
@@ -188,7 +215,7 @@ function readJsonBody(request) {
         }
         resolve(value);
       } catch (error) {
-        reject(new VaultError('Request body must be a JSON object.', 400));
+        reject(new VaultError('Request body must be a JSON object.', 400, 'INVALID_JSON'));
       }
     });
     request.on('error', reject);
@@ -200,7 +227,7 @@ function createQuantumVaultHandler(options) {
   const key = settings.key
     ? (Buffer.isBuffer(settings.key) ? settings.key : parseVaultKey(settings.key))
     : parseVaultKey(process.env.QUANTUM_VAULT_KEY);
-  if (key.length !== 32) throw new Error('Quantum Vault key must be 32 bytes.');
+  if (key.length !== 32) throw keyError('Quantum Vault key must be 32 bytes.', 'VAULT_KEY_INVALID');
 
   const dataFile = settings.dataFile || process.env.QUANTUM_VAULT_DATA_FILE
     || path.join(process.cwd(), 'data', 'quantum-vault.json');
@@ -223,9 +250,14 @@ function createQuantumVaultHandler(options) {
   let sessionIssues = 0;
 
   if (fs.existsSync(dataFile)) {
-    const loaded = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+    let loaded;
+    try {
+      loaded = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+    } catch (error) {
+      throw keyError(`Quantum Vault data file ${dataFile} could not be read as JSON.`, 'VAULT_DATA_INVALID');
+    }
     if (!loaded || loaded.version !== 1 || !Array.isArray(loaded.accounts)) {
-      throw new Error('Quantum Vault data file has an unsupported format.');
+      throw keyError(`Quantum Vault data file ${dataFile} has an unsupported format.`, 'VAULT_DATA_INVALID');
     }
     store = loaded;
   }
@@ -248,7 +280,7 @@ function createQuantumVaultHandler(options) {
       });
     }
     if (!authAttempts.has(address) && authAttempts.size >= maxAuthSources) {
-      throw new VaultError('Too many authentication attempts. Try again later.', 429);
+      throw new VaultError('Too many authentication attempts. Try again later.', 429, 'RATE_LIMITED');
     }
     const attempt = authAttempts.get(address);
     if (!attempt || current - attempt.startedAt >= authRateWindowMs) {
@@ -257,13 +289,13 @@ function createQuantumVaultHandler(options) {
     }
     attempt.count += 1;
     if (attempt.count > authRateLimit) {
-      throw new VaultError('Too many authentication attempts. Try again later.', 429);
+      throw new VaultError('Too many authentication attempts. Try again later.', 429, 'RATE_LIMITED');
     }
   }
 
   async function passwordDigest(password, salt) {
     if (passwordJobs >= maxPasswordJobs) {
-      throw new VaultError('Authentication service is busy. Try again shortly.', 503);
+      throw new VaultError('Authentication service is busy. Try again shortly.', 503, 'SERVICE_BUSY');
     }
     passwordJobs += 1;
     try {
@@ -295,7 +327,7 @@ function createQuantumVaultHandler(options) {
       sessions.delete(accountSessions.shift()[0]);
     }
     if (sessions.size >= maxSessions) {
-      throw new VaultError('Session service is busy. Try again shortly.', 503);
+      throw new VaultError('Session service is busy. Try again shortly.', 503, 'SERVICE_BUSY');
     }
     const token = randomBytes(32).toString('base64url');
     sessions.set(token, { accountId, createdAt: current, expiresAt: current + SESSION_TTL_MS });
@@ -317,12 +349,12 @@ function createQuantumVaultHandler(options) {
     const session = token && sessions.get(token);
     if (!session || session.expiresAt <= now()) {
       if (token) sessions.delete(token);
-      throw new VaultError('Authentication required.', 401);
+      throw new VaultError('Authentication required.', 401, 'SESSION_REQUIRED');
     }
     const account = store.accounts.find((entry) => entry.id === session.accountId);
     if (!account) {
       sessions.delete(token);
-      throw new VaultError('Authentication required.', 401);
+      throw new VaultError('Authentication required.', 401, 'SESSION_REQUIRED');
     }
     return { account, token };
   }
@@ -334,10 +366,10 @@ function createQuantumVaultHandler(options) {
     try {
       originHost = new URL(origin).host;
     } catch (error) {
-      throw new VaultError('Invalid request origin.', 403);
+      throw new VaultError('Invalid request origin.', 403, 'CROSS_ORIGIN');
     }
     if (!request.headers.host || originHost !== request.headers.host) {
-      throw new VaultError('Cross-origin requests are not allowed.', 403);
+      throw new VaultError('Cross-origin requests are not allowed.', 403, 'CROSS_ORIGIN');
     }
   }
 
@@ -371,7 +403,7 @@ function createQuantumVaultHandler(options) {
     const password = validatePassword(body.password);
     return withLock(async () => {
       if (store.accounts.some((account) => account.handleKey === handle.key)) {
-        throw new VaultError('This handle is already registered.', 409);
+        throw new VaultError('This handle is already registered.', 409, 'HANDLE_TAKEN');
       }
       const salt = randomBytes(16);
       const passwordHash = await passwordDigest(password, salt);
@@ -400,7 +432,7 @@ function createQuantumVaultHandler(options) {
     const candidate = await passwordDigest(password, salt);
     const expected = account ? Buffer.from(account.passwordHash, 'base64') : randomBytes(64);
     if (!account || expected.length !== candidate.length || !crypto.timingSafeEqual(expected, candidate)) {
-      throw new VaultError('Invalid handle or password.', 401);
+      throw new VaultError('Invalid handle or password.', 401, 'INVALID_CREDENTIALS');
     }
     return account;
   }
@@ -409,7 +441,7 @@ function createQuantumVaultHandler(options) {
     const action = String(body.action || '');
     if (action === 'harvest') {
       if (now() - state._lastHarvestAt < HARVEST_COOLDOWN_MS) {
-        throw new VaultError('Harvester is recharging.', 429);
+        throw new VaultError('Harvester is recharging.', 429, 'ACTION_COOLDOWN');
       }
       const amount = 1 + state.upgrades.resonator;
       state.fragments += amount;
@@ -492,6 +524,10 @@ function createQuantumVaultHandler(options) {
         send(response, 200, accountPayload(account), { 'Set-Cookie': sessionCookie(token) });
         return true;
       }
+      if (route === '/health' && request.method === 'GET') {
+        send(response, 200, { ok: true, service: 'quantum-vault', status: 'ready' });
+        return true;
+      }
       if (route === '/leaderboard' && request.method === 'GET') {
         const leaders = store.accounts.map((account) => ({
           handle: account.handle,
@@ -530,7 +566,7 @@ function createQuantumVaultHandler(options) {
       if (route === '/save' && request.method === 'POST') {
         const body = await readJsonBody(request);
         const kind = body.kind === 'auto' ? 'auto' : body.kind === 'manual' ? 'manual' : '';
-        if (!kind) throw new VaultError('Save kind must be auto or manual.', 400);
+        if (!kind) throw new VaultError('Save kind must be auto or manual.', 400, 'INVALID_SAVE_KIND');
         const result = await withLock(async () => {
           const authenticated = authenticate(request);
           const current = stateFor(authenticated.account);
@@ -544,11 +580,16 @@ function createQuantumVaultHandler(options) {
         send(response, 200, { handle: result.account.handle, state: publicState(result.state) });
         return true;
       }
-      throw new VaultError('Quantum Vault endpoint not found.', 404);
+      throw new VaultError('Quantum Vault endpoint not found.', 404, 'NOT_FOUND');
     } catch (error) {
-      const status = error instanceof VaultError ? error.status : 500;
-      const message = error instanceof VaultError ? error.message : 'Quantum Vault request failed.';
-      send(response, status, { error: message });
+      const known = error instanceof VaultError;
+      const status = known ? error.status : 500;
+      const message = known ? error.message : 'Quantum Vault request failed.';
+      const code = known ? error.code : 'INTERNAL_ERROR';
+      if (status >= 500) console.error(`[quantum-vault] ${code}: ${error && error.message}`);
+      send(response, status, { code, error: message }, code === 'RATE_LIMITED'
+        ? { 'Retry-After': String(Math.ceil(authRateWindowMs / 1000)) }
+        : undefined);
       return true;
     }
   }
@@ -607,11 +648,45 @@ function createQuantumVaultServer(options) {
   });
 }
 
+function describeStartupError(error) {
+  const generate = 'node -e "console.log(require(\'node:crypto\').randomBytes(32).toString(\'hex\'))"';
+  const code = error && error.code;
+  if (code === 'VAULT_KEY_MISSING' || code === 'VAULT_KEY_INVALID') {
+    return [
+      code === 'VAULT_KEY_MISSING'
+        ? '[quantum-vault] Start abgebrochen: QUANTUM_VAULT_KEY ist nicht gesetzt.'
+        : '[quantum-vault] Start abgebrochen: QUANTUM_VAULT_KEY ist ungültig (erwartet: 32 Byte als 64 Hex-Zeichen oder base64).',
+      '[quantum-vault] Schlüssel erzeugen:  ' + generate,
+      '[quantum-vault] Dann starten:       QUANTUM_VAULT_KEY=<schlüssel> npm start',
+      '[quantum-vault] Hinweis: Den Schlüssel geheim halten und nach dem ersten Start nicht mehr ändern,',
+      '[quantum-vault] sonst können bestehende Spielstände nicht entschlüsselt werden.'
+    ].join('\n');
+  }
+  if (code === 'VAULT_DATA_INVALID') {
+    return `[quantum-vault] Start abgebrochen: ${error.message} Prüfe QUANTUM_VAULT_DATA_FILE oder stelle ein Backup wieder her.`;
+  }
+  if (code === 'EADDRINUSE') {
+    return `[quantum-vault] Start abgebrochen: Port ${error.port || ''} ist bereits belegt. Setze PORT auf einen freien Port.`;
+  }
+  return `[quantum-vault] Start abgebrochen: ${error && error.message ? error.message : String(error)}`;
+}
+
 if (require.main === module) {
   const port = Number(process.env.PORT) || 8080;
-  const server = createQuantumVaultServer({ secureCookie: process.env.NODE_ENV === 'production' });
+  let server;
+  try {
+    server = createQuantumVaultServer({ secureCookie: process.env.NODE_ENV === 'production' });
+  } catch (error) {
+    console.error(describeStartupError(error));
+    process.exit(1);
+  }
+  server.on('error', (error) => {
+    console.error(describeStartupError(error));
+    process.exit(1);
+  });
   server.listen(port, () => {
-    console.log(`Quantum Vault listening on http://localhost:${port}`);
+    console.log(`Quantum Vault listening on http://localhost:${server.address().port}`);
+    console.log(`Quantum Vault health check: http://localhost:${server.address().port}${API_PREFIX}/health`);
   });
 }
 
@@ -621,6 +696,7 @@ module.exports = {
   createQuantumVaultHandler,
   createQuantumVaultServer,
   decryptState,
+  describeStartupError,
   encryptState,
   parseVaultKey,
   publicState

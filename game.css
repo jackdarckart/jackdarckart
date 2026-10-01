@@ -85,7 +85,10 @@ p { color: var(--muted); line-height: 1.6; }
 .auth-shell { display: grid; grid-template-columns: minmax(0, .85fr) minmax(32rem, 1.15fr); gap: clamp(1.5rem, 5vw, 5rem); align-items: center; min-height: 65vh; }
 .auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .auth-form { padding: 1.25rem; border: 1px solid var(--line); background: rgba(1, 7, 16, .55); }
-.auth-form label { display: grid; gap: .4rem; margin: .85rem 0; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+.auth-form label { display: block; margin: .95rem 0 .4rem; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+.auth-form .form-intro { margin: .35rem 0 0; color: var(--muted); font-size: .9rem; }
+.auth-form .field-hint { display: block; margin-top: .35rem; color: var(--muted); font-size: .78rem; line-height: 1.4; }
+.auth-form button { margin-top: 1.1rem; }
 .auth-form input {
   width: 100%;
   border: 1px solid var(--line);
@@ -95,6 +98,7 @@ p { color: var(--muted); line-height: 1.6; }
   padding: .8rem;
 }
 .auth-form input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(88, 239, 255, .12); }
+.auth-form input[aria-invalid="true"] { border-color: var(--danger); }
 .system-message { min-height: 1.5rem; margin: .8rem 0 0; color: var(--cyan); }
 .system-message.error { color: var(--danger); }
 

@@ -1,11 +1,38 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const os = require('node:os');
 const path = require('node:path');
-const { createQuantumVaultServer } = require('../server/quantum-vault.js');
+const { createQuantumVaultServer, parseVaultKey } = require('../server/quantum-vault.js');
+
+function testStartupDiagnostics() {
+  assert.throws(() => parseVaultKey(''), (error) => error.code === 'VAULT_KEY_MISSING');
+  assert.throws(() => parseVaultKey('not-a-valid-key!'), (error) => error.code === 'VAULT_KEY_INVALID');
+  assert.throws(() => parseVaultKey('abcd'), (error) => error.code === 'VAULT_KEY_INVALID');
+  assert.equal(parseVaultKey('07'.repeat(32)).length, 32);
+  assert.equal(parseVaultKey(Buffer.alloc(32, 1).toString('base64')).length, 32);
+
+  const serverScript = path.join(__dirname, '..', 'server', 'quantum-vault.js');
+  const env = Object.assign({}, process.env, { PORT: '0' });
+  delete env.QUANTUM_VAULT_KEY;
+  const missing = spawnSync(process.execPath, [serverScript], { env, encoding: 'utf8', timeout: 10000 });
+  assert.equal(missing.status, 1, 'server must exit when QUANTUM_VAULT_KEY is missing');
+  assert.match(missing.stderr, /QUANTUM_VAULT_KEY ist nicht gesetzt/);
+  assert.match(missing.stderr, /randomBytes\(32\)/, 'startup error should explain how to generate a key');
+  assert.doesNotMatch(missing.stderr, /\n\s+at /, 'startup diagnostics should not dump stack traces');
+
+  const invalid = spawnSync(process.execPath, [serverScript], {
+    env: Object.assign({}, env, { QUANTUM_VAULT_KEY: 'too-short' }),
+    encoding: 'utf8',
+    timeout: 10000
+  });
+  assert.equal(invalid.status, 1, 'server must exit when QUANTUM_VAULT_KEY is invalid');
+  assert.match(invalid.stderr, /QUANTUM_VAULT_KEY ist ungültig/);
+  assert.doesNotMatch(invalid.stderr, /too-short/, 'invalid key values must never be logged');
+}
 
 async function startServer(options) {
   const server = createQuantumVaultServer(options);
@@ -61,6 +88,7 @@ function startDelayedAction(origin, cookie) {
 }
 
 async function main() {
+  testStartupDiagnostics();
   const tempRoot = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'quantum-vault-test-'));
   const dataFile = path.join(tempRoot, 'vault.json');
   const key = Buffer.alloc(32, 7);
@@ -86,13 +114,41 @@ async function main() {
       body: JSON.stringify({ handle: 'large', password: 'x'.repeat(17000) })
     });
     assert.equal(oversized.status, 413);
-    assert.match((await oversized.json()).error, /too large/i);
+    const oversizedPayload = await oversized.json();
+    assert.match(oversizedPayload.error, /too large/i);
+    assert.equal(oversizedPayload.code, 'BODY_TOO_LARGE');
+
+    const health = await request(running.origin, '/health');
+    assert.equal(health.response.status, 200);
+    assert.deepEqual(health.payload, { ok: true, service: 'quantum-vault', status: 'ready' });
+    assert.match(health.response.headers.get('cache-control'), /no-store/);
+
+    const unknownRoute = await request(running.origin, '/does-not-exist');
+    assert.equal(unknownRoute.response.status, 404);
+    assert.equal(unknownRoute.payload.code, 'NOT_FOUND');
+
+    const badHandle = await request(running.origin, '/register', {
+      method: 'POST',
+      json: { handle: 'no spaces!', password: 'correct-horse-vault' }
+    });
+    assert.equal(badHandle.response.status, 400);
+    assert.equal(badHandle.payload.code, 'HANDLE_INVALID');
+
+    const badJson = await fetch(`${running.origin}/api/quantum-vault/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{not json'
+    });
+    assert.equal(badJson.status, 400);
+    assert.equal((await badJson.json()).code, 'INVALID_JSON');
 
     const weak = await request(running.origin, '/register', {
       method: 'POST',
       json: { handle: 'pilot', password: 'short' }
     });
     assert.equal(weak.response.status, 400);
+    assert.equal(weak.payload.code, 'PASSWORD_INVALID');
+    assert.ok(weak.payload.error, 'error responses keep a human-readable message');
 
     const registered = await request(running.origin, '/register', {
       method: 'POST',
@@ -117,6 +173,14 @@ async function main() {
     assert.equal(exposedVault.status, 404, 'persistent vault files must never be served');
     const exposedGit = await fetch(`${running.origin}/.git/config`);
     assert.equal(exposedGit.status, 404, 'repository internals must never be served');
+
+    const duplicate = await request(running.origin, '/register', {
+      method: 'POST',
+      json: { handle: 'pilot_one', password: 'another-strong-password' }
+    });
+    assert.equal(duplicate.response.status, 409);
+    assert.equal(duplicate.payload.code, 'HANDLE_TAKEN');
+    assert.match(duplicate.response.headers.get('cache-control'), /no-store/);
 
     const session = await request(running.origin, '/session', { headers: { Cookie: cookie } });
     assert.equal(session.response.status, 200);
@@ -143,6 +207,7 @@ async function main() {
       json: { action: 'harvest' }
     });
     assert.equal(rateLimited.response.status, 429);
+    assert.equal(rateLimited.payload.code, 'ACTION_COOLDOWN');
 
     for (let count = 1; count < 20; count += 1) {
       clock += 701;
@@ -199,6 +264,7 @@ async function main() {
       json: { kind: 'manual' }
     });
     assert.equal(crossOrigin.response.status, 403);
+    assert.equal(crossOrigin.payload.code, 'CROSS_ORIGIN');
 
     const delayedAction = startDelayedAction(running.origin, cookie);
     await new Promise((resolve) => setTimeout(resolve, 20));
@@ -212,12 +278,14 @@ async function main() {
     assert.equal(revokedAction.status, 401, 'pending requests must re-check authorization after logout');
     const expired = await request(running.origin, '/session', { headers: { Cookie: cookie } });
     assert.equal(expired.response.status, 401);
+    assert.equal(expired.payload.code, 'SESSION_REQUIRED');
 
     const wrongPassword = await request(running.origin, '/login', {
       method: 'POST',
       json: { handle: 'Pilot_One', password: 'incorrect-password' }
     });
     assert.equal(wrongPassword.response.status, 401);
+    assert.equal(wrongPassword.payload.code, 'INVALID_CREDENTIALS');
 
     await running.close();
     running = await startServer(options);
@@ -246,6 +314,8 @@ async function main() {
       json: { handle: 'UnknownPilot', password: 'incorrect-password' }
     });
     assert.equal(throttled.response.status, 429);
+    assert.equal(throttled.payload.code, 'RATE_LIMITED');
+    assert.equal(throttled.response.headers.get('retry-after'), '60');
 
     console.log('quantum vault tests passed');
   } finally {
