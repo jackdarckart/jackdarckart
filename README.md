@@ -92,13 +92,49 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 
 Auto-Enhance schätzt lokal Frequenzbalance, Dynamik, Clipping und Stereo-Korrelation und passt EQ, Kompression und Lautstärkeziel an die Quelle an. Bei auffälligen Höhen, Transienten oder phasigem Stereo werden vorsichtige DSP-Korrekturen zugeschaltet. Dies sind Heuristiken, keine KI-Modell- oder Broadcast-Loudness-Messung; falls die Analyse fehlschlägt, bleibt das klassische Preset nutzbar.
 
-Remote-Import verarbeitet Audio ausschließlich im Browser: HTTPS, Hostnamen ohne offensichtliche interne Ziele oder IP-Literale, CORS-Freigabe ohne Redirect, Audio-MIME und Dateisignatur sowie maximal 50 MB sind erforderlich. Direkte Suno-CDN-Links (`https://cdn1.suno.ai/<id>.mp4`, `.m4a` oder `.mp3`) werden akzeptiert und über MIME- plus `ftyp`-Signaturprüfung als MP4/M4A-Container dekodiert; der dekodierte AudioBuffer läuft danach durch die bestehende Preview-, Auto-Enhance-, Render- und WAV-Exportkette (MP3 nur, soweit der vorhandene MP3-Exportpfad verfügbar ist). Suno-Song-Links mit UUID werden auf genau diese CDN-Medienlinks abgebildet (zuerst `.mp3`, danach `.mp4`); andere Share-Links können nicht verlässlich aufgelöst werden. Da der Browser DNS-Adressen nicht vor dem Abruf prüfen kann, ist eine Garantie gegen DNS-Rebinding ohne vertrauenswürdigen Proxy nicht möglich. Bei blockierter CORS-Freigabe bitte die Audiodatei lokal importieren.
+Remote-Import verarbeitet Audio ausschließlich im Browser: HTTPS, Hostnamen ohne offensichtliche interne Ziele oder IP-Literale, CORS-Freigabe ohne Redirect, Audio-MIME und Dateisignatur sowie maximal 50 MB sind erforderlich. Direkte Suno-CDN-Links (`https://cdn1.suno.ai/<id>.mp4`, `.m4a` oder `.mp3`) werden akzeptiert und über MIME- plus `ftyp`-Signaturprüfung als MP4/M4A-Container dekodiert; der dekodierte AudioBuffer läuft danach durch die bestehende Preview-, Auto-Enhance-, Render- und WAV-Exportkette (MP3 nur, soweit der vorhandene MP3-Exportpfad verfügbar ist). Suno-Song-Links mit UUID werden auf genau diese CDN-Medienlinks abgebildet (zuerst `.mp3`, danach `.mp4`); andere Share-Links können nicht verlässlich aufgelöst werden. Da der Browser DNS-Adressen nicht vor dem Abruf prüfen kann, ist eine Garantie gegen DNS-Rebinding ohne vertrauenswürdigen Proxy nicht möglich.
+
+### Proxy-Fallback für nicht CORS-freigegebene Quellen
+
+Wenn die Quelle (z. B. das Suno-CDN) keine CORS-Freigabe liefert, scheitert der direkte Browserabruf. Dafür gibt es einen optionalen, vertrauenswürdigen Same-Origin-Resolver: Der Converter versucht zuerst den direkten Abruf und fällt erst bei einem CORS-/Netzwerkfehler auf den Proxy zurück (`preferProxy: true` dreht die Reihenfolge um). Lokaler Import, Preview, Auto-Enhance, Render, Cleanup und die bestehenden Exportwege bleiben unverändert.
+
+```js
+window.__JACKDARCKART_CONFIG__ = {
+  converter: {
+    remoteImport: {
+      proxyEndpoint: '/api/remote-audio',
+      preferProxy: false
+    }
+  }
+};
+```
+
+Nur echte Same-Origin-Endpunkte werden akzeptiert; fremde Origins, `data:`, `blob:`, `javascript:` und protokollrelative Werte werden ignoriert. Der Browser sendet dabei keine Credentials und keinen Referrer.
+
+`server/remote-audio-proxy.js` ist die dependency-freie Node-Referenzimplementierung dieses Endpunkts (GitHub Pages selbst liefert kein Backend mit). Sie ist bewusst kein offener Proxy und prüft serverseitig erneut:
+
+- nur HTTPS, Standardport, keine Zugangsdaten, keine IP-Literale
+- Allow-List (Standard: `cdn\d*.suno.ai` mit `.mp3`/`.mp4`/`.m4a`), erweiterbar über `allowTarget`
+- DNS-Auflösung gegen private, lokale, Link-Local- und Multicast-Adressen abgesichert
+- Content-Type plus Containersignatur (`ftyp`-Familie, RIFF/WAVE, OggS, fLaC …)
+- Größenlimit (50 MB), Timeout (15 s) und maximal zwei erneut geprüfte Weiterleitungen
+- keine Weitergabe von Client-Headern, Cookies oder Credentials; Antwort nur als validierte Audiobytes
+
+```js
+const http = require('node:http');
+const { createRemoteAudioProxyHandler } = require('./server/remote-audio-proxy.js');
+
+http.createServer(createRemoteAudioProxyHandler()).listen(8787);
+```
+
+Ohne konfigurierten Proxy bleibt es bei der bisherigen Grenze: Bei blockierter CORS-Freigabe bitte die Audiodatei lokal importieren.
 
 ## Technische Struktur
 
 - `styles.css` – gemeinsames Layout, Navigation, Mehrseiten-Komponenten und Player-Styling
 - `app.js` – defensive Initialisierung für alle Seiten, Player-Logik, Sendeplan-/Inhalts-Rendering, Theme, PWA und lokale Komfortfunktionen
 - `converter.js` – browserseitiger DSP-/Render-Workflow für `converter.html` inklusive lokaler Preview, Waveform/Spectrum, MP3/WAV-Export, Cleanup-Timer und Vault-Stub
+- `server/remote-audio-proxy.js` – optionale Node-Referenzimplementierung des Same-Origin-Resolvers für CORS-blockierte Remote-Audio-Importe
 - `assets/vendor/lame.min.js` – gebündelter lokaler MP3-Encoder (`lamejs` 1.2.1, LGPL-3.0) für privacy-first Export ohne Upload
 - `manifest.webmanifest` – PWA-Metadaten und Mehrseiten-Shortcuts
 - `sw.js` – App-Shell-Cache für alle HTML-Seiten und statischen Assets, ohne Stream-Caching

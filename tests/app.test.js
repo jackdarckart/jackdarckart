@@ -2,6 +2,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { EventEmitter } = require('node:events');
+const { Readable } = require('node:stream');
 
 const appCode = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
 const converterJsCode = fs.readFileSync(path.join(__dirname, '..', 'converter.js'), 'utf8');
@@ -3227,6 +3229,322 @@ function testIssueHelpPageAndTemplatesArePresent() {
   }
 }
 
+function createProxyFallbackEnvironment(remoteImportConfig) {
+  const env = createConverterEnvironment();
+  const mp3 = Uint8Array.from([73, 68, 51, 3, 0, 0, 0, 0, 0, 0, 1, 2]);
+  const mp4 = Uint8Array.from(Buffer.from('0000ftypM4A 0000'));
+  const audioBuffer = {
+    duration: 1, sampleRate: 44100, numberOfChannels: 1,
+    getChannelData() { return new Float32Array([0.2, -0.2]); }
+  };
+  const state = { corsBlocked: false, proxyFails: false, proxyStatus: 200, decodeFails: false };
+  const fetchCalls = [];
+  class FakeAudioContext {
+    decodeAudioData(buffer, resolve, reject) {
+      if (state.decodeFails) reject(new Error('corrupt'));
+      else resolve(audioBuffer);
+    }
+
+    async close() {}
+  }
+  env.window.URL = URL;
+  env.window.AudioContext = FakeAudioContext;
+  env.window.__JACKDARCKART_CONFIG__ = { converter: { remoteImport: remoteImportConfig } };
+  env.window.fetch = async (url, options) => {
+    fetchCalls.push({ url, options });
+    const viaProxy = url.startsWith('/api/remote-audio');
+    if (viaProxy ? state.proxyFails : state.corsBlocked) {
+      throw new TypeError('Failed to fetch');
+    }
+    const bytes = viaProxy ? mp4 : mp3;
+    const mime = viaProxy ? 'video/mp4' : 'audio/mpeg';
+    let index = 0;
+    return {
+      ok: viaProxy ? state.proxyStatus === 200 : true,
+      status: viaProxy ? state.proxyStatus : 200,
+      type: viaProxy ? 'basic' : 'cors',
+      url: viaProxy ? 'https://stream-musik.space' + url : url,
+      async json() { return { error: 'Zu groß' }; },
+      headers: { get(key) { return key === 'Content-Type' ? mime : null; } },
+      body: { getReader() {
+        return {
+          async read() {
+            index += 1;
+            return index === 1 ? { done: false, value: bytes } : { done: true };
+          },
+          async cancel() {}
+        };
+      } }
+    };
+  };
+  env.context.AbortController = AbortController;
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  return { env, studio, state, fetchCalls, audioBuffer };
+}
+
+async function testConverterRemoteImportProxyFallback() {
+  const sunoMp4Url = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  const proxyHref = '/api/remote-audio?url=' + encodeURIComponent(sunoMp4Url);
+  const { env, studio, state, fetchCalls, audioBuffer } = createProxyFallbackEnvironment({
+    proxyEndpoint: '/api/remote-audio'
+  });
+  const input = env.elements['converter-remote-url'];
+  const button = env.elements['converter-remote-import'];
+  const status = env.elements['converter-import-status'];
+
+  input.value = 'https://public.example/song.mp3';
+  await button.dispatch('click');
+  assert.deepEqual(fetchCalls.map((call) => call.url), ['https://public.example/song.mp3'],
+    'CORS-enabled sources must still load through the direct browser fetch');
+  assert.match(status.textContent, /erfolgreich/);
+  assert.doesNotMatch(status.textContent, /Proxy/, 'successful direct fetches must not claim a proxy fallback');
+
+  fetchCalls.length = 0;
+  state.corsBlocked = true;
+  input.value = sunoMp4Url;
+  await button.dispatch('click');
+  assert.deepEqual(fetchCalls.map((call) => call.url), [sunoMp4Url, proxyHref],
+    'a CORS-blocked Suno CDN MP4 must fall back to the same-origin proxy');
+  assert.equal(fetchCalls[1].options.mode, 'same-origin');
+  assert.equal(fetchCalls[1].options.credentials, 'omit');
+  assert.equal(fetchCalls[1].options.referrerPolicy, 'no-referrer');
+  assert.equal(fetchCalls[1].options.redirect, 'error');
+  assert.match(status.textContent, /Proxy/, 'proxy recovery must be reported to the user');
+  assert.match(status.textContent, /CORS/, 'the recovered CORS failure must be explained');
+  assert.match(status.textContent, /MP4\/M4A-Audio erfolgreich/);
+  assert.equal(env.elements['converter-file-name'].textContent, '4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4');
+  assert.equal(env.elements['converter-render-button'].disabled, false,
+    'proxy imports must feed the existing render pipeline');
+  const wav = Buffer.from(await studio._encodeWavForTest(audioBuffer).arrayBuffer());
+  assert.equal(wav.toString('ascii', 0, 4), 'RIFF', 'WAV export must work after a proxy import');
+
+  fetchCalls.length = 0;
+  state.proxyStatus = 403;
+  await button.dispatch('click');
+  assert.match(status.textContent, /unsicher blockiert/, 'targets rejected by the proxy must be reported as blocked');
+  assert.equal(fetchCalls.length, 2, 'a blocked proxy target must not be retried');
+
+  fetchCalls.length = 0;
+  state.proxyStatus = 413;
+  await button.dispatch('click');
+  assert.match(status.textContent, /Proxy-Ablehnung: Zu groß/, 'proxy 4xx details must be surfaced without retrying');
+  assert.equal(fetchCalls.length, 2, 'a rejected proxy request must not be retried');
+
+  fetchCalls.length = 0;
+  state.proxyStatus = 502;
+  await button.dispatch('click');
+  assert.match(status.textContent, /Proxy-Ablehnung: Zu groß/, 'proxy 5xx details must be surfaced as well');
+
+  fetchCalls.length = 0;
+  state.proxyStatus = 200;
+  state.proxyFails = true;
+  await button.dispatch('click');
+  assert.match(status.textContent, /Proxy war nicht erreichbar/);
+
+  fetchCalls.length = 0;
+  state.proxyFails = false;
+  state.decodeFails = true;
+  await button.dispatch('click');
+  assert.match(status.textContent, /nicht dekodiert/, 'decode failures after a proxy fetch must stay clean');
+  state.decodeFails = false;
+
+  fetchCalls.length = 0;
+  input.value = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.exe';
+  await button.dispatch('click');
+  assert.equal(fetchCalls.length, 0, 'unsafe targets must never reach the proxy');
+  assert.match(status.textContent, /Suno-CDN-Links/);
+  studio.destroy();
+
+  const preferred = createProxyFallbackEnvironment({ proxyEndpoint: '/api/remote-audio', preferProxy: true });
+  preferred.env.elements['converter-remote-url'].value = sunoMp4Url;
+  await preferred.env.elements['converter-remote-import'].dispatch('click');
+  assert.equal(preferred.fetchCalls[0].url, proxyHref, 'preferProxy must try the proxy before the direct fetch');
+  assert.match(preferred.env.elements['converter-import-status'].textContent, /Proxy/);
+  preferred.studio.destroy();
+
+  const unsafeEndpoint = createProxyFallbackEnvironment({ proxyEndpoint: 'https://evil.example/proxy' });
+  unsafeEndpoint.state.corsBlocked = true;
+  unsafeEndpoint.env.elements['converter-remote-url'].value = sunoMp4Url;
+  await unsafeEndpoint.env.elements['converter-remote-import'].dispatch('click');
+  assert.deepEqual(unsafeEndpoint.fetchCalls.map((call) => call.url), [sunoMp4Url],
+    'cross-origin proxy endpoints must be ignored');
+  unsafeEndpoint.studio.destroy();
+}
+
+function createFakeHttps(responder) {
+  const requests = [];
+  return {
+    requests,
+    request(options, callback) {
+      const request = new EventEmitter();
+      const index = requests.length;
+      requests.push(options);
+      request.end = () => {
+        const response = responder(options, index);
+        if (!response) return;
+        setImmediate(() => callback(response));
+      };
+      request.destroy = (error) => {
+        request.emit('close');
+        if (error) request.emit('error', error);
+      };
+      return request;
+    }
+  };
+}
+
+function createFakeProxyResponse(statusCode, headers, body) {
+  const response = Readable.from(body === undefined ? [] : [Buffer.from(body)]);
+  response.statusCode = statusCode;
+  response.headers = headers;
+  return response;
+}
+
+async function assertProxyError(promise, status, pattern) {
+  await assert.rejects(promise, (error) => {
+    assert.equal(error.status, status);
+    assert.match(error.message, pattern);
+    return true;
+  });
+}
+
+async function testRemoteAudioProxyValidatesAndFetchesAudio() {
+  const proxy = require('../server/remote-audio-proxy.js');
+  const target = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  const mp4 = '0000ftypM4A 0000';
+  const lookup = (hostname, options, callback) => {
+    const done = typeof options === 'function' ? options : callback;
+    if (typeof options === 'object' && options && options.all) done(null, [{ address: '203.0.113.10', family: 4 }]);
+    else done(null, '203.0.113.10', 4);
+  };
+
+  for (const unsafe of [
+    'http://cdn1.suno.ai/a.mp4', 'data:audio/mp4,abc', 'javascript:alert(1)',
+    'blob:https://cdn1.suno.ai/a.mp4', 'https://cdn1.suno.ai:8443/a.mp4',
+    'https://localhost/a.mp4', 'https://127.0.0.1/a.mp4', 'https://192.168.1.5/a.mp4',
+    'https://[::1]/a.mp4', 'https://router.local/a.mp4',
+    'https://cdn1.suno.ai/payload.exe', 'https://evil.example/song.mp4'
+  ]) {
+    assert.throws(() => proxy.validateTargetUrl(unsafe), /erlaubt|Ungültige|freigegeben/,
+      `${unsafe} must be rejected by the proxy allow-list`);
+  }
+  assert.equal(proxy.validateTargetUrl(target + '#fragment').href, target, 'fragments must be stripped');
+  assert.throws(() => proxy.validateTargetUrl('https://' + 'user:secret@' + 'cdn1.suno.ai/a.mp4'),
+    /Zugangsdaten/, 'credentialed URLs must be rejected');
+
+  for (const blocked of ['127.0.0.1', '10.0.0.5', '169.254.169.254', '172.16.4.4', '192.168.0.1',
+    '::1', 'fd00::1', 'fe80::1', 'ff02::1', '::ffff:127.0.0.1', 'not-an-ip']) {
+    assert.equal(proxy.isBlockedAddress(blocked), true, `${blocked} must be treated as an internal target`);
+  }
+  assert.equal(proxy.isBlockedAddress('203.0.113.10'), false);
+  await assert.rejects(new Promise((resolve, reject) => {
+    proxy.safeLookup('localhost', {}, (error, address) => (error ? reject(error) : resolve(address)));
+  }), /Interne Netzwerkziele/);
+
+  const audio = await proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, mp4))
+  });
+  assert.equal(audio.contentType, 'video/mp4');
+  assert.equal(audio.body.toString('latin1'), mp4);
+  const forwarded = createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, mp4));
+  await proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), { lookup, httpsModule: forwarded });
+  assert.deepEqual(Object.keys(forwarded.requests[0].headers).sort(), ['accept', 'user-agent'],
+    'the proxy must not forward credentials or client headers');
+
+  await assertProxyError(proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, 'not-a-real-mp4'))
+  }), 502, /MIME\/Dateisignatur/);
+
+  await assertProxyError(proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'text/html' }, mp4))
+  }), 502, /MIME\/Dateisignatur/);
+
+  await assertProxyError(proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, {
+      'content-type': 'video/mp4', 'content-length': String(proxy.DEFAULT_MAX_BYTES + 1)
+    }, mp4))
+  }), 413, /zu groß/);
+
+  await assertProxyError(proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup, maxBytes: 4,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, mp4))
+  }), 413, /zu groß/);
+
+  await assertProxyError(proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup, timeoutMs: 20, httpsModule: createFakeHttps(() => null)
+  }), 504, /Zeitlimit/);
+
+  await assertProxyError(proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(302, { location: 'https://evil.example/song.mp4' }))
+  }), 403, /nicht freigegeben/);
+
+  await assertProxyError(proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup, maxRedirects: 0,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(302, { location: 'https://cdn2.suno.ai/other.mp4' }))
+  }), 502, /Weiterleitung/);
+
+  const redirected = await proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup,
+    httpsModule: createFakeHttps((options, index) => (index === 0
+      ? createFakeProxyResponse(302, { location: 'https://cdn2.suno.ai/other.mp4' })
+      : createFakeProxyResponse(200, { 'content-type': 'audio/mp4' }, mp4)))
+  });
+  assert.equal(redirected.url, 'https://cdn2.suno.ai/other.mp4', 'allowed redirects must be re-validated and followed');
+
+  await assertProxyError(proxy.fetchRemoteAudio(proxy.validateTargetUrl(target), {
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(404, { 'content-type': 'text/plain' }, 'missing'))
+  }), 502, /nicht erreichbar/);
+}
+
+async function testRemoteAudioProxyHandlerResponses() {
+  const proxy = require('../server/remote-audio-proxy.js');
+  const target = 'https://cdn1.suno.ai/4c1f8738-f62e-4fa4-bd86-afe9d24b4d7c.mp4';
+  const lookup = (hostname, options, callback) => {
+    const done = typeof options === 'function' ? options : callback;
+    done(null, '203.0.113.10', 4);
+  };
+  const handler = proxy.createRemoteAudioProxyHandler({
+    lookup,
+    httpsModule: createFakeHttps(() => createFakeProxyResponse(200, { 'content-type': 'video/mp4' }, '0000ftypM4A 0000'))
+  });
+  const call = async (url, method) => {
+    const result = { headers: null, status: 0, body: null };
+    await handler({ method: method || 'GET', url }, {
+      writeHead(status, headers) {
+        result.status = status;
+        result.headers = headers;
+      },
+      end(body) {
+        result.body = body;
+      }
+    });
+    return result;
+  };
+
+  const success = await call('/api/remote-audio?url=' + encodeURIComponent(target));
+  assert.equal(success.status, 200);
+  assert.equal(success.headers['Content-Type'], 'video/mp4');
+  assert.equal(success.headers['Cache-Control'], 'no-store');
+  assert.equal(success.headers['X-Content-Type-Options'], 'nosniff');
+  assert.equal(success.body.toString('latin1'), '0000ftypM4A 0000');
+
+  assert.equal((await call('/api/remote-audio?url=' + encodeURIComponent(target), 'POST')).status, 405);
+  assert.equal((await call('/api/remote-audio')).status, 400);
+  assert.equal((await call('/api/remote-audio?url=' + encodeURIComponent('http://cdn1.suno.ai/a.mp4'))).status, 400);
+  assert.equal((await call('/api/remote-audio?url=' + encodeURIComponent('https://127.0.0.1/a.mp4'))).status, 403);
+  const blocked = await call('/api/remote-audio?url=' + encodeURIComponent('https://evil.example/a.mp4'));
+  assert.equal(blocked.status, 403);
+  assert.match(JSON.parse(blocked.body).error, /nicht freigegeben/);
+}
+
 async function testConverterAdaptiveEnhance() {
   const env = createConverterEnvironment();
   vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
@@ -3346,6 +3664,9 @@ async function main() {
   await testConverterMp3CompressedExportPath();
   testConverterDownloadClearsTemporaryAsset();
   await testConverterRemoteImport();
+  await testConverterRemoteImportProxyFallback();
+  await testRemoteAudioProxyValidatesAndFetchesAudio();
+  await testRemoteAudioProxyHandlerResponses();
   await testConverterAdaptiveEnhance();
   await testConverterCompressedExportPath();
   await testConverterCompressedExportFailureClosesAudioContext();
