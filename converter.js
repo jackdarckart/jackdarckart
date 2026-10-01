@@ -166,12 +166,14 @@
         }
         throw error;
       }
-      if (proxyEndpoint && response.status >= 400 && response.status < 500) {
-        // 4xx des eigenen Proxys sind endgültige Ablehnungen und dürfen keinen weiteren Versuch auslösen.
+      if (proxyEndpoint && response.status >= 400) {
+        // 4xx des eigenen Proxys sind endgültige Ablehnungen; 5xx melden den Grund und dürfen weiterhin ausweichen.
         if (response.status === 403) {
           throw new Error(REMOTE_IMPORT_ERROR_BLOCKED);
         }
-        throw new Error(await readProxyErrorMessage(response));
+        const rejection = new Error(await readProxyErrorMessage(response));
+        if (response.status >= 500) rejection.remoteSourceUnavailable = true;
+        throw rejection;
       }
       if (!response.ok || response.type === 'opaque' || response.url !== absoluteRequestHref) {
         const unreachable = new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
@@ -919,9 +921,9 @@
 
     async function fetchFirstAvailableRemoteAudio(candidates, generation) {
       const proxy = resolveRemoteImportProxy();
-      const attempts = proxy.preferProxy
-        ? [proxy.endpoint, '']
-        : (proxy.endpoint ? ['', proxy.endpoint] : ['']);
+      const attempts = proxy.endpoint
+        ? (proxy.preferProxy ? [proxy.endpoint, ''] : ['', proxy.endpoint])
+        : [''];
       let lastError = null;
       let corsBlocked = false;
       for (let index = 0; index < candidates.length; index += 1) {

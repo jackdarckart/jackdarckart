@@ -41,7 +41,7 @@ function isBlockedIpv4(address) {
   if (a === 0 || a === 10 || a === 127 || a >= 224) return true;
   if (a === 169 && b === 254) return true;
   if (a === 172 && b >= 16 && b <= 31) return true;
-  // 192.0.0.0/16 wird bewusst komplett blockiert (deckt 192.0.0.0/24 und TEST-NET-1 192.0.2.0/24 ab).
+  // 192.168.0.0/16 (privat) und 192.0.0.0/16 (deckt 192.0.0.0/24 sowie TEST-NET-1 192.0.2.0/24 ab) werden blockiert.
   if (a === 192 && (b === 168 || b === 0)) return true;
   if (a === 100 && b >= 64 && b <= 127) return true;
   if (a === 198 && (b === 18 || b === 19)) return true;
@@ -156,8 +156,8 @@ function requestOnce(url, options) {
       headers: { accept: 'audio/*,video/mp4;q=0.9', 'user-agent': 'jackdarckart-remote-audio-proxy' }
     }, resolve);
     request.on('error', reject);
+    if (typeof options.register === 'function') options.register(request);
     request.end();
-    options.register(request);
   });
 }
 

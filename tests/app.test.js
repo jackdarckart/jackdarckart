@@ -3333,6 +3333,11 @@ async function testConverterRemoteImportProxyFallback() {
   assert.equal(fetchCalls.length, 2, 'a rejected proxy request must not be retried');
 
   fetchCalls.length = 0;
+  state.proxyStatus = 502;
+  await button.dispatch('click');
+  assert.match(status.textContent, /Proxy-Ablehnung: Zu groß/, 'proxy 5xx details must be surfaced as well');
+
+  fetchCalls.length = 0;
   state.proxyStatus = 200;
   state.proxyFails = true;
   await button.dispatch('click');
