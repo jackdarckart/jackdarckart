@@ -1724,6 +1724,8 @@
     return parts.some((part) => !Number.isFinite(part) || part > 255) ? null : parts;
   }
 
+  // Blocks this-network, RFC1918, loopback, link-local, CGNAT, IETF protocol assignments,
+  // benchmarking ranges plus multicast and reserved space to prevent SSRF against internal targets.
   function isBlockedIpv4Address(parts) {
     const first = parts[0];
     const second = parts[1];
@@ -1907,7 +1909,10 @@
       throw new Error('Die Antwort ist kein erlaubter Audio-Typ (' + (normalizeRemoteContentType(contentType) || 'unbekannt') + ').');
     }
 
-    const declaredLength = headers && typeof headers.get === 'function' ? Number(headers.get('content-length')) : NaN;
+    const declaredLengthHeader = headers && typeof headers.get === 'function' ? headers.get('content-length') : null;
+    const declaredLength = typeof declaredLengthHeader === 'string' && declaredLengthHeader.trim()
+      ? Number(declaredLengthHeader)
+      : NaN;
     if (Number.isFinite(declaredLength) && declaredLength > REMOTE_IMPORT_MAX_BYTES) {
       throw new Error('Die Remote-Datei überschreitet das Speicherlimit von ' + formatBytes(REMOTE_IMPORT_MAX_BYTES) + '.');
     }

@@ -760,7 +760,7 @@ function createConverterEnvironment(options = {}) {
     removeEventListener() {}
   };
 
-  class urlApi extends URL {
+  class UrlApi extends URL {
     static createObjectURL() {
       return 'blob:converter-test';
     }
@@ -774,7 +774,7 @@ function createConverterEnvironment(options = {}) {
     window: windowObject,
     document,
     console,
-    URL: urlApi,
+    URL: UrlApi,
     Blob,
     MediaRecorder: options.MediaRecorder,
     Math,
@@ -800,7 +800,7 @@ function createConverterEnvironment(options = {}) {
     cancelAnimationFrame() {}
   });
   context.globalThis = context;
-  windowObject.URL = urlApi;
+  windowObject.URL = UrlApi;
 
   return {
     context,
