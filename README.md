@@ -83,7 +83,6 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `events.html` – bestätigte Events und Specials oder professioneller Leerzustand
 - `news.html` – Sender-/Website-Neuigkeiten oder redaktioneller Leerzustand
 - `archiv.html` – Mix-/Sendungsarchiv mit ehrlichem Leerzustand für verifizierte Inhalte
-- `game.html` – Subdomain-Gateway zur Singularity Arcade (`jackdarckart/game`, Quantum Vault) mit Launch-Konsole, Architektur-Einordnung und Verbindungstest
 - `ueber-uns.html` – Einordnung von jackdarckart und stream-musik.space
 - `hilfe.html` – umfangreiche Hilfe/FAQ zu Wiedergabe, PWA, Datenverbrauch, Theme und Tastatursteuerung
 - `issue-hilfe.html` – ausführliche GitHub-Issue-Hilfe mit Checklisten, Qualitätsregeln und deutschsprachigen Vorlagen
@@ -180,18 +179,6 @@ Folgende Inhalte bleiben zentral über `APP_CONFIG.content` pflegbar:
 - `archive`
 - `platformLinks`
 - `contact`
-
-## Singularity Arcade / Subdomain-Integration (`jackdarckart/game`)
-
-Das Projekt `jackdarckart/game` ist ein eigenständiges Cyberpunk-Hacking-Webgame („Quantum Vault“) mit einem Node.js-Backend (`scrypt`, HttpOnly-Sessions, servergespeicherte Vaults und Session-APIs).
-
-### Architektur & Hosting-Realität
-- **Hauptseite (`jackdarckart/jackdarckart`):** Statische Multi-Page-App, gehostet auf GitHub Pages unter der Custom Domain `stream-musik.space` (definiert via `CNAME`). GitHub Pages kann keine serverseitigen Node.js-Prozesse ausführen und keine getrennten Repositories unter unterschiedlichen Subdomains dynamisch ausliefern.
-- **Game-Projekt (`jackdarckart/game`):** Benötigt eine Node.js-Laufzeitumgebung.
-- **Subdomain-Modell:** Im Produktivbetrieb wird das Game unter der Subdomain `game.stream-musik.space` über einen externen Node-Host (z. B. VPS, Render, Railway, Docker) bereitgestellt.
-- **Gateway-Integration (`game.html`):** Auf der Hauptseite fungiert `game.html` als direkt verknüpftes Subdomain-Gateway. Es ist in die persistente Audio-Shell integriert, sodass der Livestream beim Erkunden der Arcade ohne Unterbrechung weiterläuft.
-- **Launcher & Verbindungstest:** Nutzer können direkt auf `https://game.stream-musik.space` springen, einen lokalen Entwicklungs-Server (`http://127.0.0.1:3000`) ansteuern oder eine benutzerdefinierte URL testen und öffnen.
-- **Konfiguration:** Standard-URLs können über `APP_CONFIG.game` (bzw. `window.__JACKDARCKART_CONFIG__.game`) angepasst werden (`subdomainUrl`, `localUrl`, `repoUrl`, `healthEndpoint`).
 
 ## Lokale Vorschau
 
