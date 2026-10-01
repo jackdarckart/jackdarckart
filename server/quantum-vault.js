@@ -501,42 +501,47 @@ function createQuantumVaultHandler(options) {
         return true;
       }
 
-      const authenticated = authenticate(request);
       if (route === '/session' && request.method === 'GET') {
+        const authenticated = authenticate(request);
         send(response, 200, accountPayload(authenticated.account));
         return true;
       }
       if (route === '/logout' && request.method === 'POST') {
-        sessions.delete(authenticated.token);
+        await withLock(async () => {
+          const authenticated = authenticate(request);
+          sessions.delete(authenticated.token);
+        });
         send(response, 200, { ok: true }, { 'Set-Cookie': clearSessionCookie() });
         return true;
       }
       if (route === '/action' && request.method === 'POST') {
         const body = await readJsonBody(request);
-        const state = await withLock(async () => {
+        const result = await withLock(async () => {
+          const authenticated = authenticate(request);
           const current = stateFor(authenticated.account);
           applyAction(current, body);
           saveState(authenticated.account, current);
           await persist();
-          return current;
+          return { account: authenticated.account, state: current };
         });
-        send(response, 200, { handle: authenticated.account.handle, state: publicState(state) });
+        send(response, 200, { handle: result.account.handle, state: publicState(result.state) });
         return true;
       }
       if (route === '/save' && request.method === 'POST') {
         const body = await readJsonBody(request);
         const kind = body.kind === 'auto' ? 'auto' : body.kind === 'manual' ? 'manual' : '';
         if (!kind) throw new VaultError('Save kind must be auto or manual.', 400);
-        const state = await withLock(async () => {
+        const result = await withLock(async () => {
+          const authenticated = authenticate(request);
           const current = stateFor(authenticated.account);
           current.stats[kind === 'auto' ? 'autosaves' : 'manualSaves'] += 1;
           current.stats.lastSavedAt = new Date(now()).toISOString();
           current.revision += 1;
           saveState(authenticated.account, current);
           await persist();
-          return current;
+          return { account: authenticated.account, state: current };
         });
-        send(response, 200, { handle: authenticated.account.handle, state: publicState(state) });
+        send(response, 200, { handle: result.account.handle, state: publicState(result.state) });
         return true;
       }
       throw new VaultError('Quantum Vault endpoint not found.', 404);

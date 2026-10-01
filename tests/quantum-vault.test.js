@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const http = require('node:http');
 const os = require('node:os');
 const path = require('node:path');
 const { createQuantumVaultServer } = require('../server/quantum-vault.js');
@@ -27,9 +28,36 @@ async function request(origin, route, options) {
     settings.headers['Content-Type'] = 'application/json';
     delete settings.json;
   }
+
   const response = await fetch(`${origin}/api/quantum-vault${route}`, settings);
   const payload = await response.json();
   return { response, payload };
+}
+
+function startDelayedAction(origin, cookie) {
+  const target = new URL('/api/quantum-vault/action', origin);
+  let requestHandle;
+  const result = new Promise((resolve, reject) => {
+    requestHandle = http.request(target, {
+      method: 'POST',
+      headers: { Cookie: cookie, 'Content-Type': 'application/json' }
+    }, (response) => {
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => resolve({
+        status: response.statusCode,
+        payload: JSON.parse(Buffer.concat(chunks).toString('utf8'))
+      }));
+    });
+    requestHandle.on('error', reject);
+    requestHandle.write('{"action":"har');
+  });
+  return {
+    finish() {
+      requestHandle.end('vest"}');
+      return result;
+    }
+  };
 }
 
 async function main() {
@@ -172,12 +200,16 @@ async function main() {
     });
     assert.equal(crossOrigin.response.status, 403);
 
+    const delayedAction = startDelayedAction(running.origin, cookie);
+    await new Promise((resolve) => setTimeout(resolve, 20));
     const loggedOut = await request(running.origin, '/logout', {
       method: 'POST',
       headers: { Cookie: cookie },
       json: {}
     });
     assert.equal(loggedOut.response.status, 200);
+    const revokedAction = await delayedAction.finish();
+    assert.equal(revokedAction.status, 401, 'pending requests must re-check authorization after logout');
     const expired = await request(running.origin, '/session', { headers: { Cookie: cookie } });
     assert.equal(expired.response.status, 401);
 
