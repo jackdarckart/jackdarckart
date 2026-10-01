@@ -2640,7 +2640,7 @@ async function testConverterRemoteImport() {
     const chunks = responseOptions.chunks || [bytes];
     let index = 0;
     return {
-      ok: true, type: 'cors', url: responseOptions.finalUrl || url,
+      ok: true, type: 'cors', url: responseOptions.finalUrl || url.split('#')[0],
       headers: { get(key) {
         return key === 'Content-Type' ? (responseOptions.mime || 'audio/mpeg')
           : (responseOptions.length === undefined ? null : responseOptions.length);
@@ -2684,6 +2684,10 @@ async function testConverterRemoteImport() {
   assert.equal(fetchCalls[0].options.cache, 'no-store');
   assert.equal(env.elements['converter-render-button'].disabled, false);
   assert.equal(env.elements['converter-file-size'].textContent, '12 B');
+  assert.match(status.textContent, /erfolgreich/);
+  input.value = 'https://public.example/song.mp3#playback';
+  await button.dispatch('click');
+  assert.equal(fetchCalls.at(-1).url, 'https://public.example/song.mp3', 'fragments must not reach fetch or trigger a false redirect');
   assert.match(status.textContent, /erfolgreich/);
 
   const previousCalls = fetchCalls.length;
@@ -2754,6 +2758,17 @@ async function testConverterRemoteImport() {
   await pendingImport;
   assert.equal(env.elements['converter-file-name'].textContent, 'local.wav', 'stale remote completion must not replace local import');
   env.window.fetch = immediateFetch;
+  let finishLocalRead;
+  env.elements['converter-file-input'].files = [{
+    ...file, arrayBuffer() { return new Promise((resolve) => { finishLocalRead = resolve; }); }
+  }];
+  const pendingLocal = env.elements['converter-file-input'].dispatch('change');
+  await flushMicrotasks();
+  input.value = 'https://public.example/newer.mp3';
+  await button.dispatch('click');
+  finishLocalRead(wav.buffer);
+  await pendingLocal;
+  assert.equal(env.elements['converter-file-name'].textContent, 'newer.mp3', 'stale local decode must not replace a newer remote import');
   const exported = await studio._encodeWavForTest(audioBuffer).arrayBuffer();
   assert.equal(Buffer.from(exported).toString('ascii', 0, 4), 'RIFF');
   assert.equal(Buffer.from(exported).toString('ascii', 8, 12), 'WAVE');

@@ -51,6 +51,7 @@
     if (url.port && url.port !== '443') {
       throw new Error('Nur der Standard-HTTPS-Port ist erlaubt.');
     }
+    url.hash = '';
     return url;
   }
 
@@ -716,7 +717,9 @@
       }
 
       cancelRemoteImport();
+      const generation = importGeneration;
       await resetPlaybackOnly();
+      if (generation !== importGeneration) return;
       clearRenderedAsset('Vorherige temporäre Master-Datei entfernt, weil eine neue Quelldatei geladen wurde.');
       loadedFile = file;
       setRenderState('loading', 'Datei wird lokal dekodiert …');
@@ -724,7 +727,9 @@
       try {
         const context = await ensureAudioContext();
         const arrayBuffer = await file.arrayBuffer();
-        loadedBuffer = await decodeAudioBuffer(context, arrayBuffer);
+        const buffer = await decodeAudioBuffer(context, arrayBuffer);
+        if (generation !== importGeneration) return;
+        loadedBuffer = buffer;
         previewOffset = 0;
         updateMetadata(file, loadedBuffer);
         updateButtons();
@@ -733,6 +738,7 @@
         setRenderState('ready', 'Datei bereit – Preview und Render sind lokal verfügbar.');
         elements.importStatus.textContent = 'Datei erfolgreich lokal geladen. Alle Mastering-Schritte bleiben im Browser.';
       } catch (error) {
+        if (generation !== importGeneration) return;
         loadedBuffer = null;
         updateButtons();
         drawWaveformIdle();
