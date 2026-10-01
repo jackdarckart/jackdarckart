@@ -2095,22 +2095,32 @@ async function testGameCloudflareCookieFlow() {
     await flushStudioTasks();
     assert.equal(getElement('game-shell').hidden, false, 'registration must restore authenticated game state');
     assert.equal((action.listeners.get('click') || []).length, 1, 'game action should be wired');
+    await getElement('leaderboard-refresh').dispatch('click');
+    await flushStudioTasks();
+    assert.equal(calls.filter(({ url }) => url.endsWith('/leaderboard')).length, 3,
+      'manual leaderboard refresh should bypass the short-lived cache');
+    assert.equal(calls[4].options.cache, 'no-store');
+    await getElement('logout-button').dispatch('click');
+    await getElement('login-form').dispatch('submit');
+    await flushStudioTasks();
+    assert.equal(calls.filter(({ url }) => url.endsWith('/leaderboard')).length, 3,
+      'login should reuse a fresh public leaderboard response');
     await action.dispatch('click');
     await getElement('save-button').dispatch('click');
     await getElement('logout-button').dispatch('click');
     assert.deepEqual(calls.map(({ url }) => url.slice(base.length)),
-      ['/session', '/leaderboard', '/register', '/leaderboard', '/action', '/save', '/logout']);
+      ['/session', '/leaderboard', '/register', '/leaderboard', '/leaderboard', '/logout', '/login', '/action', '/save', '/logout']);
     for (const { options } of calls) {
       assert.equal(options.credentials, 'include', 'every game request must carry the Worker session cookie');
     }
     assert.deepEqual(JSON.parse(calls[2].options.body), { handle: 'Pilot_One', password: 'correct-horse-vault' });
-    assert.deepEqual(JSON.parse(calls[4].options.body), { action: 'harvest' });
-    assert.deepEqual(JSON.parse(calls[5].options.body), { kind: 'manual' });
+    assert.deepEqual(JSON.parse(calls[7].options.body), { action: 'harvest' });
+    assert.deepEqual(JSON.parse(calls[8].options.body), { kind: 'manual' });
     assert.equal(getElement('auth-shell').hidden, false, 'logout should return to the login page');
     await getElement('login-form').dispatch('submit');
     await flushStudioTasks();
-    assert.equal(calls[7].url, `${base}/login`);
-    assert.equal(calls[7].options.credentials, 'include');
+    assert.equal(calls[10].url, `${base}/login`);
+    assert.equal(calls[10].options.credentials, 'include');
     assert.equal(getElement('game-shell').hidden, false, 'login should restore the game from server state');
   }
 }

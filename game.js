@@ -24,6 +24,10 @@
   let dirty = false;
   let authGeneration = 0;
   let authPending = false;
+  let leaderboardCache = null;
+  let leaderboardRequest = null;
+  let leaderboardRevision = 0;
+  const LEADERBOARD_CACHE_MS = 30000;
 
   const SESSION_EXPIRED = 'Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.';
   const MESSAGES = {
@@ -194,7 +198,12 @@
       render(payload);
       startAutosave();
       setMessage(elements.gameMessage, 'Quantum Vault synchronisiert.', false);
-      loadLeaderboard();
+      if (route === '/register') {
+        invalidateLeaderboard();
+        loadLeaderboard(true);
+      } else {
+        loadLeaderboard();
+      }
     } catch (error) {
       if (generation !== authGeneration) return;
       if (isOffline(error)) setOfflineConnection(error);
@@ -222,6 +231,7 @@
       const payload = await request('/action', { method: 'POST', body: JSON.stringify(body) });
       if (generation !== authGeneration || !currentState) return;
       render(payload);
+      invalidateLeaderboard();
       dirty = true;
       elements.saveState.textContent = 'Autosave ausstehend';
       setMessage(elements.gameMessage, 'Aktion bestätigt und im Vault persistiert.', false);
@@ -268,30 +278,53 @@
     }
   }
 
-  async function loadLeaderboard() {
-    try {
-      const payload = await request('/leaderboard');
-      elements.leaderboard.replaceChildren(...payload.leaders.map((leader) => {
-        const item = document.createElement('li');
-        const handle = document.createElement('span');
-        const score = document.createElement('b');
-        handle.textContent = leader.handle;
-        score.textContent = leader.vibeScore;
-        item.append(handle, score);
-        return item;
-      }));
-      if (!payload.leaders.length) {
-        const empty = document.createElement('li');
-        empty.innerHTML = '<span>Noch keine Signale</span><b>0</b>';
-        elements.leaderboard.append(empty);
-      }
-    } catch (error) {
+  function invalidateLeaderboard() {
+    leaderboardCache = null;
+    leaderboardRevision += 1;
+  }
+
+  function renderLeaderboard(payload) {
+    elements.leaderboard.replaceChildren(...payload.leaders.map((leader) => {
       const item = document.createElement('li');
-      const text = document.createElement('span');
-      text.textContent = isOffline(error) ? 'Leaderboard nicht verfügbar – Vault-Server offline' : 'Leaderboard konnte nicht geladen werden';
-      item.append(text);
-      elements.leaderboard.replaceChildren(item);
+      const handle = document.createElement('span');
+      const score = document.createElement('b');
+      handle.textContent = leader.handle;
+      score.textContent = leader.vibeScore;
+      item.append(handle, score);
+      return item;
+    }));
+    if (!payload.leaders.length) {
+      const empty = document.createElement('li');
+      empty.innerHTML = '<span>Noch keine Signale</span><b>0</b>';
+      elements.leaderboard.append(empty);
     }
+  }
+
+  function loadLeaderboard(forceRefresh) {
+    const now = Date.now();
+    if (!forceRefresh && leaderboardCache && now - leaderboardCache.loadedAt >= 0
+      && now - leaderboardCache.loadedAt < LEADERBOARD_CACHE_MS) {
+      renderLeaderboard(leaderboardCache.payload);
+      return Promise.resolve();
+    }
+    if (leaderboardRequest) return leaderboardRequest;
+    const revision = leaderboardRevision;
+    leaderboardRequest = request('/leaderboard', forceRefresh ? { cache: 'no-store' } : undefined)
+      .then((payload) => {
+        if (revision === leaderboardRevision) leaderboardCache = { payload, loadedAt: Date.now() };
+        renderLeaderboard(payload);
+      })
+      .catch((error) => {
+        const item = document.createElement('li');
+        const text = document.createElement('span');
+        text.textContent = isOffline(error) ? 'Leaderboard nicht verfügbar – Vault-Server offline' : 'Leaderboard konnte nicht geladen werden';
+        item.append(text);
+        elements.leaderboard.replaceChildren(item);
+      })
+      .finally(() => {
+        leaderboardRequest = null;
+      });
+    return leaderboardRequest;
   }
 
   document.getElementById('login-form').addEventListener('submit', (event) => {
@@ -315,7 +348,7 @@
     button.addEventListener('click', () => performAction({ action: 'jukebox', track: button.dataset.track }, button));
   });
   document.getElementById('save-button').addEventListener('click', () => save('manual'));
-  document.getElementById('leaderboard-refresh').addEventListener('click', loadLeaderboard);
+  document.getElementById('leaderboard-refresh').addEventListener('click', () => loadLeaderboard(true));
   document.getElementById('logout-button').addEventListener('click', async () => {
     const generation = authGeneration;
     try {
