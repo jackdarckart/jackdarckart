@@ -192,6 +192,83 @@
       return { peak, rms, loudnessDb };
     }
 
+    analyzeSource(buffer) {
+      if (!buffer || !buffer.length || !buffer.sampleRate || !buffer.numberOfChannels) {
+        throw new Error('Keine analysierbare Audioquelle.');
+      }
+      const sums = [0, 0, 0, 0];
+      const coefficients = [250, 3500, 8000].map((hz) => 1 - Math.exp(-2 * Math.PI * Math.min(hz, buffer.sampleRate * 0.45) / buffer.sampleRate));
+      let sum = 0;
+      let peak = 0;
+      let clipped = 0;
+      let cross = 0;
+      let leftEnergy = 0;
+      let rightEnergy = 0;
+      const channels = Array.from({ length: Math.min(2, buffer.numberOfChannels) }, (_, index) => buffer.getChannelData(index));
+      for (const channel of channels) {
+        const filters = [0, 0, 0];
+        for (let i = 0; i < buffer.length; i += 1) {
+          const sample = channel[i];
+          if (!Number.isFinite(sample)) throw new Error('Ungültige Audiodaten.');
+          peak = Math.max(peak, Math.abs(sample));
+          sum += sample * sample;
+          if (Math.abs(sample) >= 0.98) clipped += 1;
+          for (let band = 0; band < 3; band += 1) {
+            filters[band] += coefficients[band] * (sample - filters[band]);
+          }
+          const values = [filters[0], filters[1] - filters[0], filters[2] - filters[1], sample - filters[2]];
+          for (let band = 0; band < 4; band += 1) sums[band] += values[band] * values[band];
+        }
+      }
+      if (channels.length === 2) {
+        for (let i = 0; i < buffer.length; i += 1) {
+          const left = channels[0][i];
+          const right = channels[1][i];
+          cross += left * right;
+          leftEnergy += left * left;
+          rightEnergy += right * right;
+        }
+      }
+      const count = buffer.length * channels.length;
+      const rms = Math.sqrt(sum / count);
+      const bandRms = sums.map((value) => Math.sqrt(value / count));
+      const tilt = (a, b) => 20 * Math.log10((a + 1e-8) / (b + 1e-8));
+      const bassTiltDb = tilt(bandRms[0], bandRms[1]);
+      const presenceTiltDb = tilt(bandRms[2], bandRms[1]);
+      const trebleTiltDb = tilt(bandRms[3], bandRms[1]);
+      const crestDb = tilt(peak, rms);
+      const correlation = channels.length === 2 && leftEnergy * rightEnergy > 0
+        ? cross / Math.sqrt(leftEnergy * rightEnergy) : 1;
+      return {
+        peak, rms, loudnessDb: rms ? 20 * Math.log10(rms) : -Infinity,
+        bandRms, bassTiltDb, presenceTiltDb, trebleTiltDb,
+        brightnessDb: tilt(bandRms[2] + bandRms[3], bandRms[0] + bandRms[1]),
+        crestDb, clippingRatio: clipped / count, stereoCorrelation: correlation,
+        harshness: rms > 1e-5 && (presenceTiltDb > -2 || trebleTiltDb > -9),
+        phasey: correlation < -0.15,
+        brittle: rms > 1e-5 && crestDb > 15 && (presenceTiltDb > -5 || trebleTiltDb > -12)
+      };
+    }
+
+    chooseEnhancement(profile) {
+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+      const loud = profile.loudnessDb;
+      const compressed = profile.crestDb < 9 || profile.clippingRatio > 0.001;
+      return {
+        eqLow: clamp((2 - profile.bassTiltDb) * 0.25, -3, 3),
+        eqMid: clamp(-profile.presenceTiltDb * 0.2, -2.5, 2),
+        eqHigh: clamp((-12 - profile.trebleTiltDb) * 0.2, -3, 2),
+        compThreshold: compressed ? -12 : -20,
+        compRatio: compressed ? 1.5 : 2.5,
+        limiterCeiling: profile.clippingRatio > 0.001 ? -2 : -1,
+        stereoWidth: profile.phasey ? 65 : 100,
+        targetLufs: compressed || loud > -12 ? -14 : -12,
+        artifactCleaner: profile.harshness || profile.phasey || profile.brittle
+          ? { presenceCut: profile.harshness ? -2.5 : 0, highCut: profile.brittle || profile.harshness ? -1.5 : 0, softenTransients: profile.brittle }
+          : null
+      };
+    }
+
     createPreviewChain(context, settings, analyser, sourceChannelCount) {
       const input = context.createGain();
       const lowEq = context.createBiquadFilter();
@@ -210,11 +287,25 @@
       highEq.frequency.value = this.highFrequency;
       highEq.gain.value = settings.eqHigh;
 
+      const cleaner = settings.artifactCleaner;
+      const ringCut = cleaner && cleaner.presenceCut ? context.createBiquadFilter() : null;
+      if (ringCut) {
+        ringCut.type = 'peaking';
+        ringCut.frequency.value = 4400;
+        ringCut.Q.value = 3;
+        ringCut.gain.value = cleaner.presenceCut;
+      }
+      const airCut = cleaner && cleaner.highCut ? context.createBiquadFilter() : null;
+      if (airCut) {
+        airCut.type = 'highshelf';
+        airCut.frequency.value = 6500;
+        airCut.gain.value = cleaner.highCut;
+      }
       const compressor = context.createDynamicsCompressor();
       compressor.threshold.value = settings.compThreshold;
       compressor.knee.value = 18;
       compressor.ratio.value = settings.compRatio;
-      compressor.attack.value = 0.01;
+      compressor.attack.value = cleaner && cleaner.softenTransients ? 0.003 : 0.01;
       compressor.release.value = 0.16;
 
       const makeup = context.createGain();
@@ -228,7 +319,10 @@
       input.connect(lowEq);
       lowEq.connect(midEq);
       midEq.connect(highEq);
-      highEq.connect(compressor);
+      let tail = highEq;
+      if (ringCut) { tail.connect(ringCut); tail = ringCut; }
+      if (airCut) { tail.connect(airCut); tail = airCut; }
+      tail.connect(compressor);
       compressor.connect(makeup);
       makeup.connect(widthStage.input);
       widthStage.output.connect(limiter);
@@ -542,6 +636,8 @@
     let audioContext = null;
     let loadedFile = null;
     let loadedBuffer = null;
+    let sourceProfile = null;
+    let artifactCleaner = null;
     let previewSource = null;
     let previewAnalyser = null;
     let previewStartAt = 0;
@@ -730,6 +826,8 @@
         const buffer = await decodeAudioBuffer(context, arrayBuffer);
         if (generation !== importGeneration) return;
         loadedBuffer = buffer;
+        sourceProfile = analyzeLoadedSource();
+        artifactCleaner = null;
         previewOffset = 0;
         updateMetadata(file, loadedBuffer);
         updateButtons();
@@ -740,6 +838,8 @@
       } catch (error) {
         if (generation !== importGeneration) return;
         loadedBuffer = null;
+        sourceProfile = null;
+        artifactCleaner = null;
         updateButtons();
         drawWaveformIdle();
         setRenderState('error', 'Datei konnte lokal nicht dekodiert werden.');
@@ -776,6 +876,8 @@
           type: audio.type
         };
         loadedBuffer = buffer;
+        sourceProfile = analyzeLoadedSource();
+        artifactCleaner = null;
         previewOffset = 0;
         updateMetadata(loadedFile, loadedBuffer);
         updateButtons();
@@ -871,24 +973,45 @@
         compRatio: Number(controls['converter-comp-ratio'].value),
         limiterCeiling: Number(controls['converter-limiter-ceiling'].value),
         stereoWidth: Number(controls['converter-stereo-width'].value),
-        targetLufs: Number(controls['converter-target-lufs'].value)
+        targetLufs: Number(controls['converter-target-lufs'].value),
+        artifactCleaner
       };
+    }
+
+    function analyzeLoadedSource() {
+      try {
+        return core.analyzeSource(loadedBuffer);
+      } catch (error) {
+        return null;
+      }
     }
 
     function applyAutoEnhance() {
       if (!loadedBuffer) {
         return;
       }
-      controls['converter-eq-low'].value = '1.5';
-      controls['converter-eq-mid'].value = '2.5';
-      controls['converter-eq-high'].value = '2';
-      controls['converter-comp-threshold'].value = '-20';
-      controls['converter-comp-ratio'].value = '3.2';
-      controls['converter-limiter-ceiling'].value = '-1';
-      controls['converter-stereo-width'].value = '118';
-      controls['converter-target-lufs'].value = '-12';
+      let settings;
+      try {
+        settings = core.chooseEnhancement(sourceProfile || core.analyzeSource(loadedBuffer));
+      } catch (error) {
+        settings = {
+          eqLow: 1.5, eqMid: 2.5, eqHigh: 2, compThreshold: -20,
+          compRatio: 3.2, limiterCeiling: -1, stereoWidth: 118, targetLufs: -12,
+          artifactCleaner: null
+        };
+      }
+      const names = {
+        eqLow: 'converter-eq-low', eqMid: 'converter-eq-mid', eqHigh: 'converter-eq-high',
+        compThreshold: 'converter-comp-threshold', compRatio: 'converter-comp-ratio',
+        limiterCeiling: 'converter-limiter-ceiling', stereoWidth: 'converter-stereo-width',
+        targetLufs: 'converter-target-lufs'
+      };
+      Object.keys(names).forEach((key) => { controls[names[key]].value = String(settings[key]); });
+      artifactCleaner = settings.artifactCleaner;
       updateControlOutputs();
-      elements.renderStatus.textContent = 'Auto-Enhance gesetzt: leichte Präsenzanhebung, moderater Glue-Kompressor und konservatives Ceiling.';
+      elements.renderStatus.textContent = sourceProfile
+        ? 'Auto-Enhance quellenabhängig gesetzt' + (artifactCleaner ? ' · Artefakt-Reinigung aktiv.' : '.')
+        : 'Analyse nicht verfügbar: klassisches Auto-Enhance-Preset gesetzt.';
     }
 
     async function togglePreview() {
@@ -1244,6 +1367,9 @@
         return;
       }
       output.push('<p><strong>Quelle:</strong> approx. ' + formatLoudness(sourceAnalysis && sourceAnalysis.loudnessDb) + ' · Peak ' + formatPeak(sourceAnalysis && sourceAnalysis.peak) + '</p>');
+      if (sourceProfile) {
+        output.push('<p><strong>Quellenprofil:</strong> Bass ' + sourceProfile.bassTiltDb.toFixed(1) + ' dB · Präsenz ' + sourceProfile.presenceTiltDb.toFixed(1) + ' dB · Höhen ' + sourceProfile.trebleTiltDb.toFixed(1) + ' dB · Crest ' + sourceProfile.crestDb.toFixed(1) + ' dB' + (sourceProfile.harshness || sourceProfile.brittle ? ' · harsche Höhen' : '') + (sourceProfile.phasey ? ' · phasiges Stereo' : '') + (sourceProfile.clippingRatio > 0.001 ? ' · Clipping' : '') + '</p>');
+      }
       if (renderReport && asset) {
         output.push('<p><strong>Master:</strong> approx. ' + formatLoudness(renderReport.outputApproxLufs) + ' · Peak ' + formatPeak(renderReport.peakAfter) + ' · ' + escapeHtml(asset.filename) + ' · ' + (asset.sampleRate / 1000).toFixed(1) + ' kHz</p>');
       } else {
@@ -1266,6 +1392,8 @@
       clearRenderedAsset('Temporäre Master-Datei entfernt, weil das Studio zurückgesetzt wurde.');
       loadedFile = null;
       loadedBuffer = null;
+      sourceProfile = null;
+      artifactCleaner = null;
       previewOffset = 0;
       if (elements.fileInput) {
         elements.fileInput.value = '';
@@ -1392,6 +1520,8 @@
       cancelRemoteImport();
       stopPreview(true);
       clearRenderedAsset('Temporäre Master-Datei bei Seitenwechsel bereinigt.');
+      sourceProfile = null;
+      artifactCleaner = null;
       if (audioContext && audioContext.state !== 'closed') {
         audioContext.close().catch(() => null);
       }
@@ -1428,7 +1558,9 @@
       },
       _encodeWavForTest(buffer) {
         return core.encodeWav(buffer);
-      }
+      },
+      _coreForTest: core,
+      _settingsForTest: readSettings
     };
   }
 
