@@ -844,7 +844,8 @@
       const rightCross = context.createGain();
 
       // Channel balance correction is folded into the width matrix, so it
-      // costs no extra nodes in preview or offline render.
+      // costs no extra nodes in preview or offline render. Each path is scaled
+      // by its source channel: leftCross carries input 1 (right), rightCross input 0 (left).
       const trim = Number.isFinite(balanceTrimDb) ? balanceTrimDb : 0;
       const leftGain = this.dbToLinear(-trim / 2);
       const rightGain = this.dbToLinear(trim / 2);
