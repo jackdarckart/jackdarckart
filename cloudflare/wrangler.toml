@@ -1,0 +1,33 @@
+# Template: copy this file, replace the REPLACE_WITH_* placeholders and deploy.
+# Never commit real secrets here – use `wrangler secret put` instead.
+
+name = "quantum-vault-api"
+main = "src/worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+[vars]
+# Comma separated allowlist of browser origins that may send credentialed requests.
+ALLOWED_ORIGINS = "https://stream-musik.space"
+# Optional: cooldown between harvest actions in milliseconds (default 700).
+# HARVEST_COOLDOWN_MS = "700"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "quantum-vault-db"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Route the Worker to a custom subdomain, e.g. https://vault.stream-musik.space.
+# The zone must be managed by Cloudflare and the hostname must exist as a
+# proxied DNS record (an AAAA/CNAME placeholder is enough for Worker routes).
+# [[routes]]
+# pattern = "vault.stream-musik.space/api/*"
+# zone_name = "stream-musik.space"
+
+# Secrets (set via `wrangler secret put <NAME>`, never via [vars]):
+#   PEPPER – optional extra secret mixed into the password KDF input.

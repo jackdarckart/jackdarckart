@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node server/quantum-vault.js",
-    "check": "node --check app.js && node --check converter.js && node --check game.js && node --check sw.js && node --check server/quantum-vault.js",
-    "test": "node tests/app.test.js && node tests/quantum-vault.test.js"
+    "check": "node --check app.js && node --check converter.js && node --check game.js && node --check sw.js && node --check server/quantum-vault.js && node --check cloudflare/src/worker.js",
+    "test": "node tests/app.test.js && node tests/quantum-vault.test.js && node tests/cloudflare-worker.test.js"
   }
 }
