@@ -524,14 +524,14 @@
         ? { id: 'stereo', tone: profile.phasey ? 'alert' : 'warn', label: 'Phasiges Stereobild', detail: 'Korrelation ' + profile.stereoCorrelation.toFixed(2) + '. Die Stereobreite wird für Mono-Kompatibilität reduziert.' }
         : { id: 'stereo', tone: 'good', label: 'Stereobild stabil', detail: 'Korrelation ' + profile.stereoCorrelation.toFixed(2) + ' bleibt mono-kompatibel.' });
       if (profile.channelCount === 2) {
-        findings.push(s.balance > 0
+        findings.push(s.balance >= 0.2
           ? { id: 'balance', tone: tone(s.balance), label: 'Kanäle unausgewogen', detail: (profile.balanceDb > 0 ? 'Links' : 'Rechts') + ' ist ' + Math.abs(profile.balanceDb).toFixed(1) + ' dB lauter. Das fließt in den Qualitäts-Score ein.' }
           : { id: 'balance', tone: 'good', label: 'Kanäle ausgewogen', detail: 'Links/Rechts-Differenz ' + Math.abs(profile.balanceDb || 0).toFixed(1) + ' dB.' });
       }
       findings.push({
         id: 'tonality',
         tone: tone(s.tonality),
-        label: s.tonality > 0 ? (profile.bassTiltDb > 2 ? 'Bassbetonte Quelle' : 'Bassarme Quelle') : 'Tonale Balance in Ordnung',
+        label: s.tonality >= 0.2 ? (profile.bassTiltDb > 2 ? 'Bassbetonte Quelle' : 'Bassarme Quelle') : 'Tonale Balance in Ordnung',
         detail: 'Bass-Tilt ' + dB(profile.bassTiltDb) + ' gegenüber den unteren Mitten.'
       });
       if (profile.rumble) {
