@@ -42,6 +42,9 @@
   });
   const REMOTE_IMPORT_STATUS_DEFAULT = 'Remote-Audio erfolgreich im Browser geladen. Keine Speicherung auf dem Server.';
   const REMOTE_IMPORT_STATUS_MP4 = 'MP4/M4A-Audio erfolgreich im Browser dekodiert. Export als WAV ist verfügbar, MP3 nur bei vorhandener Encoder-Unterstützung. Keine Speicherung auf dem Server.';
+  const REMOTE_IMPORT_STATUS_PROXY = 'Direkter Abruf war durch CORS blockiert; die Datei wurde über den vertrauenswürdigen Same-Origin-Proxy geladen und geprüft.';
+  const REMOTE_IMPORT_ERROR_BLOCKED = 'Ziel wurde als unsicher blockiert und nicht geladen.';
+  const REMOTE_IMPORT_ERROR_CORS = 'Remote-Audio konnte nicht geladen werden (Netzwerk oder CORS-Freigabe). Ohne konfigurierten Same-Origin-Proxy bitte die Datei lokal importieren.';
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -117,22 +120,39 @@
     return mime;
   }
 
-  async function fetchRemoteAudio(url, controller) {
+  function buildProxyRequestUrl(endpoint, url) {
+    return endpoint + (endpoint.indexOf('?') === -1 ? '?' : '&') + 'url=' + encodeURIComponent(url.href);
+  }
+
+  async function fetchRemoteAudio(url, controller, proxyEndpoint) {
+    const requestHref = proxyEndpoint ? buildProxyRequestUrl(proxyEndpoint, url) : url.href;
     const timeout = window.setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
     let reader;
     try {
       let response;
       try {
-        response = await window.fetch(url.href, {
-          mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
+        response = await window.fetch(requestHref, {
+          mode: proxyEndpoint ? 'same-origin' : 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
           redirect: 'error', cache: 'no-store', signal: controller.signal
         });
       } catch (error) {
         // Netzwerk-/CORS-Fehler markieren eine nicht abrufbare Quelle, nicht einen inhaltlichen Fehler.
-        if (error && error.name !== 'AbortError') error.remoteSourceUnavailable = true;
+        if (error && error.name === 'AbortError') throw error;
+        if (proxyEndpoint) {
+          const proxyUnavailable = new Error('Der vertrauenswürdige Proxy war nicht erreichbar.');
+          proxyUnavailable.remoteSourceUnavailable = true;
+          throw proxyUnavailable;
+        }
+        if (error) {
+          error.remoteSourceUnavailable = true;
+          error.remoteCorsBlocked = true;
+        }
         throw error;
       }
-      if (!response.ok || response.type === 'opaque' || response.url !== url.href) {
+      if (proxyEndpoint && response.status === 403) {
+        throw new Error(REMOTE_IMPORT_ERROR_BLOCKED);
+      }
+      if (!response.ok || response.type === 'opaque' || response.url !== requestHref) {
         const unreachable = new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
         unreachable.remoteSourceUnavailable = true;
         throw unreachable;
@@ -877,19 +897,29 @@
     }
 
     async function fetchFirstAvailableRemoteAudio(candidates, generation) {
+      const proxy = resolveRemoteImportProxy();
+      const attempts = proxy.preferProxy
+        ? [proxy.endpoint, '']
+        : (proxy.endpoint ? ['', proxy.endpoint] : ['']);
       let lastError = null;
+      let corsBlocked = false;
       for (let index = 0; index < candidates.length; index += 1) {
-        const controller = new AbortController();
-        remoteController = controller;
-        try {
-          return { url: candidates[index], audio: await fetchRemoteAudio(candidates[index], controller) };
-        } catch (error) {
-          if (remoteController === controller) remoteController = null;
-          // Nur fehlende oder nicht abrufbare Quellen dürfen auf den nächsten Kandidaten ausweichen;
-          // Abbrüche, veraltete Importe und Inhaltsfehler werden sofort gemeldet.
-          const retryable = error && error.remoteSourceUnavailable === true;
-          if (generation !== importGeneration || !retryable) throw error;
-          lastError = error;
+        for (let attempt = 0; attempt < attempts.length; attempt += 1) {
+          const proxyEndpoint = attempts[attempt];
+          const controller = new AbortController();
+          remoteController = controller;
+          try {
+            const audio = await fetchRemoteAudio(candidates[index], controller, proxyEndpoint);
+            return { url: candidates[index], audio, viaProxy: Boolean(proxyEndpoint), corsBlocked };
+          } catch (error) {
+            if (remoteController === controller) remoteController = null;
+            // Nur fehlende oder nicht abrufbare Quellen dürfen auf den Proxy bzw. den nächsten Kandidaten ausweichen;
+            // Abbrüche, veraltete Importe und Inhaltsfehler werden sofort gemeldet.
+            const retryable = error && error.remoteSourceUnavailable === true;
+            if (generation !== importGeneration || !retryable) throw error;
+            if (error.remoteCorsBlocked === true) corsBlocked = true;
+            lastError = error;
+          }
         }
       }
       throw lastError || new Error('Remote-Import fehlgeschlagen.');
@@ -903,7 +933,7 @@
       elements.importStatus.textContent = 'Remote-Audio wird geladen und im Browser geprüft …';
       try {
         const candidates = resolveRemoteAudioCandidates(elements.remoteInput.value);
-        const { url, audio } = await fetchFirstAvailableRemoteAudio(candidates, generation);
+        const { url, audio, viaProxy, corsBlocked } = await fetchFirstAvailableRemoteAudio(candidates, generation);
         if (generation !== importGeneration) return;
         const context = await ensureAudioContext();
         let buffer;
@@ -929,16 +959,21 @@
         updateButtons();
         drawWaveform(loadedBuffer);
         updateAnalysisSummary();
-        setRenderState('ready', 'Remote-Audio bereit – Preview und Render bleiben lokal.');
-        elements.importStatus.textContent = remoteAudioContainer(audio.type) === 'mp4'
+        setRenderState('ready', viaProxy
+          ? 'Remote-Audio über den Proxy bereit – Preview und Render bleiben lokal.'
+          : 'Remote-Audio bereit – Preview und Render bleiben lokal.');
+        const successStatus = remoteAudioContainer(audio.type) === 'mp4'
           ? REMOTE_IMPORT_STATUS_MP4
           : REMOTE_IMPORT_STATUS_DEFAULT;
+        elements.importStatus.textContent = viaProxy
+          ? (corsBlocked ? REMOTE_IMPORT_STATUS_PROXY + ' ' : 'Über den vertrauenswürdigen Same-Origin-Proxy geladen und geprüft. ') + successStatus
+          : successStatus;
       } catch (error) {
         if (generation !== importGeneration) return;
         const reason = error.name === 'AbortError'
           ? 'Remote-Import hat das Zeitlimit überschritten oder wurde abgebrochen.'
-          : error instanceof TypeError
-            ? 'Remote-Audio konnte nicht geladen werden (Netzwerk oder CORS-Freigabe).'
+          : (error && error.remoteCorsBlocked === true) || error instanceof TypeError
+            ? REMOTE_IMPORT_ERROR_CORS
             : (error instanceof Error ? error.message : 'Remote-Import fehlgeschlagen.');
         setRenderState('error', reason);
         elements.importStatus.textContent = reason;
@@ -1788,9 +1823,11 @@
     return null;
   }
 
-  function resolveMp3ServerEndpoint() {
-    const config = (window.__JACKDARCKART_CONFIG__ || globalThis.__JACKDARCKART_CONFIG__ || {}).converter;
-    const endpoint = config && config.mp3Export && config.mp3Export.serverEndpoint;
+  function readConverterConfig() {
+    return (window.__JACKDARCKART_CONFIG__ || globalThis.__JACKDARCKART_CONFIG__ || {}).converter;
+  }
+
+  function resolveSameOriginEndpoint(endpoint) {
     if (typeof endpoint !== 'string') {
       return '';
     }
@@ -1803,6 +1840,19 @@
       return resolvedUrl && resolvedUrl.origin === getWindowOrigin() ? resolvedUrl.href : '';
     }
     return normalizeSameOriginPath(trimmed);
+  }
+
+  function resolveMp3ServerEndpoint() {
+    const config = readConverterConfig();
+    return resolveSameOriginEndpoint(config && config.mp3Export && config.mp3Export.serverEndpoint);
+  }
+
+  function resolveRemoteImportProxy() {
+    const config = readConverterConfig();
+    const remoteImport = config && config.remoteImport;
+    // Nur ein echter Same-Origin-Endpunkt gilt als vertrauenswürdiger Resolver.
+    const endpoint = resolveSameOriginEndpoint(remoteImport && remoteImport.proxyEndpoint);
+    return { endpoint, preferProxy: Boolean(endpoint && remoteImport && remoteImport.preferProxy) };
   }
 
   function getWindowOrigin() {
