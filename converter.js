@@ -7,6 +7,15 @@
   const DEFAULT_COMPRESSED_BITRATE = '192000';
   const PREFERRED_MP3_BITRATE = DEFAULT_COMPRESSED_BITRATE;
   const MP3_MIME_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/mpeg;codecs=mp3'];
+  const MP3_SAMPLE_RATES = [32000, 44100, 48000];
+  const OPUS_SAMPLE_RATE = 48000;
+  const LIMITER_MAX_REDUCTION_DB = 4;
+  const LIMITER_LOOKAHEAD_SECONDS = 0.005;
+  const LIMITER_RELEASE_SECONDS = 0.08;
+  const END_FADE_SECONDS = 0.01;
+  const SERVER_MP3_TIMEOUT_MS = 120000;
+  const REALTIME_EXPORT_GRACE_MS = 15000;
+  const MP3_ENCODE_CHUNK_FRAMES = 1152 * 32;
   const BROWSER_DEPENDENT_EXPORT_FORMATS = [
     {
       id: 'webm-opus',
@@ -245,12 +254,32 @@
     return energy;
   }
 
+  const IS_LITTLE_ENDIAN = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
+
+  // Float -> 16-bit PCM with triangular (TPDF) dither. Digital silence stays
+  // exactly zero so quiet passages and tails do not gain a noise floor.
+  function createPcm16Quantizer(seed) {
+    let state = (seed >>> 0) || 0x9e3779b9;
+    function random() {
+      state ^= state << 13;
+      state ^= state >>> 17;
+      state ^= state << 5;
+      return (state >>> 0) / 4294967296;
+    }
+    return function quantize(sample) {
+      if (!sample || !Number.isFinite(sample)) {
+        return 0;
+      }
+      const rounded = Math.round(sample * 32767 + random() - random());
+      return rounded > 32767 ? 32767 : (rounded < -32768 ? -32768 : rounded);
+    };
+  }
+
   class BrowserAudioMasteringCore {
     constructor() {
       this.lowFrequency = 110;
       this.midFrequency = 2800;
       this.highFrequency = 7600;
-      this.fallbackBufferContext = null;
     }
 
     analyzeBuffer(buffer) {
@@ -711,10 +740,12 @@
       return { input, output: analyser };
     }
 
-    async render(buffer, settings, targetSampleRate) {
-      const sampleRate = Number.isFinite(targetSampleRate) ? targetSampleRate : buffer.sampleRate;
+    async render(buffer, settings, targetSampleRate, options) {
+      const onStage = options && typeof options.onStage === 'function' ? options.onStage : null;
+      const sampleRate = Number.isFinite(targetSampleRate) && targetSampleRate > 0 ? targetSampleRate : buffer.sampleRate;
+      const duration = Number.isFinite(buffer.duration) ? buffer.duration : buffer.length / buffer.sampleRate;
       const channelCount = Math.min(2, Math.max(1, buffer.numberOfChannels));
-      const frameCount = Math.max(1, Math.ceil(buffer.duration * sampleRate));
+      const frameCount = Math.max(1, Math.ceil(duration * sampleRate));
       const offlineContext = this.createOfflineContext(channelCount, frameCount, sampleRate);
       const source = offlineContext.createBufferSource();
       source.buffer = buffer;
@@ -726,90 +757,192 @@
       source.start(0);
 
       const rendered = await offlineContext.startRendering();
+      if (onStage) {
+        await onStage('finish');
+      }
       return this.finalizeRenderedBuffer(rendered, settings);
     }
 
+    // The offline chain already contains EQ, compressor, stereo width and the
+    // soft clipper, so the finish stage only adds loudness gain, a lookahead
+    // peak limiter and an anti-click fade. It works in place on the freshly
+    // rendered buffer to avoid extra full-length copies.
     finalizeRenderedBuffer(buffer, settings) {
-      const widthBuffer = this.cloneBufferWithWidth(buffer, settings.stereoWidth);
-      const beforeNormalization = this.analyzeBuffer(widthBuffer);
+      const channels = [];
+      for (let channelIndex = 0; channelIndex < buffer.numberOfChannels; channelIndex += 1) {
+        channels.push(buffer.getChannelData(channelIndex));
+      }
+      const beforeNormalization = this.measureAndSanitize(channels);
       const ceilingLinear = this.dbToLinear(settings.limiterCeiling);
       const loudnessGain = Number.isFinite(beforeNormalization.loudnessDb)
         ? this.dbToLinear(settings.targetLufs - beforeNormalization.loudnessDb)
         : 1;
+      // The limiter may shave at most LIMITER_MAX_REDUCTION_DB off the peaks;
+      // anything beyond that is handled with clean static gain instead of
+      // audible pumping.
+      const peakAllowance = ceilingLinear * this.dbToLinear(LIMITER_MAX_REDUCTION_DB);
       const peakAfterGain = beforeNormalization.peak * loudnessGain;
-      const limiterGain = peakAfterGain > ceilingLinear && peakAfterGain > 0
-        ? ceilingLinear / peakAfterGain
+      const staticTrim = peakAfterGain > peakAllowance && peakAfterGain > 0
+        ? peakAllowance / peakAfterGain
         : 1;
-      const appliedGain = loudnessGain * limiterGain;
-      const limitedBuffer = this.applyGainAndCeiling(widthBuffer, appliedGain, ceilingLinear);
-      const finalAnalysis = this.analyzeBuffer(limitedBuffer);
+      const appliedGain = loudnessGain * staticTrim;
+      const limiter = this.applyLookaheadLimiter(channels, appliedGain, ceilingLinear, buffer.sampleRate);
+      this.applyEndFade(channels, buffer.sampleRate);
+      const finalAnalysis = this.analyzeBuffer(buffer);
+      const targetLufs = Number(settings.targetLufs);
 
       return {
-        buffer: limitedBuffer,
+        buffer,
         report: {
           inputApproxLufs: beforeNormalization.loudnessDb,
           outputApproxLufs: finalAnalysis.loudnessDb,
           peakBefore: beforeNormalization.peak,
           peakAfter: finalAnalysis.peak,
-          appliedGainDb: 20 * Math.log10(appliedGain || 1)
+          appliedGainDb: 20 * Math.log10(appliedGain || 1),
+          limiterReductionDb: limiter.maxReductionDb,
+          targetLufs,
+          loudnessShortfallDb: Number.isFinite(finalAnalysis.loudnessDb) && Number.isFinite(beforeNormalization.loudnessDb)
+            ? Math.max(0, targetLufs - finalAnalysis.loudnessDb)
+            : 0,
+          sanitizedSamples: beforeNormalization.sanitized
         }
       };
     }
 
-    cloneBufferWithWidth(buffer, stereoWidthPercent) {
-      const output = this.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
-
-      for (let channelIndex = 0; channelIndex < buffer.numberOfChannels; channelIndex += 1) {
-        output.copyToChannel(buffer.getChannelData(channelIndex), channelIndex);
-      }
-
-      if (buffer.numberOfChannels < 2) {
-        return output;
-      }
-
-      const left = output.getChannelData(0);
-      const right = output.getChannelData(1);
-      const width = Math.max(0, stereoWidthPercent) / 100;
-      for (let index = 0; index < left.length; index += 1) {
-        const mid = (left[index] + right[index]) * 0.5;
-        const side = (left[index] - right[index]) * 0.5 * width;
-        left[index] = mid + side;
-        right[index] = mid - side;
-      }
-
-      return output;
-    }
-
-    applyGainAndCeiling(buffer, gainValue, ceilingLinear) {
-      const output = this.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
-
-      for (let channelIndex = 0; channelIndex < buffer.numberOfChannels; channelIndex += 1) {
-        const input = buffer.getChannelData(channelIndex);
-        const channel = new Float32Array(input.length);
-        for (let index = 0; index < input.length; index += 1) {
-          const amplified = input[index] * gainValue;
-          channel[index] = Math.max(-ceilingLinear, Math.min(ceilingLinear, amplified));
+    measureAndSanitize(channels) {
+      let peak = 0;
+      let sumSquares = 0;
+      let sampleCount = 0;
+      let sanitized = 0;
+      for (let channelIndex = 0; channelIndex < channels.length; channelIndex += 1) {
+        const channel = channels[channelIndex];
+        for (let index = 0; index < channel.length; index += 1) {
+          let sample = channel[index];
+          if (!Number.isFinite(sample)) {
+            channel[index] = 0;
+            sample = 0;
+            sanitized += 1;
+          }
+          const absolute = sample < 0 ? -sample : sample;
+          if (absolute > peak) {
+            peak = absolute;
+          }
+          sumSquares += sample * sample;
         }
-        output.copyToChannel(channel, channelIndex);
+        sampleCount += channel.length;
       }
-
-      return output;
+      const rms = sampleCount ? Math.sqrt(sumSquares / sampleCount) : 0;
+      return { peak, rms, loudnessDb: rms > 0 ? 20 * Math.log10(rms) : -Infinity, sanitized };
     }
 
-    createBuffer(numberOfChannels, length, sampleRate) {
-      const AudioBufferCtor = window.AudioBuffer || globalThis.AudioBuffer;
-      if (typeof AudioBufferCtor === 'function') {
-        return new AudioBufferCtor({
-          length,
-          numberOfChannels,
-          sampleRate
-        });
+    // Stereo-linked lookahead brickwall limiter. The gain curve is the
+    // forward-looking minimum of the required gain, smoothed by a release
+    // stage and a box filter of the lookahead length. Every value inside the
+    // box window is <= the required gain at the current frame, so the output
+    // never exceeds the ceiling while transitions stay click-free.
+    applyLookaheadLimiter(channels, gainValue, ceilingLinear, sampleRate) {
+      const length = channels.length ? channels[0].length : 0;
+      const gain = Number.isFinite(gainValue) ? gainValue : 1;
+      const ceiling = ceilingLinear > 0 ? ceilingLinear : 1;
+      if (!length) {
+        return { maxReductionDb: 0 };
+      }
+      const channelCount = channels.length;
+      const required = new Float32Array(length);
+      let needsLimiting = false;
+      for (let index = 0; index < length; index += 1) {
+        let framePeak = 0;
+        for (let channelIndex = 0; channelIndex < channelCount; channelIndex += 1) {
+          const value = channels[channelIndex][index] * gain;
+          const absolute = value < 0 ? -value : value;
+          if (absolute > framePeak) {
+            framePeak = absolute;
+          }
+        }
+        if (framePeak > ceiling) {
+          required[index] = ceiling / framePeak;
+          needsLimiting = true;
+        } else {
+          required[index] = 1;
+        }
       }
 
-      if (!this.fallbackBufferContext) {
-        this.fallbackBufferContext = this.createOfflineContext(1, 1, sampleRate);
+      if (!needsLimiting) {
+        for (let channelIndex = 0; channelIndex < channelCount; channelIndex += 1) {
+          const channel = channels[channelIndex];
+          for (let index = 0; index < length; index += 1) {
+            const value = channel[index] * gain;
+            channel[index] = value > ceiling ? ceiling : (value < -ceiling ? -ceiling : value);
+          }
+        }
+        return { maxReductionDb: 0 };
       }
-      return this.fallbackBufferContext.createBuffer(numberOfChannels, length, sampleRate);
+
+      const lookahead = Math.max(1, Math.min(length, Math.round((sampleRate || 44100) * LIMITER_LOOKAHEAD_SECONDS)));
+      // Backward pass: sliding minimum over [index, index + lookahead - 1]
+      // using a ring-buffer deque bounded by the lookahead length.
+      const dequeSize = lookahead + 1;
+      const dequeIndex = new Int32Array(dequeSize);
+      const dequeValue = new Float32Array(dequeSize);
+      let head = 0;
+      let count = 0;
+      for (let index = length - 1; index >= 0; index -= 1) {
+        const value = required[index];
+        while (count > 0 && dequeValue[(head + count - 1) % dequeSize] >= value) {
+          count -= 1;
+        }
+        const slot = (head + count) % dequeSize;
+        dequeIndex[slot] = index;
+        dequeValue[slot] = value;
+        count += 1;
+        while (dequeIndex[head] > index + lookahead - 1) {
+          head = (head + 1) % dequeSize;
+          count -= 1;
+        }
+        required[index] = dequeValue[head];
+      }
+
+      // Forward pass: release smoothing, box filter and gain application.
+      const releaseCoefficient = Math.exp(-1 / ((sampleRate || 44100) * LIMITER_RELEASE_SECONDS));
+      const history = new Float64Array(lookahead);
+      let released = required[0];
+      history.fill(released);
+      let windowSum = released * lookahead;
+      let minimumGain = 1;
+      for (let index = 0; index < length; index += 1) {
+        const held = required[index];
+        released = held < released ? held : held + (released - held) * releaseCoefficient;
+        const slot = index % lookahead;
+        windowSum += released - history[slot];
+        history[slot] = released;
+        const smoothed = Math.min(1, windowSum / lookahead);
+        if (smoothed < minimumGain) {
+          minimumGain = smoothed;
+        }
+        const frameGain = gain * smoothed;
+        for (let channelIndex = 0; channelIndex < channelCount; channelIndex += 1) {
+          const channel = channels[channelIndex];
+          const value = channel[index] * frameGain;
+          channel[index] = value > ceiling ? ceiling : (value < -ceiling ? -ceiling : value);
+        }
+      }
+      return { maxReductionDb: minimumGain < 1 ? -20 * Math.log10(Math.max(minimumGain, 1e-6)) : 0 };
+    }
+
+    applyEndFade(channels, sampleRate) {
+      const length = channels.length ? channels[0].length : 0;
+      const fadeFrames = Math.round((sampleRate || 44100) * END_FADE_SECONDS);
+      if (!fadeFrames || length < fadeFrames * 4) {
+        return;
+      }
+      const start = length - fadeFrames;
+      for (let channelIndex = 0; channelIndex < channels.length; channelIndex += 1) {
+        const channel = channels[channelIndex];
+        for (let offset = 0; offset < fadeFrames; offset += 1) {
+          const progress = (fadeFrames - offset - 1) / fadeFrames;
+          channel[start + offset] *= progress * progress;
+        }
+      }
     }
 
     createOfflineContext(numberOfChannels, length, sampleRate) {
@@ -882,14 +1015,17 @@
       return Math.pow(10, value / 20);
     }
 
+    // 16-bit PCM WAV with TPDF dither. Samples are written straight into an
+    // Int16Array view (no intermediate interleaved Float32 copy).
     encodeWav(buffer) {
+      const channelCount = Math.max(1, buffer.numberOfChannels || 1);
       const channels = [];
-      for (let channelIndex = 0; channelIndex < buffer.numberOfChannels; channelIndex += 1) {
+      for (let channelIndex = 0; channelIndex < channelCount; channelIndex += 1) {
         channels.push(buffer.getChannelData(channelIndex));
       }
-
-      const interleaved = this.interleaveChannels(channels);
-      const dataLength = interleaved.length * 2;
+      const frameCount = channels.reduce((min, channel) => Math.min(min, channel.length), channels[0].length);
+      const sampleRate = Math.round(buffer.sampleRate);
+      const dataLength = frameCount * channelCount * 2;
       const arrayBuffer = new ArrayBuffer(44 + dataLength);
       const view = new DataView(arrayBuffer);
       this.writeAscii(view, 0, 'RIFF');
@@ -898,42 +1034,35 @@
       this.writeAscii(view, 12, 'fmt ');
       view.setUint32(16, 16, true);
       view.setUint16(20, 1, true);
-      view.setUint16(22, buffer.numberOfChannels, true);
-      view.setUint32(24, buffer.sampleRate, true);
-      view.setUint32(28, buffer.sampleRate * buffer.numberOfChannels * 2, true);
-      view.setUint16(32, buffer.numberOfChannels * 2, true);
+      view.setUint16(22, channelCount, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * channelCount * 2, true);
+      view.setUint16(32, channelCount * 2, true);
       view.setUint16(34, 16, true);
       this.writeAscii(view, 36, 'data');
       view.setUint32(40, dataLength, true);
 
-      let offset = 44;
-      for (let index = 0; index < interleaved.length; index += 1) {
-        const sample = Math.max(-1, Math.min(1, interleaved[index]));
-        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
-        offset += 2;
+      const quantize = createPcm16Quantizer();
+      if (IS_LITTLE_ENDIAN) {
+        const pcm = new Int16Array(arrayBuffer, 44, frameCount * channelCount);
+        let writeIndex = 0;
+        for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
+          for (let channelIndex = 0; channelIndex < channelCount; channelIndex += 1) {
+            pcm[writeIndex] = quantize(channels[channelIndex][frameIndex]);
+            writeIndex += 1;
+          }
+        }
+      } else {
+        let offset = 44;
+        for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
+          for (let channelIndex = 0; channelIndex < channelCount; channelIndex += 1) {
+            view.setInt16(offset, quantize(channels[channelIndex][frameIndex]), true);
+            offset += 2;
+          }
+        }
       }
 
       return new Blob([arrayBuffer], { type: 'audio/wav' });
-    }
-
-    interleaveChannels(channels) {
-      if (!channels.length) {
-        return new Float32Array(0);
-      }
-      if (channels.length === 1) {
-        return channels[0];
-      }
-
-      const frameCount = channels[0].length;
-      const interleaved = new Float32Array(frameCount * channels.length);
-      let writeIndex = 0;
-      for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
-        for (let channelIndex = 0; channelIndex < channels.length; channelIndex += 1) {
-          interleaved[writeIndex] = channels[channelIndex][frameIndex] || 0;
-          writeIndex += 1;
-        }
-      }
-      return interleaved;
     }
 
     writeAscii(view, offset, text) {
@@ -1004,6 +1133,7 @@
       renderState: document.getElementById('converter-render-state'),
       renderStateText: document.getElementById('converter-render-state-text'),
       renderStatus: document.getElementById('converter-render-status'),
+      renderProgress: document.getElementById('converter-render-progress'),
       cleanupTimer: document.getElementById('converter-cleanup-timer'),
       cleanupState: document.getElementById('converter-cleanup-state'),
       analysisSummary: document.getElementById('converter-analysis-summary'),
@@ -1064,6 +1194,8 @@
     let cleanupTimeout = 0;
     let cleanupInterval = 0;
     let renderedAsset = null;
+    let renderInProgress = false;
+    let lastFormatId = '';
     let isPreviewStopping = false;
     let importGeneration = 0;
     let cloudHandle = '';
@@ -1197,10 +1329,13 @@
       if (!selected || !elements.formatNote) {
         return;
       }
-      elements.bitrateSelect.disabled = selected.id === 'wav';
-      if (selected.id !== 'wav') {
+      elements.bitrateSelect.disabled = selected.id === 'wav' || renderInProgress;
+      // Only a real format change resets the bitrate; capability refreshes
+      // (focus/pageshow) must keep the user's chosen bitrate.
+      if (selected.id !== 'wav' && selected.id !== lastFormatId) {
         elements.bitrateSelect.value = getDefaultBitrateForFormat(selected);
       }
+      lastFormatId = selected.id;
       elements.formatNote.textContent = getFormatNoteText(selected, getMp3Support());
     }
 
@@ -1326,8 +1461,11 @@
       elements.autoEnhance.disabled = !hasBuffer;
       elements.previewToggle.disabled = !hasBuffer;
       elements.previewStop.disabled = !hasBuffer;
-      elements.renderButton.disabled = !hasBuffer;
+      elements.renderButton.disabled = !hasBuffer || renderInProgress;
       elements.downloadButton.disabled = !renderedAsset;
+      elements.downloadButton.textContent = renderedAsset
+        ? 'Master herunterladen (' + describeFormatName(renderedAsset.format) + ' · ' + formatBytes(renderedAsset.blob && renderedAsset.blob.size) + ')'
+        : 'Master herunterladen';
       elements.clearRender.disabled = !renderedAsset;
       if (elements.autoEnhanceUndo) {
         elements.autoEnhanceUndo.disabled = !enhanceSnapshot || enhanceState !== 'applied';
@@ -1760,52 +1898,157 @@
     }
 
     async function renderMaster() {
-      if (!loadedBuffer) {
+      if (!loadedBuffer || renderInProgress) {
         return;
       }
       syncExportFormatOptions();
       const exportFormat = getSelectedFormat();
-      const mp3Support = exportFormat.id === 'mp3' ? getMp3Support() : null;
+      const sourceBuffer = loadedBuffer;
+      const sourceFile = loadedFile;
+      const generation = importGeneration;
+      const settings = readSettings();
+      const requestedRate = elements.samplerateSelect.value === 'source'
+        ? sourceBuffer.sampleRate
+        : Number(elements.samplerateSelect.value);
+      const sampleRateValue = resolveExportSampleRate(exportFormat, requestedRate || sourceBuffer.sampleRate);
+      const bitrate = exportFormat.id === 'wav'
+        ? 0
+        : (Number(elements.bitrateSelect.value) || Number(getDefaultBitrateForFormat(exportFormat)) || 192000);
+      const isCurrent = () => generation === importGeneration && sourceBuffer === loadedBuffer;
+      const startedAt = Date.now();
+      const steps = 3;
+
+      renderInProgress = true;
+      setRenderBusy(true);
       setRenderState('loading', 'Master wird lokal gerendert …');
-      elements.renderStatus.textContent = exportFormat.id === 'mp3' && mp3Support && mp3Support.clientEncoder && !mp3Support.nativeMimeType
-        ? 'Offline-Render läuft lokal im Browser. MP3 wird direkt mit dem integrierten lokalen Encoder erzeugt.'
-        : (exportFormat.id === 'mp3' && mp3Support && mp3Support.serverEndpoint && !mp3Support.nativeMimeType && !mp3Support.clientEncoder
-          ? 'Offline-Render läuft lokal im Browser. Die fertige WAV-Datei wird danach an den konfigurierten Same-Origin-Konverter für MP3 übergeben.'
-          : 'Offline-Render läuft lokal im Browser. Keine Daten verlassen dieses Gerät.');
-      elements.renderButton.disabled = true;
+      reportRenderStep(1, steps, 'Mastering-Kette wird offline gerendert (EQ, Kompressor, Stereo, Limiter) …', null);
       try {
-        const sampleRateValue = elements.samplerateSelect.value === 'source'
-          ? loadedBuffer.sampleRate
-          : Number(elements.samplerateSelect.value);
-        const rendered = await core.render(loadedBuffer, readSettings(), sampleRateValue);
-        const bitrate = Number(elements.bitrateSelect.value) || Number(getDefaultBitrateForFormat(exportFormat)) || 192000;
+        const rendered = await core.render(sourceBuffer, settings, sampleRateValue, {
+          onStage: async () => {
+            reportRenderStep(2, steps, 'Mastering-Finish: Lautheit auf ' + formatLoudness(settings.targetLufs)
+              + ' angleichen, Spitzen mit Lookahead-Limiter auf ' + Number(settings.limiterCeiling).toFixed(1) + ' dBFS begrenzen …', null);
+            await yieldToEventLoop();
+          }
+        });
+        if (!isCurrent()) {
+          return;
+        }
+        reportRenderStep(3, steps, describeEncodeStep(exportFormat), exportFormat.id === 'wav' ? null : 0);
+        await yieldToEventLoop();
         const masteredBuffer = rendered.buffer;
+        const onProgress = (fraction) => {
+          if (isCurrent()) {
+            reportRenderStep(3, steps, describeEncodeStep(exportFormat), fraction);
+          }
+        };
         const blob = exportFormat.id === 'wav'
           ? core.encodeWav(masteredBuffer)
           : exportFormat.id === 'mp3'
-            ? await renderMp3Export(masteredBuffer, bitrate)
-          : await recordCompressedExport(masteredBuffer, exportFormat, bitrate);
+            ? await renderMp3Export(masteredBuffer, bitrate, { onProgress })
+            : await recordCompressedExport(masteredBuffer, exportFormat, bitrate, { onProgress });
+        if (!isCurrent()) {
+          return;
+        }
+        if (!blob || !blob.size) {
+          throw new Error('Der Export lieferte eine leere Datei. Bitte erneut rendern oder ein anderes Zielformat wählen.');
+        }
 
-        storeRenderedAsset({
+        const asset = {
           blob,
-          filename: buildRenderedFilename(loadedFile, exportFormat),
+          filename: buildRenderedFilename(sourceFile, exportFormat),
           report: rendered.report,
           format: exportFormat,
-          sampleRate: rendered.buffer.sampleRate
-        });
+          bitrate,
+          sampleRate: masteredBuffer.sampleRate,
+          channels: masteredBuffer.numberOfChannels,
+          duration: getBufferDurationSeconds(masteredBuffer),
+          renderMs: Date.now() - startedAt
+        };
+        storeRenderedAsset(asset);
         setRenderState('playing', 'Master-Datei bereit – Cleanup-Timer aktiv.');
-        elements.renderStatus.textContent = 'Render erfolgreich. Die temporäre Master-Datei wird maximal 2:00 lokal im Speicher gehalten.';
+        elements.renderStatus.textContent = buildRenderSuccessText(asset, requestedRate);
       } catch (error) {
+        if (!isCurrent()) {
+          return;
+        }
         setRenderState('error', 'Render fehlgeschlagen.');
-        elements.renderStatus.textContent = error && error.message
-          ? error.message
-          : 'Der lokale Render ist fehlgeschlagen. Bitte Einstellungen reduzieren oder anderes Zielformat testen.';
+        elements.renderStatus.textContent = describeRenderError(error);
       } finally {
-        elements.renderButton.disabled = !loadedBuffer;
+        renderInProgress = false;
+        setRenderBusy(false);
       }
     }
 
-    async function recordCompressedExport(masteredBuffer, format, bitrate) {
+    function describeEncodeStep(format) {
+      if (format.id === 'wav') {
+        return 'WAV wird als 16-Bit-PCM mit Dither geschrieben …';
+      }
+      if (format.id === 'mp3') {
+        const mp3Support = getMp3Support();
+        if (mp3Support.nativeMimeType) {
+          return 'MP3 wird mit dem nativen Browser-Encoder in Echtzeit aufgezeichnet …';
+        }
+        if (mp3Support.clientEncoder) {
+          return 'MP3 wird mit dem integrierten lokalen Encoder erzeugt …';
+        }
+        return 'Die fertige WAV-Datei wird an den konfigurierten Same-Origin-Konverter für MP3 übergeben …';
+      }
+      return (format.label || 'Komprimiertes Format').replace(/\s*·.*$/, '')
+        + ' wird mit dem Browser-Encoder in Echtzeit aufgezeichnet – das dauert so lange wie der Song …';
+    }
+
+    function reportRenderStep(step, total, text, fraction) {
+      const hasFraction = Number.isFinite(fraction);
+      const percent = hasFraction ? Math.round(Math.max(0, Math.min(1, fraction)) * 100) : null;
+      elements.renderStatus.textContent = 'Schritt ' + step + '/' + total + ': ' + text
+        + (percent !== null ? ' ' + percent + ' %' : '')
+        + ' Alles läuft lokal im Browser.';
+      if (elements.renderProgress) {
+        elements.renderProgress.hidden = false;
+        const overall = ((step - 1) + (hasFraction ? Math.max(0, Math.min(1, fraction)) : 0.5)) / total;
+        elements.renderProgress.value = Math.round(overall * 100);
+        elements.renderProgress.setAttribute('aria-valuetext', 'Schritt ' + step + ' von ' + total
+          + (percent !== null ? ', ' + percent + ' %' : ''));
+      }
+    }
+
+    function setRenderBusy(busy) {
+      elements.renderButton.disabled = busy || !loadedBuffer;
+      elements.renderButton.textContent = busy ? 'Rendert …' : 'Master rendern';
+      if (elements.formatSelect) {
+        elements.formatSelect.disabled = busy;
+      }
+      if (elements.samplerateSelect) {
+        elements.samplerateSelect.disabled = busy;
+      }
+      if (elements.bitrateSelect) {
+        const selected = getSelectedFormat();
+        elements.bitrateSelect.disabled = busy || !selected || selected.id === 'wav';
+      }
+      if (elements.renderProgress && !busy) {
+        elements.renderProgress.hidden = true;
+        elements.renderProgress.value = 0;
+      }
+    }
+
+    function buildRenderSuccessText(asset, requestedRate) {
+      const parts = ['Render erfolgreich in ' + formatSeconds(asset.renderMs / 1000) + ': ' + describeAssetSpecs(asset) + '.'];
+      const report = asset.report || {};
+      if (Number(report.loudnessShortfallDb) > 0.5) {
+        parts.push('Ziel-Lautheit um ' + Number(report.loudnessShortfallDb).toFixed(1)
+          + ' dB unterschritten, damit der Limiter nicht hörbar pumpt – für mehr Lautheit Ceiling anheben oder Kompressor stärker einstellen.');
+      } else if (Number(report.limiterReductionDb) > 0.1) {
+        parts.push('Limiter hat Spitzen um max. ' + Number(report.limiterReductionDb).toFixed(1) + ' dB sauber abgefangen.');
+      }
+      if (Number.isFinite(requestedRate) && requestedRate > 0 && Math.round(requestedRate) !== asset.sampleRate) {
+        parts.push('Samplerate für ' + describeFormatName(asset.format) + ' auf ' + (asset.sampleRate / 1000).toFixed(1) + ' kHz angepasst.');
+      }
+      parts.push('Die temporäre Master-Datei wird maximal 2:00 lokal im Speicher gehalten.');
+      return parts.join(' ');
+    }
+
+    async function recordCompressedExport(masteredBuffer, format, bitrate, options) {
+      const onProgress = options && typeof options.onProgress === 'function' ? options.onProgress : null;
       if (typeof MediaRecorder !== 'function') {
         throw new Error('Für dieses Zielformat steht kein Browser-Encoder zur Verfügung.');
       }
@@ -1822,47 +2065,119 @@
       const destination = exportContext.createMediaStreamDestination();
       source.connect(destination);
       const chunks = [];
+      const durationSeconds = getBufferDurationSeconds(masteredBuffer);
       const recorder = new MediaRecorder(destination.stream, {
         mimeType: format.mimeType,
         audioBitsPerSecond: bitrate
       });
 
       return new Promise((resolve, reject) => {
+        let settled = false;
+        let watchdogId = 0;
+        let progressId = 0;
+        let startedAt = 0;
+        const stopTimers = () => {
+          if (watchdogId) {
+            window.clearTimeout(watchdogId);
+            watchdogId = 0;
+          }
+          if (progressId) {
+            window.clearInterval(progressId);
+            progressId = 0;
+          }
+        };
+        const fail = async (message) => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          stopTimers();
+          if (recorder.state && recorder.state !== 'inactive') {
+            try {
+              recorder.stop();
+            } catch (error) {
+              // The recorder is already shutting down.
+            }
+          }
+          await closeAudioContextQuietly(exportContext);
+          reject(new Error(message));
+        };
+
         recorder.addEventListener('dataavailable', (event) => {
           if (event.data && event.data.size) {
             chunks.push(event.data);
           }
         });
-        recorder.addEventListener('error', async () => {
-          await closeAudioContextQuietly(exportContext);
-          reject(new Error('Browser-Encoder hat den lokalen Export abgebrochen.'));
+        recorder.addEventListener('error', () => {
+          fail('Browser-Encoder hat den lokalen Export abgebrochen.');
         });
         recorder.addEventListener('stop', async () => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          stopTimers();
           try {
             await exportContext.close();
           } catch (error) {
             reject(new Error('Browser-Encoder konnte den lokalen Export-Kontext nicht sauber schließen.'));
             return;
           }
-          resolve(new Blob(chunks, { type: format.mimeType }));
+          const blob = new Blob(chunks, { type: format.mimeType });
+          if (!blob.size) {
+            reject(new Error('Browser-Encoder lieferte eine leere Datei. Bitte erneut rendern oder WAV exportieren.'));
+            return;
+          }
+          if (onProgress) {
+            onProgress(1);
+          }
+          resolve(blob);
         }, { once: true });
 
         source.addEventListener('ended', () => {
           if (recorder.state !== 'inactive') {
+            if (typeof recorder.requestData === 'function') {
+              try {
+                recorder.requestData();
+              } catch (error) {
+                // stop() flushes the remaining data as well.
+              }
+            }
             recorder.stop();
           }
         }, { once: true });
 
         exportContext.resume().then(() => {
+          if (settled) {
+            return;
+          }
           try {
-            recorder.start();
+            recorder.start(1000);
+            startedAt = Number(exportContext.currentTime) || 0;
             source.start(0);
           } catch (error) {
-            closeAudioContextQuietly(exportContext).then(() => {
-              reject(new Error('Browser konnte den lokalen Encoder nicht starten.'));
-            });
+            fail('Browser konnte den lokalen Encoder nicht starten.');
+            return;
+          }
+          if (settled || !(durationSeconds > 0)) {
+            return;
+          }
+          // Realtime encoders can stall when the tab is throttled; never
+          // leave the UI waiting forever.
+          watchdogId = window.setTimeout(() => {
+            fail('Der Browser-Encoder hat nicht rechtzeitig fertig aufgezeichnet. Tab im Vordergrund lassen und erneut rendern oder WAV exportieren.');
+          }, Math.round(durationSeconds * 1500) + REALTIME_EXPORT_GRACE_MS);
+          if (onProgress) {
+            progressId = window.setInterval(() => {
+              const elapsed = (Number(exportContext.currentTime) || 0) - startedAt;
+              onProgress(Math.max(0, Math.min(0.99, elapsed / durationSeconds)));
+            }, 500);
           }
         }).catch(async () => {
+          if (settled) {
+            return;
+          }
+          settled = true;
           try {
             await exportContext.close();
           } catch (error) {
@@ -1874,14 +2189,14 @@
       });
     }
 
-    async function renderMp3Export(masteredBuffer, bitrate) {
+    async function renderMp3Export(masteredBuffer, bitrate, options) {
       const mp3Support = getMp3Support();
       if (mp3Support.nativeMimeType) {
-        return recordCompressedExport(masteredBuffer, buildMp3Format(mp3Support), bitrate);
+        return recordCompressedExport(masteredBuffer, buildMp3Format(mp3Support), bitrate, options);
       }
 
       if (mp3Support.clientEncoder) {
-        return encodeMp3Locally(masteredBuffer, bitrate, mp3Support.clientEncoder);
+        return encodeMp3Locally(masteredBuffer, bitrate, mp3Support.clientEncoder, options);
       }
 
       if (mp3Support.serverEndpoint) {
@@ -2009,6 +2324,9 @@
       }
       if (renderReport && asset) {
         output.push('<p><strong>Master:</strong> approx. ' + formatLoudness(renderReport.outputApproxLufs) + ' · Peak ' + formatPeak(renderReport.peakAfter) + ' · ' + escapeHtml(asset.filename) + ' · ' + (asset.sampleRate / 1000).toFixed(1) + ' kHz</p>');
+        output.push('<p><strong>Export:</strong> ' + escapeHtml(describeAssetSpecs(asset))
+          + (Number(renderReport.limiterReductionDb) > 0.1 ? ' · Limiter max. −' + Number(renderReport.limiterReductionDb).toFixed(1) + ' dB' : '')
+          + '</p>');
       } else {
         output.push('<p><strong>Master:</strong> Noch kein Render vorhanden. Preview und Regler arbeiten weiterhin lokal auf derselben Quelle.</p>');
       }
@@ -2349,11 +2667,11 @@
       _buildRenderedFilenameForTest(file, format) {
         return buildRenderedFilename(file, format);
       },
-      _recordCompressedExportForTest(buffer, format, bitrate) {
-        return recordCompressedExport(buffer, format, bitrate);
+      _recordCompressedExportForTest(buffer, format, bitrate, options) {
+        return recordCompressedExport(buffer, format, bitrate, options);
       },
-      _renderMp3ExportForTest(buffer, bitrate) {
-        return renderMp3Export(buffer, bitrate);
+      _renderMp3ExportForTest(buffer, bitrate, options) {
+        return renderMp3Export(buffer, bitrate, options);
       },
       _refreshExportFormatsForTest() {
         syncExportFormatOptions();
@@ -2401,6 +2719,42 @@
       unitIndex += 1;
     }
     return value.toFixed(value >= 10 || unitIndex === 0 ? 0 : 1) + ' ' + units[unitIndex];
+  }
+
+  function formatSeconds(seconds) {
+    if (!Number.isFinite(seconds) || seconds < 0) {
+      return '–';
+    }
+    return seconds < 10 ? seconds.toFixed(1).replace('.', ',') + ' s' : formatDuration(seconds) + ' min';
+  }
+
+  function describeFormatName(format) {
+    if (format && format.label) {
+      return String(format.label).replace(/\s*·.*$/, '');
+    }
+    return String((format && format.extension) || 'wav').toUpperCase();
+  }
+
+  function describeAssetSpecs(asset) {
+    const parts = [describeFormatName(asset.format)];
+    if (asset.format && asset.format.id === 'wav') {
+      parts.push('16 Bit PCM');
+    } else if (Number(asset.bitrate) > 0) {
+      parts.push(Math.round(Number(asset.bitrate) / 1000) + ' kbps');
+    }
+    if (Number(asset.sampleRate) > 0) {
+      parts.push((Number(asset.sampleRate) / 1000).toFixed(1) + ' kHz');
+    }
+    if (Number(asset.channels) > 0) {
+      parts.push(Number(asset.channels) === 1 ? 'Mono' : 'Stereo');
+    }
+    if (Number.isFinite(asset.duration) && asset.duration > 0) {
+      parts.push(formatDuration(asset.duration));
+    }
+    if (asset.blob && asset.blob.size) {
+      parts.push(formatBytes(asset.blob.size));
+    }
+    return parts.join(' · ');
   }
 
   function describeFormat(file) {
@@ -2627,7 +2981,7 @@
     return '/' + normalized.join('/') + suffix;
   }
 
-  async function encodeMp3Locally(masteredBuffer, bitrate, encoder) {
+  async function encodeMp3Locally(masteredBuffer, bitrate, encoder, options) {
     if (!encoder || !encoder.id) {
       throw new Error('Lokaler MP3-Encoder ist nicht verfügbar.');
     }
@@ -2642,7 +2996,7 @@
     }
 
     if (encoder.id === 'lamejs') {
-      return encodeMp3WithLameJs(masteredBuffer, bitrate, encoder.library);
+      return encodeMp3WithLameJs(masteredBuffer, bitrate, encoder.library, options);
     }
 
     throw new Error('Lokaler MP3-Encoder wird nicht unterstützt.');
@@ -2658,64 +3012,151 @@
     if (!fetchImplementation) {
       throw new Error('Serverseitiger MP3-Export erfordert fetch-Unterstützung im Browser.');
     }
-    const response = await fetchImplementation(endpoint, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Accept': 'audio/mpeg',
-        'Content-Type': 'audio/wav',
-        'X-Converter-Target-Format': 'mp3',
-        'X-Converter-Bitrate': String(bitrate),
-        'X-Converter-Sample-Rate': String(masteredBuffer.sampleRate),
-        'X-Converter-Channels': String(masteredBuffer.numberOfChannels)
-      },
-      body: wavBlob instanceof Blob ? wavBlob : new BrowserAudioMasteringCore().encodeWav(masteredBuffer)
-    });
+    const AbortCtor = window.AbortController || globalThis.AbortController;
+    const controller = typeof AbortCtor === 'function' ? new AbortCtor() : null;
+    const durationSeconds = getBufferDurationSeconds(masteredBuffer);
+    const timeoutMs = Math.max(SERVER_MP3_TIMEOUT_MS, durationSeconds * 1000);
+    let timedOut = false;
+    const timeoutId = controller
+      ? window.setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+      }, timeoutMs)
+      : 0;
+    let response;
+    try {
+      response = await fetchImplementation(endpoint, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'audio/wav',
+          'X-Converter-Target-Format': 'mp3',
+          'X-Converter-Bitrate': String(bitrate),
+          'X-Converter-Sample-Rate': String(masteredBuffer.sampleRate),
+          'X-Converter-Channels': String(masteredBuffer.numberOfChannels)
+        },
+        body: wavBlob instanceof Blob ? wavBlob : new BrowserAudioMasteringCore().encodeWav(masteredBuffer),
+        signal: controller ? controller.signal : undefined
+      });
+    } catch (error) {
+      throw new Error(timedOut
+        ? 'Der Same-Origin-Konverter hat nicht rechtzeitig geantwortet. Bitte erneut versuchen oder WAV exportieren.'
+        : 'Der Same-Origin-Konverter ist nicht erreichbar. Bitte Verbindung prüfen oder WAV exportieren.');
+    } finally {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    }
     if (!response || !response.ok || typeof response.blob !== 'function') {
-      throw new Error('Same-Origin-Konverter konnte keine MP3-Datei erzeugen.');
+      throw new Error('Same-Origin-Konverter konnte keine MP3-Datei erzeugen'
+        + (response && response.status ? ' (HTTP ' + response.status + ')' : '') + '.');
     }
     return normalizeMp3Blob(await response.blob());
   }
 
-  async function encodeMp3WithLameJs(buffer, bitrate, lamejs) {
+  async function encodeMp3WithLameJs(buffer, bitrate, lamejs, options) {
+    const onProgress = options && typeof options.onProgress === 'function' ? options.onProgress : null;
     const sampleRate = Math.max(8000, Math.round(buffer.sampleRate) || 44100);
     const channelCount = Math.min(2, Math.max(1, buffer.numberOfChannels || 1));
     const bitrateKbps = normalizeMp3BitrateKbps(bitrate);
     const encoder = new lamejs.Mp3Encoder(channelCount, sampleRate, bitrateKbps);
-    const frameSize = 1152;
+    const quantize = createPcm16Quantizer();
+    const leftSource = buffer.getChannelData(0);
+    const rightSource = channelCount > 1 ? buffer.getChannelData(1) : null;
+    const totalFrames = Math.max(0, Math.min(buffer.length, leftSource.length, rightSource ? rightSource.length : Infinity));
+    const chunkFrames = MP3_ENCODE_CHUNK_FRAMES;
+    const left = new Int16Array(chunkFrames);
+    const right = rightSource ? new Int16Array(chunkFrames) : null;
     const chunks = [];
-    for (let offset = 0; offset < buffer.length; offset += frameSize) {
-      const frames = Math.min(frameSize, buffer.length - offset);
-      const left = convertAudioBufferChannelToInt16(buffer, 0, offset, frames);
-      const right = channelCount > 1
-        ? convertAudioBufferChannelToInt16(buffer, 1, offset, frames)
-        : null;
-      const encoded = channelCount > 1
-        ? encoder.encodeBuffer(left, right)
-        : encoder.encodeBuffer(left);
+    for (let offset = 0; offset < totalFrames; offset += chunkFrames) {
+      const frames = Math.min(chunkFrames, totalFrames - offset);
+      for (let index = 0; index < frames; index += 1) {
+        left[index] = quantize(leftSource[offset + index]);
+        if (right) {
+          right[index] = quantize(rightSource[offset + index]);
+        }
+      }
+      const leftChunk = frames === chunkFrames ? left : left.subarray(0, frames);
+      const encoded = right
+        ? encoder.encodeBuffer(leftChunk, frames === chunkFrames ? right : right.subarray(0, frames))
+        : encoder.encodeBuffer(leftChunk);
       if (encoded && encoded.length) {
         chunks.push(new Uint8Array(encoded));
+      }
+      if (offset + frames < totalFrames) {
+        if (onProgress) {
+          onProgress((offset + frames) / totalFrames);
+        }
+        await yieldToEventLoop();
       }
     }
     const flushed = encoder.flush();
     if (flushed && flushed.length) {
       chunks.push(new Uint8Array(flushed));
     }
+    if (onProgress) {
+      onProgress(1);
+    }
     return new Blob(chunks, { type: 'audio/mpeg' });
   }
 
-  function convertAudioBufferChannelToInt16(buffer, channelIndex, offset, frameCount) {
-    const source = buffer.getChannelData(Math.min(channelIndex, buffer.numberOfChannels - 1));
-    const pcm = new Int16Array(frameCount);
-    for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
-      pcm[frameIndex] = floatToInt16Sample(source ? source[offset + frameIndex] || 0 : 0);
+  // Lets the browser paint progress between encoder chunks without the
+  // 4 ms clamp of nested setTimeout calls.
+  function yieldToEventLoop() {
+    const ChannelCtor = window.MessageChannel || globalThis.MessageChannel;
+    if (typeof ChannelCtor !== 'function') {
+      return Promise.resolve();
     }
-    return pcm;
+    return new Promise((resolve) => {
+      const channel = new ChannelCtor();
+      channel.port1.onmessage = () => {
+        channel.port1.close();
+        resolve();
+      };
+      channel.port2.postMessage(0);
+    });
   }
 
-  function floatToInt16Sample(sample) {
-    const clamped = Math.max(-1, Math.min(1, Number(sample) || 0));
-    return clamped < 0 ? Math.round(clamped * 0x8000) : Math.round(clamped * 0x7FFF);
+  function getBufferDurationSeconds(buffer) {
+    if (!buffer) {
+      return 0;
+    }
+    if (Number.isFinite(buffer.duration) && buffer.duration > 0) {
+      return buffer.duration;
+    }
+    return Number.isFinite(buffer.length) && buffer.sampleRate > 0 ? buffer.length / buffer.sampleRate : 0;
+  }
+
+  // MP3 only knows a few sample rates and Opus always runs at 48 kHz, so
+  // the render already targets the encoder rate instead of resampling twice.
+  function resolveExportSampleRate(format, requestedRate) {
+    const rate = Math.round(Number(requestedRate)) || 44100;
+    if (format && format.id === 'mp3') {
+      if (MP3_SAMPLE_RATES.includes(rate)) {
+        return rate;
+      }
+      return MP3_SAMPLE_RATES.find((candidate) => candidate >= rate) || MP3_SAMPLE_RATES[MP3_SAMPLE_RATES.length - 1];
+    }
+    if (format && /opus/.test(String(format.id || format.mimeType || ''))) {
+      return OPUS_SAMPLE_RATE;
+    }
+    return rate;
+  }
+
+  function describeRenderError(error) {
+    const name = error && error.name;
+    const message = error && typeof error.message === 'string' ? error.message : '';
+    if (name === 'RangeError' || /memory|allocation/i.test(message)) {
+      return 'Nicht genug Arbeitsspeicher für diesen Render. Bitte eine niedrigere Samplerate (z. B. 44.1 kHz) wählen oder eine kürzere Datei verwenden.';
+    }
+    if (name === 'NotSupportedError') {
+      return 'Die gewählte Samplerate oder Kanalzahl wird von diesem Browser nicht unterstützt. Bitte 44.1 kHz oder 48 kHz wählen.';
+    }
+    if (message) {
+      return message;
+    }
+    return 'Der lokale Render ist fehlgeschlagen. Bitte Einstellungen reduzieren oder anderes Zielformat testen.';
   }
 
   function normalizeMp3BitrateKbps(bitrate) {
@@ -2727,11 +3168,14 @@
   }
 
   async function normalizeMp3Blob(blob) {
-    if (blob instanceof Blob && blob.type === 'audio/mpeg') {
-      return blob;
-    }
     if (!(blob instanceof Blob)) {
       throw new Error('MP3-Encoder lieferte keine Blob-Antwort zurück.');
+    }
+    if (!blob.size) {
+      throw new Error('MP3-Encoder lieferte eine leere Datei. Bitte erneut rendern oder WAV exportieren.');
+    }
+    if (blob.type === 'audio/mpeg') {
+      return blob;
     }
     const arrayBuffer = typeof blob.arrayBuffer === 'function'
       ? await blob.arrayBuffer()
