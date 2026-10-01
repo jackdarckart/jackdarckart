@@ -289,7 +289,9 @@ function createQuantumVaultHandler(options) {
     }
     attempt.count += 1;
     if (attempt.count > authRateLimit) {
-      throw new VaultError('Too many authentication attempts. Try again later.', 429, 'RATE_LIMITED');
+      const error = new VaultError('Too many authentication attempts. Try again later.', 429, 'RATE_LIMITED');
+      error.retryAfter = Math.max(1, Math.ceil((attempt.startedAt + authRateWindowMs - current) / 1000));
+      throw error;
     }
   }
 
@@ -587,8 +589,8 @@ function createQuantumVaultHandler(options) {
       const message = known ? error.message : 'Quantum Vault request failed.';
       const code = known ? error.code : 'INTERNAL_ERROR';
       if (status >= 500) console.error(`[quantum-vault] ${code}: ${error && error.message}`);
-      send(response, status, { code, error: message }, code === 'RATE_LIMITED'
-        ? { 'Retry-After': String(Math.ceil(authRateWindowMs / 1000)) }
+      send(response, status, { code, error: message }, known && error.retryAfter
+        ? { 'Retry-After': String(error.retryAfter) }
         : undefined);
       return true;
     }

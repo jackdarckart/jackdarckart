@@ -110,7 +110,6 @@
     const input = field && form.elements.namedItem(field);
     if (!input) return;
     input.setAttribute('aria-invalid', 'true');
-    if (field === 'password') input.value = '';
     input.focus();
   }
 
@@ -194,6 +193,7 @@
     } catch (error) {
       if (generation !== authGeneration) return;
       if (isOffline(error)) setOfflineConnection(error);
+      else if (error.status >= 500) setConnection('offline', 'Vault-Fehler – später erneut versuchen', error.message);
       else setConnection('', 'Vault online – bitte anmelden');
       setMessage(elements.authMessage, error.message, true);
       markField(form, FIELD_FOR_CODE[error.code]);
