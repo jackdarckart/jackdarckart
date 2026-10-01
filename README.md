@@ -77,7 +77,7 @@ Bitte vor dem Erstellen eines neuen Issues zuerst vorhandene offene Themen durch
 - `index.html` – kompakte Startseite mit Live-Status, Schnellzugriffen und Übersicht
 - `live.html` – vollständige Live-Hören-Seite mit großem Player, Lautstärke, Retry, Sleep-Timer und Tastaturkürzeln
 - `titel.html` – aktueller Titel, Historie, lokale Favoriten, Bibliotheksfilter und schnelle Kopieraktionen
-- `converter.html` – lokales Browser-Studio für Audio-Import, Waveform/Spectrum, Auto-Enhance, Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
+- `converter.html` – lokales Browser-Studio für Audio-Import (lokale Dateien und zero-trust HTTPS-Remote-Import inkl. Suno-Share-Links), Waveform/Spectrum, Auto-Enhance, Mastering-Regler sowie WAV- und gebündelten MP3-Export mit 2-Minuten-Cleanup
 - `sendeplan.html` – aktueller und kommender Sendeplan mit Jetzt-live-/Als-Nächstes-Logik plus Zeitraumfilter für kommende Einträge
 - `events.html` – bestätigte Events und Specials oder professioneller Leerzustand
 - `news.html` – Sender-/Website-Neuigkeiten oder redaktioneller Leerzustand
@@ -164,6 +164,19 @@ window.__JACKDARCKART_CONFIG__ = {
 - `/api/lautfm/station/jackdarckart/last_songs`
 - `/api/lautfm/station/jackdarckart/schedule`
 - …
+
+### Remote-Import im Converter Studio
+
+Der Remote-Import lädt Audio ausschließlich clientseitig in den Arbeitsspeicher. Es gibt weder Upload noch serverseitige Speicherung. Geschützt wird der Abruf durch:
+
+- **HTTPS-Zwang**: `http:`, `data:`, `blob:` und `javascript:` werden abgelehnt, ebenso Ports abseits von 443 und URLs mit eingebetteten Zugangsdaten.
+- **SSRF-Schutz**: localhost, Loopback, RFC1918-Bereiche, Link-Local, CGNAT, IPv6-Literale sowie interne Suffixe wie `.local` oder `.internal` sind blockiert; Redirects auf solche Ziele brechen den Import ab.
+- **MIME-Guard**: akzeptiert werden nur echte Audio-Content-Types wie `audio/mpeg` oder `audio/wav`.
+- **Magic-Byte-Prüfung**: der Anfang des Datenstroms muss zu einem bekannten Audio-Container passen (ID3/MPEG, RIFF/WAVE, Ogg, FLAC, MP4/M4A, AIFF, WebM).
+- **Quota-Guard**: harte Obergrenze von 80 MB pro Remote-Datei.
+- **Defensives Decoding**: `AudioContext`-Fehler werden abgefangen und als verständliche Meldung angezeigt.
+
+Suno-Share-Links der Form `https://suno.com/song/<id>` werden clientseitig auf die öffentliche CDN-Medien-URL aufgelöst. Der Abruf erfordert, dass die Quelle CORS erlaubt.
 
 ### Statische Inhaltsbereiche
 
