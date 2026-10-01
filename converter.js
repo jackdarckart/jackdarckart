@@ -30,7 +30,7 @@
   const SUNO_CDN_HOST_PATTERN = /^cdn\d*\.suno\.ai$/;
   const SUNO_CDN_MEDIA_PATTERN = /\.(mp3|mp4|m4a)$/i;
   const SUNO_SONG_ID_PATTERN = /^\/song\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i;
-  const REMOTE_AUDIO_MIME_TYPES = {
+  const REMOTE_AUDIO_MIME_TYPES = Object.assign(Object.create(null), {
     'audio/mpeg': 'mp3', 'audio/mp3': 'mp3',
     'audio/wav': 'wav', 'audio/wave': 'wav', 'audio/x-wav': 'wav',
     'audio/ogg': 'ogg', 'application/ogg': 'ogg',
@@ -39,7 +39,7 @@
     'video/mp4': 'mp4', 'application/mp4': 'mp4',
     'audio/webm': 'webm',
     'audio/aiff': 'aiff', 'audio/x-aiff': 'aiff'
-  };
+  });
   const spectrumFftSize = 2048;
   let currentStudio = null;
 
@@ -98,13 +98,16 @@
     return '';
   }
 
+  function normalizeMimeType(contentType) {
+    return (contentType || '').split(';')[0].trim().toLowerCase();
+  }
+
   function remoteAudioContainer(contentType) {
-    const mime = (contentType || '').split(';')[0].trim().toLowerCase();
-    return REMOTE_AUDIO_MIME_TYPES[mime] || '';
+    return REMOTE_AUDIO_MIME_TYPES[normalizeMimeType(contentType)] || '';
   }
 
   function remoteAudioFormat(contentType, bytes) {
-    const mime = (contentType || '').split(';')[0].trim().toLowerCase();
+    const mime = normalizeMimeType(contentType);
     const container = remoteAudioContainer(mime);
     if (!container || (bytes && sniffRemoteAudio(bytes) !== container)) {
       throw new Error('Die Antwort ist kein unterstütztes Audioformat (MIME/Dateisignatur).');
@@ -121,7 +124,9 @@
         redirect: 'error', cache: 'no-store', signal: controller.signal
       });
       if (!response.ok || response.type === 'opaque' || response.url !== url.href) {
-        throw new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
+        const unreachable = new Error('Audioquelle nicht erreichbar oder Weiterleitung nicht erlaubt.');
+        unreachable.remoteSourceUnavailable = true;
+        throw unreachable;
       }
       const contentType = response.headers.get('Content-Type');
       // Fail closed before allocating a buffer, even if the server omits Content-Length.
@@ -870,8 +875,10 @@
         try {
           return { url: candidates[index], audio: await fetchRemoteAudio(candidates[index], controller) };
         } catch (error) {
-          // Ein abgebrochener oder veralteter Import darf nicht still auf die nächste Quelle ausweichen.
-          if (generation !== importGeneration || error.name === 'AbortError') throw error;
+          // Nur fehlende oder nicht abrufbare Quellen dürfen auf den nächsten Kandidaten ausweichen;
+          // Abbrüche, veraltete Importe und Inhaltsfehler werden sofort gemeldet.
+          const retryable = error.name === 'TypeError' || error.remoteSourceUnavailable === true;
+          if (generation !== importGeneration || !retryable) throw error;
           lastError = error;
         }
       }
