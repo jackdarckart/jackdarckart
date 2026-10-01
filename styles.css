@@ -774,6 +774,7 @@ input[type="range"] {
 }
 
 input[type="text"],
+input[type="password"],
 input[type="url"],
 input[type="search"],
 input[type="number"],
@@ -788,6 +789,7 @@ textarea {
 }
 
 html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="password"],
 html[data-theme="light"] input[type="url"],
 html[data-theme="light"] input[type="search"],
 html[data-theme="light"] input[type="number"],
@@ -2615,4 +2617,24 @@ html[data-theme="light"] .converter-analysis-summary {
     align-items: flex-start;
     gap: 0.25rem;
   }
+}
+
+.converter-cloud-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.converter-cloud-form .actions {
+  grid-column: 1 / -1;
+}
+
+.converter-cloud-form[hidden],
+.converter-cloud-panel [hidden] {
+  display: none;
+}
+
+.converter-cloud-status.error {
+  border-color: rgba(255, 107, 125, 0.45);
 }

@@ -709,8 +709,15 @@ function createConverterEnvironment(options = {}) {
     'converter-analysis-summary',
     'converter-waveform',
     'converter-spectrum',
-    'converter-vault-button',
-    'converter-vault-status',
+    'converter-cloud-auth-form',
+    'converter-cloud-handle',
+    'converter-cloud-password',
+    'converter-cloud-register',
+    'converter-cloud-logout',
+    'converter-cloud-account',
+    'converter-cloud-save',
+    'converter-cloud-load',
+    'converter-cloud-status',
     'converter-eq-low',
     'converter-eq-mid',
     'converter-eq-high',
@@ -761,6 +768,8 @@ function createConverterEnvironment(options = {}) {
     AudioContext: options.AudioContext,
     webkitAudioContext: undefined,
     MediaRecorder: options.MediaRecorder,
+    fetch: options.fetch,
+    __JACKDARCKART_CONFIG__: options.config,
     setTimeout(callback, delay) {
       const id = timerId++;
       timers.set(id, { callback, delay, repeat: false });
@@ -2107,8 +2116,15 @@ function testConverterPageExposesStudioHooksAndLoader() {
     'converter-cleanup-timer',
     'converter-waveform',
     'converter-spectrum',
-    'converter-vault-button',
-    'converter-vault-status',
+    'converter-cloud-auth-form',
+    'converter-cloud-handle',
+    'converter-cloud-password',
+    'converter-cloud-register',
+    'converter-cloud-logout',
+    'converter-cloud-account',
+    'converter-cloud-save',
+    'converter-cloud-load',
+    'converter-cloud-status',
     'converter-auto-enhance-undo',
     'converter-auto-enhance-toggle',
     'converter-auto-enhance-strength',
@@ -2166,10 +2182,22 @@ function testConverterPageExposesStudioHooksAndLoader() {
     /<option value="mp3">/i,
     'converter page should not hardcode MP3 export options in static HTML because native support is detected at runtime'
   );
+  for (const outdated of [/Phase[ -]?27\.3/i, /Vault-Sync/i, /Placeholder/, /\bStub\b/i, /E2EE/i, /converter-vault-/]) {
+    assert.doesNotMatch(
+      converterHtmlCode,
+      outdated,
+      `converter page should no longer contain the outdated vault placeholder wording ${outdated}`
+    );
+    assert.doesNotMatch(
+      converterJsCode,
+      outdated,
+      `converter studio script should no longer contain the outdated vault placeholder wording ${outdated}`
+    );
+  }
   assert.match(
     converterHtmlCode,
-    /Phase 27\.3/i,
-    'converter page should clearly label the vault integration as a Phase 27.3 dependency'
+    /Cloud-Sync für Studio-Presets[\s\S]*Cloudflare[\s\S]*Audiodateien und fertigen Renders bleiben immer lokal/,
+    'converter page should describe the Cloudflare preset sync honestly and state that audio never leaves the browser'
   );
   assert.match(
     converterHtmlCode,
@@ -2208,8 +2236,8 @@ function testConverterPageExposesStudioHooksAndLoader() {
   );
   assert.match(
     converterJsCode,
-    /class VaultSyncAdapterStub/,
-    'converter studio should keep the vault sync integration as an explicit stub instead of faking storage'
+    /class CloudflareStudioSyncAdapter[\s\S]*credentials: 'include'/,
+    'converter studio should sync presets through the Cloudflare Worker with the HttpOnly session cookie'
   );
   assert.match(
     appCode,
@@ -3839,6 +3867,137 @@ async function testConverterAutomaticQualityWorkflow() {
   studio.destroy();
 }
 
+function createCloudflareWorkerFetchDouble() {
+  const calls = [];
+  let signedIn = false;
+  let storedPreset = null;
+  function respond(status, payload) {
+    return {
+      ok: status >= 200 && status < 300,
+      status,
+      headers: { get: (name) => (/content-type/i.test(name) ? 'application/json; charset=utf-8' : null) },
+      async json() { return payload; }
+    };
+  }
+  async function fetchDouble(url, options = {}) {
+    const body = options.body ? JSON.parse(options.body) : undefined;
+    calls.push({ url, method: options.method, credentials: options.credentials, body });
+    const route = url.replace('https://vault.stream-musik.space/api/quantum-vault', '');
+    if (route === '/session') {
+      return signedIn ? respond(200, { handle: 'Pilot_One' }) : respond(401, { code: 'SESSION_REQUIRED' });
+    }
+    if (route === '/login') {
+      if (body.password !== 'correct-horse-vault') {
+        return respond(401, { code: 'INVALID_CREDENTIALS' });
+      }
+      signedIn = true;
+      return respond(200, { handle: 'Pilot_One' });
+    }
+    if (route === '/logout') {
+      signedIn = false;
+      return respond(200, { ok: true });
+    }
+    if (route === '/studio-preset' && options.method === 'POST') {
+      storedPreset = body.preset;
+      return respond(200, { handle: 'Pilot_One', preset: storedPreset });
+    }
+    if (route === '/studio-preset') {
+      return signedIn ? respond(200, { handle: 'Pilot_One', preset: storedPreset }) : respond(401, { code: 'SESSION_REQUIRED' });
+    }
+    return respond(404, { code: 'NOT_FOUND' });
+  }
+  return { fetchDouble, calls };
+}
+
+async function flushStudioTasks() {
+  for (let index = 0; index < 5; index += 1) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+}
+
+async function testConverterCloudSyncWithoutConfigurationIsHonest() {
+  let fetchCalls = 0;
+  const env = createConverterEnvironment({ fetch: async () => { fetchCalls += 1; throw new Error('unexpected'); } });
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  await flushStudioTasks();
+
+  assert.equal(fetchCalls, 0, 'studio must not contact any backend when Cloud-Sync is not configured');
+  assert.match(env.elements['converter-cloud-status'].textContent, /noch nicht eingerichtet[\s\S]*lokal/,
+    'unconfigured Cloud-Sync should explain that settings stay local');
+  assert.equal(env.elements['converter-cloud-account'].textContent, 'nicht eingerichtet');
+  assert.equal(env.elements['converter-cloud-auth-form'].hidden, true, 'login form should be hidden without a configured backend');
+  assert.equal(env.elements['converter-cloud-save'].disabled, true);
+  assert.equal(env.elements['converter-cloud-load'].disabled, true);
+
+  await env.elements['converter-cloud-save'].dispatch('click');
+  assert.equal(fetchCalls, 0, 'saving must not pretend to persist anything without a backend');
+
+  const insecure = createConverterEnvironment({
+    fetch: async () => { fetchCalls += 1; throw new Error('unexpected'); },
+    config: { converter: { cloudSync: { apiBase: 'http://vault.example/api/quantum-vault' } } }
+  });
+  vm.runInContext(converterJsCode, insecure.context, { filename: 'converter.js' });
+  insecure.window.__JACKDARCKART_CONVERTER__._createStudioForTest().init();
+  await flushStudioTasks();
+  assert.equal(fetchCalls, 0, 'non-HTTPS cross-origin Cloud-Sync endpoints must be rejected');
+  studio.destroy();
+}
+
+async function testConverterCloudSyncUsesCloudflareWorker() {
+  const worker = createCloudflareWorkerFetchDouble();
+  const env = createConverterEnvironment({
+    fetch: worker.fetchDouble,
+    config: { converter: { cloudSync: { apiBase: 'https://vault.stream-musik.space/api/quantum-vault/' } } }
+  });
+  vm.runInContext(converterJsCode, env.context, { filename: 'converter.js' });
+  const studio = env.window.__JACKDARCKART_CONVERTER__._createStudioForTest();
+  studio.init();
+  await flushStudioTasks();
+
+  assert.equal(worker.calls[0].url, 'https://vault.stream-musik.space/api/quantum-vault/session');
+  assert.equal(env.elements['converter-cloud-account'].textContent, 'nicht angemeldet');
+  assert.equal(env.elements['converter-cloud-auth-form'].hidden, false);
+  assert.equal(env.elements['converter-cloud-save'].disabled, true, 'saving requires a Cloudflare session');
+
+  env.elements['converter-cloud-handle'].value = 'Pilot_One';
+  env.elements['converter-cloud-password'].value = 'wrong-password-123';
+  await env.elements['converter-cloud-auth-form'].dispatch('submit');
+  assert.match(env.elements['converter-cloud-status'].textContent, /Handle oder Passwort ist falsch/);
+
+  env.elements['converter-cloud-password'].value = 'correct-horse-vault';
+  await env.elements['converter-cloud-auth-form'].dispatch('submit');
+  assert.equal(env.elements['converter-cloud-account'].textContent, 'angemeldet als Pilot_One');
+  assert.equal(env.elements['converter-cloud-password'].value, '', 'password field should be cleared after login');
+  assert.equal(env.elements['converter-cloud-save'].disabled, false);
+  assert.equal(env.elements['converter-cloud-logout'].hidden, false);
+
+  env.elements['converter-eq-low'].value = '3';
+  env.elements['converter-auto-enhance-strength'].value = 'strong';
+  await env.elements['converter-cloud-save'].dispatch('click');
+  const saveCall = worker.calls.find((call) => call.method === 'POST' && call.url.endsWith('/studio-preset'));
+  assert.ok(saveCall, 'saving should POST the preset to the Cloudflare Worker');
+  assert.equal(saveCall.credentials, 'include', 'Cloudflare requests must include the HttpOnly session cookie');
+  assert.deepEqual(Object.keys(saveCall.body.preset).sort(), ['enhance', 'settings']);
+  assert.equal(saveCall.body.preset.settings.eqLow, 3);
+  assert.equal(saveCall.body.preset.enhance.strength, 'strong');
+  assert.ok(!JSON.stringify(saveCall.body).includes('artifactCleaner'), 'only slider values and enhance preferences are synced');
+  assert.match(env.elements['converter-cloud-status'].textContent, /Audiodateien wurden nicht hochgeladen/);
+
+  env.elements['converter-eq-low'].value = '0';
+  env.elements['converter-auto-enhance-strength'].value = 'gentle';
+  await env.elements['converter-cloud-load'].dispatch('click');
+  assert.equal(env.elements['converter-eq-low'].value, '3', 'loading should apply the stored slider values');
+  assert.equal(env.elements['converter-auto-enhance-strength'].value, 'strong', 'loading should apply the stored enhance strength');
+  assert.match(env.elements['converter-cloud-status'].textContent, /Cloud-Preset geladen/);
+
+  await env.elements['converter-cloud-logout'].dispatch('click');
+  assert.equal(env.elements['converter-cloud-account'].textContent, 'nicht angemeldet');
+  assert.equal(env.elements['converter-cloud-save'].disabled, true);
+  studio.destroy();
+}
+
 async function main() {
   testStickyPlayerCssKeepsPlayerWithinViewport();
   testLivePageExposesEnhancedModulesAndHooks();
@@ -3856,6 +4015,8 @@ async function main() {
   await testConverterFormatRefreshClearsUnavailableSelection();
   await testConverterMp3CompressedExportPath();
   testConverterDownloadClearsTemporaryAsset();
+  await testConverterCloudSyncWithoutConfigurationIsHonest();
+  await testConverterCloudSyncUsesCloudflareWorker();
   await testConverterLocalFileWorkflowAndAbsenceOfRemoteControls();
   await testRemoteAudioProxyValidatesAndFetchesAudio();
   await testRemoteAudioProxyHandlerResponses();

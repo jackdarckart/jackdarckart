@@ -12,6 +12,7 @@ function createDatabase() {
   const users = [];
   const vaultState = new Map();
   const leaderboard = new Map();
+  const studioPresets = new Map();
 
   function execute(sql, args) {
     if (sql.startsWith('SELECT id FROM users WHERE handle_key')) {
@@ -55,11 +56,20 @@ function createDatabase() {
         .slice(0, args[0]);
       return { results: rows };
     }
+    if (sql.startsWith('SELECT preset_json, updated_at FROM studio_presets')) {
+      const stored = studioPresets.get(args[0]);
+      return { first: stored ? { preset_json: stored.json, updated_at: stored.updatedAt } : null };
+    }
+    if (sql.startsWith('INSERT INTO studio_presets') && sql.includes('ON CONFLICT(user_id) DO UPDATE')) {
+      studioPresets.set(args[0], { json: args[1], updatedAt: args[2] });
+      return { first: null };
+    }
     throw new Error(`unsupported SQL in test double: ${sql}`);
   }
 
   return {
     users,
+    studioPresets,
     prepare(sql) {
       return {
         bind(...args) {
@@ -265,12 +275,69 @@ async function main() {
   assert.equal(badSaveKind.response.status, 400);
   assert.equal(badSaveKind.payload.code, 'INVALID_SAVE_KIND');
 
+  const anonymousPreset = await call(worker, env, '/studio-preset');
+  assert.equal(anonymousPreset.response.status, 401);
+  assert.equal(anonymousPreset.payload.code, 'SESSION_REQUIRED');
+
+  const emptyPreset = await call(worker, env, '/studio-preset', { cookie });
+  assert.equal(emptyPreset.response.status, 200);
+  assert.equal(emptyPreset.payload.preset, null, 'accounts start without a stored studio preset');
+
+  const invalidPreset = await call(worker, env, '/studio-preset', {
+    method: 'POST',
+    cookie,
+    json: { preset: { settings: { eqLow: 'loud' } } }
+  });
+  assert.equal(invalidPreset.response.status, 400);
+  assert.equal(invalidPreset.payload.code, 'STUDIO_PRESET_INVALID');
+
+  const crossOriginPreset = await call(worker, env, '/studio-preset', {
+    method: 'POST',
+    cookie,
+    headers: { Origin: 'https://attacker.example' },
+    json: { preset: { settings: {} } }
+  });
+  assert.equal(crossOriginPreset.response.status, 403);
+  assert.equal(crossOriginPreset.payload.code, 'CROSS_ORIGIN');
+
+  const savedPreset = await call(worker, env, '/studio-preset', {
+    method: 'POST',
+    cookie,
+    json: {
+      preset: {
+        settings: {
+          eqLow: 1.3, eqMid: -40, eqHigh: 2, compThreshold: -20, compRatio: 3.24,
+          limiterCeiling: -1, stereoWidth: 400, targetLufs: -12, audio: 'data:audio/wav;base64,AAAA'
+        },
+        enhance: { auto: false, strength: 'strong' },
+        userId: 'another-account'
+      }
+    }
+  });
+  assert.equal(savedPreset.response.status, 200);
+  assert.deepEqual(savedPreset.payload.preset, {
+    settings: {
+      eqLow: 1.5, eqMid: -12, eqHigh: 2, compThreshold: -20, compRatio: 3.2,
+      limiterCeiling: -1, stereoWidth: 200, targetLufs: -12
+    },
+    enhance: { auto: false, strength: 'strong' }
+  }, 'studio presets must be clamped, snapped and stripped of unknown fields');
+  assert.ok(!JSON.stringify(Array.from(env.DB.studioPresets.values())).includes('audio'),
+    'studio presets must never persist audio payloads');
+
+  const loadedPreset = await call(worker, env, '/studio-preset', { cookie });
+  assert.equal(loadedPreset.response.status, 200);
+  assert.deepEqual(loadedPreset.payload.preset, savedPreset.payload.preset);
+  assert.equal(typeof loadedPreset.payload.updatedAt, 'string');
+
   const second = await call(worker, env, '/register', {
     method: 'POST',
     json: { handle: 'SecondPilot', password: 'second-correct-password' }
   });
   assert.equal(second.response.status, 201);
   assert.equal(second.payload.state.vibeScore, 0, 'vault state must be account-bound');
+  const secondPreset = await call(worker, env, '/studio-preset', { cookie: cookieFrom(second.response) });
+  assert.equal(secondPreset.payload.preset, null, 'studio presets must be account-bound');
 
   const leaderboard = await call(worker, env, '/leaderboard');
   assert.equal(leaderboard.response.status, 200);
